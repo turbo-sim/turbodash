@@ -10,7 +10,7 @@ server = app.server
 
 def main():
     app.run(debug=False)
-    
+
 # === default values ===
 default_params = dict(
     nu_lower=0.0,
@@ -59,8 +59,55 @@ def linked_input(label_children, id_prefix, min_val, max_val, step, default):
     )
 
 
-# === app layout ===
-app.layout = html.Div(
+
+
+
+# # === app layout ===
+# app.layout = html.Div(
+#     style={"font-family": "Arial", "display": "flex", "max-width": "1400px", "margin": "auto"},
+#     children=[
+#         # === left control panel ===
+#         html.Div(
+#             style={"width": "38%", "padding": "20px"},
+#             children=[
+#                 html.H3("Stage parameters"),
+#                 linked_input(["Blade velocity ratio, ν", html.Sub("min")], "nu_lower", 0.0, 10.0, 0.01, default_params["nu_lower"]),
+#                 linked_input(["Blade velocity ratio, ν", html.Sub("max")], "nu_upper", 0.0, 10.0, 0.01, default_params["nu_upper"]),
+#                 linked_input(["Stator inlet angle, α", html.Sub("1"), " [deg]"], "alpha1", -60.0, 60.0, 1.0, default_params["alpha1"]),
+#                 linked_input(["Stator exit angle, α", html.Sub("2"), " [deg]"], "alpha2", 0.0, 90.0, 1.0, default_params["alpha2"]),
+#                 linked_input(["Radius ratio, r", html.Sub("2"), "/", "r", html.Sub("3")], "radius", 0.0, 1.0, 0.01, default_params["radius"]),
+#                 linked_input(["Loss coefficient, ξ", html.Sub("stator")], "xi_stator", 0.0, 0.5, 0.01, default_params["xi_stator"]),
+#                 linked_input(["Loss coefficient, ξ", html.Sub("rotor")], "xi_rotor", 0.0, 0.5, 0.01, default_params["xi_rotor"]),
+#                 html.Label(["Degree of reaction, ", html.I("R")], style={"font-weight": "bold"}),
+
+#                 dcc.Input(
+#                     id="R_values_input",
+#                     type="text",
+#                     value=", ".join([f"{R:.2f}" for R in R_list_default]),
+#                     style={"width": "100%", "margin-top": "5px"},
+#                     debounce=True,
+#                 ),
+#             ],
+#         ),
+
+#         # === right plot ===
+#         html.Div(
+#             style={"width": "62%", "padding": "20px"},
+#             children=[
+#                 html.H2("Turbine stage performance analysis"),
+#                 html.Div(
+#                     children=[
+#                         dcc.Graph(id="efficiency_ts_plot", style={"height": "340px", "margin-bottom": "20px"}),
+#                         dcc.Graph(id="efficiency_tt_plot", style={"height": "340px"}),
+#                     ]
+#                 ),
+#             ],
+#         ),
+#     ],
+# )
+
+# === define calculator layout (your existing code) ===
+calculator_layout = html.Div(
     style={"font-family": "Arial", "display": "flex", "max-width": "1400px", "margin": "auto"},
     children=[
         # === left control panel ===
@@ -102,6 +149,60 @@ app.layout = html.Div(
         ),
     ],
 )
+
+# === load your theory markdown (static doc) ===
+import os
+
+# Go one level up from the turbodash/ folder to root/, then into docs/
+theory_path = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)),  # root folder
+    "docs",
+    "documentation.md"
+)
+
+if os.path.exists(theory_path):
+    with open(theory_path, "r", encoding="utf-8") as f:
+        theory_md = f.read()
+else:
+    theory_md = "Theory file not found."
+
+
+docs_markdown = dcc.Markdown(
+    theory_md,
+    mathjax=True,
+    style={
+        "whiteSpace": "pre-wrap",
+        "padding": "40px",
+        "fontFamily": "Segoe UI, Roboto, Helvetica, Arial, sans-serif",
+        "fontSize": "16px",
+        "lineHeight": "1.6",
+        "color": "#24292e",
+        "backgroundColor": "#ffffff",
+    },
+),
+
+app.layout = html.Div([
+    dcc.Tabs(
+        id="tabs",
+        value="calculator",
+        children=[
+            dcc.Tab(label="Calculator", value="calculator", children=[calculator_layout]),
+            dcc.Tab(label="Documentation", value="docs", children=[
+                html.Div(
+                    docs_markdown,
+                    style={"max-width": "1000px", "margin": "auto"},
+                )
+            ]),
+        ],
+        colors={
+            "border": "#007acc",
+            "primary": "#007acc",
+            "background": "#f9f9f9",
+        },
+        style={"fontFamily": "Arial", "fontSize": "16px","font-weight": "bold"},
+    )
+])
+
 
 
 # === sync sliders and inputs (with range enforcement) ===

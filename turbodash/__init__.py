@@ -15,7 +15,7 @@ from .graphics import *
 
 
 # Package info
-__version__ = "0.2.4"
+__version__ = "0.2.5"
 PACKAGE_NAME = "turbodash"
 URL_GITHUB = "https://github.com/turbo-sim/turbodash"
 # URL_DOCS = "https://turbo-sim.github.io/turbodash/"

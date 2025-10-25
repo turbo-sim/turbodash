@@ -14,6 +14,7 @@ turbodash = "turbodash.app:main"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"
+gunicorn = "^22.0.0"
 dash = "^3.2.0"
 plotly = "^5.23.0"
 numpy = "^2.3.0"

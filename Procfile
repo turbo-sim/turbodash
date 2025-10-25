@@ -1,1 +1,1 @@
-web: poetry run python app.py
+web: gunicorn turbodash.app:server

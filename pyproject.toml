@@ -9,6 +9,9 @@ repository = "https://github.com/turbo-sim/turbodash"
 documentation = "https://github.com/turbo-sim/turbodash"
 packages = [{ include = "turbodash" }]
 
+[tool.poetry.scripts]
+turbodash = "turbodash.app:main"
+
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"
 dash = "^3.2.0"

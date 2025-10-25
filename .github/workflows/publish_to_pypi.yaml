@@ -10,56 +10,56 @@ on:
 
 jobs:
 
-  # test_ubuntu:
-  #   runs-on: ubuntu-latest
+  test_ubuntu:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #   - name: Checkout code
-  #     uses: actions/checkout@v2
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-  #   - name: Set up Python
-  #     uses: actions/setup-python@v2
-  #     with:
-  #       python-version: '3.12'
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.12'
 
-  #   - name: Install Poetry
-  #     uses: abatilo/actions-poetry@v3
-  #     with:
-  #       poetry-version: "1.8.2"
+    - name: Install Poetry
+      uses: abatilo/actions-poetry@v3
+      with:
+        poetry-version: "1.8.2"
     
-  #   - name: Install dependencies
-  #     run: poetry install
+    - name: Install dependencies
+      run: poetry install
 
-  #   - name: Run tests
-  #     run: poetry run pytest
+    - name: Run tests
+      run: poetry run pytest
 
 
-  # test_windows:
-  #   runs-on: windows-latest
+  test_windows:
+    runs-on: windows-latest
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v2
-  #       with:
-  #         python-version: '3.12'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
 
-  #     - name: Install Poetry
-  #       uses: abatilo/actions-poetry@v3
-  #       with:
-  #         poetry-version: "1.8.2"
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: "1.8.2"
 
-  #     - name: Install dependencies
-  #       run: poetry install
+      - name: Install dependencies
+        run: poetry install
         
-  #     - name: Run tests
-  #       run: poetry run pytest
+      - name: Run tests
+        run: poetry run pytest
 
   publish_to_pypi:
 
-    # needs: [test_ubuntu, test_windows]
+    needs: [test_ubuntu, test_windows]
     runs-on: ubuntu-latest
     
     steps:

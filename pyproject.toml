@@ -7,6 +7,7 @@ license = "MIT"
 readme = "README.md"
 repository = "https://github.com/turbo-sim/turbodash"
 documentation = "https://github.com/turbo-sim/turbodash"
+packages = [{ include = "turbodash" }]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"

@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import plotly.graph_objects as go
-import dash_bootstrap_components as dbc
 from dash import Dash, dcc, html, Input, Output, ctx
 from plotly.colors import sample_colorscale
 from turbodash import compute_performance_stage
@@ -42,6 +41,7 @@ def linked_input(label_children, id_prefix, min_val, max_val, step, default):
                             value=default,
                             marks=None,
                             tooltip={"placement": "bottom", "always_visible": False},
+                                updatemode="drag",  # 👈 update continuously while dragging
                         ),
                         style={"flex-grow": "1"},
                     ),

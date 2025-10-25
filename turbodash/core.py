@@ -72,18 +72,17 @@ def compute_performance_stage(
     tan_alpha3 = tan_beta3 + 1 / phi
     alpha3 = np.arctan(tan_alpha3)
 
-    # ψ = φ (ρ tanα₂ - tanα₃)
-    psi = phi * (rho * tan_alpha2 - tan_alpha3)
-    # ψ = (1/(2ν²)) [1 - ν² φ² (1 + tan²α₃)]
-    # psi = 0.5 / (nu**2) * (1 - (nu**2) * phi**2 * (1 + tan_alpha3**2))
     # Both expressions for the work coefficient give the same result
+    # ψ = φ (ρ tanα₂ - tanα₃)
+    # ψ = (1/(2ν²)) [1 - ν² φ² (1 + tan²α₃)]
+    psi = phi * (rho * tan_alpha2 - tan_alpha3) + 1e-12
+    # psi = 0.5 / (nu**2) * (1 - (nu**2) * phi**2 * (1 + tan_alpha3**2))
 
-    # Compute decoupled losses
+    # Compute losses and efficiency in a decoupled way
     d_eta_ke = nu ** 2 * phi **2 * (1 + tan_alpha3 ** 2)
     loss_stator = (1 + tan_alpha2**2) * loss_coeff_stator
     loss_rotor = (1 + tan_beta3**2) * loss_coeff_rotor
     eta_tt = psi / (psi + 0.5 * phi**2 * (loss_stator + loss_rotor))
-
     eta_ts = (1 / eta_tt + 0.5 * phi**2 / psi * (1 + tan_alpha3**2))**-1
 
     return {

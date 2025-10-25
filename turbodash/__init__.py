@@ -10,9 +10,6 @@ else:
     sys.excepthook = IPython.core.ultratb.FormattedTB(call_pdb=False)
 
 
-print("hellllooo!!")
-
-
 from .core import *
 from .graphics import *
 

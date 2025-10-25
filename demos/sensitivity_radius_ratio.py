@@ -1,11 +1,10 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import barotropy as bpy
+import turbodash as td
 
-from functions_stage import compute_performance_stage
 
-bpy.set_plot_options()
+td.set_plot_options()
 
 FIG_DIR = "figures"
 os.makedirs(FIG_DIR, exist_ok=True)
@@ -33,7 +32,7 @@ for j, alpha2_deg in enumerate(alpha2_vals):
     for i, R in enumerate(R_vals):
         ax = axes[i, j]
         for rho, color in zip(rho_vals, colors):
-            eta_vals = compute_performance_stage(alpha1_deg, alpha2_deg, R, nu_vals, rho)["eta_ts"]
+            eta_vals = td.compute_performance_stage(alpha1_deg, alpha2_deg, R, nu_vals, rho)["eta_ts"]
             ax.plot(nu_vals, eta_vals, color=color, lw=1.2, label=fr"$r_2/r_3={rho:.2f}$")
             # ax.plot(nu_vals*rho, eta_vals, color=color, lw=1.2, label=fr"$r_2/r_3={rho:.2f}$")
         ax.grid(True)
@@ -54,5 +53,5 @@ axes[0, 0].set_xlim(0, 2)
 axes[0, 0].set_ylim(0, 1.1)
 axes[-1, -1].legend(loc="lower right", ncol=2, fontsize=8)
 plt.tight_layout(pad=1)
-bpy.savefig_in_formats(fig, os.path.join(FIG_DIR, "sensitivity_radius_ratio"))
+td.savefig_in_formats(fig, os.path.join(FIG_DIR, "sensitivity_radius_ratio"))
 plt.show()

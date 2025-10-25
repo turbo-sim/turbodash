@@ -1,11 +1,9 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import barotropy as bpy
+import turbodash as td
 
-from functions_stage import compute_performance_stage
-
-bpy.set_plot_options()
+td.set_plot_options()
 
 FIG_DIR = "figures"
 os.makedirs(FIG_DIR, exist_ok=True)
@@ -20,7 +18,7 @@ R = 0.50
 fig= plt.figure(figsize=(6, 4))
 colors = plt.cm.magma(np.linspace(0.2, 0.8, len(alpha2_values)))
 for alpha2_deg, color in zip(alpha2_values, colors):
-    eta_vals = compute_performance_stage(alpha1_deg, alpha2_deg, R, nu_vals)["eta_ts"]
+    eta_vals = td.compute_performance_stage(alpha1_deg, alpha2_deg, R, nu_vals)["eta_ts"]
     plt.plot(nu_vals, eta_vals, color=color, lw=1.5, label=fr"$\alpha_2={alpha2_deg:.0f}^\circ$")
 
 # === formatting ===
@@ -31,7 +29,7 @@ plt.legend(loc="lower right", ncol=2)
 plt.xlim(0, nu_vals[-1])
 plt.ylim(0, 1.1)
 plt.tight_layout(pad=1)
-bpy.savefig_in_formats(fig, os.path.join(FIG_DIR, "sensitivity_flow_angle"))
+td.savefig_in_formats(fig, os.path.join(FIG_DIR, "sensitivity_flow_angle"))
 plt.show()
 
 

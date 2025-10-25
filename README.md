@@ -8,11 +8,11 @@
 
 ## Key features
 - Visualization of total-to-static and total-to-total efficiencies.  
-- Supports both axial flow, radial inflow, and radial outflow turbine stages.
+- Supports axial flow, radial inflow, and radial outflow turbine stages.
 - Adjustable stator/rotor geometry, reaction degree, loss coefficients, and blade velocity ratio. 
 - Lightweight, dependency-minimal design based on Plotly Dash.
-- Automatic synchronization between sliders and numeric inputs for precise parameter control.  
-- Documentation describing the derivation of governing equations and special analytical cases.  
+- Automatic synchronization between sliders and numeric inputs.  
+- Documentation describing the derivation of governing equations and special cases.  
 
 ## 🚀 Installation and local run
 

@@ -11,7 +11,7 @@ os.makedirs(FIG_DIR, exist_ok=True)
 
 # === main parameters ===
 alpha2_deg = 60
-nu_vals = np.linspace(1e-3, 1.5, 200)
+nu_vals = np.linspace(1e-3, 1.5, 500)
 R_values = [0.0, 0.5]
 colors = ["tab:blue", "tab:orange"]
 
@@ -54,6 +54,40 @@ plt.xlim(0, nu_vals[-1])
 plt.ylim(0, 1.0)
 plt.tight_layout(pad=1)
 td.savefig_in_formats(fig, os.path.join(FIG_DIR, "validation_analytic"))
-plt.show()
 
 
+# === validation ===
+tol = 1e-2  # tolerance for numerical–analytical agreement
+
+for R, color in zip(R_values, colors):
+    res = td.compute_performance_repeating_stage(alpha2_deg, R, nu_vals)
+    eta_vals = res["eta_ts"]
+
+    eta_max_num = np.max(eta_vals)
+    nu_opt_num = nu_vals[np.argmax(eta_vals)]
+
+    if R == 0.0:
+        eta_ref = eta_max_imp
+        nu_ref = nu_opt_imp
+    elif R == 0.5:
+        eta_ref = eta_max_react
+        nu_ref = nu_opt_react
+    else:
+        raise ValueError(f"Unexpected R = {R}")
+
+    # numerical consistency check
+    assert np.isclose(eta_max_num, eta_ref, atol=tol), (
+        f"Max efficiency mismatch for R={R}: "
+        f"numerical={eta_max_num:.4f}, analytical={eta_ref:.4f}"
+    )
+    assert np.isclose(nu_opt_num, nu_ref, atol=tol), (
+        f"Optimum velocity ratio mismatch for R={R}: "
+        f"numerical={nu_opt_num:.4f}, analytical={nu_ref:.4f}"
+    )
+
+print("Analytical-numerical validation passed within tolerance.")
+
+
+# Show plot if not disabled
+if not os.environ.get("DISABLE_PLOTS"):
+    plt.show()

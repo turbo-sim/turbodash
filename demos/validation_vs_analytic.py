@@ -29,9 +29,8 @@ eta_max_react = 2 * np.sin(alpha2_rad) ** 2 / (1 + np.sin(alpha2_rad) ** 2)
 
 # === compute and plot numerical results ===
 fig = plt.figure(figsize=(6, 4))
-
 for R, color in zip(R_values, colors):
-    res = compute_performance_repeating_stage(alpha2_deg, R, nu_vals)
+    res = td.compute_performance_repeating_stage(alpha2_deg, R, nu_vals)
     eta_vals = res["eta_ts"]
     plt.plot(nu_vals, eta_vals, lw=1.5, color=color, label=fr"$R={R:.2f}$")
 
@@ -54,7 +53,7 @@ plt.legend()
 plt.xlim(0, nu_vals[-1])
 plt.ylim(0, 1.0)
 plt.tight_layout(pad=1)
-bpy.savefig_in_formats(fig, os.path.join(FIG_DIR, "validation_analytic"))
+td.savefig_in_formats(fig, os.path.join(FIG_DIR, "validation_analytic"))
 plt.show()
 
 

@@ -2,7 +2,8 @@
 import os
 import webbrowser
 from threading import Timer
-from turbodash.app import app
+# from turbodash.app import app
+from turbodash.app_meanline import app
 
 if __name__ == "__main__":
     # Open only once, not in the reloader process

@@ -16,12 +16,13 @@ The aim of this note is to derive the equations describing the work exchange, ve
 | $m$      | Meridional (axial) component                                 |
 | $\theta$ | Circumferential (tangential) component                       |
 | 1        | Inlet of stator                                              |
-| 2        | Between stator and rotor                                     |
-| 3        | Exit of rotor                                                |
+| 2        | Exit of stator                                               |
+| 3        | Inlet of rotor                                               |
+| 4        | Exit of rotor                                                |
 
 **Assumptions**
-- The blade velocity may change due to radius variation across the rotor ($\rho = u_2/u_3 = r_2/r_3$). The equations for a purely axial turbine are obtained by setting $\rho=1$.
-- Uniform meridional velocity across all flow stations ($v_{m1} = v_{m2} = v_{m3} = v_m$). This condition is not very restrictive because the density and area variation across the expansion can be accommodated through endwall flaring.
+- The blade velocity may change due to radius variation across the rotor ($\rho_{34} = u_3/u_4 = r_3/r_4$). The equations for a purely axial turbine are obtained by setting $\rho_{34}=1$.
+- Uniform meridional velocity across all flow stations ($v_{m1} = v_{m2} = v_{m3} = v_{m4} = v_m$). This condition is not very restrictive because the density and area variation across the expansion can be accommodated through endwall flaring.
 - The velocity triangles are evaluated assuming isentropic flow across the stage. Frictional and viscous losses are added a posteriori when computing the efficiencies based on prescribed values of the stator and rotor loss coefficient. This decoupled approach is described the in the textbook from Dixon and Hall, and provides a good approximation when the losses are not high.
 
 
@@ -63,16 +64,23 @@ h_{02} = h_{01} \\[1ex]
 h_2 + \frac{v_2^2}{2} = h_1 + \frac{v_1^2}{2}
 \end{gather*}
 $$
+Energy conservation in the interspace:
+$$
+\begin{gather*}
+h_{03} = h_{02} \\[1ex]
+h_3 + \frac{v_3^2}{2} = h_2 + \frac{v_2^2}{2}
+\end{gather*}
+$$
 The work exchange in the rotor is given by:
 $$
 \begin{gather*}
-W = h_{02} - h_{03}  \\[1ex]
-W = u_2 v_{\theta 2} - u_3 v_{\theta 3}
+W = h_{03} - h_{04}  \\[1ex]
+W = u_3 v_{\theta 3} - u_4 v_{\theta 4}
 \end{gather*}
 $$
 Combining these expressions gives
 $$
-h_{02} - u_2 v_{\theta 2} = h_{03} - u_3 v_{\theta 3}
+h_{0j3} - u_3 v_{\theta 3} = h_{04} - u_4 v_{\theta 4}
 $$
 This indicates the existence of a conserved property across the rotor blades, known as **rothalpy**, defined as:
 $$
@@ -87,35 +95,35 @@ $$
 
 **Work coefficient ($\psi$)** — ratio of the actual specific work in the stage to the square of the exit blade velocity:
 $$
-\psi = \frac{h_{01} - h_{03}}{u_3^2}
+\psi = \frac{h_{01} - h_{04}}{U^2}
 $$
 **Flow coefficient ($\phi$)** — quotient between the meridional velocity and the exit blade velocity:
 $$
-\phi = \frac{v_m}{u_3}
+\phi = \frac{v_m}{U}
 $$
 **Degree of reaction ($R$)** — fraction of the total enthalpy drop occurring in the rotor relative to the total enthalpy drop across the entire stage:
 $$
-R = \frac{h_{2} - h_{3}}{h_{1} - h_{3}} = 1 - \frac{h_{1} - h_{2}}{h_{1} - h_{3}}
+R = \frac{h_{3} - h_{4}}{h_{1} - h_{4}} = 1 - \frac{h_{1} - h_{3}}{h_{1} - h_{4}}
 $$
 **Blade velocity ratio ($\nu$)** — quotient of the exit blade speed and the spouting velocity:
 $$
-\nu = \frac{u_3}{v_s}
+\nu = \frac{U}{v_s}
 $$
 where the **spouting velocity** $v_s$ is the ideal velocity achieved by a jet expanding isentropically from the inlet stagnation state to the exit static pressure:
 $$
-v_s = \sqrt{2 (h_{01} - h_{3s})}
+v_s = \sqrt{2 (h_{01} - h_{4s})}
 $$
 **Total-to-static efficiency ($\eta_{ts}$)** — ratio of the actual specific work to the isentropic enthalpy drop from inlet total to exit static conditions:
 $$
-\eta_{ts} = \frac{h_{01} - h_{03}}{h_{01} - h_{3s}}
+\eta_{ts} = \frac{h_{01} - h_{04}}{h_{01} - h_{4s}}
 $$
 Note that the total-to-static efficiency is directly related to the work coefficient and the blade velocity ratio as:
 $$
-2 \nu^2 \psi = \frac{u_3^2}{h_{01} - h_{3s}} \cdot \frac{h_{01} - h_{03}}{u_3^2} = \eta_{ts}
+2 \nu^2 \psi = \frac{U^2}{h_{01} - h_{4s}} \cdot \frac{h_{01} - h_{04}}{U^2} = \eta_{ts}
 $$
 **Total-to-total efficiency ($\eta_{tt}$)** — ratio of the actual enthalpy drop between inlet and outlet total conditions to the isentropic enthalpy drop between the same total states:
 $$
-\eta_{tt} =  \frac{h_{01} - h_{03}}{h_{01} - h_{03s}} = \frac{h_{01} - h_{03}}{h_{01} - h_{3s} - v_3^2/2}
+\eta_{tt} =  \frac{h_{01} - h_{04}}{h_{01} - h_{04s}} = \frac{h_{01} - h_{04}}{h_{01} - h_{4s} - v_4^2/2}
 $$
 
 
@@ -123,37 +131,44 @@ $$
 
 The velocity triangles at the inlet of the rotor can be expressed in terms of flow angles and the flow coefficient:
 $$
-\tan \alpha_2 = \tan \beta_2 + \frac{u_2/u_3}{v_m/u_3} = \tan \beta_2 + \frac{\rho}{\phi}
+\tan \alpha_3 = \tan \beta_3 + \frac{u_3/u_4}{v_m/u_4} = \tan \beta_3 + \frac{\rho_{34}}{\phi}
 \tag{1}
 $$
 Similarly, at the exit of the rotor:
 $$
-\tan \alpha_3 = \tan \beta_3 + \frac{u_3}{v_m} = \tan \beta_3 + \frac{1}{\phi}
+\tan \alpha_4 = \tan \beta_4 + \frac{u_4}{v_m} = \tan \beta_4 + \frac{1}{\phi}
 \tag{2}
 $$
 The enthalpy change in the stator can also be expressed in terms of the flow coefficient and flow angles as:
 $$
-\frac{h_1 - h_2}{u_3^2} = \frac{1}{2} \phi^2 \left( \tan^2 \alpha_2 - \tan^2 \alpha_1 \right)
+\frac{h_1 - h_2}{U^2} = \frac{1}{2} \phi^2 \left( \tan^2 \alpha_2 - \tan^2 \alpha_1 \right)
 \tag{3}
+$$
+In the absence of losses, the enthalpy change across the interspace is:
+$$
+\frac{h_2 - h_3}{U^2} = \frac{1}{2} \phi^2 \left( \tan^2 \alpha_3 - \tan^2 \alpha_2 \right) = \frac{1}{2} \phi^2  \tan^2 \alpha_2 \left[\left(\frac{r_3}{r_2}\right)^2 - 1 \right]
+\tag{3a}
 $$
 Similarly, for the rotor, using the conservation of rothalpy, we find:
 $$
-\frac{h_2 - h_3}{u_3^2} = \frac{1}{2} \phi^2 \left( \tan^2 \beta_3 - \tan^2 \beta_2 \right)- \frac{1}{2}(1-\rho^2)
+\frac{h_3 - h_4}{U^2} = \frac{1}{2} \phi^2 \left( \tan^2 \beta_4 - \tan^2 \beta_3 \right)- \frac{1}{2}(1-\rho_{34}^2)
 \tag{4}
 $$
 The relation between stagnation and static enthalpies can also be expressed as a function of the flow coefficient and the absolute flow angle:
 $$
-\frac{h_{01} - h_1}{u_3^2} = \frac{1}{2} \phi^2 \left( 1 + \tan^2 \alpha_1 \right)
+\frac{h_{01} - h_1}{U^2} = \frac{1}{2} \phi^2 \left( 1 + \tan^2 \alpha_1 \right)
 \tag{5}
 $$
-Similarly, at station 2:
 $$
-\frac{h_{02} - h_2}{u_3^2} = \frac{1}{2} \phi^2 \left( 1 + \tan^2 \alpha_2 \right)
+\frac{h_{02} - h_2}{U^2} = \frac{1}{2} \phi^2 \left( 1 + \tan^2 \alpha_2 \right)
 \tag{6}
 $$
-and at station 3:
 $$
-\frac{h_{03} - h_3}{u_3^2} = \frac{1}{2} \phi^2 \left( 1 + \tan^2 \alpha_3 \right)
+\frac{h_{03} - h_3}{U^2} = \frac{1}{2} \phi^2 \left( 1 + \tan^2 \alpha_3 \right)
+\tag{7}
+$$
+$$
+\frac{h_{04} - h_4}{U^2} = \frac{1}{2} \phi^2 \left( 1 + \tan^2 \alpha_4 \right)
 \tag{7}
 $$
 
@@ -164,64 +179,65 @@ We aim to derive an expression for the total-to-total and total-to-static effici
 - Blade velocity ratio, $\nu$
 - Degree of reaction, $R$
 - Absolute flow angles at the stator inlet and outlet, $\alpha_1$ and $\alpha_2$
-- Rotor inlet-to-exit radius ratio, $\rho=r_2/r_3=u_3/u_2$
+- Interspace inlet-to-exit radius ratio, $\rho_{23}=r_2/r_3$
+- Rotor inlet-to-exit radius ratio, $\rho_{34}=r_3/r_4=u_3/u_4$
 
 We start from the definition of the degree of reaction:
 $$
-R = \frac{h_{2} - h_{3}}{h_{1} - h_{3}} = 1 - \frac{h_{1} - h_{2}}{h_{1} - h_{3}} = 1 - \frac{h_{1} - h_{2}}{(h_{01} - h_{3}) - (h_{01} - h_{1})}
+R = \frac{h_{3} - h_{4}}{h_{1} - h_{4}} = 1 - \frac{h_{1} - h_{3}}{h_{1} - h_{4}} = 1 - \frac{h_{1} - h_{3}}{(h_{01} - h_{4}) - (h_{01} - h_{1})}
 $$
 Substituting Eq. (3), Eq. (5), and the definition of the blade velocity ratio, while assuming isentropic flow across the stage (i.e. total-to-total efficiency equal to unity so that $h_3 = h_{3s}$), the degree of reaction can be expressed as:
 $$
-R = 1 - \frac{\nu^2 \phi^2 (\tan^2 \alpha_2 - \tan^2 \alpha_1)}{1 - \nu^2 \phi^2 (1 + \tan^2 \alpha_1)}
+R = 1 - \frac{\nu^2 \phi^2 (\tan^2 \alpha_3 - \tan^2 \alpha_1)}{1 - \nu^2 \phi^2 (1 + \tan^2 \alpha_1)}
 $$
 Solving for the flow coefficient yields:
 $$
-\phi^2 = \frac{1 - R}{\nu^2 \left[(1 + \tan^2 \alpha_2) - R (1 + \tan^2 \alpha_1)\right]}
+\phi^2 = \frac{1 - R}{\nu^2 \left[(1 + \tan^2 \alpha_3) - R (1 + \tan^2 \alpha_1)\right]}
 $$
 The relative flow angle at the rotor inlet can be obtained from Eq. (1) as:
 $$
-\tan \beta_2 =  \tan \alpha_2 - \frac{\rho}{\phi}
+\tan \beta_3 =  \tan \alpha_3 - \frac{\rho_{34}}{\phi}
 $$
 Summing Eqs. (3), (4), and (5) gives:
 $$
 \begin{gather*}
-h_{01} - h_3 = (h_{01} - h_1) + (h_1 - h_2) + (h_2 - h_3) \\[1ex]
-h_{01} - h_3 = \frac{1}{2}(v_1^2 + v_2^2 - v_1^2 + w_3^2 - w_2^2 - u_3^2 + u_2^2) \\[1ex]
-\frac{h_{01} - h_3}{u_3^2} = \frac{\phi^2}{2} \left[1 + \tan^2 \alpha_2 + \tan^2 \beta_3 - \tan^2 \beta_2 \right] -\frac{1}{2}(1-\rho^2) \equiv \frac{1}{2 \nu^2} 
+h_{01} - h_4 = (h_{01} - h_1) + (h_1 - h_2) + (h_2 - h_3) + (h_3 - h_4) \\[1ex]
+h_{01} - h_3 = \frac{1}{2}(v_1^2 + v_2^2 - v_1^2 + v_3^2 - v_2^2 + w_4^2 - w_3^2 - u_4^2 + u_3^2) \\[1ex]
+\frac{h_{01} - h_4}{U^2} = \frac{\phi^2}{2} \left[1 + \tan^2 \alpha_3 + \tan^2 \beta_4 - \tan^2 \beta_3 \right] -\frac{1}{2}(1-\rho_{34}^2) \equiv \frac{1}{2 \nu^2} 
 \end{gather*}
 $$
 The relative flow angle at the exit of the rotor is therefore given by:
 $$
-\tan^2 \beta_3 =  \tan^2 \beta_2 - \tan^2 \alpha_2  - 1 + \frac{1}{\nu^2 \phi^2} + \frac{1-\rho^2}{\phi^2} 
+\tan^2 \beta_4 =  \tan^2 \beta_3 - \tan^2 \alpha_3  - 1 + \frac{1}{\nu^2 \phi^2} + \frac{1-\rho^2}{\phi^2} 
 $$
 The absolute flow angle at the rotor exit, from Eq. (2), is:
 $$
-\tan \alpha_3 = \tan \beta_3 + \frac{1}{\phi}
+\tan \alpha_4 = \tan \beta_4 + \frac{1}{\phi}
 $$
 The work coefficient is given by:
 $$
 \begin{gather*}
-\psi = \frac{h_{01} - h_{03}}{u_3^2} = \frac{u_2 v_{\theta 2} - u_3 v_{\theta 3}}{u_3^2} = \phi (\rho \tan \alpha_2 - \tan \alpha_3)
+\psi = \frac{h_{01} - h_{04}}{U^2} = \frac{u_3 v_{\theta 3} - u_4 v_{\theta 4}}{U^2} = \phi (\rho_{34} \tan \alpha_3 - \tan \alpha_4)
 \end{gather*}
 $$
 Which gives the same result is this equivalent expression:
 $$
 \begin{gather*}
-\psi = \frac{h_{01} - h_{03}}{u_3^2} = \frac{h_{01} - h_3}{u_3^2} - \frac{h_{03} - h_3}{u_3^2} =  \frac{1}{2 \nu^2} - \frac{\phi^2}{2} (1 + \tan^2 \alpha_3)
+\psi = \frac{h_{01} - h_{04}}{u_4^2} = \frac{h_{01} - h_4}{u_4^2} - \frac{h_{04} - h_4}{u_4^2} =  \frac{1}{2 \nu^2} - \frac{\phi^2}{2} (1 + \tan^2 \alpha_4)
 \end{gather*}
 $$
 Losses in the stator and rotor are modeled through the loss coefficients
 $$
 \xi_S = \frac{h_2 - h_{2s}}{\tfrac{1}{2} v_2^2}, 
 \qquad
-\xi_R = \frac{h_3 - h_{3s}}{\tfrac{1}{2} w_3^2}
+\xi_R = \frac{h_4 - h_{4s}}{\tfrac{1}{2} w_4^2}
 $$
 which relate the deviation from isentropic behavior to the kinetic energy at the exit of the blades. Following Dixon and Hall, the total-to-total efficiency can be expressed as
 $$
-\eta_{tt} =  \frac{h_{01} - h_{03}}{h_{01} - h_{03s}}
+\eta_{tt} =  \frac{h_{01} - h_{04}}{h_{01} - h_{04s}}
             \approx
-            \frac{h_{01} - h_{03}}
-            {(h_{01} - h_{03}) + \tfrac{1}{2}\xi_S v_2^2 + \tfrac{1}{2}\xi_R w_3^2}
+            \frac{h_{01} - h_{04}}
+            {(h_{01} - h_{04}) + \tfrac{1}{2}\xi_S v_2^2 + \tfrac{1}{2}\xi_R w_4^2}
 $$
 This equation. decouples the aerodynamic losses from the velocity triangle calculations. The main advantage is its straightforward implementation, without the need for iterative coupling or detailed thermodynamic modeling that would otherwise be required if losses were fully integrated into the stage calculations. It remains accurate as long as losses are moderate, making it well suited for preliminary design and concept analysis. Expressed in terms of non-dimensional parameters, the total-to-total efficiency is given by:
 $$
@@ -230,23 +246,24 @@ $$
 \psi + 
 \tfrac{1}{2} \phi^2 
 \left[(1+\tan^2 \alpha_2)\xi_S
-+ (1+\tan^2 \beta_3)\xi_R \right]}
++ (1+\tan^2 \beta_4)\xi_R \right]}
 $$
 The total-to-static isentropic efficiency can finally be derived from the total-to-total efficiency:
 $$
-\frac{1}{\eta_{ts}}  =  \frac{1}{\eta_{tt}} + \frac{ v_3^2/2}{h_{01} - h_{03}} = \frac{1}{\eta_{tt}}  + \frac{1}{2}\frac{\phi^2}{\psi} \left(1 + \tan^2 \alpha_3\right)
+\frac{1}{\eta_{ts}}  =  \frac{1}{\eta_{tt}} + \frac{ v_4^2/2}{h_{01} - h_{04}} = \frac{1}{\eta_{tt}}  + \frac{1}{2}\frac{\phi^2}{\psi} \left(1 + \tan^2 \alpha_4\right)
 $$
 In summary, the complete velocity triangle and stage efficiencies can be explicitly determined from the input parameters $R$, $\nu$, $\alpha_1$, and $\alpha_2$, using the following relations: 
 $$
  \boxed{
  \begin{gather*}
- \phi^2 = \frac{1 - R}{\nu^2 \left[(1 + \tan^2 \alpha_2) - R (1 + \tan^2 \alpha_1)\right]} \\[1.2ex]
- \tan \beta_2 = \tan \alpha_2 - \frac{\rho}{\phi} \\[1.2ex]
- \tan^2 \beta_3 =  \tan^2 \beta_2 - \tan^2 \alpha_2  - 1 + \frac{1}{\nu^2 \phi^2} + \frac{1-\rho^2}{\phi^2} \\[1.2ex]
- \tan \alpha_3 = \tan \beta_3 + \frac{1}{\phi} \\[1.2ex]
- \psi = \phi (\rho \tan \alpha_2 - \tan \alpha_3) = \frac{1}{2 \nu^2} - \frac{\phi^2}{2} (1 + \tan^2 \alpha_3) \\[1.2ex]
- \eta_{tt} =  \frac{\psi}{\psi + \tfrac{1}{2} \phi^2 \left[(1+\tan^2 \alpha_2)\xi_{S} + (1+\tan^2 \beta_3)\xi_{R} \right]} \\[1.2ex]
- \eta_{ts} = \left[\frac{1}{\eta_{tt}} + \frac{ v_3^2/2}{h_{01} - h_{03}} = \frac{1}{\eta_{tt}}  + \frac{1}{2}\frac{\phi^2}{\psi} \left(1 + \tan^2 \alpha_3\right)\right]^{-1}
+ \tan \alpha_3 = (r_3 / r_2) \tan \alpha_2 \\[1.2ex]
+ \phi^2 = \frac{1 - R}{\nu^2 \left[(1 + \tan^2 \alpha_3) - R (1 + \tan^2 \alpha_1)\right]} \\[1.2ex]
+ \tan \beta_3 = \tan \alpha_3 - \frac{\rho}{\phi} \\[1.2ex]
+ \tan^2 \beta_4 =  \tan^2 \beta_3 - \tan^2 \alpha_3  - 1 + \frac{1}{\nu^2 \phi^2} + \frac{1-\rho_{34}^2}{\phi^2} \\[1.2ex]
+ \tan \alpha_4 = \tan \beta_4 + \frac{1}{\phi} \\[1.2ex]
+ \psi = \phi (\rho \tan \alpha_3 - \tan \alpha_4) = \frac{1}{2 \nu^2} - \frac{\phi^2}{2} (1 + \tan^2 \alpha_4) \\[1.2ex]
+ \eta_{tt} =  \frac{\psi}{\psi + \tfrac{1}{2} \phi^2 \left[(1+\tan^2 \alpha_2)\xi_{S} + (1+\tan^2 \beta_4)\xi_{R} \right]} \\[1.2ex]
+ \eta_{ts} = \left[\frac{1}{\eta_{tt}} + \frac{ v_4^2/2}{h_{01} - h_{04}} = \frac{1}{\eta_{tt}}  + \frac{1}{2}\frac{\phi^2}{\psi} \left(1 + \tan^2 \alpha_4\right)\right]^{-1}
  \end{gather*}
  }
  $$
@@ -254,6 +271,8 @@ $$
 
 
 ## Special case: Ideal 100 % impulse stage
+
+> Note: I did not update the subscripts 3-4 in the special cases
 
 For the special case of an impulse stage, where $\alpha_1 = 0$, $R = 0$, $\rho=1$, and zero losses the equations simplify considerably. From the general relations, we obtain:
 $$
@@ -276,6 +295,9 @@ $$
 The optimum blade velocity ratio and maximum efficiency depends solely on the stator exit flow angle, and not on the stator inlet angle. For a purely tangential flow at the stator exit $\alpha_3=90^\circ$, the efficiency approaches unity, as the kinetic energy at the rotor exit tends to zero. In practice, however, the maximum efficiency does not occur at a tangential outlet angle, since this condition would require very high flow turning and velocity, leading to increased losses. This is therefore a theoretical limit corresponding to the idealized assumption of isentropic flow.
 
 ## Special case: Ideal 50 % reaction stage
+
+> Note: I did not update the subscripts 3-4 in the special cases
+
 
 Another important special case is the 50 % reaction repating stage with $\rho=1$ and zero losses. The repeating stage assumption implies that, in addition to the general assumptions, the following conditions hold:
 $$

@@ -7,12 +7,14 @@ except ImportError:
     pass
 else:
     import sys
+
     sys.excepthook = IPython.core.ultratb.FormattedTB(call_pdb=False)
 
 
 from .core import *
 from .graphics import *
-
+from .plotting_mpl import *
+from . import plotting_plotly as plotly
 
 # Package info
 __version__ = "0.2.5"
@@ -22,4 +24,3 @@ URL_GITHUB = "https://github.com/turbo-sim/turbodash"
 URL_PYPI = "https://pypi.org/project/turbodash/"
 URL_DTU = "https://thermalpower.dtu.dk/"
 BREAKLINE = 80 * "-"
-

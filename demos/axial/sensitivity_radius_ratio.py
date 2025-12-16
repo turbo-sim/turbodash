@@ -32,7 +32,7 @@ for j, alpha2_deg in enumerate(alpha2_vals):
     for i, R in enumerate(R_vals):
         ax = axes[i, j]
         for rho, color in zip(rho_vals, colors):
-            eta_vals = td.compute_performance_stage(alpha1_deg, alpha2_deg, R, nu_vals, rho)["eta_ts"]
+            eta_vals = td.compute_performance_stage(alpha1_deg, alpha2_deg, R, nu_vals, 1.00, rho)["eta_ts"]
             ax.plot(nu_vals, eta_vals, color=color, lw=1.2, label=fr"$r_2/r_3={rho:.2f}$")
             # ax.plot(nu_vals*rho, eta_vals, color=color, lw=1.2, label=fr"$r_2/r_3={rho:.2f}$")
         ax.grid(True)

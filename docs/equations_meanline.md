@@ -129,6 +129,12 @@ $$
 \end{gather}
 $$
 
+Additionally, the flaring semi-angle of each cascade is obtained as:
+
+$$
+\tan \delta_{\mathrm{fl}} = \frac{H_{\mathrm{out}}-H_{\mathrm{in}}}{2\,c_{\mathrm{mer}}}
+$$
+
 
 
 

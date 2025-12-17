@@ -62,7 +62,6 @@ def linked_input(label_children, id_prefix, min_val, max_val, step, default):
     )
 
 
-
 # === define calculator layout (your existing code) ===
 calculator_layout = html.Div(
     style={

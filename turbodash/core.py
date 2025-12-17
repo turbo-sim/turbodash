@@ -71,7 +71,11 @@ def compute_performance_stage(
     # tan²β₃ = tan²β₂ - tan²α₂ - 1 + 1/(ν²φ²) + (1-ρ²)/φ²
     # Use the negative root of this second order equation
     tan_beta4_sq = (
-        tan_beta3**2 - tan_alpha3**2 - 1 + 1 / (nu**2 * phi**2) + (1 - radius_ratio_34**2) / phi**2
+        tan_beta3**2
+        - tan_alpha3**2
+        - 1
+        + 1 / (nu**2 * phi**2)
+        + (1 - radius_ratio_34**2) / phi**2
     )
     tan_beta4 = -np.sqrt(np.clip(tan_beta4_sq, 0, None))
     beta4 = np.arctan(tan_beta4)
@@ -205,9 +209,10 @@ def assert_velocity_triangle(v, w, u, alpha_deg, beta_deg, label, rtol=1e-8):
 
 
 def compute_stage_meanline(
-    fluid,
-    inlet_density,
-    inlet_pressure,
+    fluid_name,
+    inlet_property_pair_string,
+    inlet_property_1,
+    inlet_property_2,
     exit_pressure,
     mass_flow_rate,
     stator_inlet_angle,
@@ -237,12 +242,15 @@ def compute_stage_meanline(
     # ------------------------------------------------------------------
     # Stage performance (velocity triangles, efficiencies)
     # ------------------------------------------------------------------
+    RR_12 = radius_ratio_12
+    RR_23 = radius_ratio_23
+    RR_34 = radius_ratio_34
     perf = compute_performance_stage(
         stator_inlet_angle=stator_inlet_angle,
         stator_exit_angle=stator_exit_angle,
         degree_reaction=degree_reaction,
         blade_velocity_ratio=blade_velocity_ratio,
-        radius_ratio_34=radius_ratio_34,
+        radius_ratio_34=RR_34,
         loss_coeff_stator=loss_coeff_stator,
         loss_coeff_rotor=loss_coeff_rotor,
     )
@@ -250,7 +258,9 @@ def compute_stage_meanline(
     # ------------------------------------------------------------------
     # Isentropic outlet enthalpy and spouting velocity
     # ------------------------------------------------------------------
-    state_01 = fluid.get_state(jxp.DmassP_INPUTS, inlet_density, inlet_pressure)
+    fluid = jxp.Fluid(fluid_name, backend="HEOS")
+    ip = jxp.INPUT_PAIRS[inlet_property_pair_string]
+    state_01 = fluid.get_state(ip, inlet_property_1, inlet_property_2)
     state_4s = fluid.get_state(jxp.PSmass_INPUTS, exit_pressure, state_01.s)
     h_01 = state_01.h
     h_4s = state_4s.h
@@ -267,7 +277,7 @@ def compute_stage_meanline(
     U = nu * v0
     u_1 = 0.0
     u_2 = 0.0
-    u_3 = U * radius_ratio_34
+    u_3 = U * RR_34
     u_4 = U
 
     # Absolute velocities
@@ -302,19 +312,15 @@ def compute_stage_meanline(
     # ------------------------------------------------------------------
     # Static enthalpies
     # ------------------------------------------------------------------
+    tan2_a1 = np.tan(np.deg2rad(alpha_1)) ** 2
+    tan2_a2 = np.tan(np.deg2rad(alpha_2)) ** 2
+    tan2_a3 = np.tan(np.deg2rad(alpha_3)) ** 2
+    tan2_b3 = np.tan(np.deg2rad(beta_3)) ** 2
+    tan2_b4 = np.tan(np.deg2rad(beta_4)) ** 2
     h_1 = state_01.h - 0.5 * v_1**2
-    h_2 = h_1 - 0.5 * U**2 * phi**2 * (
-        np.tan(np.deg2rad(alpha_2)) ** 2 - np.tan(np.deg2rad(alpha_1)) ** 2
-    )
-    h_3 = h_2 - 0.5 * U**2 * phi**2 * (
-        np.tan(np.deg2rad(alpha_3)) ** 2 - np.tan(np.deg2rad(alpha_2)) ** 2
-    )
-    h_4 = h_3 - U**2 * (
-        0.5
-        * phi**2
-        * (np.tan(np.deg2rad(beta_4)) ** 2 - np.tan(np.deg2rad(beta_3)) ** 2)
-        - 0.5 * (1.0 - radius_ratio_34**2)
-    )
+    h_2 = h_1 - 0.5 * U**2 * phi**2 * (tan2_a2 - tan2_a1)
+    h_3 = h_2 - 0.5 * U**2 * phi**2 * (tan2_a3 - tan2_a2)
+    h_4 = h_3 - U**2 * (0.5 * phi**2 * (tan2_b4 - tan2_b3) - 0.5 * (1.0 - RR_34**2))
 
     # ------------------------------------------------------------------
     # EOS states (isentropic, using (h, s_01))
@@ -340,9 +346,9 @@ def compute_stage_meanline(
     # ------------------------------------------------------------------
     # Compute radii
     r_1 = np.sqrt(mass_flow_rate / (2.0 * np.pi * d_1 * vm * height_radius_ratio))
-    r_2 = r_1 / radius_ratio_12
-    r_3 = r_2 / radius_ratio_23
-    r_4 = r_3 / radius_ratio_34
+    r_2 = r_1 / RR_12
+    r_3 = r_2 / RR_23
+    r_4 = r_3 / RR_34
 
     # Compute blade heights
     H_1 = mass_flow_rate / (2.0 * np.pi * r_1 * d_1 * vm)
@@ -350,6 +356,7 @@ def compute_stage_meanline(
     H_3 = mass_flow_rate / (2.0 * np.pi * r_3 * d_3 * vm)
     H_4 = mass_flow_rate / (2.0 * np.pi * r_4 * d_4 * vm)
 
+    # Asset inlet height-to-radius ratio
     assert np.isclose(
         height_radius_ratio,
         H_1 / r_1,
@@ -361,11 +368,16 @@ def compute_stage_meanline(
     )
 
     # ------------------------------------------------------------------
-    # Angular speed
+    # Angular speed from blade speed and radius
     # ------------------------------------------------------------------
     omega_3 = u_3 / r_3
     omega_4 = u_4 / r_4
     RPM = omega_4 * 60 / (2 * np.pi)
+    ws = (
+        omega_3
+        * (mass_flow_rate / state_4s.d) ** (1 / 2)
+        * (state_01.h - state_4s.h) ** (-3 / 4)
+    )
     assert np.isclose(
         omega_3, omega_4, rtol=1e-6
     ), f"Inconsistent rotational speed: omega_3={omega_3:0.2f}, omega_4={omega_4:0.2f}"
@@ -386,13 +398,6 @@ def compute_stage_meanline(
         zweiffel=zweiffel_stator,
     )
 
-    c_stator = stator_geom["chord"]
-    s_stator = stator_geom["spacing"]
-    N_stator = stator_geom["N_blades"]
-    o_stator = stator_geom["opening"]
-    H_stator = 0.5 * (H_1 +  H_2)
-    AR_stator = H_stator / c_stator
-
     # Rotor
     rotor_geom = compute_blade_row_geometry(
         stage_type=stage_type,
@@ -405,183 +410,159 @@ def compute_stage_meanline(
         zweiffel=zweiffel_rotor,
     )
 
-    solidity_stator = stator_geom["solidity"]
-    c_rotor = rotor_geom["chord"]
-    s_rotor = rotor_geom["spacing"]
-    N_rotor = rotor_geom["N_blades"]
-    o_rotor = rotor_geom["opening"]
-    solidity_rotor = rotor_geom["solidity"]
-    H_rotor = 0.5 * (H_3 +  H_4)
-    AR_rotor = H_rotor / c_rotor
-
     # ------------------------------------------------------------------
-    # Stage-level quantities
+    # Export results as nested dictionary
     # ------------------------------------------------------------------
+    # Initialize container
     out = {}
-    out["fluid"] = fluid.name
-    out["inlet_density"] = inlet_density
-    out["inlet_pressure"] = inlet_pressure
-    out["exit_pressure"] = exit_pressure
-    out["stage_type"] = stage_type
-    out["phi"] = phi
-    out["psi"] = perf["psi"]
-    out["eta_tt"] = perf["eta_tt"]
-    out["eta_ts"] = perf["eta_ts"]
-    out["v_0"] = v0
-    out["U"] = U
-    out["v_m"] = vm
-    out["RPM"] = RPM
-    out["mass_flow_rate"] = mass_flow_rate
-    out["power_isentropic"] = mass_flow_rate*(state_01.h-h_4s)
-    out["power_actual_tt"] = mass_flow_rate*(state_01.h-h_4s)*perf["eta_tt"]
-    out["power_actual_ts"] = mass_flow_rate*(state_01.h-h_4s)*perf["eta_ts"]
-    out["specific_speed"] = omega_3 * (mass_flow_rate / state_4s.d) ** (1/2) * (state_01.h - state_4s.h) ** (-3/4)
 
-    # ------------------------------------------------------------------
-    # Station 1
-    # ------------------------------------------------------------------t
-    out["station_0.h"] = state_01.h
-    out["station_0.p"] = state_01.p
-    out["station_0.d"] = state_01.d
-    out["station_0.a"] = state_01.a
-    out["station_0.s"] = state_01.s
-    out["station_0.T"] = state_01.T
-    out["station_0.q"] = state_01.quality_mass
-    out["station_0.v"] = 0.0
-    out["station_0.w"] = 0.0
-    out["station_0.u"] = 0.0
-    out["station_0.alpha"] = alpha_1
-    out["station_0.beta"] = beta_1
-    out["station_0.Ma"] = 0.0
-    out["station_0.r"] = r_1
-    out["station_0.H"] = H_1
+    # Input variables
+    out["inputs"] = {
+        "fluid": fluid_name,
+        "stage_type": stage_type,
+        "inlet_property_pair": inlet_property_pair_string,
+        "inlet_property_1": inlet_property_1,
+        "inlet_property_2": inlet_property_2,
+        "exit_pressure": exit_pressure,
+        "mass_flow_rate": mass_flow_rate,
+        "stator_inlet_angle": stator_inlet_angle,
+        "stator_exit_angle": stator_exit_angle,
+        "blade_velocity_ratio": blade_velocity_ratio,
+        "degree_reaction": degree_reaction,
+        "radius_ratio_12": RR_12,
+        "radius_ratio_23": RR_23,
+        "radius_ratio_34": RR_34,
+        "height_radius_ratio": height_radius_ratio,
+        "zweiffel_stator": zweiffel_stator,
+        "zweiffel_rotor": zweiffel_rotor,
+        "loss_coeff_stator": loss_coeff_stator,
+        "loss_coeff_rotor": loss_coeff_rotor,
+    }
 
-    out["station_1.h"] = h_1
-    out["station_1.p"] = p_1
-    out["station_1.d"] = d_1
-    out["station_1.a"] = a_1
-    out["station_1.s"] = s_1
-    out["station_1.T"] = T_1
-    out["station_1.q"] = state_1.quality_mass
-    out["station_1.v"] = v_1
-    out["station_1.w"] = w_1
-    out["station_1.u"] = u_1
-    out["station_1.alpha"] = alpha_1
-    out["station_1.beta"] = beta_1
-    out["station_1.Ma"] = Ma_1
-    out["station_1.r"] = r_1
-    out["station_1.H"] = H_1
+    # Performance metrics
+    out["stage_performance"] = {
+        "efficiency_tt": perf["eta_tt"],
+        "efficiency_ts": perf["eta_ts"],
+        "pressure_ratio_ts": state_01.p / state_4s.p,
+        "volume_ratio_ts": state_4s.d / state_01.d,
+        "flow_coefficient": perf["phi"],
+        "work_coefficient": perf["psi"],
+        "degree_reaction": degree_reaction,
+        "blade_velocity_ratio": blade_velocity_ratio,
+        "specific_speed": ws,
+        "spouting_velocity": v0,
+        "rotor_exit_velocity": U,
+        "rotational_speed": RPM,
+        "mass_flow_rate": mass_flow_rate,
+        "power_isentropic": mass_flow_rate * (state_01.h - h_4s),
+        "power_actual_tt": mass_flow_rate * (state_01.h - h_4s) * perf["eta_tt"],
+        "power_actual_ts": mass_flow_rate * (state_01.h - h_4s) * perf["eta_ts"],
+    }
 
-    # ------------------------------------------------------------------
-    # Station 2
-    # ------------------------------------------------------------------
-    out["station_2.h"] = h_2
-    out["station_2.p"] = p_2
-    out["station_2.d"] = d_2
-    out["station_2.a"] = a_2
-    out["station_2.s"] = s_2
-    out["station_2.T"] = T_2
-    out["station_2.q"] = state_2.quality_mass
-    out["station_2.v"] = v_2
-    out["station_2.w"] = w_2
-    out["station_2.u"] = u_2
-    out["station_2.alpha"] = alpha_2
-    out["station_2.beta"] = beta_2
-    out["station_2.Ma"] = Ma_2
-    out["station_2.r"] = r_2
-    out["station_2.H"] = H_2
+    # Cascade geometry
+    out["geometry"] = {
+        "stator": stator_geom,
+        "rotor": rotor_geom,
+    }
 
-    # ------------------------------------------------------------------
-    # Station 3
-    # ------------------------------------------------------------------
-    out["station_3.h"] = h_3
-    out["station_3.p"] = p_3
-    out["station_3.d"] = d_3
-    out["station_3.a"] = a_3
-    out["station_3.s"] = s_3
-    out["station_3.T"] = T_3
-    out["station_3.q"] = state_3.quality_mass
-    out["station_3.v"] = v_3
-    out["station_3.w"] = w_3
-    out["station_3.u"] = u_3
-    out["station_3.alpha"] = alpha_3
-    out["station_3.beta"] = beta_3
-    out["station_3.Ma"] = Ma_3
-    out["station_3.r"] = r_3
-    out["station_3.H"] = H_3
-
-    # ------------------------------------------------------------------
-    # Station 4
-    # ------------------------------------------------------------------
-    out["station_4.h"] = h_4
-    out["station_4.p"] = p_4
-    out["station_4.d"] = d_4
-    out["station_4.a"] = a_4
-    out["station_4.s"] = s_4
-    out["station_4.T"] = T_4
-    out["station_4.q"] = state_4.quality_mass
-    out["station_4.v"] = v_4
-    out["station_4.w"] = w_4
-    out["station_4.u"] = u_4
-    out["station_4.alpha"] = alpha_4
-    out["station_4.beta"] = beta_4
-    out["station_4.Ma"] = Ma_4
-    out["station_4.r"] = r_4
-    out["station_4.H"] = H_4
-
-    # ------------------------------------------------------------------
-    # Stator geometry
-    # ------------------------------------------------------------------
-    out["stator.chord"] = c_stator
-    out["stator.height"] = H_stator
-    out["stator.spacing"] = s_stator
-    out["stator.N_blades"] = N_stator
-    out["stator.opening"] = o_stator
-    out["stator.aspect_ratio"] = AR_stator
-    out["stator.solidity"] = solidity_stator
-    out["stator.zweiffel"] = zweiffel_stator
-
-    # ------------------------------------------------------------------
-    # Rotor geometry
-    # ------------------------------------------------------------------
-    out["rotor.chord"] = c_rotor
-    out["rotor.height"] = H_rotor
-    out["rotor.spacing"] = s_rotor
-    out["rotor.N_blades"] = N_rotor
-    out["rotor.opening"] = o_rotor
-    out["rotor.aspect_ratio"] = AR_rotor
-    out["rotor.solidity"] = solidity_rotor
-    out["rotor.zweiffel"] = zweiffel_rotor
-
-    # ------------------------------------------------------------------
-    # Inputs (flat, explicit, reproducible)
-    # ------------------------------------------------------------------
-    out["inputs.fluid"] = fluid.name
-    out["inputs.stage_type"] = stage_type
-
-    # Boundary conditions
-    out["inputs.inlet_density"] = inlet_density
-    out["inputs.inlet_pressure"] = inlet_pressure
-    out["inputs.exit_pressure"] = exit_pressure
-    out["inputs.mass_flow_rate"] = mass_flow_rate
-
-    # Kinematics
-    out["inputs.stator_inlet_angle"] = stator_inlet_angle
-    out["inputs.stator_exit_angle"] = stator_exit_angle
-    out["inputs.blade_velocity_ratio"] = blade_velocity_ratio
-    out["inputs.degree_reaction"] = degree_reaction
-
-    # Geometry closures
-    out["inputs.radius_ratio_12"] = radius_ratio_12
-    out["inputs.radius_ratio_23"] = radius_ratio_23
-    out["inputs.radius_ratio_34"] = radius_ratio_34
-    out["inputs.height_radius_ratio"] = height_radius_ratio
-    out["inputs.zweiffel_stator"] = zweiffel_stator
-    out["inputs.zweiffel_rotor"] = zweiffel_rotor
-
-    # Losses
-    out["inputs.loss_coeff_stator"] = loss_coeff_stator
-    out["inputs.loss_coeff_rotor"] = loss_coeff_rotor
+    # Thermodynamics and kinematics at each flow station
+    out["flow_stations"] = [
+        # Station 0 (inlet total state)
+        {
+            "p": state_01.p,
+            "T": state_01.T,
+            "d": state_01.d,
+            "q": state_01.quality_mass,
+            "Z": state_01.Z,
+            "a": state_01.a,
+            "h": state_01.h,
+            "s": state_01.s,
+            "v": 0.0,
+            "w": 0.0,
+            "u": 0.0,
+            "alpha": alpha_1,
+            "beta": beta_1,
+            "Ma": 0.0,
+            "r": r_1,
+            "H": H_1,
+        },
+        # Station 1 (stator inlet)
+        {
+            "p": p_1,
+            "T": T_1,
+            "d": d_1,
+            "q": state_1.quality_mass,
+            "Z": state_1.Z,
+            "a": a_1,
+            "h": h_1,
+            "s": s_1,
+            "v": v_1,
+            "w": w_1,
+            "u": u_1,
+            "alpha": alpha_1,
+            "beta": beta_1,
+            "Ma": Ma_1,
+            "r": r_1,
+            "H": H_1,
+        },
+        # Station 2 (stator exit / rotor inlet)
+        {
+            "p": p_2,
+            "T": T_2,
+            "d": d_2,
+            "q": state_2.quality_mass,
+            "Z": state_2.Z,
+            "a": a_2,
+            "h": h_2,
+            "s": s_2,
+            "v": v_2,
+            "w": w_2,
+            "u": u_2,
+            "alpha": alpha_2,
+            "beta": beta_2,
+            "Ma": Ma_2,
+            "r": r_2,
+            "H": H_2,
+        },
+        # Station 3 (rotor exit, relative frame)
+        {
+            "p": p_3,
+            "T": T_3,
+            "d": d_3,
+            "q": state_3.quality_mass,
+            "Z": state_3.Z,
+            "a": a_3,
+            "h": h_3,
+            "s": s_3,
+            "v": v_3,
+            "w": w_3,
+            "u": u_3,
+            "alpha": alpha_3,
+            "beta": beta_3,
+            "Ma": Ma_3,
+            "r": r_3,
+            "H": H_3,
+        },
+        # Station 4 (rotor exit / stage outlet)
+        {
+            "p": p_4,
+            "T": T_4,
+            "d": d_4,
+            "q": state_4.quality_mass,
+            "Z": state_4.Z,
+            "a": a_4,
+            "h": h_4,
+            "s": s_4,
+            "v": v_4,
+            "w": w_4,
+            "u": u_4,
+            "alpha": alpha_4,
+            "beta": beta_4,
+            "Ma": Ma_4,
+            "r": r_4,
+            "H": H_4,
+        },
+    ]
 
     return out
 
@@ -595,10 +576,15 @@ def compute_blade_row_geometry(
     angle_in_deg,
     angle_out_deg,
     zweiffel,
+    maximum_thickness_to_chord=0.3,
+    maximum_thickness_location=0.25,
+    leading_edge_radius_to_max_thickness=0.50,
+    trailing_edge_thickness_to_opening=0.05,
+    trailing_edge_wedge_angle=10.0,
 ):
     """
     Compute blade chord, spacing, blade count, opening, and solidity
-    using Zweifel criterion.
+    using Zweifel criterion and return full geometry dictionary
 
     Parameters
     ----------
@@ -613,67 +599,95 @@ def compute_blade_row_geometry(
         Zweifel loading coefficient
     """
 
-    # --------------------------------------------------------------
     # Chord definition
-    # --------------------------------------------------------------
     if stage_type == "radial":
-        c_meridional = r_out - r_in
+        meridional_chord = r_out - r_in
     elif stage_type == "axial":
-        c_meridional = 0.75 * 0.5 * (H_in + H_out)
+        meridional_chord = 0.75 * 0.5 * (H_in + H_out)
     else:
         raise ValueError(f"Invalid stage type: {stage_type}")
 
-    # --------------------------------------------------------------
-    # Blade spacing (Zweifel criterion)
-    # --------------------------------------------------------------
+    # Integer number of blades from Zweifel criterion
     angle_in = np.deg2rad(angle_in_deg)
     angle_out = np.deg2rad(angle_out_deg)
-
     s_mean = (
         0.5
         * zweiffel
-        * c_meridional
+        * meridional_chord
         / (np.cos(angle_out) ** 2 * np.abs(np.tan(angle_in) - np.tan(angle_out)))
     )
-    solidity = c_meridional / s_mean
 
-    # --------------------------------------------------------------
-    # Blade count
-    # --------------------------------------------------------------
-    N = np.pi * (r_in + r_out) / s_mean
+    N_blades = int(np.ceil(np.pi * (r_in + r_out) / s_mean))
+    s_mean = (np.pi * (r_in + r_out)) / N_blades
+    solidity = meridional_chord / s_mean
 
-    # --------------------------------------------------------------
     # Opening (cosine rule)
-    # --------------------------------------------------------------
-    s_out = 2 * np.pi * r_out / N
+    s_out = 2 * np.pi * r_out / N_blades
     if stage_type == "radial":
-        o = s_out * np.cos(np.abs(angle_out) - 0.5 * (2.0 * np.pi / N))
+        o = s_out * np.cos(np.abs(angle_out) - 0.5 * (2.0 * np.pi / N_blades))
     elif stage_type == "axial":
         o = s_out * np.cos(angle_out)
     else:
         raise ValueError(f"Invalid stage type: {stage_type}")
 
-    # --------------------------------------------------------------
-    # Solidity
-    # --------------------------------------------------------------
+    # Flaring angle
+    height = 0.5 * (H_in + H_out)
+    aspect_ratio = height / meridional_chord
+    flaring_angle = np.rad2deg(np.arctan(0.5 * (H_out - H_in) / meridional_chord))
+
+    # Miscellaneous quantities for plotting
+    maximum_thickness = meridional_chord * maximum_thickness_to_chord
+    leading_edge_radius = maximum_thickness * leading_edge_radius_to_max_thickness
+    trailing_edge_thickness = o * trailing_edge_thickness_to_opening
+
+    # Return complete dictionary
     return dict(
-        chord=c_meridional,
+        blade_count=N_blades,
+        radius_in=r_in,
+        radius_out=r_out,
+        height=height,
+        chord=meridional_chord,
         spacing=s_mean,
-        N_blades=N,
         opening=o,
         solidity=solidity,
+        aspect_ratio=aspect_ratio,
+        flaring_angle=flaring_angle,
+        maximum_thickness=maximum_thickness,
+        maximum_thickness_location=maximum_thickness_location,
+        leading_edge_radius=leading_edge_radius,
+        trailing_edge_thickness=trailing_edge_thickness,
+        trailing_edge_wedge_angle=trailing_edge_wedge_angle,
+        metal_angle_in=angle_in_deg,
+        metal_angle_out=angle_out_deg,
     )
-
 
 
 def _fmt(value, unit="-", width=10, prec=4):
     if value is None:
         return " " * width
-    return f"{value:{width}.{prec}f} {unit}".rstrip()
+
+    # Strings: right-aligned, same width as numbers, no unit
+    if isinstance(value, str):
+        return f"{value:>{width}s}"
+
+    # Integers
+    if isinstance(value, int):
+        return f"{value:{width}d} {unit}".rstrip()
+
+    # Floats
+    if isinstance(value, float):
+        return f"{value:{width}.{prec}f} {unit}".rstrip()
+
+    # Fallback
+    return f"{str(value):>{width}s}"
 
 
 def _fmt_mm(value_m, width=10, prec=2):
     return _fmt(1e3 * value_m, "mm", width, prec)
+
+
+def _fmt_deg(value, width=10, prec=2):
+    return _fmt(value, "deg", width, prec)
 
 
 def _section(title):
@@ -681,69 +695,114 @@ def _section(title):
     print("=" * len(title))
 
 
+def _pretty_name(key: str) -> str:
+    return key.replace("_", " ").capitalize()
+
+
+def _fmt_geom(key, value):
+    """
+    Geometry-aware formatter based on variable semantics.
+    """
+    if value is None:
+        return " " * 12
+
+    if key in {
+        "radius_in",
+        "radius_out",
+        "height",
+        "chord",
+        "spacing",
+        "opening",
+        "maximum_thickness",
+        "leading_edge_radius",
+        "trailing_edge_thickness",
+    }:
+        return _fmt_mm(value)
+
+    if key in {
+        "flaring_angle",
+        "trailing_edge_wedge_angle",
+        "metal_angle_in",
+        "metal_angle_out",
+    }:
+        return _fmt_deg(value)
+
+    if key in {
+        "aspect_ratio",
+        "solidity",
+        "flaring_angle",
+        "trailing_edge_wedge_angle",
+        "maximum_thickness_location",
+    }:
+        return _fmt(value, "-")
+
+    if key == "blade_count":
+        return _fmt(value, "-", prec=0)
+
+    # Fallback
+    return _fmt(value, "-")
+
+
+def _print_geometry_block(title, geom):
+    print(f"\n{title}:")
+    for key, value in geom.items():
+        label = _pretty_name(key)
+        print(f"  {label:28s}: {_fmt_geom(key, value)}")
+
+
 def print_stage(out):
     """
     ASCII-only, human-readable pretty print of turbine stage results.
+    Assumes a fully nested and structured `out` dictionary.
     """
+
+    inputs = out["inputs"]
+    perf = out["stage_performance"]
+    geom = out["geometry"]
+    stations = out["flow_stations"]
 
     # ==============================================================
     # Boundary conditions and operating point
     # ==============================================================
     _section("Boundary conditions and operating point")
 
-    print(f"{'Fluid':30s}: {out['fluid']}")
-    print(f"{'Stage type':30s}: {out['stage_type']}")
-    print(f"{'Inlet density':30s}: {_fmt(out['inlet_density'], 'kg/m3')}")
-    print(f"{'Inlet pressure':30s}: {_fmt(out['inlet_pressure']/1e5, 'bar')}")
-    print(f"{'Exit pressure':30s}: {_fmt(out['exit_pressure']/1e5, 'bar')}")
-    print(f"{'Mass flow rate':30s}: {_fmt(out['mass_flow_rate'], 'kg/s')}")
-    print(f"{'Rotational speed':30s}: {_fmt(out['RPM'], 'rpm', prec=1)}")
+    print(f"{'Fluid':30s}: {_fmt(inputs['fluid'])}")
+    print(f"{'Stage type':30s}: {_fmt(inputs['stage_type'])}")
+    print(f"{'Inlet pressure':30s}: {_fmt(stations[0]['p'] / 1e5, 'bar')}")
+    print(f"{'Exit pressure':30s}: {_fmt(stations[-1]['p'] / 1e5, 'bar')}")
+    print(f"{'Mass flow rate':30s}: {_fmt(inputs['mass_flow_rate'], 'kg/s')}")
+    print(f"{'Rotational speed':30s}: {_fmt(perf['rotational_speed'], 'rpm', prec=1)}")
 
     # ==============================================================
     # Stage performance
     # ==============================================================
     _section("Stage performance")
-    print(f"{'Total-to-total efficiency':30s}: {_fmt(out['eta_tt'], '-')}")
-    print(f"{'Total-to-static efficiency':30s}: {_fmt(out['eta_ts'], '-')}")
-    print(f"{'Flow coefficient':30s}: {_fmt(out['phi'], '-')}")
-    print(f"{'Loading coefficient':30s}: {_fmt(out['psi'], '-')}")
-    print(f"{'Specific speed':30s}: {_fmt(out['specific_speed'], '-')}")
-    print(f"{'Blade velocity ratio':30s}: {_fmt(out['inputs.blade_velocity_ratio'], '-')}")
-    print(f"{'Spouting velocity':30s}: {_fmt(out['v_0'], 'm/s')}")
-    print(f"{'Meridional velocity':30s}: {_fmt(out['v_m'], 'm/s')}")
-    print(f"{'Blade speed at rotor exit':30s}: {_fmt(out['U'], 'm/s')}")
 
+    print(f"{'Total-to-total efficiency':30s}: {_fmt(perf['efficiency_tt'], '-')}")
+    print(f"{'Total-to-static efficiency':30s}: {_fmt(perf['efficiency_ts'], '-')}")
+    print(
+        f"{'Total-to-static pressure ratio':30s}: {_fmt(perf['pressure_ratio_ts'], '-')}"
+    )
+    print(f"{'Total-to-static volume ratio':30s}: {_fmt(perf['volume_ratio_ts'], '-')}")
+    print(f"{'Flow coefficient':30s}: {_fmt(perf['flow_coefficient'], '-')}")
+    print(f"{'Loading coefficient':30s}: {_fmt(perf['work_coefficient'], '-')}")
+    print(f"{'Degree of reaction':30s}: {_fmt(perf['degree_reaction'], '-')}")
+    print(f"{'Blade velocity ratio':30s}: {_fmt(perf['blade_velocity_ratio'], '-')}")
+    print(f"{'Specific speed':30s}: {_fmt(perf['specific_speed'], '-')}")
+    print(f"{'Spouting velocity':30s}: {_fmt(perf['spouting_velocity'], 'm/s')}")
+    print(f"{'Rotor exit blade speed':30s}: {_fmt(perf['rotor_exit_velocity'], 'm/s')}")
 
     # ==============================================================
     # Geometry summary
     # ==============================================================
     _section("Geometry summary")
-
-    print("\nStator:")
-    print(f"  {'Chord':22s}: {_fmt_mm(out['stator.chord'])}")
-    print(f"  {'Height':22s}: {_fmt_mm(out['stator.height'])}")
-    print(f"  {'Aspect ratio':22s}: {_fmt(out['stator.aspect_ratio'], '-')}")
-    print(f"  {'Spacing':22s}: {_fmt_mm(out['stator.spacing'])}")
-    print(f"  {'Opening':22s}: {_fmt_mm(out['stator.opening'])}")
-    print(f"  {'Number of blades':22s}: {_fmt(out['stator.N_blades'], '-', prec=1)}")
-    print(f"  {'Solidity':22s}: {_fmt(out['stator.solidity'], '-')}")
-    print(f"  {'Zweifel coefficient':22s}: {_fmt(out['stator.zweiffel'], '-')}")
-
-    print("\nRotor:")
-    print(f"  {'Chord':22s}: {_fmt_mm(out['rotor.chord'])}")
-    print(f"  {'Height':22s}: {_fmt_mm(out['rotor.height'])}")
-    print(f"  {'Aspect ratio':22s}: {_fmt(out['rotor.aspect_ratio'], '-')}")
-    print(f"  {'Spacing':22s}: {_fmt_mm(out['rotor.spacing'])}")
-    print(f"  {'Opening':22s}: {_fmt_mm(out['rotor.opening'])}")
-    print(f"  {'Number of blades':22s}: {_fmt(out['rotor.N_blades'], '-', prec=1)}")
-    print(f"  {'Solidity':22s}: {_fmt(out['rotor.solidity'], '-')}")
-    print(f"  {'Zweifel coefficient':22s}: {_fmt(out['rotor.zweiffel'], '-')}")
+    _print_geometry_block("Stator", geom["stator"])
+    _print_geometry_block("Rotor", geom["rotor"])
 
     # ==============================================================
     # Flow stations
     # ==============================================================
     _section("Flow stations")
-
     header = (
         f"{'Stn':>3s} "
         f"{'p [bar]':>10s} "
@@ -757,20 +816,172 @@ def print_stage(out):
         f"{'r [mm]':>9s} "
         f"{'H [mm]':>9s}"
     )
-    print(header)
+    print()
     print("-" * len(header))
 
-    for i in range(1, 5):
+    print(header)
+
+    for i, st in enumerate(stations):
         print(
             f"{i:3d} "
-            f"{out[f'station_{i}.p']/1e5:10.3f} "
-            f"{out[f'station_{i}.T']:9.2f} "
-            f"{out[f'station_{i}.d']:12.4f} "
-            f"{out[f'station_{i}.v']:10.2f} "
-            f"{out[f'station_{i}.w']:10.2f} "
-            f"{out[f'station_{i}.Ma']:7.3f} "
-            f"{out[f'station_{i}.alpha']:12.2f} "
-            f"{out[f'station_{i}.beta']:11.2f} "
-            f"{1e3*out[f'station_{i}.r']:9.2f} "
-            f"{1e3*out[f'station_{i}.H']:9.2f}"
+            f"{st['p']/1e5:10.3f} "
+            f"{st['T']:9.2f} "
+            f"{st['d']:12.4f} "
+            f"{st['v']:10.2f} "
+            f"{st['w']:10.2f} "
+            f"{st['Ma']:7.3f} "
+            f"{st['alpha']:12.2f} "
+            f"{st['beta']:11.2f} "
+            f"{1e3*st['r']:9.2f} "
+            f"{1e3*st['H']:9.2f}"
         )
+    print("-" * len(header))
+    print()
+
+
+def stage_performance_table(out):
+    perf = out["stage_performance"]
+
+    rows = [
+        ("Total-to-total efficiency", perf["efficiency_tt"], "-"),
+        ("Total-to-static efficiency", perf["efficiency_ts"], "-"),
+        ("Pressure ratio (t–s)", perf["pressure_ratio_ts"], "-"),
+        ("Volume ratio (t–s)", perf["volume_ratio_ts"], "-"),
+        ("Flow coefficient", perf["flow_coefficient"], "-"),
+        ("Work coefficient", perf["work_coefficient"], "-"),
+        ("Degree of reaction", perf["degree_reaction"], "-"),
+        ("Blade velocity ratio", perf["blade_velocity_ratio"], "-"),
+        ("Specific speed", perf["specific_speed"], "-"),
+        ("Spouting velocity", perf["spouting_velocity"], "m/s"),
+        ("Rotor exit blade speed", perf["rotor_exit_velocity"], "m/s"),
+        ("Rotational speed", perf["rotational_speed"], "rpm"),
+        ("Isentropic power", perf["power_isentropic"] / 1e3, "kW"),
+        ("Actual power (t–t)", perf["power_actual_tt"] / 1e3, "kW"),
+        ("Actual power (t–s)", perf["power_actual_ts"] / 1e3, "kW"),
+    ]
+
+    return [
+        {"Quantity": name, "Value": float(value), "Unit": unit}
+        for name, value, unit in rows
+    ]
+
+
+# def geometry_table(out):
+#     stator = out["geometry"]["stator"]
+#     rotor = out["geometry"]["rotor"]
+
+#     # Definition: key → (label, unit, scale)
+#     specs = [
+#         ("blade_count", "Blade count", "-", 1.0),
+#         ("chord", "Chord", "mm", 1e3),
+#         ("height", "Height", "mm", 1e3),
+#         ("spacing", "Spacing", "mm", 1e3),
+#         ("opening", "Opening", "mm", 1e3),
+#         ("solidity", "Solidity", "-", 1.0),
+#         ("aspect_ratio", "Aspect ratio", "-", 1.0),
+#         ("flaring_angle", "Flaring angle", "deg", 1.0),
+#         ("metal_angle_in", "Metal angle in", "deg", 1.0),
+#         ("metal_angle_out", "Metal angle out", "deg", 1.0),
+#     ]
+
+#     rows = []
+#     for key, label, unit, scale in specs:
+#         rows.append(
+#             {
+#                 "Variable": label,
+#                 "Stator": float(stator[key] * scale),
+#                 "Rotor": float(rotor[key] * scale),
+#                 "Unit": unit,
+#             }
+#         )
+
+#     print(rows)
+
+#     return rows
+
+
+def geometry_table(out):
+    stator = out["geometry"]["stator"]
+    rotor = out["geometry"]["rotor"]
+
+    # Sanity check: geometry dictionaries must match
+    if stator.keys() != rotor.keys():
+        raise ValueError("Stator and rotor geometry keys do not match")
+
+    def pretty_name(key):
+        return key.replace("_", " ").capitalize()
+
+    def infer_unit_and_scale(key):
+        if key in {
+            "radius_in",
+            "radius_out",
+            "height",
+            "chord",
+            "spacing",
+            "opening",
+            "maximum_thickness",
+            "leading_edge_radius",
+            "trailing_edge_thickness",
+        }:
+            return "mm", 1e3
+
+        if key in {
+            "metal_angle_in",
+            "metal_angle_out",
+            "flaring_angle",
+            "trailing_edge_wedge_angle",
+        }:
+            return "deg", 1.0
+
+        if key in {
+            "solidity",
+            "aspect_ratio",
+            "maximum_thickness_location",
+        }:
+            return "-", 1.0
+
+        if key == "blade_count":
+            return "-", 1.0
+
+        # Fallback
+        return "-", 1.0
+
+    rows = []
+    for key in stator.keys():
+        unit, scale = infer_unit_and_scale(key)
+
+        rows.append(
+            {
+                "Variable": pretty_name(key),
+                "Stator": float(stator[key] * scale),
+                "Rotor": float(rotor[key] * scale),
+                "Unit": unit,
+            }
+        )
+
+    return rows
+
+
+def flow_stations_table(out):
+    rows = []
+
+    for i, st in enumerate(out["flow_stations"]):
+        rows.append(
+            {
+                "Station": i,
+                "p [bar]": st["p"] / 1e5,
+                "T [K]": st["T"],
+                "ρ [kg/m³]": st["d"],
+                "q [-]": st["q"],
+                "v [m/s]": st["v"],
+                "w [m/s]": st["w"],
+                "u [m/s]": st["u"],
+                "Ma [-]": st["Ma"],
+                "α [deg]": st["alpha"],
+                "β [deg]": st["beta"],
+                "r [mm]": 1e3 * st["r"],
+                "H [mm]": 1e3 * st["H"],
+            }
+        )
+
+    return rows

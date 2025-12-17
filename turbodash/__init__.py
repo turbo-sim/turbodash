@@ -13,8 +13,9 @@ else:
 
 from .core import *
 from .graphics import *
-from .plotting_mpl import *
+from . import plotting_mpl as mpl
 from . import plotting_plotly as plotly
+
 
 # Package info
 __version__ = "0.2.5"

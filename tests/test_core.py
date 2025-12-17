@@ -12,7 +12,7 @@ EXAMPLES_DIR = THIS_DIR.parent / "demos"
 
 # Manually define relative paths from examples/ root
 example_relative_paths = [
-    "validation_vs_analytic.py",
+    "axial/validation_vs_analytic.py",
 ]
 
 # Full absolute paths

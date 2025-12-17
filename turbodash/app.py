@@ -1,10 +1,27 @@
 import numpy as np
-import plotly.graph_objects as go
-from dash import Dash, dcc, html, Input, Output, ctx
-from plotly.colors import sample_colorscale
-from turbodash import compute_performance_stage
+import yaml
+import jaxprop as jxp
+import turbodash as td
+import CoolProp.CoolProp as CP
 
-# === initialize app ===
+from datetime import datetime
+
+from dash import (
+    Dash,
+    dcc,
+    html,
+    Input,
+    Output,
+    ctx,
+    dash_table,
+    State,
+)
+from dash.dash_table.Format import Format, Scheme
+
+
+# =========================
+# Global / setup
+# =========================
 app = Dash(__name__)
 server = app.server
 
@@ -13,26 +30,82 @@ def main():
     app.run(debug=False)
 
 
-# === default values ===
-default_params = dict(
-    nu_lower=0.0,
-    nu_upper=2.0,
-    alpha1=0.0,
-    alpha2=60.0,
-    radius=0.9,
+# =========================
+# Default inputs
+# =========================
+defaults = dict(
+    # Operating conditions
+    fluid_name="Air",
+    inlet_property_pair="PT_INPUTS",
+    inlet_property_1=1e5,
+    inlet_property_2=300,
+    p_out=0.5e5,  # Pa
+    mdot=5.0,  # kg/s
+    alpha1=0.0,  # deg
+    alpha2=70.0,  # deg
+    nu=0.7,  # blade velocity ratio
+    R=0.5,  # degree of reaction
+    rr_12=0.75,
+    rr_23=0.95,
+    rr_34=0.80,
+    HR_inlet=0.25,
+    Z_stator=0.7,
+    Z_rotor=0.7,
     xi_stator=0.05,
-    xi_rotor=0.05,
+    xi_rotor=0.06,
 )
-R_list_default = [0.0, 0.25, 0.5, 0.75, 1 - 1e-6]
+
+
+# =========================
+# UI helpers
+# =========================
+def input_only(label_children, id_prefix, default):
+    return html.Div(
+        style={"marginBottom": "16px", "marginTop": "8px"},
+        children=[
+            html.Label(
+                label_children,
+                style={
+                    "fontWeight": "bold",
+                    "display": "block",
+                    "marginBottom": "6px",
+                    "marginTop": "8px",
+                },
+            ),
+            dcc.Input(
+                id=f"{id_prefix}_input",
+                type="number",
+                value=default,
+                debounce=True,
+                style={
+                    "width": "95%",
+                    "padding": "6px 8px",
+                    "fontSize": "14px",
+                    "borderRadius": "4px",
+                    "border": "1px solid #ccc",
+                    "backgroundColor": "#ffffff",
+                    "boxShadow": "inset 0 1px 2px rgba(0,0,0,0.08)",
+                },
+            ),
+        ],
+    )
 
 
 def linked_input(label_children, id_prefix, min_val, max_val, step, default):
     return html.Div(
-        style={"margin-bottom": "20px"},
+        style={"marginBottom": "16px", "marginTop": "8px"},
         children=[
-            html.Label(label_children, style={"font-weight": "bold"}),
+            html.Label(
+                label_children,
+                style={
+                    "fontWeight": "bold",
+                    "display": "block",
+                    "marginBottom": "6px",
+                    "marginTop": "8px",
+                },
+            ),
             html.Div(
-                style={"display": "flex", "align-items": "center", "gap": "10px"},
+                style={"display": "flex", "alignItems": "center", "gap": "10px"},
                 children=[
                     html.Div(
                         dcc.Slider(
@@ -43,9 +116,9 @@ def linked_input(label_children, id_prefix, min_val, max_val, step, default):
                             value=default,
                             marks=None,
                             tooltip={"placement": "bottom", "always_visible": False},
-                            updatemode="drag",  # 👈 update continuously while dragging
+                            updatemode="drag",
                         ),
-                        style={"flex-grow": "1"},
+                        style={"flexGrow": "1"},
                     ),
                     dcc.Input(
                         id=f"{id_prefix}_input",
@@ -54,7 +127,16 @@ def linked_input(label_children, id_prefix, min_val, max_val, step, default):
                         min=min_val,
                         max=max_val,
                         step=step,
-                        style={"width": "80px"},
+                        debounce=True,  # Wait until number is types before callback
+                        style={
+                            "width": "60px",
+                            "padding": "6px 8px",
+                            "fontSize": "14px",
+                            "borderRadius": "4px",
+                            "border": "1px solid #ccc",
+                            "backgroundColor": "#ffffff",
+                            "boxShadow": "inset 0 1px 2px rgba(0,0,0,0.08)",
+                        },
                     ),
                 ],
             ),
@@ -62,326 +144,620 @@ def linked_input(label_children, id_prefix, min_val, max_val, step, default):
     )
 
 
-# === define calculator layout (your existing code) ===
-calculator_layout = html.Div(
-    style={
-        "font-family": "Arial",
-        "display": "flex",
-        "max-width": "1400px",
-        "margin": "auto",
-    },
-    children=[
-        # === left control panel ===
+# =========================
+# Controls layout
+# =========================
+
+LABEL_STYLE = dict(
+    fontWeight="bold",
+    display="block",
+    marginBottom="6px",
+    marginTop="8px",
+)
+
+CONTROLS_STYLE = dict(
+    width="400px",
+    padding="30px",
+    overflowY="auto",
+    borderRight="1px solid #ddd",
+    backgroundColor="#fdfdfd",
+)
+
+
+def html_section(title):
+    return html.H4(
+        title,
+        style={
+            "marginTop": "24px",
+            "paddingBottom": "6px",
+            "borderBottom": "1px solid #ddd",
+        },
+    )
+
+
+def labeled(label, component):
+    return html.Div([html.Label(label, style=LABEL_STYLE), component])
+
+
+def save_load_row():
+    return html.Div(
+        [
+            html.Button(
+                "Save current design",
+                id="save_button",
+                n_clicks=0,
+                style={"padding": "8px 16px", "fontWeight": "bold"},
+            ),
+            dcc.Upload(
+                id="load_button",
+                accept=".yaml,.yml",
+                children=html.Button(
+                    "Load previous design",
+                    style={"padding": "8px 16px", "fontWeight": "bold"},
+                ),
+            ),
+        ],
+        style=dict(display="flex", gap="12px", marginBottom="10px"),
+    )
+
+
+def stage_type_selector():
+    return html.Div(
+        [
+            html.Label("Stage type", style=LABEL_STYLE),
+            dcc.RadioItems(
+                id="stage_type",
+                options=[
+                    {"label": "Axial", "value": "axial"},
+                    {"label": "Radial", "value": "radial"},
+                ],
+                value="radial",
+                style=dict(display="flex", flexDirection="column", gap="6px"),
+                labelStyle=dict(
+                    display="flex",
+                    alignItems="center",
+                    width="100%",
+                    padding="8px 10px",
+                    border="1px solid #ddd",
+                    borderRadius="4px",
+                    backgroundColor="#fafafa",
+                ),
+                inputStyle={"marginRight": "10px"},
+            ),
+        ],
+        style={"marginBottom": "20px"},
+    )
+
+
+OPERATING_DROPDOWNS = [
+    (
+        "Working fluid",
+        dcc.Dropdown(
+            id="fluid_name",
+            options=[
+                {"label": f, "value": f}
+                for f in sorted(CP.get_global_param_string("FluidsList").split(","))
+            ],
+            value=defaults["fluid_name"],
+            clearable=False,
+        ),
+    ),
+    (
+        "Inlet property pair",
+        dcc.Dropdown(
+            id="inlet_property_pair",
+            options=list(jxp.INPUT_PAIRS.keys()),
+            value=defaults["inlet_property_pair"],
+            clearable=False,
+        ),
+    ),
+]
+
+
+DESIGN_VARIABLES = [
+    (["Stator inlet angle, α", html.Sub("1"), " [deg]"], "alpha1", -75.0, 75.0, 1.0),
+    (["Stator exit angle, α", html.Sub("2"), " [deg]"], "alpha2", 0.0, 90.0, 1.0),
+    (["Blade velocity ratio, ν"], "nu", 0.05, 2.0, 0.01),
+    (["Degree of reaction, R"], "R", 0.0, 1.0 - 1e-6, 0.01),
+    (["Inlet height-to-radius ratio, H₁ / r₁"], "HR_inlet", 0.01, 2.0, 0.005),
+    (["Radius ratio, r₁ / r₂"], "rr_12", 0.10, 1.00, 0.001),
+    (["Radius ratio, r₂ / r₃"], "rr_23", 0.10, 1.00, 0.001),
+    (["Radius ratio, r₃ / r₄"], "rr_34", 0.10, 1.00, 0.001),
+    (["Zweifel (stator)"], "Z_stator", 0.1, 2.0, 0.01),
+    (["Zweifel (rotor)"], "Z_rotor", 0.1, 2.0, 0.01),
+]
+
+
+controls = html.Div(
+    [
+        save_load_row(),
+        dcc.Download(id="download_meanline_yaml"),
+        dcc.Store(id="stage_result_store"),
+        dcc.Store(id="loaded_cfg_store"),
+        stage_type_selector(),
+        html_section("Operating conditions"),
+        *[labeled(lbl, comp) for lbl, comp in OPERATING_DROPDOWNS],
         html.Div(
-            style={"width": "38%", "padding": "20px"},
+            style={"marginLeft": "16px"},
             children=[
-                html.H3("Stage parameters"),
-                linked_input(
-                    ["Blade velocity ratio, ν", html.Sub("min")],
-                    "nu_lower",
-                    0.0,
-                    10.0,
-                    0.01,
-                    default_params["nu_lower"],
-                ),
-                linked_input(
-                    ["Blade velocity ratio, ν", html.Sub("max")],
-                    "nu_upper",
-                    0.0,
-                    10.0,
-                    0.01,
-                    default_params["nu_upper"],
-                ),
-                linked_input(
-                    ["Stator inlet angle, α", html.Sub("1"), " [deg]"],
-                    "alpha1",
-                    -60.0,
-                    60.0,
-                    1.0,
-                    default_params["alpha1"],
-                ),
-                linked_input(
-                    ["Stator exit angle, α", html.Sub("2"), " [deg]"],
-                    "alpha2",
-                    0.0,
-                    90.0,
-                    1.0,
-                    default_params["alpha2"],
-                ),
-                linked_input(
-                    ["Radius ratio, r", html.Sub("2"), "/", "r", html.Sub("3")],
-                    "radius",
-                    0.0,
-                    1.0,
-                    0.01,
-                    default_params["radius"],
-                ),
-                linked_input(
-                    ["Loss coefficient, ξ", html.Sub("stator")],
-                    "xi_stator",
-                    0.0,
-                    0.5,
-                    0.01,
-                    default_params["xi_stator"],
-                ),
-                linked_input(
-                    ["Loss coefficient, ξ", html.Sub("rotor")],
-                    "xi_rotor",
-                    0.0,
-                    0.5,
-                    0.01,
-                    default_params["xi_rotor"],
-                ),
-                html.Label(
-                    ["Degree of reaction, ", html.I("R")], style={"font-weight": "bold"}
-                ),
-                dcc.Input(
-                    id="R_values_input",
-                    type="text",
-                    value=", ".join([f"{R:.2f}" for R in R_list_default]),
-                    style={"width": "100%", "margin-top": "5px"},
-                    debounce=True,
-                ),
+                input_only(["Inlet property 1"], "inlet_property_1", defaults["inlet_property_1"]),
+                input_only(["Inlet property 2"], "inlet_property_2", defaults["inlet_property_2"]),
             ],
         ),
-        # === right plot ===
+
+
+        input_only(
+            ["Exit static pressure, p", html.Sub("out"), " [Pa]"],
+            "p_out",
+            defaults["p_out"],
+        ),
+        input_only(["Mass flow rate, ṁ [kg/s]"], "mdot", defaults["mdot"]),
+        html_section("Design variables"),
+        *[
+            linked_input(label, key, lo, hi, step, defaults[key])
+            for label, key, lo, hi, step in DESIGN_VARIABLES
+        ],
+        html_section("Loss coefficients"),
+        linked_input(
+            ["Loss coefficient, ξ", html.Sub("stator")],
+            "xi_stator",
+            0.0,
+            0.5,
+            0.005,
+            defaults["xi_stator"],
+        ),
+        linked_input(
+            ["Loss coefficient, ξ", html.Sub("rotor")],
+            "xi_rotor",
+            0.0,
+            0.5,
+            0.005,
+            defaults["xi_rotor"],
+        ),
+    ],
+    style=CONTROLS_STYLE,
+)
+
+# =========================
+# Results layout
+# =========================
+
+TABLE_COLUMNS = {
+    "Value",
+    "Stator",
+    "Rotor",
+    "p [bar]",
+    "T [K]",
+    "ρ [kg/m³]",
+    "q [-]",
+    "v [m/s]",
+    "w [m/s]",
+    "u [m/s]",
+    "Ma [-]",
+    "α [deg]",
+    "β [deg]",
+    "r [mm]",
+    "H [mm]",
+}
+
+
+def make_table(data, columns):
+    formatted_columns = []
+
+    for c in columns:
+        if c in TABLE_COLUMNS:
+            formatted_columns.append(
+                {
+                    "name": c,
+                    "id": c,
+                    "type": "numeric",
+                    "format": Format(precision=3, scheme=Scheme.fixed),
+                }
+            )
+        else:
+            formatted_columns.append({"name": c, "id": c})
+
+    return dash_table.DataTable(
+        data=data,
+        columns=formatted_columns,
+        style_table={
+            "overflowX": "auto",
+        },
+        style_cell={
+            "fontFamily": "monospace",
+            "fontSize": "13px",
+            "padding": "6px",
+            "textAlign": "right",
+        },
+        style_header={
+            "fontWeight": "bold",
+            "backgroundColor": "#f0f0f0",
+            "borderBottom": "2px solid black",
+        },
+    )
+
+
+def plot_card(title, graph_id):
+    return html.Div(
+        style={
+            "display": "flex",
+            "flexDirection": "column",
+            "border": "1px solid #ddd",
+            "borderRadius": "6px",
+            "padding": "10px",
+            "backgroundColor": "white",
+        },
+        children=[
+            html.Div(
+                title,
+                style={"fontWeight": "bold", "marginBottom": "6px"},
+            ),
+            dcc.Graph(
+                id=graph_id,
+                style={"flex": "1 1 auto"},
+                config={"responsive": True},
+            ),
+        ],
+    )
+
+
+def table_card(title, table_id, max_height):
+    return html.Div(
+        style={
+            "display": "flex",
+            "flexDirection": "column",
+            "border": "1px solid #ddd",
+            "borderRadius": "6px",
+            "padding": "10px",
+            "backgroundColor": "white",
+        },
+        children=[
+            html.Div(
+                title,
+                style={"fontWeight": "bold", "marginBottom": "8px"},
+            ),
+            html.Div(
+                id=table_id,
+                style={
+                    "maxHeight": f"{max_height}px",
+                    "overflowY": "auto",
+                },
+            ),
+        ],
+    )
+
+
+plots = html.Div(
+    style={
+        "display": "grid",
+        "gridTemplateColumns": "repeat(2, 1fr)",
+        "gridAutoRows": "minmax(420px, 1fr)",
+        "gap": "24px",
+    },
+    children=[
+        plot_card("Meridional channel", "meridional_plot"),
+        plot_card("Blade-to-blade view", "blades_plot"),
+        plot_card("Total-to-static efficiency", "efficiency_ts_plot"),
+        plot_card("Total-to-total efficiency", "efficiency_tt_plot"),
+    ],
+)
+
+
+tables = html.Div(
+    style={
+        "display": "flex",
+        "flexDirection": "column",
+        "gap": "24px",
+        "marginTop": "24px",
+    },
+    children=[
+        # Row 1: two tables (50/50)
         html.Div(
-            style={"width": "62%", "padding": "20px"},
+            style={
+                "display": "grid",
+                "gridTemplateColumns": "1fr 1fr",
+                "gap": "20px",
+            },
             children=[
-                html.H2("Turbine stage performance analysis"),
-                html.Div(
-                    children=[
-                        dcc.Graph(
-                            id="efficiency_ts_plot",
-                            style={"height": "340px", "margin-bottom": "20px"},
-                        ),
-                        dcc.Graph(id="efficiency_tt_plot", style={"height": "340px"}),
-                    ]
-                ),
+                table_card("Stage performance", "perf_table", 300),
+                table_card("Geometry summary", "geom_table", 300),
+            ],
+        ),
+        # Row 2: full-width table
+        html.Div(
+            children=[
+                table_card("Flow stations", "stations_table", 450),
             ],
         ),
     ],
 )
 
-# === load your theory markdown (static doc) ===
-import os
-
-# Go one level up from the turbodash/ folder to root/, then into docs/
-theory_path = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)),  # root folder
-    "docs",
-    "documentation.md",
-)
-
-if os.path.exists(theory_path):
-    with open(theory_path, "r", encoding="utf-8") as f:
-        theory_md = f.read()
-else:
-    theory_md = "Theory file not found."
-
-
-docs_markdown = (
-    dcc.Markdown(
-        theory_md,
-        mathjax=True,
-        style={
-            "whiteSpace": "pre-wrap",
-            "padding": "40px",
-            "fontFamily": "Segoe UI, Roboto, Helvetica, Arial, sans-serif",
-            "fontSize": "16px",
-            "lineHeight": "1.6",
-            "color": "#24292e",
-            "backgroundColor": "#ffffff",
-        },
-    ),
-)
 
 app.layout = html.Div(
-    [
-        dcc.Tabs(
-            id="tabs",
-            value="calculator",
-            children=[
-                dcc.Tab(
-                    label="Calculator", value="calculator", children=[calculator_layout]
-                ),
-                dcc.Tab(
-                    label="Documentation",
-                    value="docs",
-                    children=[
-                        html.Div(
-                            docs_markdown,
-                            style={"max-width": "1000px", "margin": "auto"},
-                        )
-                    ],
-                ),
-            ],
-            colors={
-                "border": "#007acc",
-                "primary": "#007acc",
-                "background": "#f9f9f9",
+    style={
+        "display": "flex",
+        "width": "100vw",
+        "height": "100vh",
+        "overflow": "hidden",
+        "fontFamily": "Arial",
+    },
+    children=[
+        # Left: controls (own scrollbar)
+        controls,
+        # Right: plots + tables (own scrollbar)
+        html.Div(
+            style={
+                "flex": "1 1 auto",
+                "overflowY": "auto",
+                "padding": "20px",
             },
-            style={"fontFamily": "Arial", "fontSize": "16px", "font-weight": "bold"},
-        )
-    ]
+            children=[
+                plots,
+                tables,
+            ],
+        ),
+    ],
 )
 
 
-# === sync sliders and inputs (with range enforcement) ===
-def link_value(prefix, min_val, max_val):
-    @app.callback(
-        Output(f"{prefix}_slider", "value"),
-        Output(f"{prefix}_input", "value"),
-        Input(f"{prefix}_slider", "value"),
-        Input(f"{prefix}_input", "value"),
-    )
-    def sync(val_slider, val_input):
-        trigger = ctx.triggered_id
-        val_slider = np.clip(
-            val_slider if val_slider is not None else min_val, min_val, max_val
-        )
-        val_input = np.clip(
-            val_input if val_input is not None else min_val, min_val, max_val
-        )
-        if trigger == f"{prefix}_slider":
-            return val_slider, val_slider
-        elif trigger == f"{prefix}_input":
-            return val_input, val_input
-        return val_slider, val_input
-
-
-# register sync callbacks
-link_value("nu_lower", 1e-12, 10.0)
-link_value("nu_upper", 1e-12, 10.0)
-link_value("alpha1", -60.0, 60.0)
-link_value("alpha2", 0.0, 90.0)
-link_value("radius", 0.0, 1.0)
-link_value("xi_stator", 0.0, 0.5)
-link_value("xi_rotor", 0.0, 0.5)
-
-
-# === update plots callback ===
+# =========================
+# Callback: compute + plot
+# =========================
 @app.callback(
+    Output("meridional_plot", "figure"),
+    Output("blades_plot", "figure"),
     Output("efficiency_ts_plot", "figure"),
     Output("efficiency_tt_plot", "figure"),
+    Output("perf_table", "children"),
+    Output("geom_table", "children"),
+    Output("stations_table", "children"),
+    Output("stage_result_store", "data"),
+    Input("fluid_name", "value"),
+    Input("stage_type", "value"),
+    Input("inlet_property_pair", "value"),
+    Input("inlet_property_1_input", "value"),
+    Input("inlet_property_2_input", "value"),
+    Input("p_out_input", "value"),
+    Input("mdot_input", "value"),
     Input("alpha1_slider", "value"),
     Input("alpha2_slider", "value"),
-    Input("radius_slider", "value"),
+    Input("nu_slider", "value"),
+    Input("R_slider", "value"),
+    Input("rr_12_slider", "value"),
+    Input("rr_23_slider", "value"),
+    Input("rr_34_slider", "value"),
+    Input("HR_inlet_slider", "value"),
+    Input("Z_stator_slider", "value"),
+    Input("Z_rotor_slider", "value"),
     Input("xi_stator_slider", "value"),
     Input("xi_rotor_slider", "value"),
-    Input("nu_lower_slider", "value"),
-    Input("nu_upper_slider", "value"),
-    Input("R_values_input", "value"),
 )
-def update_plots(
-    alpha1, alpha2, radius, xi_stator, xi_rotor, nu_lower, nu_upper, R_values_input
+def update_turbine(
+    fluid_name,
+    stage_type,
+    inlet_property_pair,
+    inlet_property_1,
+    inlet_property_2,
+    p_out,
+    mdot,
+    alpha1,
+    alpha2,
+    nu,
+    R,
+    rr_12,
+    rr_23,
+    rr_34,
+    HR_inlet,
+    Z_stator,
+    Z_rotor,
+    xi_stator,
+    xi_rotor,
 ):
 
-    # --- Parse and sanitize R values ---
-    if isinstance(R_values_input, str):
-        # Split by comma or space and convert to floats
-        try:
-            R_list = np.array(
-                [
-                    float(r.strip())
-                    for r in R_values_input.replace(";", ",").split(",")
-                    if r.strip() != ""
-                ]
-            )
-        except ValueError:
-            R_list = np.array([0.0, 0.25, 0.5, 0.75, 1.0 - 1e-9])
-    else:
-        # fallback (shouldn't happen)
-        R_list = np.array([0.0, 0.25, 0.5, 0.75, 1.0 - 1e-9])
-
-    # Clamp all values to [0.0, 1 - 1e-9]
-    R_list = np.clip(R_list, 0.0, 1.0 - 1e-9)
-
-    # Ensure unique, sorted order (optional but nice)
-    R_list = np.unique(R_list)
-
-    # generate ν array
-    n_points = 200
-    nu_vals = np.linspace(nu_lower, nu_upper, n_points)
-
-    fig_ts = go.Figure()
-    fig_tt = go.Figure()
-
-    colors = [
-        sample_colorscale("Magma", 0.2 + 0.6 * i / (len(R_list) - 1))[0]
-        for i in range(len(R_list))
-    ]
-
-    for R, color in zip(R_list, colors):
-        results = compute_performance_stage(
+    try:
+        # Calculate performance
+        out = td.compute_stage_meanline(
+            fluid_name=fluid_name,
+            inlet_property_pair_string=inlet_property_pair,
+            inlet_property_1=inlet_property_1,
+            inlet_property_2=inlet_property_2,
+            exit_pressure=p_out,
+            mass_flow_rate=mdot,
             stator_inlet_angle=alpha1,
             stator_exit_angle=alpha2,
+            blade_velocity_ratio=nu,
             degree_reaction=R,
-            blade_velocity_ratio=nu_vals,
-            radius_ratio_34=radius,
+            radius_ratio_12=rr_12,
+            radius_ratio_23=rr_23,
+            radius_ratio_34=rr_34,
+            height_radius_ratio=HR_inlet,
+            zweiffel_stator=Z_stator,
+            zweiffel_rotor=Z_rotor,
             loss_coeff_stator=xi_stator,
             loss_coeff_rotor=xi_rotor,
-        )
-        # first plot: total-to-static efficiency
-        fig_ts.add_trace(
-            go.Scatter(
-                x=nu_vals,
-                y=results["eta_ts"],
-                mode="lines",
-                line=dict(color=color, width=2),
-                name=f"R={R:.2f}",
-            )
-        )
-        # second plot: total-to-total efficiency
-        if "eta_tt" in results:
-            fig_tt.add_trace(
-                go.Scatter(
-                    x=nu_vals,
-                    y=results["eta_tt"],
-                    mode="lines",
-                    line=dict(color=color, width=2),
-                    name=f"R={R:.2f}",
-                )
-            )
-
-    # === Layouts ===
-    for fig, ylabel in zip(
-        [fig_ts, fig_tt],
-        ["Total-to-static efficiency", "Total-to-total efficiency"],
-    ):
-        fig.update_layout(
-            xaxis_title="Blade velocity ratio",
-            yaxis_title=ylabel,
-            template="simple_white",
-            showlegend=True,
-            legend=dict(
-                x=1.02,
-                y=1.0,
-                xanchor="left",
-                yanchor="top",
-                bgcolor="rgba(255,255,255,0.8)",
-            ),
-            margin=dict(l=80, r=20, t=30, b=60),
-        )
-        fig.update_xaxes(
-            range=[0, max(2, nu_upper)],
-            showline=True,  # box edges
-            linewidth=1,
-            linecolor="black",
-            mirror=True,
-            showgrid=True,
-            gridcolor="lightgray",
-            gridwidth=0.5,
-        )
-        fig.update_yaxes(
-            range=[0, 1.1],
-            showline=True,
-            linewidth=1,
-            linecolor="black",
-            mirror=True,
-            showgrid=True,
-            gridcolor="lightgray",
-            gridwidth=0.5,
+            stage_type=stage_type,
         )
 
-    return fig_ts, fig_tt
+        # Convert results to Python types
+        out_python = {k: getattr(v, "item", lambda: v)() for k, v in out.items()}
+
+        # Create plots
+        fig_meridional = td.plotly.plot_meridional_channel(out)
+        fig_blades = td.plotly.plot_blades(out, N_points=500, N_blades_plot=10)
+        fig_ts = td.plotly.plot_eta_ts(out)
+        fig_tt = td.plotly.plot_eta_tt(out)
+
+        # Create tables
+        perf_data = td.stage_performance_table(out)
+        geom_data = td.geometry_table(out)
+        stations_data = td.flow_stations_table(out)
+        perf_table = make_table(perf_data, ["Quantity", "Value", "Unit"])
+        geom_table = make_table(geom_data, ["Variable", "Stator", "Rotor", "Unit"])
+        stations_table = make_table(stations_data, list(stations_data[0].keys()))
+
+        return (
+            fig_meridional,
+            fig_blades,
+            fig_ts,
+            fig_tt,
+            perf_table,
+            geom_table,
+            stations_table,
+            out_python,
+        )
+        # return fig_meridional, fig_blades, fig_ts, fig_tt, None, None, None, out_python
+
+    except Exception as e:
+        print("\n=== ERROR IN update_turbine CALLBACK ===")
+        print(e)
+        print("========================================\n")
+        raise
+
+
+# =========================================
+# YAML saving
+# =========================================
+@app.callback(
+    Output("download_meanline_yaml", "data"),
+    Input("save_button", "n_clicks"),
+    State("stage_result_store", "data"),
+    prevent_initial_call=True,
+)
+def download_meanline_yaml(n_clicks, out):
+    if out is None:
+        return None
+
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    filename = f"meanline_stage_{timestamp}.yaml"
+
+    yaml_str = yaml.safe_dump(
+        out,
+        sort_keys=False,
+        default_flow_style=False,
+    )
+
+    return dict(
+        content=yaml_str,
+        filename=filename,
+        type="text/yaml",
+    )
+
+
+# =========================================
+# Register slider–input sync + YAML load
+# =========================================
+
+
+@app.callback(
+    Output("loaded_cfg_store", "data"),
+    Input("load_button", "contents"),
+    prevent_initial_call=True,
+)
+def load_design(contents):
+    import base64, yaml
+    from dash.exceptions import PreventUpdate
+
+    if contents is None:
+        raise PreventUpdate
+
+    _, content_string = contents.split(",")
+    decoded = base64.b64decode(content_string).decode("utf-8")
+    cfg = yaml.safe_load(decoded) or {}
+    return cfg
+
+
+def register_link_value(prefix, min_val, max_val, cfg_key=None):
+    slider_id = f"{prefix}_slider"
+    input_id = f"{prefix}_input"
+
+    @app.callback(
+        Output(slider_id, "value"),
+        Output(input_id, "value"),
+        Input(slider_id, "value"),
+        Input(input_id, "value"),
+        Input("loaded_cfg_store", "data"),
+        prevent_initial_call=True,
+    )
+    def _sync(val_slider, val_input, loaded_cfg):
+        trigger = ctx.triggered_id
+
+        # 1) Loading: apply cfg["inputs"][cfg_key] if present
+        if trigger == "loaded_cfg_store" and loaded_cfg and cfg_key:
+            inp = loaded_cfg.get("inputs", {})
+            if cfg_key in inp and inp[cfg_key] is not None:
+                v = float(np.clip(inp[cfg_key], min_val, max_val))
+                return v, v
+
+        # 2) Normal slider <-> input sync
+        v_slider = np.clip(
+            val_slider if val_slider is not None else min_val, min_val, max_val
+        )
+        v_input = np.clip(
+            val_input if val_input is not None else min_val, min_val, max_val
+        )
+
+        if trigger == slider_id:
+            return float(v_slider), float(v_slider)
+        if trigger == input_id:
+            return float(v_input), float(v_input)
+
+        return float(v_slider), float(v_input)
+
+
+def register_input_only_load(id_prefix, cfg_key):
+    input_id = f"{id_prefix}_input"
+
+    @app.callback(
+        Output(input_id, "value"),
+        Input("loaded_cfg_store", "data"),
+        State(input_id, "value"),
+        prevent_initial_call=True,
+    )
+    def _load_input_only(loaded_cfg, cur):
+        if not loaded_cfg:
+            return cur
+        inp = loaded_cfg.get("inputs", {})
+        if cfg_key in inp and inp[cfg_key] is not None:
+            return inp[cfg_key]
+        return cur
+
+
+register_input_only_load("inlet_property_1", "inlet_property_1")
+register_input_only_load("inlet_property_2", "inlet_property_2")
+register_input_only_load("p_out", "exit_pressure")
+register_input_only_load("mdot", "mass_flow_rate")
+register_link_value("alpha1", -75.0, 75.0, cfg_key="stator_inlet_angle")
+register_link_value("alpha2", 0.0, 90.0, cfg_key="stator_exit_angle")
+register_link_value("nu", 0.05, 2.0, cfg_key="blade_velocity_ratio")
+register_link_value("R", 1e-9, 1.0 - 1e-9, cfg_key="degree_reaction")
+register_link_value("rr_12", 0.10, 1.00, cfg_key="radius_ratio_12")
+register_link_value("rr_23", 0.10, 1.00, cfg_key="radius_ratio_23")
+register_link_value("rr_34", 0.10, 1.00, cfg_key="radius_ratio_34")
+register_link_value("HR_inlet", 0.01, 2.0, cfg_key="height_radius_ratio")
+register_link_value("Z_stator", 0.1, 1.5, cfg_key="zweiffel_stator")
+register_link_value("Z_rotor", 0.1, 1.5, cfg_key="zweiffel_rotor")
+register_link_value("xi_stator", 0.0, 0.5, cfg_key="loss_coeff_stator")
+register_link_value("xi_rotor", 0.0, 0.5, cfg_key="loss_coeff_rotor")
+
+
+@app.callback(
+    Output("fluid_name", "value"),
+    Output("stage_type", "value"),
+    Output("inlet_property_pair", "value"),
+    Input("loaded_cfg_store", "data"),
+    State("fluid_name", "value"),
+    State("stage_type", "value"),
+    State("inlet_property_pair", "value"),
+    prevent_initial_call=True,
+)
+def apply_loaded_meta(cfg, fluid_cur, stage_cur, pair_cur):
+    if not cfg:
+        return fluid_cur, stage_cur, pair_cur
+
+    inp = cfg.get("inputs", {})
+
+    fluid = inp.get("fluid", fluid_cur)
+    stage = inp.get("stage_type", stage_cur)
+    pair = inp.get("inlet_property_pair", pair_cur)  # now a string in YAML
+
+    return fluid, stage, pair

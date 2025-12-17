@@ -444,7 +444,7 @@ def compute_stage_meanline(
         "efficiency_tt": perf["eta_tt"],
         "efficiency_ts": perf["eta_ts"],
         "pressure_ratio_ts": state_01.p / state_4s.p,
-        "volume_ratio_ts": state_4s.d / state_01.d,
+        "volume_ratio_ts": state_01.d / state_4s.d,
         "flow_coefficient": perf["phi"],
         "work_coefficient": perf["psi"],
         "degree_reaction": degree_reaction,

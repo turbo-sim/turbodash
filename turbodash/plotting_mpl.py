@@ -1,15 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from .geom_blade import compute_blade_coordinates_radial, compute_blade_coordinates_cartesian
+from .geom_blade import (
+    compute_blade_coordinates_radial,
+    compute_blade_coordinates_cartesian,
+)
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_stage(
-    result,
-    N_points=500,
-):
+
+def plot_stage(out, N_points=500):
     """
     Side-by-side visualization of a turbine stage.
 
@@ -25,51 +26,34 @@ def plot_stage(
         Points per blade camberline
     """
 
+    # Create figure
     fig, (ax_mer, ax_blade) = plt.subplots(
         ncols=2,
-        figsize=(12, 5),
+        figsize=(8, 5),
         sharey=False,
-        gridspec_kw={"width_ratios": [1.0, 1.2]},
+        gridspec_kw={"width_ratios": [1.0, 2.0]},
     )
 
-    # ============================================================
     # Meridional channel
-    # ============================================================
-    stage_type = result["stage_type"]
+    stage_type = out["inputs"]["stage_type"]
     if stage_type == "radial":
-        plot_meridional_channel_radial(result, ax=ax_mer)
+        plot_meridional_channel_radial(out, ax=ax_mer)
+        plot_blades_radial(out, ax=ax_blade, N_points=N_points)
     elif stage_type == "axial":
-        plot_meridional_channel_axial(result, ax=ax_mer)
+        plot_meridional_channel_axial(out, ax=ax_mer)
+        plot_blades_axial(out, ax=ax_blade, N_points=N_points)
     else:
         raise ValueError(f"Invalid stage type: {stage_type}")
 
-    # ============================================================
-    # Blade-to-blade view
-    # ============================================================
-    if stage_type == "radial":
-        plot_blades_radial(result, ax=ax_blade, N_points=N_points)
-
-        # Positive quadrant only (radial convention)
-        r_max = 1.05 * result["station_4.r"]
-        ax_blade.set_xlim(0.0, r_max)
-        ax_blade.set_ylim(0.0, r_max)
-
-    elif stage_type == "axial":
-        plot_blades_axial(result, ax=ax_blade, N_points=N_points)
-
-    # ============================================================
     # Consistent formatting
-    # ============================================================
     ax_mer.set_aspect("equal", adjustable="box")
     ax_blade.set_aspect("equal", adjustable="box")
 
-    plt.tight_layout(pad=1.0)
+    plt.tight_layout(pad=1)
     return fig, (ax_mer, ax_blade)
 
 
-
-
-def plot_meridional_channel_radial(result, ax=None):
+def plot_meridional_channel_radial(out, ax=None):
     """
     Plot stator and rotor blades in the meridional (r-x) plane.
 
@@ -83,15 +67,15 @@ def plot_meridional_channel_radial(result, ax=None):
         fig, ax = plt.subplots(figsize=(6, 5))
 
     # Extract radii and heights
-    r_1 = result["station_1.r"]
-    r_2 = result["station_2.r"]
-    r_3 = result["station_3.r"]
-    r_4 = result["station_4.r"]
+    r_1 = out["flow_stations"][1]["r"]
+    r_2 = out["flow_stations"][2]["r"]
+    r_3 = out["flow_stations"][3]["r"]
+    r_4 = out["flow_stations"][4]["r"]
 
-    H_1 = result["station_1.H"]
-    H_2 = result["station_2.H"]
-    H_3 = result["station_3.H"]
-    H_4 = result["station_4.H"]
+    H_1 = out["flow_stations"][1]["H"]
+    H_2 = out["flow_stations"][2]["H"]
+    H_3 = out["flow_stations"][3]["H"]
+    H_4 = out["flow_stations"][4]["H"]
 
     # -----------------------------
     # Stator (1 -> 2)
@@ -120,8 +104,8 @@ def plot_meridional_channel_radial(result, ax=None):
     # -----------------------------
     # Formatting (only once)
     # -----------------------------
-    ax.set_xlabel("Axis")
-    ax.set_ylabel("Radius")
+    ax.set_xlabel("Axial direction")
+    ax.set_ylabel("Radial direction")
     ax.set_aspect("equal", adjustable="box")
     ax.set_ylim(bottom=0.0)
     H_max = max(H_1, H_2, H_3, H_4)
@@ -132,7 +116,7 @@ def plot_meridional_channel_radial(result, ax=None):
 
 
 def plot_blades_radial(
-    result,
+    out,
     ax=None,
     N_points=500,
 ):
@@ -142,7 +126,7 @@ def plot_blades_radial(
 
     Parameters
     ----------
-    result : dict
+    out : dict
         Output of compute_stage_meanline
     ax : matplotlib axis, optional
     N_points : int
@@ -156,23 +140,22 @@ def plot_blades_radial(
     # Helper to plot one blade row
     # ============================================================
     def plot_row(
-        r_in,
-        r_out,
-        angle_in,
-        angle_out,
-        N_blades,
+        geom,
         color,
         label=None,
     ):
+        # --- Blade parameters
+        N_blades = geom["blade_count"]
+        r_in = geom["radius_in"]
+        r_out = geom["radius_out"]
+        angle_in = geom["metal_angle_in"]
+        angle_out = geom["metal_angle_out"]
         angle_0 = 0.0
-
-        # --- thickness parameters (meanline-consistent, tunable)
-        loc_max = 0.30
-        chord_radial = r_out - r_in
-        t_max = 0.30 * chord_radial
-        r_le = 0.50 * t_max
-        t_te = 0.02 * chord_radial
-        wedge_angle = np.deg2rad(10.0)
+        loc_max = geom["maximum_thickness_location"]
+        t_max = geom["maximum_thickness"]
+        r_le = geom["leading_edge_radius"]
+        t_te = geom["trailing_edge_thickness"]
+        wedge_angle = geom["maximum_thickness_location"]
 
         x_b, y_b, *_ = compute_blade_coordinates_radial(
             "linear_angle_change",
@@ -184,7 +167,7 @@ def plot_blades_radial(
             loc_max,
             t_max,
             t_te,
-            wedge_angle,
+            np.deg2rad(wedge_angle),
             r_le,
             N_points,
         )
@@ -205,48 +188,28 @@ def plot_blades_radial(
             ax.plot(X, Y, color=color, lw=1.5, label=label if i == 0 else None)
 
     # ============================================================
-    # Stator
+    # Plot blades
     # ============================================================
-    plot_row(
-        r_in=result["station_1.r"],
-        r_out=result["station_2.r"],
-        angle_in=result["station_1.alpha"],
-        angle_out=result["station_2.alpha"],
-        N_blades=int(round(result["stator.N_blades"])),
-        color="tab:blue",
-        label="Stator",
-    )
-
-    # ============================================================
-    # Rotor
-    # ============================================================
-    plot_row(
-        r_in=result["station_3.r"],
-        r_out=result["station_4.r"],
-        angle_in=result["station_3.beta"],
-        angle_out=result["station_4.beta"],
-        N_blades=int(round(result["rotor.N_blades"])),
-        color="tab:orange",
-        label="Rotor",
-    )
-
-    # ============================================================
-    # Formatting
-    # ============================================================
-    r_max = 1.10 * result["station_4.r"]
+    plot_row(out["geometry"]["stator"], color="tab:blue", label="Stator")
+    plot_row(out["geometry"]["rotor"], color="tab:orange", label="Rotor")
+    r_max = 1.10 * out["flow_stations"][4]["r"]
     ax.set_xlim(-r_max, r_max)
     ax.set_ylim(-r_max, r_max)
     ax.set_aspect("equal", adjustable="box")
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
+    ax.set_xlabel(r"$x$ direction")
+    ax.set_ylabel(r"$y$ direction")
     # ax.grid(True)
     ax.legend()
+
+    # Positive quadrant only (radial convention)
+    r_max = 1.05 * out["flow_stations"][-1]["r"]
+    ax.set_xlim(0.0, r_max)
+    ax.set_ylim(0.0, r_max)
 
     return ax
 
 
-
-def plot_meridional_channel_axial(result, ax=None):
+def plot_meridional_channel_axial(out, ax=None):
     """
     Plot stator and rotor meridional channel for an axial stage.
 
@@ -265,25 +228,25 @@ def plot_meridional_channel_axial(result, ax=None):
     # ------------------------------------------------------------
     # Extract mean radii and blade heights
     # ------------------------------------------------------------
-    r_1 = result["station_1.r"]
-    r_2 = result["station_2.r"]
-    r_3 = result["station_3.r"]
-    r_4 = result["station_4.r"]
+    r_1 = out["flow_stations"][1]["r"]
+    r_2 = out["flow_stations"][2]["r"]
+    r_3 = out["flow_stations"][3]["r"]
+    r_4 = out["flow_stations"][4]["r"]
 
-    H_1 = result["station_1.H"]
-    H_2 = result["station_2.H"]
-    H_3 = result["station_3.H"]
-    H_4 = result["station_4.H"]
+    H_1 = out["flow_stations"][1]["H"]
+    H_2 = out["flow_stations"][2]["H"]
+    H_3 = out["flow_stations"][3]["H"]
+    H_4 = out["flow_stations"][4]["H"]
 
     # ------------------------------------------------------------
     # Axial locations
     # ------------------------------------------------------------
     x_1 = 0.0
-    x_2 = x_1 + result["stator.chord"]
+    x_2 = x_1 + out["geometry"]["stator"]["chord"]
 
-    axial_gap = result["stator.opening"]
+    axial_gap = out["geometry"]["stator"]["opening"]
     x_3 = x_2 + axial_gap
-    x_4 = x_3 + result["rotor.chord"]
+    x_4 = x_3 + out["geometry"]["rotor"]["chord"]
 
     # ------------------------------------------------------------
     # Hub and tip radii
@@ -319,18 +282,19 @@ def plot_meridional_channel_axial(result, ax=None):
     # Formatting
     # ------------------------------------------------------------
     ax.set_xlabel("Axial direction")
-    ax.set_ylabel("Radius")
+    ax.set_ylabel("Radial direction")
     ax.set_aspect("equal", adjustable="box")
-    ax.set_ylim(bottom=0.0)
 
-    x_max = x_4 * 1.05
-    ax.set_xlim(0.0, x_max)
+    dx = x_4 * 0.15
+    r_max = 1.05 * (out["flow_stations"][-1]["r"] + out["flow_stations"][-1]["H"] / 2)
+    ax.set_xlim([-dx, x_4 + dx])
+    ax.set_ylim([0.0, r_max])
 
     return ax
 
 
 def plot_blades_axial(
-    result,
+    out,
     ax=None,
     N_points=500,
     N_blades_plot=4,
@@ -352,22 +316,22 @@ def plot_blades_axial(
     # ============================================================
     def plot_row(
         *,
+        geom,
         x0,
         y0,
         beta_in,
         beta_out,
-        chord_ax,
-        opening,
-        spacing,
         color,
         label,
     ):
-        # --- thickness parameters (same philosophy as radial)
-        loc_max = 0.30
-        t_max = 0.30 * chord_ax
-        r_le = 0.50 * t_max
-        t_te = 0.1 * opening
-        wedge_angle = np.deg2rad(5.0)
+        # Blade parameters
+        chord_ax = geom["chord"]
+        spacing = geom["spacing"]
+        loc_max = geom["maximum_thickness_location"]
+        t_max = geom["maximum_thickness"]
+        r_le = geom["leading_edge_radius"]
+        t_te = geom["trailing_edge_thickness"]
+        wedge_angle = np.deg2rad(geom["trailing_edge_wedge_angle"])
 
         # Base blade (reference at y = 0)
         x_b, y_b, *_ = compute_blade_coordinates_cartesian(
@@ -386,8 +350,8 @@ def plot_blades_axial(
         )
 
         # --- blade stacking in pitchwise direction
-        for i in range(5*N_blades_plot):
-            y_shift = (i-10.5) * spacing
+        for i in range(5 * N_blades_plot):
+            y_shift = (i - 10.5) * spacing
             ax.plot(
                 x_b,
                 y_b + y_shift,
@@ -400,13 +364,11 @@ def plot_blades_axial(
     # Stator (absolute angles)
     # ============================================================
     plot_row(
+        geom=out["geometry"]["stator"],
         x0=0.0,
         y0=0.0,
-        beta_in=result["station_1.alpha"],
-        beta_out=result["station_2.alpha"],
-        chord_ax=result["stator.chord"],
-        opening=result["stator.opening"],
-        spacing=result["stator.spacing"],
+        beta_in=out["flow_stations"][1]["alpha"],
+        beta_out=out["flow_stations"][2]["alpha"],
         color="tab:blue",
         label="Stator",
     )
@@ -415,13 +377,12 @@ def plot_blades_axial(
     # Rotor (relative angles)
     # ============================================================
     plot_row(
-        x0=result["stator.chord"] + 1 * result["stator.opening"],  # downstream shift
+        geom=out["geometry"]["rotor"],
+        x0=out["geometry"]["stator"]["chord"]
+        + 1 * out["geometry"]["stator"]["opening"],  # downstream shift
         y0=0.0,
-        beta_in=result["station_3.beta"],
-        beta_out=result["station_4.beta"],
-        chord_ax=result["rotor.chord"],
-        opening=result["rotor.opening"],
-        spacing=result["rotor.spacing"],
+        beta_in=out["flow_stations"][3]["beta"],
+        beta_out=out["flow_stations"][4]["beta"],
         color="tab:orange",
         label="Rotor",
     )
@@ -431,15 +392,15 @@ def plot_blades_axial(
     # ============================================================
     ax.set_aspect("equal", adjustable="box")
     ax.set_xlabel("Axial direction")
-    ax.set_ylabel("Pitchwise direction")
-    ax.set_ylim([0, N_blades_plot * result["stator.spacing"]])
+    ax.set_ylabel("Tangential direction")
+    ax.set_ylim([0, N_blades_plot * out["geometry"]["stator"]["spacing"]])
     # ax.legend()
     ax.grid(False)
 
     return ax
 
 
-def plot_rotor_velocity_triangles(result, ax=None):
+def plot_rotor_velocity_triangles(out, ax=None):
     """
     Plot rotor inlet (station 3) and rotor outlet (station 4)
     Mach-number triangles in the (M_m, M_theta) plane.
@@ -460,14 +421,21 @@ def plot_rotor_velocity_triangles(result, ax=None):
     # --------------------------------------------------------------
     # Extract data
     # --------------------------------------------------------------
-    v3, w3, u3 = result["station_3.v"], result["station_3.w"], result["station_3.u"]
-    v4, w4, u4 = result["station_4.v"], result["station_4.w"], result["station_4.u"]
+    v3 = out["flow_stations"][3]["v"]
+    w3 = out["flow_stations"][3]["w"]
+    u3 = out["flow_stations"][3]["u"]
 
-    a3, b3 = result["station_3.alpha"], result["station_3.beta"]
-    a4, b4 = result["station_4.alpha"], result["station_4.beta"]
+    v4 = out["flow_stations"][4]["v"]
+    w4 = out["flow_stations"][4]["w"]
+    u4 = out["flow_stations"][4]["u"]
 
-    a_s3 = result["station_3.a"]
-    a_s4 = result["station_4.a"]
+    a3 = out["flow_stations"][3]["alpha"]
+    b3 = out["flow_stations"][3]["beta"]
+    a4 = out["flow_stations"][4]["alpha"]
+    b4 = out["flow_stations"][4]["beta"]
+
+    a_s3 = out["flow_stations"][3]["a"]
+    a_s4 = out["flow_stations"][4]["a"]
 
     # --------------------------------------------------------------
     # Mach components (degrees → radians only here)
@@ -524,10 +492,22 @@ def plot_rotor_velocity_triangles(result, ax=None):
     # Plot outlet (station 4) – solid
     # --------------------------------------------------------------
     ax.arrow(
-        0, 0, Mv4_m, Mv4_t, color="tab:blue", head_width=0.03, length_includes_head=True
+        0,
+        0,
+        Mv4_m,
+        Mv4_t,
+        color="tab:blue",
+        head_width=0.03,
+        length_includes_head=True,
     )
     ax.arrow(
-        0, 0, 0, Mu4_t, color="tab:orange", head_width=0.03, length_includes_head=True
+        0,
+        0,
+        0,
+        Mu4_t,
+        color="tab:orange",
+        head_width=0.03,
+        length_includes_head=True,
     )
     ax.arrow(
         0,

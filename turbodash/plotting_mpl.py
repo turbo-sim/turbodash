@@ -107,10 +107,10 @@ def plot_meridional_channel_radial(out, ax=None):
     ax.set_xlabel("Axial direction")
     ax.set_ylabel("Radial direction")
     ax.set_aspect("equal", adjustable="box")
-    ax.set_ylim(bottom=0.0)
+    r_max = 1.05 * out["flow_stations"][-1]["r"]
     H_max = max(H_1, H_2, H_3, H_4)
     ax.set_xlim(-1.5 * H_max, +1.5 * H_max)
-    # ax.grid(True)
+    ax.set_ylim(0.0, r_max)
 
     return ax
 
@@ -118,7 +118,7 @@ def plot_meridional_channel_radial(out, ax=None):
 def plot_blades_radial(
     out,
     ax=None,
-    N_points=500,
+    N_points=1000,
 ):
     """
     Plot stator and rotor radial blade cascades (blade-to-blade view)
@@ -190,8 +190,8 @@ def plot_blades_radial(
     # ============================================================
     # Plot blades
     # ============================================================
-    plot_row(out["geometry"]["stator"], color="tab:blue", label="Stator")
-    plot_row(out["geometry"]["rotor"], color="tab:orange", label="Rotor")
+    plot_row(out["geometry"]["stator"], color="tab:orange", label="Stator")
+    plot_row(out["geometry"]["rotor"], color="tab:blue", label="Rotor")
     r_max = 1.10 * out["flow_stations"][4]["r"]
     ax.set_xlim(-r_max, r_max)
     ax.set_ylim(-r_max, r_max)
@@ -259,22 +259,18 @@ def plot_meridional_channel_axial(out, ax=None):
     # ------------------------------------------------------------
     # Stator (1 → 2)
     # ------------------------------------------------------------
-    color = "tab:blue"
-
+    color = "tab:orange"
     ax.plot([x_1, x_2], [r1_h, r2_h], color=color, lw=1.5)
     ax.plot([x_1, x_2], [r1_t, r2_t], color=color, lw=1.5)
-
     ax.plot([x_1, x_1], [r1_h, r1_t], color=color, lw=1.5)
     ax.plot([x_2, x_2], [r2_h, r2_t], color=color, lw=1.5)
 
     # ------------------------------------------------------------
     # Rotor (3 → 4)
     # ------------------------------------------------------------
-    color = "tab:orange"
-
+    color = "tab:blue"
     ax.plot([x_3, x_4], [r3_h, r4_h], color=color, lw=1.5)
     ax.plot([x_3, x_4], [r3_t, r4_t], color=color, lw=1.5)
-
     ax.plot([x_3, x_3], [r3_h, r3_t], color=color, lw=1.5)
     ax.plot([x_4, x_4], [r4_h, r4_t], color=color, lw=1.5)
 
@@ -369,7 +365,7 @@ def plot_blades_axial(
         y0=0.0,
         beta_in=out["flow_stations"][1]["alpha"],
         beta_out=out["flow_stations"][2]["alpha"],
-        color="tab:blue",
+        color="tab:orange",
         label="Stator",
     )
 
@@ -383,7 +379,7 @@ def plot_blades_axial(
         y0=0.0,
         beta_in=out["flow_stations"][3]["beta"],
         beta_out=out["flow_stations"][4]["beta"],
-        color="tab:orange",
+        color="tab:blue",
         label="Rotor",
     )
 
@@ -463,7 +459,7 @@ def plot_rotor_velocity_triangles(out, ax=None):
         Mv3_m,
         Mv3_t,
         color="tab:blue",
-        linestyle="--",
+        linestyle=":",
         head_width=0.03,
         length_includes_head=True,
     )
@@ -473,7 +469,7 @@ def plot_rotor_velocity_triangles(out, ax=None):
         0,
         Mu3_t,
         color="tab:orange",
-        linestyle="--",
+        linestyle=":",
         head_width=0.03,
         length_includes_head=True,
     )
@@ -483,7 +479,7 @@ def plot_rotor_velocity_triangles(out, ax=None):
         Mw3_m,
         Mw3_t,
         color="tab:green",
-        linestyle="--",
+        linestyle=":",
         head_width=0.03,
         length_includes_head=True,
     )
@@ -538,8 +534,8 @@ def plot_rotor_velocity_triangles(out, ax=None):
     ax.axvline(0.0, color="k", lw=0.5)
 
     ax.set_aspect("equal", adjustable="box")
-    ax.set_xlabel("Meridional Mach number")
-    ax.set_ylabel("Tangential Mach number")
+    ax.set_xlabel("Meridional Mach")
+    ax.set_ylabel("Tangential Mach")
     # ax.grid(True)
 
     # Legend
@@ -547,5 +543,6 @@ def plot_rotor_velocity_triangles(out, ax=None):
     ax.plot([], [], color="tab:green", label=r"$\mathrm{Ma}_{\mathrm{rel}}$")
     ax.plot([], [], color="tab:orange", label=r"$\mathrm{Ma}_{\mathrm{blade}}$")
     ax.legend(loc="upper right", fontsize=9)
+    fig.tight_layout(pad=1)
 
-    return ax
+    return fig, ax

@@ -866,40 +866,6 @@ def stage_performance_table(out):
     ]
 
 
-# def geometry_table(out):
-#     stator = out["geometry"]["stator"]
-#     rotor = out["geometry"]["rotor"]
-
-#     # Definition: key → (label, unit, scale)
-#     specs = [
-#         ("blade_count", "Blade count", "-", 1.0),
-#         ("chord", "Chord", "mm", 1e3),
-#         ("height", "Height", "mm", 1e3),
-#         ("spacing", "Spacing", "mm", 1e3),
-#         ("opening", "Opening", "mm", 1e3),
-#         ("solidity", "Solidity", "-", 1.0),
-#         ("aspect_ratio", "Aspect ratio", "-", 1.0),
-#         ("flaring_angle", "Flaring angle", "deg", 1.0),
-#         ("metal_angle_in", "Metal angle in", "deg", 1.0),
-#         ("metal_angle_out", "Metal angle out", "deg", 1.0),
-#     ]
-
-#     rows = []
-#     for key, label, unit, scale in specs:
-#         rows.append(
-#             {
-#                 "Variable": label,
-#                 "Stator": float(stator[key] * scale),
-#                 "Rotor": float(rotor[key] * scale),
-#                 "Unit": unit,
-#             }
-#         )
-
-#     print(rows)
-
-#     return rows
-
-
 def geometry_table(out):
     stator = out["geometry"]["stator"]
     rotor = out["geometry"]["rotor"]
@@ -985,3 +951,229 @@ def flow_stations_table(out):
         )
 
     return rows
+
+def generate_meanline_report(
+    out_left,
+    out_right=None,
+    left_name="Case A",
+    right_name="Case B",
+    filename="meanline_report.docx",
+):
+    from docx import Document
+    from docx.shared import Pt
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.oxml import OxmlElement, ns
+
+    doc = Document()
+
+    # ---------------------------------
+    # Helpers
+    # ---------------------------------
+    def prettify_name(key):
+        return key.replace("_", " ").capitalize()
+
+    def format_value(v, scale=1.0):
+        if isinstance(v, (int, float)):
+            return f"{v * scale:.3f}"
+        return "-" if v is None else str(v)
+
+    def set_cell_text(cell, text, bold=False, italic=False, align="center"):
+        cell.text = ""
+        p = cell.paragraphs[0]
+        p.alignment = (
+            WD_ALIGN_PARAGRAPH.LEFT if align == "left" else WD_ALIGN_PARAGRAPH.CENTER
+        )
+        run = p.add_run(str(text))
+        run.font.name = "Times New Roman"
+        run.font.size = Pt(11)
+        run.bold = bold
+        run.italic = italic
+        p.paragraph_format.space_before = Pt(0)
+        p.paragraph_format.space_after = Pt(0)
+        p.paragraph_format.line_spacing = 1.0
+
+    def set_cell_borders(cell, top=False, bottom=False):
+        tc = cell._tc
+        tcPr = tc.get_or_add_tcPr()
+
+        borders = OxmlElement("w:tcBorders")
+
+        def _border(tag):
+            el = OxmlElement(tag)
+            el.set(ns.qn("w:val"), "single")
+            el.set(ns.qn("w:sz"), "8")
+            el.set(ns.qn("w:space"), "0")
+            el.set(ns.qn("w:color"), "000000")
+            return el
+
+        if top:
+            borders.append(_border("w:top"))
+        if bottom:
+            borders.append(_border("w:bottom"))
+
+        tcPr.append(borders)
+
+    # ---------------------------------
+    # Create table
+    # ---------------------------------
+    ncols = 4 if out_right else 3
+    table = doc.add_table(rows=1, cols=ncols)
+    table.autofit = True
+
+    # Header
+    hdr_row = table.rows[0]
+    hdr = hdr_row.cells
+    set_cell_text(hdr[0], "Variable", bold=True, align="left")
+    set_cell_text(hdr[1], left_name, bold=True)
+    if out_right:
+        set_cell_text(hdr[2], right_name, bold=True)
+        set_cell_text(hdr[3], "Unit", bold=True)
+    else:
+        set_cell_text(hdr[2], "Unit", bold=True)
+
+    # set_row_borders(hdr_row, top=True, bottom=True)
+    for cell in hdr_row.cells:
+        set_cell_borders(cell, top=True, bottom=True)
+
+
+    # ---------------------------------
+    # Row writers
+    # ---------------------------------
+    def add_section(title):
+        row = table.add_row()
+        cells = row.cells
+        set_cell_text(cells[0], title, bold=True, italic=True, align="left")
+        for c in cells[1:]:
+            set_cell_text(c, "")
+        
+        for cell in row.cells:
+            set_cell_borders(cell, top=True, bottom=True)
+
+
+        # set_row_borders(row, top=True, bottom=True)
+
+    def add_row(name, v1, v2, unit, scale=1.0):
+        row = table.add_row().cells
+        set_cell_text(row[0], prettify_name(name), align="left")
+        set_cell_text(row[1], format_value(v1, scale))
+        if out_right:
+            set_cell_text(row[2], format_value(v2, scale))
+            set_cell_text(row[3], unit)
+        else:
+            set_cell_text(row[2], unit)
+
+    # ---------------------------------
+    # Operating conditions
+    # ---------------------------------
+    add_section("Operating conditions")
+    oc_units = {
+        "fluid": ("-", 1.0),
+        "stage_type": ("-", 1.0),
+        "inlet_property_pair": ("-", 1.0),
+        "inlet_property_1": ("bar", 1e-5),
+        "inlet_property_2": ("-", 1.0),
+        "exit_pressure": ("bar", 1e-5),
+        "mass_flow_rate": ("kg/s", 1.0),
+    }
+
+    for k, (unit, scale) in oc_units.items():
+        add_row(
+            k,
+            out_left["inputs"].get(k),
+            out_right["inputs"].get(k) if out_right else None,
+            unit,
+            scale,
+        )
+
+    # ---------------------------------
+    # Design variables
+    # ---------------------------------
+    add_section("Design variables")
+    dv_units = {
+        "stator_inlet_angle": ("deg", 1.0),
+        "stator_exit_angle": ("deg", 1.0),
+        "blade_velocity_ratio": ("-", 1.0),
+        "degree_reaction": ("-", 1.0),
+        "radius_ratio_12": ("-", 1.0),
+        "radius_ratio_23": ("-", 1.0),
+        "radius_ratio_34": ("-", 1.0),
+        "height_radius_ratio": ("-", 1.0),
+        "zweiffel_stator": ("-", 1.0),
+        "zweiffel_rotor": ("-", 1.0),
+        "loss_coeff_stator": ("-", 1.0),
+        "loss_coeff_rotor": ("-", 1.0),
+    }
+
+    for k, (unit, scale) in dv_units.items():
+        add_row(
+            k,
+            out_left["inputs"].get(k),
+            out_right["inputs"].get(k) if out_right else None,
+            unit,
+            scale,
+        )
+
+    # ---------------------------------
+    # Stage performance
+    # ---------------------------------
+    add_section("Stage performance")
+    sp_units = {
+        "efficiency_tt": ("-", 1.0),
+        "efficiency_ts": ("-", 1.0),
+        "pressure_ratio_ts": ("-", 1.0),
+        "volume_ratio_ts": ("-", 1.0),
+        "flow_coefficient": ("-", 1.0),
+        "work_coefficient": ("-", 1.0),
+        "specific_speed": ("-", 1.0),
+        "rotational_speed": ("rpm", 1.0),
+        "spouting_velocity": ("m/s", 1.0),
+        "power_isentropic": ("W", 1.0),
+        "power_actual_tt": ("W", 1.0),
+        "power_actual_ts": ("W", 1.0),
+    }
+
+    for k, (unit, scale) in sp_units.items():
+        add_row(
+            k,
+            out_left["stage_performance"].get(k),
+            out_right["stage_performance"].get(k) if out_right else None,
+            unit,
+            scale,
+        )
+
+    # ---------------------------------
+    # Geometry
+    # ---------------------------------
+    for part in ("stator", "rotor"):
+        add_section(f"{part.capitalize()} geometry")
+        geo_units = {
+            "blade_count": ("-", 1.0),
+            "radius_in": ("mm", 1e3),
+            "radius_out": ("mm", 1e3),
+            "height": ("mm", 1e3),
+            "chord": ("mm", 1e3),
+            "spacing": ("mm", 1e3),
+            "opening": ("mm", 1e3),
+            "solidity": ("-", 1.0),
+            "aspect_ratio": ("-", 1.0),
+            "flaring_angle": ("deg", 1.0),
+            "metal_angle_in": ("deg", 1.0),
+            "metal_angle_out": ("deg", 1.0),
+        }
+
+        for k, (unit, scale) in geo_units.items():
+            add_row(
+                k,
+                out_left["geometry"][part].get(k),
+                out_right["geometry"][part].get(k) if out_right else None,
+                unit,
+                scale,
+            )
+
+    # Bottom rule for entire table (last row)
+    last_row = table.rows[-1]
+    for cell in last_row.cells:
+        set_cell_borders(cell, bottom=True)
+        
+    doc.save(filename)
+    return filename

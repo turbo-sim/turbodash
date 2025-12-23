@@ -7,10 +7,9 @@ import turbodash as td
 td.set_plot_options(grid=False)
 
 
-
 # Define inlet state
 fluid_name = "air"
-input_pair = jxp.PT_INPUTS
+input_pair = "PT_INPUTS"
 T_in = 600.0
 p_in = 10e5
 p_out = 5e5
@@ -18,7 +17,7 @@ p_out = 5e5
 # Evaluate radial stagenput_only+
 out = td.compute_stage_meanline(
     fluid_name=fluid_name,
-    inlet_property_pair=input_pair,
+    inlet_property_pair_string=input_pair,
     inlet_property_1=p_in,
     inlet_property_2=T_in,
     exit_pressure=p_out,
@@ -45,7 +44,7 @@ out = td.compute_stage_meanline(
 # Evaluate axial stage
 out = td.compute_stage_meanline(
     fluid_name=fluid_name,
-    inlet_property_pair=input_pair,
+    inlet_property_pair_string=input_pair,
     inlet_property_1=p_in,
     inlet_property_2=T_in,
     exit_pressure=p_out,
@@ -74,7 +73,6 @@ td.plotly.plot_meridional_channel(out).show()
 
 for item in td.geometry_table(out):
     print(item )
-
 
 print()
 for item in td.stage_performance_table(out):

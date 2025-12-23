@@ -368,19 +368,29 @@ def compute_stage_meanline(
     )
 
     # ------------------------------------------------------------------
-    # Angular speed from blade speed and radius
+    # Compute actual and specific rotational speeds
     # ------------------------------------------------------------------
     omega_3 = u_3 / r_3
     omega_4 = u_4 / r_4
     RPM = omega_4 * 60 / (2 * np.pi)
-    ws = (
+    specific_speed = (
         omega_3
         * (mass_flow_rate / state_4s.d) ** (1 / 2)
         * (state_01.h - state_4s.h) ** (-3 / 4)
     )
+    RR_14 = RR_12 * RR_23 * RR_34
+    VR = state_01.d / state_4s.d
+    VR14 = state_1.d / state_4s.d
+    K = 4.0 * np.sqrt(2) * np.pi
+    specific_speed_bis = (K * phi * nu ** 3 * RR_14 ** 2 * height_radius_ratio * VR14) ** 0.5
+
     assert np.isclose(
         omega_3, omega_4, rtol=1e-6
     ), f"Inconsistent rotational speed: omega_3={omega_3:0.2f}, omega_4={omega_4:0.2f}"
+
+    assert np.isclose(
+        specific_speed, specific_speed_bis, rtol=1e-6
+    ), f"Inconsistent specific speed: def_1={specific_speed:0.2f}, def_2={specific_speed_bis:0.2f}"
 
     # ------------------------------------------------------------------
     # Stator and rotor geometry
@@ -444,12 +454,12 @@ def compute_stage_meanline(
         "efficiency_tt": perf["eta_tt"],
         "efficiency_ts": perf["eta_ts"],
         "pressure_ratio_ts": state_01.p / state_4s.p,
-        "volume_ratio_ts": state_01.d / state_4s.d,
+        "volume_ratio_ts": VR,
         "flow_coefficient": perf["phi"],
         "work_coefficient": perf["psi"],
         "degree_reaction": degree_reaction,
         "blade_velocity_ratio": blade_velocity_ratio,
-        "specific_speed": ws,
+        "specific_speed": specific_speed,
         "spouting_velocity": v0,
         "rotor_exit_velocity": U,
         "rotational_speed": RPM,

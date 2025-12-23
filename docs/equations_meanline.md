@@ -32,6 +32,8 @@
 - $Z_\mathrm{R}= 0.8$, Zweiffel parameter of the rotor
 - $AR_{\mathrm{S}}=\tfrac{1}{2}(H_1 +  H_2) / (r_2- r_1)$, aspect ratio of the stator
 - $AR_{\mathrm{R}}=\tfrac{1}{2}(H_3 +  H_4) / (r_4- r_3)$, aspect ratio of the rotor
+
+
 ## Outputs
 
 The flow coefficient $\phi=v_{m}/U$ is computed from the stage equations
@@ -118,7 +120,18 @@ $$
     H_i = \frac{\dot{m}}{2\pi r_i \rho_i v_m} \\
 \end{gather}
 $$
-These equations are general for an axial or radial turbines.
+
+The actual rotational speed can be calculated from the actual blade velocity and the radius of the rotor blades. The specific speed can then be derived from the rotational speed and the thermodynamic conditions:
+$$
+\Omega_s = \Omega \frac{(\dot{m}/\rho_{\mathrm{out}})^{1/2}}{(h_{01} - h_{4s})^{3/4}}
+$$
+Alternatively, one can directly relate the specific speed to dimensionless geometric parameters and thermodynamic conditions using the mass balance at the inlet of the turbine:
+$$
+\Omega_s^2 = 4 \sqrt{2} \pi \phi \nu^3 \left(\frac{r_1}{r_4}\right)^2 \left(\frac{H_1}{r_1}\right)^2 \left(\frac{\rho_1}{\rho_4}\right)^2 
+$$
+This equation clearly shows that the specific speed (and hence the rotational speed) decrease by decreasing the flow coefficient, the blade velocity ratio, the radius ratio, or the inlet height to radius ratio. Note that this last variable does not influence the work exchange in the stage and can be controlled to reduce the rotational speed at the expense of using shorter blades with narrower flow passages.
+
+The equations so far are general for an axial or radial turbines. 
 
 In radial turbines, the meridional chord is given by $c_{\mathrm{mer}}=\Delta r$, while in axial turbines, the meridional chord can be obtained by specifying the aspect ratio of the stator and rotor blades, $c_{mer} = H / AS$. Once the meridional chord is known, the number of blades and opening can be determined using the Zweiffel criterion
 $$

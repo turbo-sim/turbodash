@@ -1,6 +1,6 @@
 # Turbodash
 
-`turbodash` is an interactive Dash application for analyzing the efficiency of turbine stages.
+`turbodash` is an interactive Dash application for the meanline design of turbine stages.
 
 - 🔗 **App**: [turbodash.onrender](https://turbodash.onrender.com/)
 - 📦**PyPI**: [pypi.org/project/turbodash-core](https://pypi.org/project/turbodash-core/)

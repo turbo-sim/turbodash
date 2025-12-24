@@ -532,12 +532,12 @@ $$
 \left(\frac{v_{m1}}{v_{m4}}\right)^{1/2}
 \left(\frac{{1 - R}}{{D}}\right)^{1/4}
 $$
-where
+where:
 $$
 D = (1 + \tan^2 \alpha_3)\,m_{3,4}^2 - R(1 + \tan^2 \alpha_1)\,m_{1,4}^2
 $$
 
 This expression highlights the relative influence of the different design parameters on the specific speed. The blade velocity ratio $\nu$ enters with a linear dependence in $\Omega_s$, and therefore exerts a strong influence on the rotational speed. By contrast, the overall radius ratio $r_1/r_4$, overall meridional velocity ratio $v_{m1}/v_{m4}$, and inlet height-to-radius ratio $H_{1}/r_{1}$ appear with a half-power dependence and consequently have a weaker impact on the rotational speed. Finally, the degree of reaction $R$ and the flow angles affect $\Omega_s$ only through a quarter-power dependence and a limited influence.
 
-Notably, the inlet height-to-radius ratio $H_1/r_1$ does not affect the velocity triangles of the stage. It therefore provides a purely geometric degree of freedom to adjust the rotational speed without altering the aerodynamic loading. Small values of $H_1/r_1$ lead to long and narrow flow paths and lower rotational speeds, whereas larger values result in wider flow channels with larger hydraulic diameters and higher rotational speeds.
+Notably, the inlet height-to-radius ratio $H_1/r_1$ does not affect the velocity triangles of the stage. It therefore provides a purely geometric degree of freedom to adjust the rotational speed without altering the flow velocities and work exchange. Small values of $H_1/r_1$ lead to long and narrow flow paths and lower rotational speeds, whereas larger values result in wider flow channels with larger hydraulic diameters and higher rotational speeds.
 

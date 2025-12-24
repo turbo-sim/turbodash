@@ -1,5 +1,6 @@
-import numpy as np
+import os
 import yaml
+import numpy as np
 import jaxprop as jxp
 import turbodash as td
 import CoolProp.CoolProp as CP
@@ -33,26 +34,64 @@ def main():
 # =========================
 # Default inputs
 # =========================
-defaults = dict(
+DEFAULTS = dict(
     # Operating conditions
     fluid_name="Air",
     inlet_property_pair="PT_INPUTS",
-    inlet_property_1=1e5,
-    inlet_property_2=300,
-    p_out=0.5e5,  # Pa
-    mdot=5.0,  # kg/s
-    alpha1=0.0,  # deg
-    alpha2=70.0,  # deg
+    inlet_property_1=1e5,  # inlet static pressure [Pa]
+    inlet_property_2=300,  # inlet temperature [K]
+    p_out=0.5e5,  # exit static pressure [Pa]
+    mdot=5.0,  # mass flow rate [kg/s]
+    alpha1=0.0,  # absolute flow angle at stator inlet [deg]
+    alpha2=70.0, # absolute flow angle at stator exit [deg]
     nu=0.7,  # blade velocity ratio
     R=0.5,  # degree of reaction
-    rr_12=0.75,
-    rr_23=0.95,
-    rr_34=0.80,
-    HR_inlet=0.25,
-    Z_stator=0.7,
-    Z_rotor=0.7,
-    xi_stator=0.05,
-    xi_rotor=0.06,
+    m_12=1.0,  # meridional velocity ratio 1-2
+    m_23=1.0,  # meridional velocity ratio 2-3
+    m_34=1.0,  # meridional velocity ratio 3-4
+    rr_12=0.75,  # radius ratio 1-2
+    rr_23=0.95,  # radius ratio 2-3
+    rr_34=0.80,  # radius ratio 3-4
+    HR_inlet=0.25,  # height-to-radius ratio at inlet
+    Z_stator=0.7,  # Zweifel coefficient (stator)
+    Z_rotor=0.7,  # Zweifel coefficient (rotor)
+    xi_stator=0.05,  # loss coefficient (stator)
+    xi_rotor=0.06,  # loss coefficient (rotor
+)
+
+# =========================
+# Documentation layout
+# =========================
+# Go one level up from the turbodash/ folder to root/, then into docs/
+docs_path = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)),  # root folder
+    "docs",
+    "documentation.md",
+)
+
+if os.path.exists(docs_path):
+    with open(docs_path, "r", encoding="utf-8") as f:
+        theory_md = f.read()
+else:
+    theory_md = "Documentation not found."
+
+docs_layout = html.Div(
+    style={"maxWidth": "1000px", "margin": "auto", "padding": "30px"},
+    children=[
+        dcc.Markdown(
+            theory_md,
+            mathjax=True,
+            style={
+                "whiteSpace": "pre-wrap",
+                "padding": "40px",
+                "fontFamily": "Segoe UI, Roboto, Helvetica, Arial, sans-serif",
+                "fontSize": "16px",
+                "lineHeight": "1.6",
+                "color": "#24292e",
+                "backgroundColor": "#ffffff",
+            },
+        ),
+    ],
 )
 
 
@@ -238,7 +277,7 @@ OPERATING_DROPDOWNS = [
                 {"label": f, "value": f}
                 for f in sorted(CP.get_global_param_string("FluidsList").split(","))
             ],
-            value=defaults["fluid_name"],
+            value=DEFAULTS["fluid_name"],
             clearable=False,
         ),
     ),
@@ -247,7 +286,7 @@ OPERATING_DROPDOWNS = [
         dcc.Dropdown(
             id="inlet_property_pair",
             options=list(jxp.INPUT_PAIRS.keys()),
-            value=defaults["inlet_property_pair"],
+            value=DEFAULTS["inlet_property_pair"],
             clearable=False,
         ),
     ),
@@ -258,11 +297,14 @@ DESIGN_VARIABLES = [
     (["Stator inlet angle, α", html.Sub("1"), " [deg]"], "alpha1", -75.0, 75.0, 1.0),
     (["Stator exit angle, α", html.Sub("2"), " [deg]"], "alpha2", 0.0, 90.0, 1.0),
     (["Blade velocity ratio, ν"], "nu", 0.05, 2.0, 0.01),
-    (["Degree of reaction, R"], "R", 0.0, 1.0 - 1e-6, 0.01),
-    (["Inlet height-to-radius ratio, H₁ / r₁"], "HR_inlet", 0.01, 2.0, 0.005),
+    (["Degree of reaction, R"], "R", -0.5, 1.0 - 1e-6, 0.01),
+    (["Meridional velocity ratio, vₘ₁/vₘ₂"], "m_12", 0.1, 2.0, 0.01),
+    (["Meridional velocity ratio, vₘ₂/vₘ₃"], "m_23", 0.1, 2.0, 0.01),
+    (["Meridional velocity ratio, vₘ₃/vₘ₄"], "m_34", 0.1, 2.0, 0.01),
     (["Radius ratio, r₁ / r₂"], "rr_12", 0.10, 1.00, 0.001),
     (["Radius ratio, r₂ / r₃"], "rr_23", 0.10, 1.00, 0.001),
     (["Radius ratio, r₃ / r₄"], "rr_34", 0.10, 1.00, 0.001),
+    (["Inlet height-to-radius ratio, H₁ / r₁"], "HR_inlet", 0.01, 2.0, 0.005),
     (["Zweifel (stator)"], "Z_stator", 0.1, 2.0, 0.01),
     (["Zweifel (rotor)"], "Z_rotor", 0.1, 2.0, 0.01),
 ]
@@ -280,8 +322,8 @@ controls = html.Div(
         html.Div(
             style={"marginLeft": "16px"},
             children=[
-                input_only(["Inlet property 1"], "inlet_property_1", defaults["inlet_property_1"]),
-                input_only(["Inlet property 2"], "inlet_property_2", defaults["inlet_property_2"]),
+                input_only(["Inlet property 1"], "inlet_property_1", DEFAULTS["inlet_property_1"]),
+                input_only(["Inlet property 2"], "inlet_property_2", DEFAULTS["inlet_property_2"]),
             ],
         ),
 
@@ -289,12 +331,12 @@ controls = html.Div(
         input_only(
             ["Exit static pressure, p", html.Sub("out"), " [Pa]"],
             "p_out",
-            defaults["p_out"],
+            DEFAULTS["p_out"],
         ),
-        input_only(["Mass flow rate, ṁ [kg/s]"], "mdot", defaults["mdot"]),
+        input_only(["Mass flow rate, ṁ [kg/s]"], "mdot", DEFAULTS["mdot"]),
         html_section("Design variables"),
         *[
-            linked_input(label, key, lo, hi, step, defaults[key])
+            linked_input(label, key, lo, hi, step, DEFAULTS[key])
             for label, key, lo, hi, step in DESIGN_VARIABLES
         ],
         html_section("Loss coefficients"),
@@ -304,7 +346,7 @@ controls = html.Div(
             0.0,
             0.5,
             0.005,
-            defaults["xi_stator"],
+            DEFAULTS["xi_stator"],
         ),
         linked_input(
             ["Loss coefficient, ξ", html.Sub("rotor")],
@@ -312,7 +354,7 @@ controls = html.Div(
             0.0,
             0.5,
             0.005,
-            defaults["xi_rotor"],
+            DEFAULTS["xi_rotor"],
         ),
     ],
     style=CONTROLS_STYLE,
@@ -473,31 +515,116 @@ tables = html.Div(
 )
 
 
+
+
+
+# =========================
+# Complete app layout
+# =========================
 app.layout = html.Div(
-    style={
-        "display": "flex",
-        "width": "100vw",
-        "height": "100vh",
-        "overflow": "hidden",
-        "fontFamily": "Arial",
-    },
     children=[
-        # Left: controls (own scrollbar)
-        controls,
-        # Right: plots + tables (own scrollbar)
-        html.Div(
+        dcc.Tabs(
+            id="tabs",
+            value="calculator",
             style={
-                "flex": "1 1 auto",
-                "overflowY": "auto",
-                "padding": "20px",
+                "fontFamily": "Segoe UI, Arial, sans-serif",
+                "fontSize": "16px",
+                "borderBottom": "1px solid #d0d7de",
             },
             children=[
-                plots,
-                tables,
+                dcc.Tab(
+                    label="Turbodash",
+                    value="calculator",
+                    style={
+                        "fontWeight": "bold",
+                        "padding": "10px 18px",
+                        "backgroundColor": "#f6f8fa",
+                        "border": "1px solid #d0d7de",
+                        "borderBottom": "none",
+                    },
+                    selected_style={
+                        "fontWeight": "bold",
+                        "padding": "10px 18px",
+                        "backgroundColor": "#ffffff",
+                        "border": "1px solid #d0d7de",
+                        "borderBottom": "3px solid #007acc",
+                    },
+                    children=[
+                        html.Div(
+                            style={
+                                "display": "flex",
+                                "width": "100vw",
+                                "height": "100vh",
+                                "overflow": "hidden",
+                                "fontFamily": "Arial",
+                            },
+                            children=[
+                                controls,
+                                html.Div(
+                                    style={
+                                        "flex": "1 1 auto",
+                                        "overflowY": "auto",
+                                        "padding": "20px",
+                                    },
+                                    children=[plots, tables],
+                                ),
+                            ],
+                        )
+                    ],
+                ),
+
+                dcc.Tab(
+                    label="Documentation",
+                    value="docs",
+                    style={
+                        "fontWeight": "bold",
+                        "padding": "10px 18px",
+                        "backgroundColor": "#f6f8fa",
+                        "border": "1px solid #d0d7de",
+                        "borderBottom": "none",
+                    },
+                    selected_style={
+                        "fontWeight": "bold",
+                        "padding": "10px 18px",
+                        "backgroundColor": "#ffffff",
+                        "border": "1px solid #d0d7de",
+                        "borderBottom": "3px solid #007acc",
+                    },
+                    children=[docs_layout],
+                ),
             ],
-        ),
-    ],
+        )
+    ]
 )
+
+
+
+
+# app.layout = html.Div(
+#     style={
+#         "display": "flex",
+#         "width": "100vw",
+#         "height": "100vh",
+#         "overflow": "hidden",
+#         "fontFamily": "Arial",
+#     },
+#     children=[
+#         # Left: controls (own scrollbar)
+#         controls,
+#         # Right: plots + tables (own scrollbar)
+#         html.Div(
+#             style={
+#                 "flex": "1 1 auto",
+#                 "overflowY": "auto",
+#                 "padding": "20px",
+#             },
+#             children=[
+#                 plots,
+#                 tables,
+#             ],
+#         ),
+#     ],
+# )
 
 
 # =========================
@@ -523,6 +650,9 @@ app.layout = html.Div(
     Input("alpha2_slider", "value"),
     Input("nu_slider", "value"),
     Input("R_slider", "value"),
+    Input("m_12_slider", "value"),
+    Input("m_23_slider", "value"),
+    Input("m_34_slider", "value"),
     Input("rr_12_slider", "value"),
     Input("rr_23_slider", "value"),
     Input("rr_34_slider", "value"),
@@ -544,6 +674,9 @@ def update_turbine(
     alpha2,
     nu,
     R,
+    m_12,
+    m_23,
+    m_34,
     rr_12,
     rr_23,
     rr_34,
@@ -567,6 +700,9 @@ def update_turbine(
             stator_exit_angle=alpha2,
             blade_velocity_ratio=nu,
             degree_reaction=R,
+            meridional_velocity_ratio_12=m_12,
+            meridional_velocity_ratio_23=m_23,
+            meridional_velocity_ratio_34=m_34,
             radius_ratio_12=rr_12,
             radius_ratio_23=rr_23,
             radius_ratio_34=rr_34,
@@ -646,7 +782,6 @@ def download_meanline_yaml(n_clicks, out):
 # =========================================
 # Register slider–input sync + YAML load
 # =========================================
-
 
 @app.callback(
     Output("loaded_cfg_store", "data"),
@@ -729,11 +864,14 @@ register_input_only_load("mdot", "mass_flow_rate")
 register_link_value("alpha1", -75.0, 75.0, cfg_key="stator_inlet_angle")
 register_link_value("alpha2", 0.0, 90.0, cfg_key="stator_exit_angle")
 register_link_value("nu", 0.05, 2.0, cfg_key="blade_velocity_ratio")
-register_link_value("R", 1e-9, 1.0 - 1e-9, cfg_key="degree_reaction")
+register_link_value("R", -0.5, 1.0 - 1e-9, cfg_key="degree_reaction")
+register_link_value("HR_inlet", 0.01, 2.0, cfg_key="height_radius_ratio")
 register_link_value("rr_12", 0.10, 1.00, cfg_key="radius_ratio_12")
 register_link_value("rr_23", 0.10, 1.00, cfg_key="radius_ratio_23")
 register_link_value("rr_34", 0.10, 1.00, cfg_key="radius_ratio_34")
-register_link_value("HR_inlet", 0.01, 2.0, cfg_key="height_radius_ratio")
+register_link_value("m_12", 0.1, 2.0, cfg_key="meridional_velocity_ratio_12")
+register_link_value("m_23", 0.1, 2.0, cfg_key="meridional_velocity_ratio_23")
+register_link_value("m_34", 0.1, 2.0, cfg_key="meridional_velocity_ratio_34")
 register_link_value("Z_stator", 0.1, 1.5, cfg_key="zweiffel_stator")
 register_link_value("Z_rotor", 0.1, 1.5, cfg_key="zweiffel_rotor")
 register_link_value("xi_stator", 0.0, 0.5, cfg_key="loss_coeff_stator")

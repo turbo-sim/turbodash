@@ -9,6 +9,9 @@ def compute_performance_stage(
     stator_exit_angle,
     degree_reaction,
     blade_velocity_ratio,
+    meridional_velocity_ratio_12=1.0,
+    meridional_velocity_ratio_23=1.0,
+    meridional_velocity_ratio_34=1.0,
     radius_ratio_23=1.00,
     radius_ratio_34=1.00,
     loss_coeff_stator=0.0,
@@ -41,6 +44,12 @@ def compute_performance_stage(
         Mean-to-outlet radius ratio (rho = r_2 / r_3). Default is 1.0.
     radius_ratio_34 : float, optional
         Mean-to-outlet radius ratio (rho = r_3 / r_4). Default is 1.0.
+    meridional_velocity_ratio_12 : float, optional
+        Meridional velocity ratio at stator (m_12 = v_m1 / v_m2). Default is 1.0.
+    meridional_velocity_ratio_23 : float, optional
+        Meridional velocity ratio at interspace (m_23 = v_m2 / v_m3). Default is 1.0.
+    meridional_velocity_ratio_34 : float, optional
+        Meridional velocity ratio at rotor (m_34 = v_m3 / v_m4). Default is 1.0.
     loss_coeff_stator : float, optional
         Stator loss coefficient, ζ_stator = (Δh_loss / ½v²). Default is 0.0.
     loss_coeff_rotor : float, optional
@@ -51,51 +60,90 @@ def compute_performance_stage(
     # Rename variables
     R = degree_reaction
     nu = blade_velocity_ratio
-    alpha1 = np.deg2rad(stator_inlet_angle)
-    alpha2 = np.deg2rad(stator_exit_angle)
+    limit = 90.0 - 1e-3
+    alpha1 = np.clip(stator_inlet_angle, -limit, limit)
+    alpha2 = np.clip(stator_exit_angle, -limit, limit)
+    alpha1 = np.deg2rad(alpha1)
+    alpha2 = np.deg2rad(alpha2)
     tan_alpha1 = np.tan(alpha1)
     tan_alpha2 = np.tan(alpha2)
+    rr_23 = radius_ratio_23
+    rr_34 = radius_ratio_34
+    m_12 = meridional_velocity_ratio_12
+    m_23 = meridional_velocity_ratio_23
+    m_34 = meridional_velocity_ratio_34
+    m_14 = m_12 * m_23 * m_34
+    m_24 = m_23 * m_34
 
-    # Compute angle after the interspace
-    tan_alpha3 = np.tan(alpha2) * radius_ratio_23**-1
+    # Compute absolute flow angle at rotor inlet
+    tan_alpha3 = rr_23 * m_23 * tan_alpha2
     alpha3 = np.arctan(tan_alpha3)
 
-    # φ² = (1 - R) / [ν² * ((1 + tan²α₂) - R(1 + tan²α₁))]
-    phi_sq = (1 - R) / (nu**2 * ((1 + tan_alpha3**2) - R * (1 + tan_alpha1**2)))
+    # Compute flow coefficient φ
+    temp = (1 + tan_alpha3**2) * m_34 ** 2 - R * (1 + tan_alpha1**2) * m_14 ** 2
+    phi_sq = (1 - R) / (nu**2 * temp) + 1e-12
     phi = np.sqrt(phi_sq)
 
-    # tanβ₂ = tanα₂ - ρ/φ
-    tan_beta3 = tan_alpha3 - radius_ratio_34 / phi
+    # Compute relative flow angle at rotor inlet
+    tan_beta3 = tan_alpha3 - rr_34 / m_34 / phi
     beta3 = np.arctan(tan_beta3)
 
-    # tan²β₃ = tan²β₂ - tan²α₂ - 1 + 1/(ν²φ²) + (1-ρ²)/φ²
-    # Use the negative root of this second order equation
+    # Compute relative flow angle at rotor exit
+    # Use the negative root of the second order equation
     tan_beta4_sq = (
-        tan_beta3**2
-        - tan_alpha3**2
-        - 1
         + 1 / (nu**2 * phi**2)
-        + (1 - radius_ratio_34**2) / phi**2
+        + (1 - rr_34**2) / phi**2
+        + (tan_beta3**2 - tan_alpha3**2) * m_34 ** 2
+        - 1
     )
-    tan_beta4 = -np.sqrt(np.clip(tan_beta4_sq, 0, None))
+
+    # Skip point beyond first invalid condition
+    if np.ndim(tan_beta4_sq) == 1:
+        bad = tan_beta4_sq < 0
+        if np.any(bad):
+            i_bad = np.argmax(bad)  # first invalid index
+            mask = np.zeros_like(tan_beta4_sq, dtype=bool)
+            mask[i_bad:] = True  # mask everything from here onward
+        else:
+            mask = np.zeros_like(tan_beta4_sq, dtype=bool)
+
+    elif np.ndim(tan_beta4_sq) == 0:
+        mask = tan_beta4_sq < 0  # scalar → True or False
+
+    # Apply mask to invalid points
+    tan_beta4 = np.where(
+        ~mask,
+        -np.sqrt(tan_beta4_sq),
+        np.nan
+    )
     beta4 = np.arctan(tan_beta4)
 
-    # tanα₃ = tanβ₃ + 1/φ
+    # Compute absolute flow angle at rotor exit
     tan_alpha4 = tan_beta4 + 1 / phi
     alpha4 = np.arctan(tan_alpha4)
 
-    # Both expressions for the work coefficient give the same result
-    # ψ = φ (ρ tanα₂ - tanα₃)
-    # ψ = (1/(2ν²)) [1 - ν² φ² (1 + tan²α₃)]
-    psi = phi * (radius_ratio_34 * tan_alpha3 - tan_alpha4) + 1e-12
-    # psi2 = 0.5 / (nu**2) * (1 - (nu**2) * phi**2 * (1 + tan_alpha4**2))
+    # Compute work coefficient ψ
+    psi = phi * (rr_34 * m_34 * tan_alpha3 - tan_alpha4) + 1e-12
+    # psi_2 = 0.5 / (nu**2) - 0.5 * phi**2 * (1 + tan_alpha4**2) + 1e-12
+    # assert np.allclose(
+    #     psi,
+    #     psi_2,
+    #     rtol=1e-9,
+    #     atol=1e-12,
+    # ), (
+    #     "Work coefficient definitions are not numerically consistent\n"
+    #     f"psi (def 1) = {psi}\n"
+    #     f"psi (def 2) = {psi_2}\n"
+    #     f"psi (diff) = {psi - psi_2}\n"
+    # )
 
     # Compute losses and efficiency in a decoupled way
-    d_eta_ke = nu**2 * phi**2 * (1 + tan_alpha4**2)
-    loss_stator = (1 + tan_alpha2**2) * loss_coeff_stator
+    delta_eta_ke = nu**2 * phi**2 * (1 + tan_alpha4**2)
+    loss_stator = (1 + tan_alpha2**2) * m_24**2 *  loss_coeff_stator
     loss_rotor = (1 + tan_beta4**2) * loss_coeff_rotor
     eta_tt = psi / (psi + 0.5 * phi**2 * (loss_stator + loss_rotor))
-    eta_ts = (1 / eta_tt + 0.5 * phi**2 / psi * (1 + tan_alpha4**2)) ** -1
+    # eta_ts = (1 / eta_tt + 0.5 * phi**2 / psi * (1 + tan_alpha4**2)) ** -1
+    eta_ts = (1 - delta_eta_ke) * eta_tt
 
     return {
         "phi": phi,
@@ -106,7 +154,7 @@ def compute_performance_stage(
         "beta4": np.rad2deg(beta4),
         "eta_ts": eta_ts,
         "eta_tt": eta_tt,
-        "d_eta_ke": d_eta_ke,
+        "delta_eta_ke": delta_eta_ke,
     }
 
 
@@ -219,6 +267,9 @@ def compute_stage_meanline(
     stator_exit_angle,
     blade_velocity_ratio,
     degree_reaction,
+    meridional_velocity_ratio_12,
+    meridional_velocity_ratio_23,
+    meridional_velocity_ratio_34,
     radius_ratio_12,
     radius_ratio_23,
     radius_ratio_34,
@@ -245,11 +296,20 @@ def compute_stage_meanline(
     RR_12 = radius_ratio_12
     RR_23 = radius_ratio_23
     RR_34 = radius_ratio_34
+    m_12 = meridional_velocity_ratio_12
+    m_23 = meridional_velocity_ratio_23
+    m_34 = meridional_velocity_ratio_34
+    m_14 = m_12 * m_23 * m_34
+    m_24 = m_23 * m_34
     perf = compute_performance_stage(
         stator_inlet_angle=stator_inlet_angle,
         stator_exit_angle=stator_exit_angle,
         degree_reaction=degree_reaction,
         blade_velocity_ratio=blade_velocity_ratio,
+        meridional_velocity_ratio_12=meridional_velocity_ratio_12,
+        meridional_velocity_ratio_23=meridional_velocity_ratio_23,
+        meridional_velocity_ratio_34=meridional_velocity_ratio_34,
+        radius_ratio_23=RR_23,
         radius_ratio_34=RR_34,
         loss_coeff_stator=loss_coeff_stator,
         loss_coeff_rotor=loss_coeff_rotor,
@@ -274,34 +334,36 @@ def compute_stage_meanline(
     # Blade velocities
     phi = perf["phi"]
     nu = blade_velocity_ratio
-    U = nu * v0
     u_1 = 0.0
     u_2 = 0.0
-    u_3 = U * RR_34
-    u_4 = U
+    u_4 = nu * v0
+    u_3 = u_4 * RR_34
+    
+    # Meridional velocities
+    vm_4 = phi * u_4
+    vm_1 = vm_4 * m_14
+    vm_2 = vm_4 * m_24
+    vm_3 = vm_4 * m_34
 
     # Absolute velocities
-    vm = phi * U
     alpha_1 = stator_inlet_angle
     alpha_2 = stator_exit_angle
-    # tan_alpha_3 = np.tan(np.deg2rad(alpha_2)) * radius_ratio_23**-1
-    # alpha_3 = np.rad2deg(np.atan2(tan_alpha_3, 1))
     alpha_3 = perf["alpha3"]
     alpha_4 = perf["alpha4"]
-    v_1 = vm / np.cos(np.deg2rad(alpha_1))
-    v_2 = vm / np.cos(np.deg2rad(alpha_2))
-    v_3 = vm / np.cos(np.deg2rad(alpha_3))
-    v_4 = vm / np.cos(np.deg2rad(alpha_4))
+    v_1 = vm_1 / np.cos(np.deg2rad(alpha_1))
+    v_2 = vm_2 / np.cos(np.deg2rad(alpha_2))
+    v_3 = vm_3 / np.cos(np.deg2rad(alpha_3))
+    v_4 = vm_4 / np.cos(np.deg2rad(alpha_4))
 
     # Relative velocities
     beta_1 = alpha_1
     beta_2 = alpha_2
     beta_3 = perf["beta3"]
     beta_4 = perf["beta4"]
-    w_1 = vm / np.cos(np.deg2rad(beta_1))
-    w_2 = vm / np.cos(np.deg2rad(beta_2))
-    w_3 = vm / np.cos(np.deg2rad(beta_3))
-    w_4 = vm / np.cos(np.deg2rad(beta_4))
+    w_1 = vm_1 / np.cos(np.deg2rad(beta_1))
+    w_2 = vm_2 / np.cos(np.deg2rad(beta_2))
+    w_3 = vm_3 / np.cos(np.deg2rad(beta_3))
+    w_4 = vm_4 / np.cos(np.deg2rad(beta_4))
 
     # Check there are no errrors in the implementation
     assert_velocity_triangle(v_1, w_1, u_1, alpha_1, beta_1, "Station 1")
@@ -312,31 +374,107 @@ def compute_stage_meanline(
     # ------------------------------------------------------------------
     # Static enthalpies
     # ------------------------------------------------------------------
-    tan2_a1 = np.tan(np.deg2rad(alpha_1)) ** 2
-    tan2_a2 = np.tan(np.deg2rad(alpha_2)) ** 2
-    tan2_a3 = np.tan(np.deg2rad(alpha_3)) ** 2
-    tan2_b3 = np.tan(np.deg2rad(beta_3)) ** 2
-    tan2_b4 = np.tan(np.deg2rad(beta_4)) ** 2
     h_1 = state_01.h - 0.5 * v_1**2
-    h_2 = h_1 - 0.5 * U**2 * phi**2 * (tan2_a2 - tan2_a1)
-    h_3 = h_2 - 0.5 * U**2 * phi**2 * (tan2_a3 - tan2_a2)
-    h_4 = h_3 - U**2 * (0.5 * phi**2 * (tan2_b4 - tan2_b3) - 0.5 * (1.0 - RR_34**2))
+    h_2 = h_1 - 0.5 * (v_2 ** 2 - v_1 ** 2)
+    h_3 = h_2 - 0.5 * (v_3 ** 2 - v_2 ** 2)
+    h_4 = h_3 - 0.5 * (w_4 ** 2 - w_3 ** 2) + 0.5 * (u_4 ** 2 - u_3 ** 2)
+    h_04 = h_4 + 0.5 * v_4 ** 2
+    
+    # ------------------------------------------------------------------
+    # Non-dimensional enthalpy consistency checks
+    # ------------------------------------------------------------------
+
+    # Degree of reaction from enthalpy definition
+    R_check = (h_3 - h_4) / (h_1 - h_4)
+
+    assert np.isclose(R_check, degree_reaction, rtol=1e-6), (
+        f"Degree of reaction check failed:\n"
+        f"Computed = {R_check:.6e}, Target = {degree_reaction:.6e}"
+    )
+
+    # Work coefficient from enthalpy definition
+    psi_check = (h_01 - h_04) / u_4**2
+    assert np.isclose(psi_check, perf["psi"], rtol=1e-6), (
+        f"Work coefficient check failed:\n"
+        f"Computed = {psi_check:.6e}, Target = {perf['psi']:.6e}"
+    )
+
+    # 1. Inlet: stagnation → static (0 → 1)
+    lhs_01_1 = (h_01 - h_1) / u_4**2
+    rhs_01_1 = (
+        0.5 * phi**2 * m_14**2
+        * (1.0 + np.tan(np.deg2rad(alpha_1))**2)
+    )
+
+    assert np.isclose(lhs_01_1, rhs_01_1, rtol=1e-6), (
+        f"Inlet enthalpy check failed:\n"
+        f"LHS = {lhs_01_1:.6e}, RHS = {rhs_01_1:.6e}"
+    )
+
+
+    # 2. Stator: 1 → 2
+    lhs_1_2 = (h_1 - h_2) / u_4**2
+    rhs_1_2 = (
+        0.5 * phi**2
+        * (
+            + (1.0 + np.tan(np.deg2rad(alpha_2))**2) * m_24**2
+            - (1.0 + np.tan(np.deg2rad(alpha_1))**2) * m_14**2
+        )
+    )
+
+    assert np.isclose(lhs_1_2, rhs_1_2, rtol=1e-6), (
+        f"Stator enthalpy check failed:\n"
+        f"LHS = {lhs_1_2:.6e}, RHS = {rhs_1_2:.6e}"
+    )
+
+
+    # 3. Interspace: 2 → 3
+    lhs_2_3 = (h_2 - h_3) / u_4**2
+    rhs_2_3 = (
+        0.5 * phi**2
+        * (
+            + (1.0 + np.tan(np.deg2rad(alpha_3))**2) * m_34**2
+            - (1.0 + np.tan(np.deg2rad(alpha_2))**2) * m_24**2
+        )
+    )
+
+    assert np.isclose(lhs_2_3, rhs_2_3, rtol=1e-6), (
+        f"Interspace enthalpy check failed:\n"
+        f"LHS = {lhs_2_3:.6e}, RHS = {rhs_2_3:.6e}"
+    )
+
+
+    # 4. Rotor: 3 → 4 (rothalpy conservation)
+    lhs_3_4 = (h_3 - h_4) / u_4**2
+    rhs_3_4 = (
+        0.5 * phi**2
+        * (
+            + (1.0 + np.tan(np.deg2rad(beta_4))**2)
+            - (1.0 + np.tan(np.deg2rad(beta_3))**2) * m_34**2
+        )
+        - 0.5 * (1.0 - (u_3 / u_4)**2)
+    )
+
+    assert np.isclose(lhs_3_4, rhs_3_4, rtol=1e-6), (
+        f"Rotor enthalpy check failed:\n"
+        f"LHS = {lhs_3_4:.6e}, RHS = {rhs_3_4:.6e}"
+    )
+
 
     # ------------------------------------------------------------------
     # EOS states (isentropic, using (h, s_01))
     # ------------------------------------------------------------------
-    # Station states (1..4): (h_i, s_01)
+    # Station states (1 to 4): (h_i, s_01)
     state_1 = fluid.get_state(jxp.HmassSmass_INPUTS, h_1, state_01.s)
     state_2 = fluid.get_state(jxp.HmassSmass_INPUTS, h_2, state_01.s)
     state_3 = fluid.get_state(jxp.HmassSmass_INPUTS, h_3, state_01.s)
     state_4 = fluid.get_state(jxp.HmassSmass_INPUTS, h_4, state_01.s)
 
     # Convenience aliases
-    d_1, d_2, d_3, d_4 = state_1.d, state_2.d, state_3.d, state_4.d
-    p_1, p_2, p_3, p_4 = state_1.p, state_2.p, state_3.p, state_4.p
-    a_1, a_2, a_3, a_4 = state_1.a, state_2.a, state_3.a, state_4.a
-    s_1, s_2, s_3, s_4 = state_1.s, state_2.s, state_3.s, state_4.s
-    T_1, T_2, T_3, T_4 = state_1.T, state_2.T, state_3.T, state_4.T
+    d_1, p_1, a_1, s_1, T_1 = state_1.d, state_1.p, state_1.a, state_1.s, state_1.T
+    d_2, p_2, a_2, s_2, T_2 = state_2.d, state_2.p, state_2.a, state_2.s, state_2.T
+    d_3, p_3, a_3, s_3, T_3 = state_3.d, state_3.p, state_3.a, state_3.s, state_3.T
+    d_4, p_4, a_4, s_4, T_4 = state_4.d, state_4.p, state_4.a, state_4.s, state_4.T
 
     # Compute Mach numbers
     Ma_1, Ma_2, Ma_3, Ma_4 = w_1 / a_1, w_2 / a_2, w_3 / a_3, w_4 / a_4
@@ -345,16 +483,16 @@ def compute_stage_meanline(
     # Geometry from continuity
     # ------------------------------------------------------------------
     # Compute radii
-    r_1 = np.sqrt(mass_flow_rate / (2.0 * np.pi * d_1 * vm * height_radius_ratio))
+    r_1 = np.sqrt(mass_flow_rate / (2.0 * np.pi * d_1 * vm_1 * height_radius_ratio))
     r_2 = r_1 / RR_12
     r_3 = r_2 / RR_23
     r_4 = r_3 / RR_34
 
     # Compute blade heights
-    H_1 = mass_flow_rate / (2.0 * np.pi * r_1 * d_1 * vm)
-    H_2 = mass_flow_rate / (2.0 * np.pi * r_2 * d_2 * vm)
-    H_3 = mass_flow_rate / (2.0 * np.pi * r_3 * d_3 * vm)
-    H_4 = mass_flow_rate / (2.0 * np.pi * r_4 * d_4 * vm)
+    H_1 = mass_flow_rate / (2.0 * np.pi * r_1 * d_1 * vm_1)
+    H_2 = mass_flow_rate / (2.0 * np.pi * r_2 * d_2 * vm_2)
+    H_3 = mass_flow_rate / (2.0 * np.pi * r_3 * d_3 * vm_3)
+    H_4 = mass_flow_rate / (2.0 * np.pi * r_4 * d_4 * vm_4)
 
     # Asset inlet height-to-radius ratio
     assert np.isclose(
@@ -382,7 +520,7 @@ def compute_stage_meanline(
     VR = state_01.d / state_4s.d
     VR14 = state_1.d / state_4s.d
     K = 4.0 * np.sqrt(2) * np.pi
-    specific_speed_bis = (K * phi * nu ** 3 * RR_14 ** 2 * height_radius_ratio * VR14) ** 0.5
+    specific_speed_bis = (K * phi * nu ** 3 * RR_14 ** 2 * height_radius_ratio * VR14 * m_14) ** 0.5
 
     assert np.isclose(
         omega_3, omega_4, rtol=1e-6
@@ -439,6 +577,9 @@ def compute_stage_meanline(
         "stator_exit_angle": stator_exit_angle,
         "blade_velocity_ratio": blade_velocity_ratio,
         "degree_reaction": degree_reaction,
+        "meridional_velocity_ratio_12": m_12,
+        "meridional_velocity_ratio_23": m_23,
+        "meridional_velocity_ratio_34": m_34,
         "radius_ratio_12": RR_12,
         "radius_ratio_23": RR_23,
         "radius_ratio_34": RR_34,
@@ -461,7 +602,7 @@ def compute_stage_meanline(
         "blade_velocity_ratio": blade_velocity_ratio,
         "specific_speed": specific_speed,
         "spouting_velocity": v0,
-        "rotor_exit_velocity": U,
+        "rotor_exit_velocity": u_4,
         "rotational_speed": RPM,
         "mass_flow_rate": mass_flow_rate,
         "power_isentropic": mass_flow_rate * (state_01.h - h_4s),
@@ -855,8 +996,8 @@ def stage_performance_table(out):
     rows = [
         ("Total-to-total efficiency", perf["efficiency_tt"], "-"),
         ("Total-to-static efficiency", perf["efficiency_ts"], "-"),
-        ("Pressure ratio (t–s)", perf["pressure_ratio_ts"], "-"),
-        ("Volume ratio (t–s)", perf["volume_ratio_ts"], "-"),
+        ("Pressure ratio (t-s)", perf["pressure_ratio_ts"], "-"),
+        ("Volume ratio (t-s)", perf["volume_ratio_ts"], "-"),
         ("Flow coefficient", perf["flow_coefficient"], "-"),
         ("Work coefficient", perf["work_coefficient"], "-"),
         ("Degree of reaction", perf["degree_reaction"], "-"),
@@ -866,8 +1007,8 @@ def stage_performance_table(out):
         ("Rotor exit blade speed", perf["rotor_exit_velocity"], "m/s"),
         ("Rotational speed", perf["rotational_speed"], "rpm"),
         ("Isentropic power", perf["power_isentropic"] / 1e3, "kW"),
-        ("Actual power (t–t)", perf["power_actual_tt"] / 1e3, "kW"),
-        ("Actual power (t–s)", perf["power_actual_ts"] / 1e3, "kW"),
+        ("Actual power (t-t)", perf["power_actual_tt"] / 1e3, "kW"),
+        ("Actual power (t-s)", perf["power_actual_ts"] / 1e3, "kW"),
     ]
 
     return [

@@ -12,9 +12,9 @@ fluid_name = "air"
 input_pair = "PT_INPUTS"
 T_in = 600.0
 p_in = 10e5
-p_out = 5e5
+p_out = 2e5
 
-# Evaluate radial stagenput_only+
+# Evaluate radial stage
 out = td.compute_stage_meanline(
     fluid_name=fluid_name,
     inlet_property_pair_string=input_pair,
@@ -26,6 +26,9 @@ out = td.compute_stage_meanline(
     stator_exit_angle=70.0,
     blade_velocity_ratio=0.7,
     degree_reaction=0.5,
+    meridional_velocity_ratio_12=1.0,
+    meridional_velocity_ratio_23=1.0,
+    meridional_velocity_ratio_34=1.0,
     radius_ratio_12=0.75,
     radius_ratio_23=0.95,
     radius_ratio_34=0.80,
@@ -53,6 +56,9 @@ out = td.compute_stage_meanline(
     stator_exit_angle=70.0,
     blade_velocity_ratio=0.6,
     degree_reaction=0.5,
+    meridional_velocity_ratio_12=0.9,
+    meridional_velocity_ratio_23=0.9,
+    meridional_velocity_ratio_34=0.9,
     radius_ratio_12=1.0,
     radius_ratio_23=1.0,
     radius_ratio_34=1.0,
@@ -70,18 +76,8 @@ td.plotly.plot_blades(out).show()
 td.plotly.plot_meridional_channel(out).show()
 
 
-
-for item in td.geometry_table(out):
-    print(item )
-
-print()
-for item in td.stage_performance_table(out):
-    print(item )
-
 # td.plotly.plot_eta_ts(out).show()
 # td.plotly.plot_eta_tt(out).show()
-
-
 
 # td.mpl.plot_stage(out)
 # td.mpl.plot_rotor_velocity_triangles(out)

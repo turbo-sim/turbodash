@@ -614,9 +614,9 @@ def plot_efficiency(
     out,
     *,
     metric,
-    nu_min=1e-9,
+    nu_min=1e-3,
     nu_max=2.0,
-    n_nu=200,
+    n_nu=250,
     R_list=None,
 ):
     """
@@ -640,6 +640,10 @@ def plot_efficiency(
     alpha2 = inputs["stator_exit_angle"]
     nu0 = inputs["blade_velocity_ratio"]
     R0 = inputs["degree_reaction"]
+    m_12 = inputs["meridional_velocity_ratio_12"]
+    m_23 = inputs["meridional_velocity_ratio_23"]
+    m_34 = inputs["meridional_velocity_ratio_34"]
+    rr_23 = inputs["radius_ratio_23"]
     rr_34 = inputs["radius_ratio_34"]
     xi_stator = inputs["loss_coeff_stator"]
     xi_rotor = inputs["loss_coeff_rotor"]
@@ -665,6 +669,10 @@ def plot_efficiency(
             stator_exit_angle=alpha2,
             degree_reaction=Ri,
             blade_velocity_ratio=nu_vals,
+            meridional_velocity_ratio_12=m_12,
+            meridional_velocity_ratio_23=m_23,
+            meridional_velocity_ratio_34=m_34,
+            radius_ratio_23=rr_23,
             radius_ratio_34=rr_34,
             loss_coeff_stator=xi_stator,
             loss_coeff_rotor=xi_rotor,
@@ -688,6 +696,10 @@ def plot_efficiency(
         stator_exit_angle=alpha2,
         degree_reaction=R0,
         blade_velocity_ratio=np.array([nu0]),
+        meridional_velocity_ratio_12=m_12,
+        meridional_velocity_ratio_23=m_23,
+        meridional_velocity_ratio_34=m_34,
+        radius_ratio_23=rr_23,
         radius_ratio_34=rr_34,
         loss_coeff_stator=xi_stator,
         loss_coeff_rotor=xi_rotor,

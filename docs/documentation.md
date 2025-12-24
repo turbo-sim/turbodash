@@ -154,11 +154,11 @@ Equating these two expressions for the rotor work yields
 $$
 h_{03} - u_3 v_{\theta 3} = h_{04} - u_4 v_{\theta 4}.
 $$
-This result indicates the existence of a quantity that remains constant along the rotor in the absence of heat transfer. This conserved quantity is known as **rothalpy**, defined as
+This result suggests the existence of a quantity that remains constant along the rotor in the absence of heat transfer. This conserved quantity is known as rothalpy and it is defined as:
 $$
 I = h_0 - u v_{\theta}.
 $$
-Using the definitions of stagnation enthalpy and the velocity triangle relations, the rothalpy can be equivalently written as
+Introducing the definitions of stagnation enthalpy and the velocity triangle relations, the rothalpy can be equivalently written as
 $$
 I = h + \frac{v^2}{2} - u v_{\theta}
    = h + \frac{w^2}{2} - \frac{u^2}{2}.
@@ -225,7 +225,7 @@ represents the efficiency penalty associated with the kinetic energy at the stag
 
 ## Stage performance relations
 
-The stage performance relations are derived by expressing the enthalpy changes across the stator, interspace, and rotor in terms of the flow coefficient and flow angles. The degree of reaction and blade velocity ratio are then used to close the model and compute the velocity triangles and stage efficiency.
+The relations among stage performance parameters are derived by expressing the enthalpy changes across the stator, interspace, and rotor in terms of the flow coefficient and flow angles. The degree of reaction and blade velocity ratio are then used to close the model and compute the velocity triangles and stage efficiency.
 
 The difference between stagnation and static enthalpy at the inlet is expressed in non-dimensional form using the flow coefficient:
 $$
@@ -265,7 +265,7 @@ h_4 + \frac{w_4^2}{2} - \frac{u_4^2}{2} = h_3 + \frac{w_3^2}{2} - \frac{u_3^2}{2
 \frac{h_3 - h_4}{u_{4}^2} = \frac{1}{2} \phi^2 \left[ (1+\tan^2 \beta_4) - (1+\tan^2 \beta_3 ) \,  m_{3,4}^2 \right] - \frac{1}{2}(1 -\rho_{3,4}^2)
 \end{gather*}
 $$
-Combining the expressions for the enthalpy changes across the stage with the definition of the degree of reaction, and assuming isentropic flow across the stage ($h_4 = h_{4s}$), allows the flow coefficient to be expressed explicitly.
+Combining the expressions for the enthalpy changes across the stage with the definition of the degree of reaction, and assuming isentropic flow across the stage ($h_4 = h_{4s}$), allows the flow coefficient to be expressed explicitly:
 $$
 \begin{gather*}
 R = \frac{h_{3} - h_{4}}{h_{1} - h_{4}} = 1 - \frac{h_{1} - h_{3}}{h_{1} - h_{4}} = 1 - \frac{h_{1} - h_{3}}{(h_{01} - h_{4}) - (h_{01} - h_{1})} \\[3ex]
@@ -276,7 +276,7 @@ Solving for the flow coefficient yields:
 $$
 \phi^2 = \frac{(1 - R) / \nu^2 }{(1 + \tan^2 \alpha_3) \, m_{3,4}^2 - R (1 + \tan^2 \alpha_1) \, m_{1,4}^2}
 $$
-The relative flow angle at the rotor inlet is obtained from the velocity triangle relation:
+The relative flow angle at the rotor inlet is obtained from the kinematic relation:
 $$
 \begin{gather*}
     \tan \beta_3 = \tan \alpha_3 - \frac{u_3/u_4}{v_{m3}/u_4} = \tan \alpha_3 - \frac{\rho_{3,4}}{m_{3,4}} \frac{1}{\phi}
@@ -290,11 +290,11 @@ $$
     \tan^2 \beta_4 = \frac{1}{\nu^2 \phi^2} + \frac{1 -\rho_{3,4}^2}{\phi^2} + (\tan^2 \beta_3 - \tan^2 \alpha_3) \,  m_{3,4}^2  - 1
 \end{gather*}
 $$
-The absolute flow angle at the rotor exit is then obtained from the kinematic relations:
+The absolute flow angle at the rotor exit is then obtained from the kinematic relation:
 $$
 \tan \alpha_4 = \tan \beta_4 + \frac{u_4}{v_{m4}} = \tan \beta_4 + \frac{1}{\phi}
 $$
-Once all the flow angles are computed, the work coefficient is obtained from:
+Once all the flow angles are computed, the work coefficient is obtained from the Euler turbomachinery equation:
 $$
 \begin{gather*}
 \psi = \frac{h_{01} - h_{04}}{u_{4}^2} = \frac{u_3 v_{\theta 3} - u_4 v_{\theta 4}}{u_{4}^2} = \phi (\rho_{3,4} \, m_{3,4} \, \tan \alpha_3 - \tan \alpha_4)
@@ -306,7 +306,7 @@ $$
 \psi = \frac{h_{01} - h_{04}}{u_4^2} = \frac{h_{01} - h_4}{u_4^2} - \frac{h_{04} - h_4}{u_4^2} =  \frac{1}{2 \nu^2} - \frac{\phi^2}{2} (1 + \tan^2 \alpha_4)
 \end{gather*}
 $$
-Up to this point, the derivation assumes isentropic flow. Aerodynamic losses are now introduced in a decoupled manner to estimate stage efficiency. Losses in the stator and rotor are modeled through the loss coefficients:
+Up to this point, the derivations assumed isentropic flow. Aerodynamic losses are now introduced in a decoupled manner to estimate stage efficiency. Losses in the stator and rotor are modeled through the loss coefficients:
 $$
 \xi_S = \frac{h_2 - h_{2s}}{\tfrac{1}{2} v_2^2}, 
 \qquad
@@ -319,7 +319,7 @@ $$
             \frac{h_{01} - h_{04}}
             {(h_{01} - h_{04}) + \tfrac{1}{2}\xi_S v_2^2 + \tfrac{1}{2}\xi_R w_4^2}
 $$
-This formulation isolates the aerodynamic losses from the velocity triangle calculations. Its main advantage is the straightforward implementation, which avoids iterative equation solving that would otherwise be required if losses were fully integrated into the stage equations. The approximation remains accurate for moderate loss levels, making it well suited for preliminary design and concept analysis.
+This formulation isolates the aerodynamic losses from the velocity triangle calculations. Its main advantage is the straightforward implementation, which avoids iterative equation solving that would otherwise be required if losses were fully integrated into the stage equations. The approximation remains accurate for moderate loss levels, making it well suited for preliminary design and concept analyses.
 
 Expressed in terms of non-dimensional parameters, the total-to-total efficiency is thus given by:
 $$
@@ -361,7 +361,7 @@ $$
 }
 $$
 
-The relations above are derived exclusively from kinematic velocity relations and the balances of mass, energy, and angular momentum. As a result, the formulation is agnostic to the thermodynamic behavior of the working fluid and can be applied uniformly to both compressible and incompressible flows, as well as to single-phase and two-phase fluids, provided that the assumptions of meanline flow are applicable.
+The relations above are derived exclusively from kinematic relations and the balances of mass, energy, and angular momentum. As a result, the formulation is agnostic to the thermodynamic behavior of the working fluid and can be applied to both compressible and incompressible fluids, as well as to single-phase and two-phase flows.
 
 **Observations**
 - The blade velocity may change due to radius variation across the rotor ($\rho_{3,4} = r_3/r_4 = u_3/u_4$).
@@ -371,7 +371,7 @@ The relations above are derived exclusively from kinematic velocity relations an
 
 ## Stage geometry relations
 
-The stage geometry is obtained by scaling up the non-dimensional parameters derived in the previous section. Given the prescribed operating conditions and the computed flow angles, the complete velocity triangles, thermodynamic states, and annulus dimensions at each flow station can be determined explicitly.
+The stage geometry is obtained by scaling up the non-dimensional parameters derived in the previous section. Given the prescribed operating conditions and the computed dimensionless parameters, the velocity vectors, thermodynamic states, and annulus dimensions at each flow station can be determined explicitly.
 
 The inlet entropy and the isentropic enthalpy at the turbine exit are first computed from the specified inlet total conditions and exit static pressure:
 $$
@@ -384,7 +384,7 @@ The blade speed at the rotor exit is obtained from the blade velocity ratio and 
 $$
 u_4 = \nu \, v_{s} = \nu \sqrt{2(h_{01} - h_{4s})}
 $$
-The blade speed at the inlet of the rotor follows from the radius ratios:
+The blade speed at the inlet of the rotor follows from the radius ratio:
 $$
 \begin{gather*}
     u_3 = \rho_{3,4} \, u_4 = (r_3/r_4) \, u_4 \\
@@ -419,7 +419,7 @@ h_4 = h_3 - \frac{1}{2}\left(w_4^2 - w_3^2\right)
       + \frac{1}{2}\left(u_4^2 - u_3^2\right).
 \end{gather*}
 $$
-The thermodynamic state at each station is evaluated assuming an isentropic expansion through the stage using the Coolprop fluid library:
+The thermodynamic state at each station is evaluated assuming an isentropic expansion through the stage using the Coolprop fluid property library:
 $$
 \begin{gather*}
     [p_i, T_i, \rho_i, a_i ] = \mathrm{EoS}(h_i, s_1) \\
@@ -429,7 +429,7 @@ The inlet radius is obtained from the mass flow rate by enforcing continuity at 
 $$
     \dot{m} = \rho_1 v_{m1} A_1 = 2\pi r_1^2 (H_1/r_1) \rho_1 v_{m1}  \to r_1^2 = \frac{\dot{m}}{2\pi v_{m1} \rho_1} (H_1/r_1)^{-1} 
 $$
-The radii at the remaining flow stations are obtained directly from the prescribed radius ratios:
+The radii at the remaining flow stations are obtained directly from the given radius ratios:
 $$
 \begin{gather*}
     r_2 = r_1 / \rho_{1,2} \\
@@ -495,10 +495,10 @@ $$
 = \frac{ Z/2}{\cos^{2} \theta_{\mathrm{out}}
 \left( \tan \theta_{\mathrm{in}} - \tan \theta_{\mathrm{out}} \right)}, \\[2ex]
 N_{\mathrm{b}} = \frac{2 \pi}{s_{\mathrm{b}}} r_{\mathrm{mean}} = \frac{\pi}{s_{\mathrm{b}}} (r_{\mathrm{in}} + r_{\mathrm{out}}) \\[2ex]
-o = s_{\mathrm{b}} \cos\!\left(\theta_{\mathrm{out}} + \tfrac{1}{2}{\theta_{\mathrm{b}}}\right)
+o = s_{\mathrm{b}} \cos\!\left(\theta_{\mathrm{out}} - \tfrac{1}{2}{\theta_{\mathrm{b}}}\right)
 \end{gather*}
 $$
-The flaring semi-angle is defined in the same way
+The flaring semi-angle is defined in the same way as for axial turbines:
 $$
 \tan \delta_{\mathrm{fl}} = \frac{H_{\mathrm{out}} - H_{\mathrm{in}}}{2\,c_{\mathrm{m}}}
 $$
@@ -537,7 +537,7 @@ $$
 D = (1 + \tan^2 \alpha_3)\,m_{3,4}^2 - R(1 + \tan^2 \alpha_1)\,m_{1,4}^2
 $$
 
-This expression highlights the relative influence of the different design parameters on the specific speed. The blade velocity ratio $\nu$ enters with a linear dependence in $\Omega_s$, and therefore exerts a strong influence on the rotational speed. By contrast, the overall radius ratio $r_1/r_4$, overall meridional velocity ratio $v_{m1}/v_{m4}$, and inlet height-to-radius ratio $H_{1}/r_{1}$ appear with a half-power dependence and consequently have a weaker impact on the rotational speed. Finally, the degree of reaction $R$ and the flow angles affect $\Omega_s$ only through a quarter-power dependence and have only a limited influence
+This expression highlights the relative influence of the different design parameters on the specific speed. The blade velocity ratio $\nu$ enters with a linear dependence in $\Omega_s$, and therefore exerts a strong influence on the rotational speed. By contrast, the overall radius ratio $r_1/r_4$, overall meridional velocity ratio $v_{m1}/v_{m4}$, and inlet height-to-radius ratio $H_{1}/r_{1}$ appear with a half-power dependence and consequently have a weaker impact on the rotational speed. Finally, the degree of reaction $R$ and the flow angles affect $\Omega_s$ only through a quarter-power dependence and a limited influence.
 
 Notably, the inlet height-to-radius ratio $H_1/r_1$ does not affect the velocity triangles of the stage. It therefore provides a purely geometric degree of freedom to adjust the rotational speed without altering the aerodynamic loading. Small values of $H_1/r_1$ lead to long and narrow flow paths and lower rotational speeds, whereas larger values result in wider flow channels with larger hydraulic diameters and higher rotational speeds.
 

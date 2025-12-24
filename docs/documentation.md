@@ -13,7 +13,7 @@ The analysis is based on steady, uniform flow through the stator and rotor rows 
 | **Latin symbols** | |
 | $A$ | Annulus flow area |
 | $a$ | Speed of sound |
-| $AR=H/c_{\mathrm{m}}$ | Aspect ratio of axial cascades |
+| $AR$ | Aspect ratio of axial cascades ($H/c_{\mathrm{m}}$) |
 | $c_{\mathrm{m}}$ | Meridional chord length |
 | $h$ | Static enthalpy |
 | $h_0$ | Stagnation enthalpy |

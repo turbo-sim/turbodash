@@ -13,6 +13,7 @@ else:
 
 from .core import *
 from .graphics import *
+from . import geom_blade as geometry
 from . import plotting_mpl as mpl
 from . import plotting_plotly as plotly
 

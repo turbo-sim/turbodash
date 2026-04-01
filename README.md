@@ -16,15 +16,37 @@
 - Support import/export of configuration files.
 - Documentation describing the derivation of governing equations.  
 
-## 🚀 Installation and local run
+## 🛠️ Installation
 
-You can install **turbodash** directly from PyPI or GitHub:
+**From PyPI:**
 
+Install the latest stable release directly from PyPI:
 ```bash
 pip install turbodash
 ```
 
-Once installed, you can run the interactive Dash application locally using the script ``demos/run_app_local.py``. This will start a local server and open the interactive calculator dashboard.
+**From source (Poetry):**
+
+To get the latest development version, clone the repository and install it using [Poetry](https://python-poetry.org/):
+```bash
+git clone https://github.com/turbo-sim/turbodash.git
+cd turbodash
+poetry install
+```
+
+## 🚀 Run the app locally
+
+Once installed, launch the interactive calculator dashboard with:
+```bash
+python -c "import turbodash; turbodash.launch_app()"
+```
+
+Or if you installed from source with Poetry:
+```bash
+poetry run python -c "import turbodash; turbodash.launch_app()"
+```
+
+This will start a local server and open the dashboard in your web browser.
 
 ## Documentation
 The theoretical derivation of the governing equations, efficiency definitions, and validation against analytical special cases are available directly in the app under the Documentation tab.

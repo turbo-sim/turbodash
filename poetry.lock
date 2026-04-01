@@ -64,6 +64,31 @@ files = [
 ]
 
 [[package]]
+name = "appscript"
+version = "1.4.0"
+description = "Control AppleScriptable applications from Python."
+optional = false
+python-versions = "*"
+groups = ["main"]
+markers = "platform_system == \"Darwin\""
+files = [
+    {file = "appscript-1.4.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:0306c09f55f799716fc2badd072b16538a797d2acbc3ea2adc55553293d18188"},
+    {file = "appscript-1.4.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:de0b644f1b86f05d7526e5621bd2fcf36f077fc90fd328e63ba12dd3e267eb9e"},
+    {file = "appscript-1.4.0-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:48d961f83be1de6aa9286d0cfae2060d3ded4302902873d34cd45ca2757c50b3"},
+    {file = "appscript-1.4.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:6ab3be221cf5e798fe1a1930b93c4b791c5cae4e5fd781cb9fb6e35fb7930274"},
+    {file = "appscript-1.4.0-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:ddecaff061f829fcfe5b0452a272f9aa5ac1f61b3929fa18b6f0f100e8eaf306"},
+    {file = "appscript-1.4.0-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:8edab6b8def4862c9582e5d8f5f72c23a3749f2d059f80e4b5ae101a53805116"},
+    {file = "appscript-1.4.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:7710db497d279d819f487dea686866b56c6c1e557befef4631b78553c523334c"},
+    {file = "appscript-1.4.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:0396978b95e06c2cabba117cc172add1df188c51a1b80fc6648aad16890a84c8"},
+    {file = "appscript-1.4.0-cp314-cp314-macosx_10_13_universal2.whl", hash = "sha256:1a5747425d2a5732e2854cab0d0dc893ef077cabd7d57f7ec4caea2ac313e19f"},
+    {file = "appscript-1.4.0-cp314-cp314-macosx_10_13_x86_64.whl", hash = "sha256:5efce3302c00674b769b79938cc5f66f7791ef45c6419e850a5f1c8f9fcefcc1"},
+    {file = "appscript-1.4.0.tar.gz", hash = "sha256:b2c6fc770bf822ea45529c7084bc0ee340e67ab260016b01d28e0449ec8723be"},
+]
+
+[package.dependencies]
+lxml = ">=4.7.1"
+
+[[package]]
 name = "asttokens"
 version = "3.0.1"
 description = "Annotate AST trees with source code positions"
@@ -2312,6 +2337,42 @@ files = [
 wcwidth = "*"
 
 [[package]]
+name = "psutil"
+version = "7.2.2"
+description = "Cross-platform lib for process and system monitoring."
+optional = false
+python-versions = ">=3.6"
+groups = ["main"]
+markers = "platform_system == \"Darwin\""
+files = [
+    {file = "psutil-7.2.2-cp313-cp313t-macosx_10_13_x86_64.whl", hash = "sha256:2edccc433cbfa046b980b0df0171cd25bcaeb3a68fe9022db0979e7aa74a826b"},
+    {file = "psutil-7.2.2-cp313-cp313t-macosx_11_0_arm64.whl", hash = "sha256:e78c8603dcd9a04c7364f1a3e670cea95d51ee865e4efb3556a3a63adef958ea"},
+    {file = "psutil-7.2.2-cp313-cp313t-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:1a571f2330c966c62aeda00dd24620425d4b0cc86881c89861fbc04549e5dc63"},
+    {file = "psutil-7.2.2-cp313-cp313t-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:917e891983ca3c1887b4ef36447b1e0873e70c933afc831c6b6da078ba474312"},
+    {file = "psutil-7.2.2-cp313-cp313t-win_amd64.whl", hash = "sha256:ab486563df44c17f5173621c7b198955bd6b613fb87c71c161f827d3fb149a9b"},
+    {file = "psutil-7.2.2-cp313-cp313t-win_arm64.whl", hash = "sha256:ae0aefdd8796a7737eccea863f80f81e468a1e4cf14d926bd9b6f5f2d5f90ca9"},
+    {file = "psutil-7.2.2-cp314-cp314t-macosx_10_15_x86_64.whl", hash = "sha256:eed63d3b4d62449571547b60578c5b2c4bcccc5387148db46e0c2313dad0ee00"},
+    {file = "psutil-7.2.2-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:7b6d09433a10592ce39b13d7be5a54fbac1d1228ed29abc880fb23df7cb694c9"},
+    {file = "psutil-7.2.2-cp314-cp314t-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:1fa4ecf83bcdf6e6c8f4449aff98eefb5d0604bf88cb883d7da3d8d2d909546a"},
+    {file = "psutil-7.2.2-cp314-cp314t-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:e452c464a02e7dc7822a05d25db4cde564444a67e58539a00f929c51eddda0cf"},
+    {file = "psutil-7.2.2-cp314-cp314t-win_amd64.whl", hash = "sha256:c7663d4e37f13e884d13994247449e9f8f574bc4655d509c3b95e9ec9e2b9dc1"},
+    {file = "psutil-7.2.2-cp314-cp314t-win_arm64.whl", hash = "sha256:11fe5a4f613759764e79c65cf11ebdf26e33d6dd34336f8a337aa2996d71c841"},
+    {file = "psutil-7.2.2-cp36-abi3-macosx_10_9_x86_64.whl", hash = "sha256:ed0cace939114f62738d808fdcecd4c869222507e266e574799e9c0faa17d486"},
+    {file = "psutil-7.2.2-cp36-abi3-macosx_11_0_arm64.whl", hash = "sha256:1a7b04c10f32cc88ab39cbf606e117fd74721c831c98a27dc04578deb0c16979"},
+    {file = "psutil-7.2.2-cp36-abi3-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:076a2d2f923fd4821644f5ba89f059523da90dc9014e85f8e45a5774ca5bc6f9"},
+    {file = "psutil-7.2.2-cp36-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:b0726cecd84f9474419d67252add4ac0cd9811b04d61123054b9fb6f57df6e9e"},
+    {file = "psutil-7.2.2-cp36-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:fd04ef36b4a6d599bbdb225dd1d3f51e00105f6d48a28f006da7f9822f2606d8"},
+    {file = "psutil-7.2.2-cp36-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:b58fabe35e80b264a4e3bb23e6b96f9e45a3df7fb7eed419ac0e5947c61e47cc"},
+    {file = "psutil-7.2.2-cp37-abi3-win_amd64.whl", hash = "sha256:eb7e81434c8d223ec4a219b5fc1c47d0417b12be7ea866e24fb5ad6e84b3d988"},
+    {file = "psutil-7.2.2-cp37-abi3-win_arm64.whl", hash = "sha256:8c233660f575a5a89e6d4cb65d9f938126312bca76d8fe087b947b3a1aaac9ee"},
+    {file = "psutil-7.2.2.tar.gz", hash = "sha256:0746f5f8d406af344fd547f1c8daa5f5c33dbc293bb8d6a16d80b4bb88f59372"},
+]
+
+[package.extras]
+dev = ["abi3audit", "black", "check-manifest", "colorama ; os_name == \"nt\"", "coverage", "packaging", "psleak", "pylint", "pyperf", "pypinfo", "pyreadline3 ; os_name == \"nt\"", "pytest", "pytest-cov", "pytest-instafail", "pytest-xdist", "pywin32 ; os_name == \"nt\" and implementation_name != \"pypy\"", "requests", "rstcheck", "ruff", "setuptools", "sphinx", "sphinx_rtd_theme", "toml-sort", "twine", "validate-pyproject[all]", "virtualenv", "vulture", "wheel", "wheel ; os_name == \"nt\" and implementation_name != \"pypy\"", "wmi ; os_name == \"nt\" and implementation_name != \"pypy\""]
+test = ["psleak", "pytest", "pytest-instafail", "pytest-xdist", "pywin32 ; os_name == \"nt\" and implementation_name != \"pypy\"", "setuptools", "wheel ; os_name == \"nt\" and implementation_name != \"pypy\"", "wmi ; os_name == \"nt\" and implementation_name != \"pypy\""]
+
+[[package]]
 name = "ptyprocess"
 version = "0.7.0"
 description = "Run a subprocess in a pseudo terminal"
@@ -2576,6 +2637,37 @@ groups = ["main"]
 files = [
     {file = "pytz-2026.1.post1-py2.py3-none-any.whl", hash = "sha256:f2fd16142fda348286a75e1a524be810bb05d444e5a081f37f7affc635035f7a"},
     {file = "pytz-2026.1.post1.tar.gz", hash = "sha256:3378dde6a0c3d26719182142c56e60c7f9af7e968076f31aae569d72a0358ee1"},
+]
+
+[[package]]
+name = "pywin32"
+version = "311"
+description = "Python for Window Extensions"
+optional = false
+python-versions = "*"
+groups = ["main"]
+markers = "platform_system == \"Windows\""
+files = [
+    {file = "pywin32-311-cp310-cp310-win32.whl", hash = "sha256:d03ff496d2a0cd4a5893504789d4a15399133fe82517455e78bad62efbb7f0a3"},
+    {file = "pywin32-311-cp310-cp310-win_amd64.whl", hash = "sha256:797c2772017851984b97180b0bebe4b620bb86328e8a884bb626156295a63b3b"},
+    {file = "pywin32-311-cp310-cp310-win_arm64.whl", hash = "sha256:0502d1facf1fed4839a9a51ccbcc63d952cf318f78ffc00a7e78528ac27d7a2b"},
+    {file = "pywin32-311-cp311-cp311-win32.whl", hash = "sha256:184eb5e436dea364dcd3d2316d577d625c0351bf237c4e9a5fabbcfa5a58b151"},
+    {file = "pywin32-311-cp311-cp311-win_amd64.whl", hash = "sha256:3ce80b34b22b17ccbd937a6e78e7225d80c52f5ab9940fe0506a1a16f3dab503"},
+    {file = "pywin32-311-cp311-cp311-win_arm64.whl", hash = "sha256:a733f1388e1a842abb67ffa8e7aad0e70ac519e09b0f6a784e65a136ec7cefd2"},
+    {file = "pywin32-311-cp312-cp312-win32.whl", hash = "sha256:750ec6e621af2b948540032557b10a2d43b0cee2ae9758c54154d711cc852d31"},
+    {file = "pywin32-311-cp312-cp312-win_amd64.whl", hash = "sha256:b8c095edad5c211ff31c05223658e71bf7116daa0ecf3ad85f3201ea3190d067"},
+    {file = "pywin32-311-cp312-cp312-win_arm64.whl", hash = "sha256:e286f46a9a39c4a18b319c28f59b61de793654af2f395c102b4f819e584b5852"},
+    {file = "pywin32-311-cp313-cp313-win32.whl", hash = "sha256:f95ba5a847cba10dd8c4d8fefa9f2a6cf283b8b88ed6178fa8a6c1ab16054d0d"},
+    {file = "pywin32-311-cp313-cp313-win_amd64.whl", hash = "sha256:718a38f7e5b058e76aee1c56ddd06908116d35147e133427e59a3983f703a20d"},
+    {file = "pywin32-311-cp313-cp313-win_arm64.whl", hash = "sha256:7b4075d959648406202d92a2310cb990fea19b535c7f4a78d3f5e10b926eeb8a"},
+    {file = "pywin32-311-cp314-cp314-win32.whl", hash = "sha256:b7a2c10b93f8986666d0c803ee19b5990885872a7de910fc460f9b0c2fbf92ee"},
+    {file = "pywin32-311-cp314-cp314-win_amd64.whl", hash = "sha256:3aca44c046bd2ed8c90de9cb8427f581c479e594e99b5c0bb19b29c10fd6cb87"},
+    {file = "pywin32-311-cp314-cp314-win_arm64.whl", hash = "sha256:a508e2d9025764a8270f93111a970e1d0fbfc33f4153b388bb649b7eec4f9b42"},
+    {file = "pywin32-311-cp38-cp38-win32.whl", hash = "sha256:6c6f2969607b5023b0d9ce2541f8d2cbb01c4f46bc87456017cf63b73f1e2d8c"},
+    {file = "pywin32-311-cp38-cp38-win_amd64.whl", hash = "sha256:c8015b09fb9a5e188f83b7b04de91ddca4658cee2ae6f3bc483f0b21a77ef6cd"},
+    {file = "pywin32-311-cp39-cp39-win32.whl", hash = "sha256:aba8f82d551a942cb20d4a83413ccbac30790b50efb89a75e4f586ac0bb8056b"},
+    {file = "pywin32-311-cp39-cp39-win_amd64.whl", hash = "sha256:e0c4cfb0621281fe40387df582097fd796e80430597cb9944f0ae70447bacd91"},
+    {file = "pywin32-311-cp39-cp39-win_arm64.whl", hash = "sha256:62ea666235135fee79bb154e695f3ff67370afefd71bd7fea7512fc70ef31e3d"},
 ]
 
 [[package]]
@@ -3809,6 +3901,66 @@ tzdata = {version = ">=2020.1", markers = "sys_platform == \"win32\""}
 tzlocal = {version = ">=4.0", markers = "sys_platform != \"darwin\" and sys_platform != \"linux\""}
 
 [[package]]
+name = "xlwings"
+version = "0.34.0"
+description = "Make Excel fly: Interact with Excel from Python and vice versa."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "xlwings-0.34.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:696eeb351e62ba844c20eb5e18537d5843552dc8e068026808ea00a980281e38"},
+    {file = "xlwings-0.34.0-cp310-cp310-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:62560c0bd032191ad6ff82d6ffe638f9b39d7b83649355454f9586e10eae69ab"},
+    {file = "xlwings-0.34.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a7d1cf7d4cd68e4a362ad5e34ff6460ee10feab86bd7c8ea61335e162ceb17b6"},
+    {file = "xlwings-0.34.0-cp310-cp310-musllinux_1_1_aarch64.whl", hash = "sha256:8479bfb9afd27d38a5d231f9af9530e39ee94d40adb2368c787a965d9da1b347"},
+    {file = "xlwings-0.34.0-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:98cfc4d13cff8a120c35de9214c02d1eb306472dfa01123aab3256702f5f42cb"},
+    {file = "xlwings-0.34.0-cp310-cp310-win_amd64.whl", hash = "sha256:e9154e0e1f61e921e36351b975a80594f45e4715095515ba2aebfe55bfa0f248"},
+    {file = "xlwings-0.34.0-cp311-cp311-macosx_10_12_x86_64.whl", hash = "sha256:5bcc2877cb1baf65fc06691f995d685f9c82e4dfa06129db9aa1255ccbb42297"},
+    {file = "xlwings-0.34.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:eba4f473a101aa46a1db60319f7e9a135b0728388f16ce68018a4ee342a6238b"},
+    {file = "xlwings-0.34.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:3f0ea8aa420dbb7a154b68868daae6118b5fd3df03b500191a834b290b7fd7bb"},
+    {file = "xlwings-0.34.0-cp311-cp311-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:21b8118eca716afda9777b04ede82ffec0519ca4b832f1b3dbb0641a25e0a1fa"},
+    {file = "xlwings-0.34.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:bb65354cffc26f1c062875307ab581bfb55a080dcf7a566ed6498a34cddc71a6"},
+    {file = "xlwings-0.34.0-cp311-cp311-musllinux_1_1_aarch64.whl", hash = "sha256:ec8c2286e507a6413f4f86a69857ab58d7e4c647cba324015fc9d89003be28d3"},
+    {file = "xlwings-0.34.0-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:a98291a1e960e202fc187d3fd39e44f5e9a5f7ea56a754ebe214d1fcda8295b6"},
+    {file = "xlwings-0.34.0-cp311-cp311-win_amd64.whl", hash = "sha256:ad37d7a2673b0f0ef2ffd010609f582dfcb4ce5f5bb547d7c54e4bbc48937e90"},
+    {file = "xlwings-0.34.0-cp312-cp312-macosx_10_12_x86_64.whl", hash = "sha256:2d291bdbfbe84218b0b608611bd371bc0feac911efebd14005b2aa8e21ea5490"},
+    {file = "xlwings-0.34.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:5cc7b009a593186aba627df0972244e14eb09142c9bf9b32bf736b42aad7de45"},
+    {file = "xlwings-0.34.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:445536b75571f1669c0854e60d879dfe6014d2a7b1a60e9823a9276534178e89"},
+    {file = "xlwings-0.34.0-cp312-cp312-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:93168d2bb769815b0b91ad0154bf14298e718699db5104d1b5d022d05cadea62"},
+    {file = "xlwings-0.34.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:feca6ee2e7424afe4f328732357076cc75a52101351ba0136811027092d9095d"},
+    {file = "xlwings-0.34.0-cp312-cp312-musllinux_1_1_aarch64.whl", hash = "sha256:756e2bb6d8a9ebc3b6e273e03cf416d4e61c0fe3cc44647cf2ed95411dd5a8e8"},
+    {file = "xlwings-0.34.0-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:3d7c79efd08a8566e1718bc20c0947ac5c414b5a3ec042033fa0faff18c17af7"},
+    {file = "xlwings-0.34.0-cp312-cp312-win_amd64.whl", hash = "sha256:94a74075e9d6ccb362808ef6488a9527cd491456436d3088471437bcff8c4128"},
+    {file = "xlwings-0.34.0-cp313-cp313-macosx_10_12_x86_64.whl", hash = "sha256:d6a3ce5582511727f9172b0ea7d3505051ed0076b836439dd890673ffc510142"},
+    {file = "xlwings-0.34.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:655107eb4ddd206f4c79473ba6c7425b15a802ef0a24e926661df3cfb42549f7"},
+    {file = "xlwings-0.34.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d7719c0de11fd7d3b92c40796f1bd5b139c7bd414e98fe0f3db4a45b78e55993"},
+    {file = "xlwings-0.34.0-cp313-cp313-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:1865ff8e54bfcd33ad74133e77cff452c5db6bd2fb1485550ad9e0e63cf0fa5d"},
+    {file = "xlwings-0.34.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2636c840c4699f4bae0cd7868210f9efde2101935a04c882feab101c99bf2769"},
+    {file = "xlwings-0.34.0-cp313-cp313-musllinux_1_1_aarch64.whl", hash = "sha256:847931b3dc347af892760ae439e9a24cc8bd94497a3bac55a89891c616696e4d"},
+    {file = "xlwings-0.34.0-cp313-cp313-musllinux_1_1_x86_64.whl", hash = "sha256:a893907ff6fc07e83515e1cb664d67ea2da02723d7a0380732218ba00d41ebb3"},
+    {file = "xlwings-0.34.0-cp313-cp313-win_amd64.whl", hash = "sha256:aed541938f015ab09e99a51fe3f3b8f96bc2fcc906171aadbb4b86e4058912ef"},
+    {file = "xlwings-0.34.0-cp314-cp314-macosx_10_12_x86_64.whl", hash = "sha256:120f2982ccc95bb4da08fee938e4c4f0a2c8c436122f3ab6a7061f166dfebff8"},
+    {file = "xlwings-0.34.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:6e6207025ee6f8f03210ca7f3758d4de5b165ad84de0b932605a00bd6a82d295"},
+    {file = "xlwings-0.34.0-cp314-cp314-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e41d838e75a2289362a657091e99bab1bfdfdd45b23772cd81ba1e769750c559"},
+    {file = "xlwings-0.34.0-cp314-cp314-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:88cff3c7fb966b6860f279f0f7ee35cc41b88ff069492c30b9ef8d8c4094307e"},
+    {file = "xlwings-0.34.0-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:37bf82093b91971fbc6eeb92ac4410019211d2c065ed2dfa94f5aeaf063d40c2"},
+    {file = "xlwings-0.34.0-cp314-cp314-musllinux_1_1_aarch64.whl", hash = "sha256:82f781f86d9e4ffd430dc28c2d003817b2f5ec82222d19577db49abdcbb0462b"},
+    {file = "xlwings-0.34.0-cp314-cp314-musllinux_1_1_x86_64.whl", hash = "sha256:c15cb6db0d00cbb0cffebddb6f720c32140f04348301b18df9fad5b3c3ecd0bd"},
+    {file = "xlwings-0.34.0-cp314-cp314-win_amd64.whl", hash = "sha256:0b6e77dfa4b5168e19a4f9d06fc9f41f14bf4df1a2112ed7e7ef6f65feb031b1"},
+    {file = "xlwings-0.34.0-py3-none-any.whl", hash = "sha256:1053d0628e97d8d1b8d098760ce39e73034d2d333ba844fc637c3581710ccddc"},
+    {file = "xlwings-0.34.0.tar.gz", hash = "sha256:9b4259728c5ca9cb91876249c575533045305e94952c9f0d11e71641d4cc8192"},
+]
+
+[package.dependencies]
+appscript = {version = ">=1.0.1", markers = "platform_system == \"Darwin\""}
+psutil = {version = ">=2.0.0", markers = "platform_system == \"Darwin\""}
+pywin32 = {version = ">=224", markers = "platform_system == \"Windows\""}
+
+[package.extras]
+all = ["black", "flask", "isort", "jinja2", "matplotlib", "mistune", "pandas", "pdfrw", "plotly", "pytest", "requests"]
+reports = ["jinja2", "mistune", "pdfrw"]
+vba-edit = ["watchgod"]
+
+[[package]]
 name = "zipp"
 version = "3.23.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
@@ -3831,4 +3983,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.14"
-content-hash = "056c2d3a7b86022e2a48b8032e75c55aae30151d9ac6fc1ebd60b881a36d830a"
+content-hash = "4a08597023777339254eae6a5b2942039efc620a991ca83332ea12bd010d64ea"

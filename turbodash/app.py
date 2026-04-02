@@ -894,8 +894,8 @@ def apply_loaded_meta(cfg, fluid_cur, stage_cur, pair_cur):
 
     inp = cfg.get("inputs", {})
 
-    fluid = inp.get("fluid", fluid_cur)
+    fluid_name = inp.get("fluid_name", fluid_cur)
     stage = inp.get("stage_type", stage_cur)
     pair = inp.get("inlet_property_pair", pair_cur)  # now a string in YAML
 
-    return fluid, stage, pair
+    return fluid_name, stage, pair

@@ -566,7 +566,7 @@ def compute_stage_meanline(
 
     # Input variables
     out["inputs"] = {
-        "fluid": fluid_name,
+        "fluid_name": fluid_name,
         "stage_type": stage_type,
         "inlet_property_pair": inlet_property_pair_string,
         "inlet_property_1": inlet_property_1,
@@ -603,11 +603,13 @@ def compute_stage_meanline(
         "specific_speed": specific_speed,
         "spouting_velocity": v0,
         "rotor_exit_velocity": u_4,
+        "rotor_exit_diameter": 2 * r_4,
         "rotational_speed": RPM,
         "mass_flow_rate": mass_flow_rate,
         "power_isentropic": mass_flow_rate * (state_01.h - h_4s),
         "power_actual_tt": mass_flow_rate * (state_01.h - h_4s) * perf["eta_tt"],
         "power_actual_ts": mass_flow_rate * (state_01.h - h_4s) * perf["eta_ts"],
+        "power_kinetic_energy": mass_flow_rate * (0.5 * v_4**2),
     }
 
     # Cascade geometry
@@ -917,7 +919,7 @@ def print_stage(out):
     # ==============================================================
     _section("Boundary conditions and operating point")
 
-    print(f"{'Fluid':30s}: {_fmt(inputs['fluid'])}")
+    print(f"{'Fluid name':30s}: {_fmt(inputs['fluid_name'])}")
     print(f"{'Stage type':30s}: {_fmt(inputs['stage_type'])}")
     print(f"{'Inlet pressure':30s}: {_fmt(stations[0]['p'] / 1e5, 'bar')}")
     print(f"{'Exit pressure':30s}: {_fmt(stations[-1]['p'] / 1e5, 'bar')}")
@@ -1218,7 +1220,7 @@ def generate_meanline_report(
     # ---------------------------------
     add_section("Operating conditions")
     oc_units = {
-        "fluid": ("-", 1.0),
+        "fluid_name": ("-", 1.0),
         "stage_type": ("-", 1.0),
         "inlet_property_pair": ("-", 1.0),
         "inlet_property_1": ("bar", 1e-5),

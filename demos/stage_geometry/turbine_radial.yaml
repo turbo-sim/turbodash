@@ -1,0 +1,23 @@
+inputs:
+  fluid_name: Air
+  stage_type: radial
+  inlet_property_pair_string: PT_INPUTS
+  inlet_property_1: 100000
+  inlet_property_2: 300
+  exit_pressure: 50000
+  mass_flow_rate: 5
+  stator_inlet_angle: 0
+  stator_exit_angle: 70
+  blade_velocity_ratio: 0.7
+  degree_reaction: 0.5
+  meridional_velocity_ratio_12: 1
+  meridional_velocity_ratio_23: 1
+  meridional_velocity_ratio_34: 1
+  radius_ratio_12: 0.75
+  radius_ratio_23: 0.95
+  radius_ratio_34: 0.8
+  height_radius_ratio: 0.25
+  zweiffel_stator: 0.7
+  zweiffel_rotor: 0.7
+  loss_coeff_stator: 0.05
+  loss_coeff_rotor: 0.06

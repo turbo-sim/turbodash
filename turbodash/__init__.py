@@ -23,7 +23,7 @@ from . import plotting_plotly_turbine
 from . import utils
 
 # Package info
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 PACKAGE_NAME = "turbodash"
 URL_GITHUB = "https://github.com/turbo-sim/turbodash"
 # URL_DOCS = "https://turbo-sim.github.io/turbodash/"

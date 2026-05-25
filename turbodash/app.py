@@ -43,7 +43,7 @@ DEFAULTS = dict(
     p_out=0.5e5,  # exit static pressure [Pa]
     mdot=5.0,  # mass flow rate [kg/s]
     alpha1=0.0,  # absolute flow angle at stator inlet [deg]
-    alpha2=70.0, # absolute flow angle at stator exit [deg]
+    alpha2=70.0,  # absolute flow angle at stator exit [deg]
     nu=0.7,  # blade velocity ratio
     R=0.5,  # degree of reaction
     m_12=1.0,  # meridional velocity ratio 1-2
@@ -322,12 +322,18 @@ controls = html.Div(
         html.Div(
             style={"marginLeft": "16px"},
             children=[
-                input_only(["Inlet property 1"], "inlet_property_1", DEFAULTS["inlet_property_1"]),
-                input_only(["Inlet property 2"], "inlet_property_2", DEFAULTS["inlet_property_2"]),
+                input_only(
+                    ["Inlet property 1"],
+                    "inlet_property_1",
+                    DEFAULTS["inlet_property_1"],
+                ),
+                input_only(
+                    ["Inlet property 2"],
+                    "inlet_property_2",
+                    DEFAULTS["inlet_property_2"],
+                ),
             ],
         ),
-
-
         input_only(
             ["Exit static pressure, p", html.Sub("out"), " [Pa]"],
             "p_out",
@@ -515,9 +521,6 @@ tables = html.Div(
 )
 
 
-
-
-
 # =========================
 # Complete app layout
 # =========================
@@ -572,7 +575,6 @@ app.layout = html.Div(
                         )
                     ],
                 ),
-
                 dcc.Tab(
                     label="Documentation",
                     value="docs",
@@ -596,8 +598,6 @@ app.layout = html.Div(
         )
     ]
 )
-
-
 
 
 # app.layout = html.Div(
@@ -782,6 +782,7 @@ def download_meanline_yaml(n_clicks, out):
 # =========================================
 # Register slider–input sync + YAML load
 # =========================================
+
 
 @app.callback(
     Output("loaded_cfg_store", "data"),

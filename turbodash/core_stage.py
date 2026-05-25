@@ -80,7 +80,7 @@ def compute_performance_stage(
     alpha3 = np.arctan(tan_alpha3)
 
     # Compute flow coefficient φ
-    temp = (1 + tan_alpha3**2) * m_34 ** 2 - R * (1 + tan_alpha1**2) * m_14 ** 2
+    temp = (1 + tan_alpha3**2) * m_34**2 - R * (1 + tan_alpha1**2) * m_14**2
     phi_sq = (1 - R) / (nu**2 * temp) + 1e-12
     phi = np.sqrt(phi_sq)
 
@@ -91,9 +91,9 @@ def compute_performance_stage(
     # Compute relative flow angle at rotor exit
     # Use the negative root of the second order equation
     tan_beta4_sq = (
-        + 1 / (nu**2 * phi**2)
+        +1 / (nu**2 * phi**2)
         + (1 - rr_34**2) / phi**2
-        + (tan_beta3**2 - tan_alpha3**2) * m_34 ** 2
+        + (tan_beta3**2 - tan_alpha3**2) * m_34**2
         - 1
     )
 
@@ -111,11 +111,7 @@ def compute_performance_stage(
         mask = tan_beta4_sq < 0  # scalar → True or False
 
     # Apply mask to invalid points
-    tan_beta4 = np.where(
-        ~mask,
-        -np.sqrt(tan_beta4_sq),
-        np.nan
-    )
+    tan_beta4 = np.where(~mask, -np.sqrt(tan_beta4_sq), np.nan)
     beta4 = np.arctan(tan_beta4)
 
     # Compute absolute flow angle at rotor exit
@@ -139,7 +135,7 @@ def compute_performance_stage(
 
     # Compute losses and efficiency in a decoupled way
     delta_eta_ke = nu**2 * phi**2 * (1 + tan_alpha4**2)
-    loss_stator = (1 + tan_alpha2**2) * m_24**2 *  loss_coeff_stator
+    loss_stator = (1 + tan_alpha2**2) * m_24**2 * loss_coeff_stator
     loss_rotor = (1 + tan_beta4**2) * loss_coeff_rotor
     eta_tt = psi / (psi + 0.5 * phi**2 * (loss_stator + loss_rotor))
     # eta_ts = (1 / eta_tt + 0.5 * phi**2 / psi * (1 + tan_alpha4**2)) ** -1
@@ -338,7 +334,7 @@ def compute_stage_meanline(
     u_2 = 0.0
     u_4 = nu * v0
     u_3 = u_4 * RR_34
-    
+
     # Meridional velocities
     vm_4 = phi * u_4
     vm_1 = vm_4 * m_14
@@ -375,11 +371,11 @@ def compute_stage_meanline(
     # Static enthalpies
     # ------------------------------------------------------------------
     h_1 = state_01.h - 0.5 * v_1**2
-    h_2 = h_1 - 0.5 * (v_2 ** 2 - v_1 ** 2)
-    h_3 = h_2 - 0.5 * (v_3 ** 2 - v_2 ** 2)
-    h_4 = h_3 - 0.5 * (w_4 ** 2 - w_3 ** 2) + 0.5 * (u_4 ** 2 - u_3 ** 2)
-    h_04 = h_4 + 0.5 * v_4 ** 2
-    
+    h_2 = h_1 - 0.5 * (v_2**2 - v_1**2)
+    h_3 = h_2 - 0.5 * (v_3**2 - v_2**2)
+    h_4 = h_3 - 0.5 * (w_4**2 - w_3**2) + 0.5 * (u_4**2 - u_3**2)
+    h_04 = h_4 + 0.5 * v_4**2
+
     # ------------------------------------------------------------------
     # Non-dimensional enthalpy consistency checks
     # ------------------------------------------------------------------
@@ -401,40 +397,35 @@ def compute_stage_meanline(
 
     # 1. Inlet: stagnation → static (0 → 1)
     lhs_01_1 = (h_01 - h_1) / u_4**2
-    rhs_01_1 = (
-        0.5 * phi**2 * m_14**2
-        * (1.0 + np.tan(np.deg2rad(alpha_1))**2)
-    )
+    rhs_01_1 = 0.5 * phi**2 * m_14**2 * (1.0 + np.tan(np.deg2rad(alpha_1)) ** 2)
 
     assert np.isclose(lhs_01_1, rhs_01_1, rtol=1e-6), (
-        f"Inlet enthalpy check failed:\n"
-        f"LHS = {lhs_01_1:.6e}, RHS = {rhs_01_1:.6e}"
+        f"Inlet enthalpy check failed:\n" f"LHS = {lhs_01_1:.6e}, RHS = {rhs_01_1:.6e}"
     )
-
 
     # 2. Stator: 1 → 2
     lhs_1_2 = (h_1 - h_2) / u_4**2
     rhs_1_2 = (
-        0.5 * phi**2
+        0.5
+        * phi**2
         * (
-            + (1.0 + np.tan(np.deg2rad(alpha_2))**2) * m_24**2
-            - (1.0 + np.tan(np.deg2rad(alpha_1))**2) * m_14**2
+            +(1.0 + np.tan(np.deg2rad(alpha_2)) ** 2) * m_24**2
+            - (1.0 + np.tan(np.deg2rad(alpha_1)) ** 2) * m_14**2
         )
     )
 
     assert np.isclose(lhs_1_2, rhs_1_2, rtol=1e-6), (
-        f"Stator enthalpy check failed:\n"
-        f"LHS = {lhs_1_2:.6e}, RHS = {rhs_1_2:.6e}"
+        f"Stator enthalpy check failed:\n" f"LHS = {lhs_1_2:.6e}, RHS = {rhs_1_2:.6e}"
     )
-
 
     # 3. Interspace: 2 → 3
     lhs_2_3 = (h_2 - h_3) / u_4**2
     rhs_2_3 = (
-        0.5 * phi**2
+        0.5
+        * phi**2
         * (
-            + (1.0 + np.tan(np.deg2rad(alpha_3))**2) * m_34**2
-            - (1.0 + np.tan(np.deg2rad(alpha_2))**2) * m_24**2
+            +(1.0 + np.tan(np.deg2rad(alpha_3)) ** 2) * m_34**2
+            - (1.0 + np.tan(np.deg2rad(alpha_2)) ** 2) * m_24**2
         )
     )
 
@@ -443,23 +434,16 @@ def compute_stage_meanline(
         f"LHS = {lhs_2_3:.6e}, RHS = {rhs_2_3:.6e}"
     )
 
-
     # 4. Rotor: 3 → 4 (rothalpy conservation)
     lhs_3_4 = (h_3 - h_4) / u_4**2
-    rhs_3_4 = (
-        0.5 * phi**2
-        * (
-            + (1.0 + np.tan(np.deg2rad(beta_4))**2)
-            - (1.0 + np.tan(np.deg2rad(beta_3))**2) * m_34**2
-        )
-        - 0.5 * (1.0 - (u_3 / u_4)**2)
-    )
+    rhs_3_4 = 0.5 * phi**2 * (
+        +(1.0 + np.tan(np.deg2rad(beta_4)) ** 2)
+        - (1.0 + np.tan(np.deg2rad(beta_3)) ** 2) * m_34**2
+    ) - 0.5 * (1.0 - (u_3 / u_4) ** 2)
 
     assert np.isclose(lhs_3_4, rhs_3_4, rtol=1e-6), (
-        f"Rotor enthalpy check failed:\n"
-        f"LHS = {lhs_3_4:.6e}, RHS = {rhs_3_4:.6e}"
+        f"Rotor enthalpy check failed:\n" f"LHS = {lhs_3_4:.6e}, RHS = {rhs_3_4:.6e}"
     )
-
 
     # ------------------------------------------------------------------
     # EOS states (isentropic, using (h, s_01))
@@ -520,7 +504,9 @@ def compute_stage_meanline(
     VR = state_01.d / state_4s.d
     VR14 = state_1.d / state_4s.d
     K = 4.0 * np.sqrt(2) * np.pi
-    specific_speed_bis = (K * phi * nu ** 3 * RR_14 ** 2 * height_radius_ratio * VR14 * m_14) ** 0.5
+    specific_speed_bis = (
+        K * phi * nu**3 * RR_14**2 * height_radius_ratio * VR14 * m_14
+    ) ** 0.5
 
     assert np.isclose(
         omega_3, omega_4, rtol=1e-6
@@ -1105,6 +1091,7 @@ def flow_stations_table(out):
 
     return rows
 
+
 def generate_meanline_report(
     out_left,
     out_right=None,
@@ -1188,7 +1175,6 @@ def generate_meanline_report(
     for cell in hdr_row.cells:
         set_cell_borders(cell, top=True, bottom=True)
 
-
     # ---------------------------------
     # Row writers
     # ---------------------------------
@@ -1198,10 +1184,9 @@ def generate_meanline_report(
         set_cell_text(cells[0], title, bold=True, italic=True, align="left")
         for c in cells[1:]:
             set_cell_text(c, "")
-        
+
         for cell in row.cells:
             set_cell_borders(cell, top=True, bottom=True)
-
 
         # set_row_borders(row, top=True, bottom=True)
 
@@ -1327,6 +1312,6 @@ def generate_meanline_report(
     last_row = table.rows[-1]
     for cell in last_row.cells:
         set_cell_borders(cell, bottom=True)
-        
+
     doc.save(filename)
     return filename

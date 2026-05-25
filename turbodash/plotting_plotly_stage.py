@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from plotly.colors import sample_colorscale
 
-from .core import compute_performance_stage, compute_stage_meanline
+from .core_stage import compute_performance_stage, compute_stage_meanline
 
 from .geom_blade import (
     compute_blade_coordinates_radial,

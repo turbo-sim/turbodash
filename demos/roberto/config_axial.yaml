@@ -1,0 +1,50 @@
+inputs:
+  fluid_name: air
+  stage_type: axial
+  inlet_property_pair: PT_INPUTS
+  inlet_property_1: 10e5    # stage-1 inlet pressure [Pa], from Macchi row 19
+  inlet_property_2: 600     # stage-1 inlet temperature [K]
+  exit_pressure: 2e5         # overall outlet pressure [Pa]
+  mass_flow_rate: 10      # kg/s per machine (304.8208 total / 4 parallel)
+  inlet_flow_angle: 0        # inlet swirl, stage 1 only (stages 2+ inherit it)
+  blade_velocity_ratio: 0.5    # global nu, sets the anchor radius
+  # Shaft speed: type is "actual" (value in rpm) or "specific" (value = Ns,
+  # defined on the whole-turbine isentropic drop and isentropic exit density).
+  # rotational_speed:
+  #   type: actual
+  #   value: 3000.0
+  rotational_speed:
+    type: specific
+    value: 0.6
+
+
+  stages:
+  - name: one
+    work_fraction_split: 1
+    stator_exit_angle: 70
+    degree_reaction: 0.5       # This can change between the stages
+    meridional_velocity_ratio_12: 1
+    meridional_velocity_ratio_23: 1
+    meridional_velocity_ratio_34: 1
+    radius_ratio_01: 1         # stage 1 has no upstream interstage duct
+    radius_ratio_12: 0.98
+    radius_ratio_23: 0.98
+    radius_ratio_34: 0.98
+
+    zweiffel_stator: 0.7
+    zweiffel_rotor: 0.7
+
+  - name: two
+    work_fraction_split: 1
+    stator_exit_angle: 70
+    degree_reaction: 0.5
+    meridional_velocity_ratio_12: 1
+    meridional_velocity_ratio_23: 1
+    meridional_velocity_ratio_34: 1
+    radius_ratio_01: 0.98
+    radius_ratio_12: 0.98
+    radius_ratio_23: 0.98
+    radius_ratio_34: 0.98
+    zweiffel_stator: 0.7
+    zweiffel_rotor: 0.7
+

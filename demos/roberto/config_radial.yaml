@@ -1,0 +1,59 @@
+inputs:
+  loss_model: benner  # benner | kacker_okapuu | moustapha | isentropic
+  fluid_name: air
+  stage_type: radial
+  inlet_property_pair: PT_INPUTS
+  inlet_property_1: 10e5
+  inlet_property_2: 600
+  exit_pressure: 2e5
+  mass_flow_rate: 10.0
+  inlet_flow_angle: 0.0
+  blade_velocity_ratio: 0.2 
+  rotational_speed:
+    type: specific  # specific | actual
+    value: 0.3
+
+
+  stages:
+  - name: one
+    work_fraction_split: 1.0
+    stator_exit_angle: 70.0
+    degree_reaction: 0.5
+    meridional_velocity_ratio_12: 1.00
+    meridional_velocity_ratio_23: 1.00
+    meridional_velocity_ratio_34: 1.00
+    radius_ratio_01: 1.00
+    radius_ratio_12: 0.90
+    radius_ratio_23: 0.98
+    radius_ratio_34: 0.90
+    zweiffel_stator: 0.7
+    zweiffel_rotor: 0.7
+
+  - name: two
+    work_fraction_split: 1.0
+    stator_exit_angle: 70.0
+    degree_reaction: 0.5
+    meridional_velocity_ratio_12: 1.00
+    meridional_velocity_ratio_23: 1.00
+    meridional_velocity_ratio_34: 1.00
+    radius_ratio_01: 0.98
+    radius_ratio_12: 0.90
+    radius_ratio_23: 0.98
+    radius_ratio_34: 0.90
+    zweiffel_stator: 0.7
+    zweiffel_rotor: 0.7
+
+  - name: three
+    work_fraction_split: 1.0
+    stator_exit_angle: 70.0
+    degree_reaction: 0.5
+    meridional_velocity_ratio_12: 1.00
+    meridional_velocity_ratio_23: 1.00
+    meridional_velocity_ratio_34: 1.00
+    radius_ratio_01: 0.98
+    radius_ratio_12: 0.90
+    radius_ratio_23: 0.98
+    radius_ratio_34: 0.90
+    zweiffel_stator: 0.7
+    zweiffel_rotor: 0.7
+

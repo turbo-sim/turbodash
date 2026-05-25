@@ -26,7 +26,7 @@ with open(CONFIG, "r") as f:
 
 # Compute stage performance and geometry
 # out = td.compute_stage_meanline(**inputs)
-out = td.dev.compute_stage_meanline(**inputs)
+out = td.dev.compute_stage_performance(**inputs)
 
 
 

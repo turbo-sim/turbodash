@@ -1,6 +1,3 @@
-
-
-
 def print_dict(data, indent=0, return_output=False):
     """
     Recursively prints nested dictionaries and lists with indentation,
@@ -633,3 +630,284 @@ def print_turbine_performance(out):
     _print_overall_performance(out)
     _print_geometry(out)
     _print_flow_stations(out)
+
+# ===========================================================================
+# GUI table builders
+# ===========================================================================
+# Return (columns, data) ready for a Dash dash_table.DataTable. Each value is
+# already scaled to its display unit and rounded to its display precision, so
+# the stored number is exactly what is shown (no Dash Format layer).
+#   columns : list of {"name": <header>, "id": <col_id>}
+#   data    : list of row dicts keyed by col_id
+
+
+import numbers
+
+def _cell(value, prec, scale=1.0):
+    """Scale + round one numeric cell to its display form.
+
+    Handles Python numbers, NumPy scalars (np.float64), AND 0-d NumPy arrays
+    (array(972423.54)), which the solver returns for p, T, d, q, a, h. Strings
+    pass through; None becomes "" (blank); bools become text.
+    """
+    if value is None:
+        return ""
+    if isinstance(value, bool):  # bool is a subclass of int
+        return str(value)
+
+    # Coerce NumPy scalars AND 0-d arrays to a plain Python number.
+    # Both have .item(); plain int/float do not, so they skip this.
+    if hasattr(value, "item"):
+        try:
+            value = value.item()
+        except (ValueError, TypeError):
+            return str(value)  # multi-element array: not a single cell
+
+    if isinstance(value, (int, float)):
+        scaled = value * scale
+        if prec == 0:
+            return int(round(scaled))
+        return round(scaled, prec)
+
+    return str(value)
+
+def _header(label, unit):
+    """'Label [unit]' for dimensional quantities, plain label for unitless."""
+    return f"{label} [{unit}]" if unit != "-" else label
+
+
+def overall_performance_table(out):
+    """
+    Overall performance: one row per quantity, a 'Turbine' column plus one
+    column per stage. Values scaled + rounded for display.
+
+    Returns
+    -------
+    (columns, data) for dash_table.DataTable.
+    """
+    op = out["overall_performance"]
+    stages = out["stages_performance"]
+    n = len(stages)
+    sps = [s["stage_performance"] for s in stages]
+
+    columns = [{"name": "Quantity", "id": "quantity"}, {"name": "Turbine", "id": "turbine"}]
+    for i in range(1, n + 1):
+        columns.append({"name": f"Stage {i}", "id": f"stage_{i}"})
+
+    # (label, unit, key, prec, scale)
+    row_specs = [
+        ("Efficiency t-t", "-", "efficiency_tt", 4, 1.0),
+        ("Efficiency t-s", "-", "efficiency_ts", 4, 1.0),
+        ("Pressure ratio t-s", "-", "pressure_ratio_ts", 2, 1.0),
+        ("Volume ratio t-s", "-", "volume_ratio_ts", 2, 1.0),
+        ("Mass flow rate", "kg/s", "mass_flow_rate", 2, 1.0),
+        ("Rotational speed", "rpm", "rotational_speed", 1, 1.0),
+        ("Shaft torque", "N.m", "shaft_torque", 2, 1.0),
+        ("Power actual", "kW", "power_actual", 2, 1e-3),
+        ("Power isentropic", "kW", "power_isentropic", 2, 1e-3),
+        ("Isentropic enthalpy", "kJ/kg", "isentropic_enthalpy_drop", 2, 1e-3),
+        ("Spouting velocity", "m/s", "spouting_velocity", 2, 1.0),
+        ("Exit blade speed", "m/s", "exit_blade_speed", 2, 1.0),
+        ("Exit rotor diameter", "mm", "exit_rotor_diameter", 1, 1e3),
+        ("Maximum Mach number", "-", "maximum_mach_number", 3, 1.0),
+        ("Specific speed", "-", "specific_speed", 4, 1.0),
+        ("Blade velocity ratio", "-", "blade_velocity_ratio", 4, 1.0),
+        ("Flow coefficient", "-", "flow_coefficient", 4, 1.0),
+        ("Loading coefficient", "-", "work_coefficient", 4, 1.0),
+        ("Degree of reaction", "-", "degree_reaction", 4, 1.0),
+        ("Stator loss coefficient", "-", "stator_loss_coefficient", 4, 1.0),
+        ("Rotor loss coefficient", "-", "rotor_loss_coefficient", 4, 1.0),
+    ]
+
+    data = []
+    for label, unit, key, prec, scale in row_specs:
+        rowd = {"quantity": _header(label, unit)}
+        rowd["turbine"] = _cell(op.get(key), prec, scale)
+        for i, sp in enumerate(sps, 1):
+            rowd[f"stage_{i}"] = _cell(sp.get(key), prec, scale)
+        data.append(rowd)
+
+    return columns, data
+
+
+# Geometry rows to display, in order: (label, unit, key, prec, scale).
+# Only these quantities are shown.
+_GEOMETRY_SPECS = [
+    ("Blade count", "-", "blade_count", 0, 1.0),
+    ("Radius in", "mm", "radius_in", 2, 1e3),
+    ("Radius out", "mm", "radius_out", 2, 1e3),
+    ("Height", "mm", "height", 2, 1e3),
+    ("Chord", "mm", "chord", 2, 1e3),
+    ("Spacing", "mm", "spacing", 2, 1e3),
+    ("Opening", "mm", "opening", 2, 1e3),
+    ("Flaring angle", "deg", "flaring_angle", 2, 1.0),
+    ("Maximum thickness", "mm", "maximum_thickness", 2, 1e3),
+    ("Leading edge radius", "mm", "leading_edge_radius", 3, 1e3),
+    ("Leading edge diameter", "mm", "leading_edge_diameter", 3, 1e3),
+    ("Leading edge angle", "deg", "leading_edge_angle", 2, 1.0),
+    ("Leading edge wedge angle", "deg", "leading_edge_wedge_angle", 2, 1.0),
+    ("Trailing edge thickness", "mm", "trailing_edge_thickness", 3, 1e3),
+    ("Trailing edge wedge angle", "deg", "trailing_edge_wedge_angle", 2, 1.0),
+    ("Stagger angle", "deg", "stagger_angle", 2, 1.0),
+    ("Metal angle in", "deg", "metal_angle_in", 2, 1.0),
+    ("Metal angle out", "deg", "metal_angle_out", 2, 1.0),
+]
+
+
+def geometry_table(out):
+    """
+    Geometry: one row per selected quantity, one column per blade row in flow
+    order (S1, R1, S2, R2, ...). Only the quantities in _GEOMETRY_SPECS are
+    shown. Values scaled + rounded for display.
+
+    Returns
+    -------
+    (columns, data) for dash_table.DataTable.
+    """
+    stages = out["stages_performance"]
+
+    # (col_id, label, geometry-dict) per blade row, in flow order.
+    cols = []
+    for i, s in enumerate(stages, 1):
+        cols.append((f"s{i}", f"S{i}", s["geometry"]["stator"]))
+        cols.append((f"r{i}", f"R{i}", s["geometry"]["rotor"]))
+
+    columns = [{"name": "Quantity", "id": "quantity"}]
+    for col_id, label, _ in cols:
+        columns.append({"name": label, "id": col_id})
+
+    data = []
+    for label, unit, key, prec, scale in _GEOMETRY_SPECS:
+        rowd = {"quantity": _header(label, unit)}
+        for col_id, _, geom in cols:
+            rowd[col_id] = _cell(geom.get(key), prec, scale)
+        data.append(rowd)
+
+    return columns, data
+
+
+def flow_stations_table(out):
+    """
+    Flow stations: stations 1-4 of every stage concatenated as rows, one column
+    per quantity. Rows tagged 'Stg i.j'. Values scaled + rounded for display.
+
+    Returns
+    -------
+    (columns, data) for dash_table.DataTable.
+    """
+    stages = out["stages_performance"]
+
+    # (col_id, header, key, prec, scale). key=None for the label column.
+    field_specs = [
+        ("station", "Station", None, None, None),
+        ("p", "p [bar]", "p", 3, 1e-5),
+        ("T", "T [K]", "T", 2, 1.0),
+        ("d", "d [kg/m3]", "d", 3, 1.0),
+        ("q", "q [-]", "q", 2, 1.0),
+        ("a", "a [m/s]", "a", 2, 1.0),
+        ("h", "h [kJ/kg]", "h", 2, 1e-3),
+        ("v", "v [m/s]", "v", 2, 1.0),
+        ("w", "w [m/s]", "w", 2, 1.0),
+        ("u", "u [m/s]", "u", 2, 1.0),
+        ("Ma_abs", "Ma_abs", "Ma_abs", 3, 1.0),
+        ("Ma_rel", "Ma_rel", "Ma_rel", 3, 1.0),
+        ("alpha", "alpha [deg]", "alpha", 2, 1.0),
+        ("beta", "beta [deg]", "beta", 2, 1.0),
+        ("r", "r [mm]", "r", 1, 1e3),
+        ("H", "H [mm]", "H", 1, 1e3),
+    ]
+
+    columns = [{"name": header, "id": col_id} for col_id, header, *_ in field_specs]
+
+    data = []
+    for i, s in enumerate(stages, 1):
+        for j, st in enumerate(s["flow_stations"], 1):
+            rowd = {"station": f"Stg {i}.{j}"}
+            for col_id, _, key, prec, scale in field_specs:
+                if key is None:
+                    continue
+                rowd[col_id] = _cell(st.get(key), prec, scale)
+            data.append(rowd)
+
+    return columns, data
+
+# def flow_stations_table(out):
+#     """
+#     Flow stations: stations 1-4 of every stage concatenated as rows, one column
+#     per quantity. Rows tagged 'Stg i.j'. Values scaled + rounded for display.
+
+#     DIAGNOSTIC VERSION: prints the raw type and value of each cell before
+#     formatting, and the formatted result, so you can see which fields arrive as
+#     0-d numpy arrays vs np.float64 vs plain floats. Remove the print blocks once
+#     the formatting is confirmed working.
+
+#     Returns
+#     -------
+#     (columns, data) for dash_table.DataTable.
+#     """
+#     stages = out["stages_performance"]
+
+#     # (col_id, header, key, prec, scale). key=None for the label column.
+#     field_specs = [
+#         ("station", "Station", None, None, None),
+#         ("p", "p [bar]", "p", 3, 1e-5),
+#         ("T", "T [K]", "T", 2, 1.0),
+#         ("d", "d [kg/m3]", "d", 3, 1.0),
+#         ("q", "q [-]", "q", 2, 1.0),
+#         ("a", "a [m/s]", "a", 2, 1.0),
+#         ("h", "h [kJ/kg]", "h", 2, 1e-3),
+#         ("v", "v [m/s]", "v", 2, 1.0),
+#         ("w", "w [m/s]", "w", 2, 1.0),
+#         ("u", "u [m/s]", "u", 2, 1.0),
+#         ("Ma_abs", "Ma_abs", "Ma_abs", 3, 1.0),
+#         ("Ma_rel", "Ma_rel", "Ma_rel", 3, 1.0),
+#         ("alpha", "alpha [deg]", "alpha", 2, 1.0),
+#         ("beta", "beta [deg]", "beta", 2, 1.0),
+#         ("r", "r [mm]", "r", 1, 1e3),
+#         ("H", "H [mm]", "H", 1, 1e3),
+#     ]
+
+#     columns = [{"name": header, "id": col_id} for col_id, header, *_ in field_specs]
+
+#     # ---- DIAGNOSTIC: header for the dump -----------------------------------
+#     print("\n" + "=" * 78)
+#     print("flow_stations_table diagnostic")
+#     print("=" * 78)
+#     print(f"{'station':>9} {'key':>8} {'raw type':>16} {'raw value':>22} {'-> formatted':>16}")
+#     print("-" * 78)
+
+#     data = []
+#     for i, s in enumerate(stages, 1):
+#         for j, st in enumerate(s["flow_stations"], 1):
+#             tag = f"Stg {i}.{j}"
+#             rowd = {"station": tag}
+#             for col_id, _, key, prec, scale in field_specs:
+#                 if key is None:
+#                     continue
+#                 raw = st.get(key)
+#                 formatted = _cell(raw, prec, scale)
+
+#                 # ---- DIAGNOSTIC: one line per cell -------------------------
+#                 type_name = type(raw).__name__
+#                 # for 0-d numpy arrays also show dtype/ndim, which is the
+#                 # detail that explains why isinstance(raw, float) is False
+#                 extra = ""
+#                 if hasattr(raw, "ndim"):
+#                     extra = f" (ndim={raw.ndim}, dtype={getattr(raw, 'dtype', '?')})"
+#                 print(
+#                     f"{tag:>9} {key:>8} {type_name + extra:>16} "
+#                     f"{repr(raw):>22} {repr(formatted):>16}"
+#                 )
+
+#                 rowd[col_id] = formatted
+#             data.append(rowd)
+#             print("-" * 78)  # separator between stations
+
+#     # ---- DIAGNOSTIC: final structures --------------------------------------
+#     print("Resulting columns:")
+#     print(columns)
+#     print("\nResulting data (first row):")
+#     print(data[0] if data else "(no rows)")
+#     print("=" * 78 + "\n")
+
+#     return columns, data

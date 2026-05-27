@@ -20,7 +20,7 @@ from . import plotting_plotly_stage as plotly
 
 from . import plotting_plotly_turbine
 
-from . import utils
+from . import reporting_utils
 
 # Package info
 __version__ = "0.5.0"
@@ -32,11 +32,24 @@ URL_DTU = "https://thermalpower.dtu.dk/"
 BREAKLINE = 80 * "-"
 
 
-def launch_app():
+def launch_app_stage():
     import os
     import webbrowser
     from threading import Timer
     from turbodash.app import app
+
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        Timer(1, lambda: webbrowser.open("http://127.0.0.1:8050/")).start()
+
+    app.run(debug=True)
+
+
+
+def launch_app_turbine():
+    import os
+    import webbrowser
+    from threading import Timer
+    from turbodash.app_turbine import app
 
     if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         Timer(1, lambda: webbrowser.open("http://127.0.0.1:8050/")).start()

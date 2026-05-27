@@ -64,7 +64,7 @@ def plot_turbine_meridional_channel(results):
     fig : plotly.graph_objects.Figure
     """
     stages = results["stages_performance"]
-    stage_type = results["inputs"]["stage_type"]
+    turbine_type = results["inputs"]["turbine_type"]
     fig = go.Figure()
 
     def _line(x, y, color):
@@ -78,7 +78,7 @@ def plot_turbine_meridional_channel(results):
             )
         )
 
-    if stage_type == "axial":
+    if turbine_type == "axial":
         intercascade_gap_factor = 2
 
         def draw_stage(out, x_offset):
@@ -121,7 +121,7 @@ def plot_turbine_meridional_channel(results):
             fig, xtitle="Axial direction", ytitle="Radial direction", equal=True
         )
 
-    elif stage_type == "radial":
+    elif turbine_type == "radial":
 
         def draw_stage(out):
             fs = out["flow_stations"]
@@ -155,7 +155,7 @@ def plot_turbine_meridional_channel(results):
         )
 
     else:
-        raise ValueError(f"Invalid stage type: {stage_type!r}")
+        raise ValueError(f"Invalid stage type: {turbine_type!r}")
 
     fig.update_layout(template="simple_white", margin=dict(l=30, r=30, t=30, b=30))
     return fig
@@ -164,7 +164,7 @@ def plot_turbine_meridional_channel(results):
 # =============================================================================
 # Plot turbine blades (multistage)
 # =============================================================================
-def plot_turbine_blades(results, N_points=200, N_blades_plot=8):
+def plot_turbine_blades(results, N_points=51, N_blades_plot=8):
     """
     Blade cascades for a full multistage turbine, axial or radial.
     Mirror of the mpl function of the same name.
@@ -174,7 +174,7 @@ def plot_turbine_blades(results, N_points=200, N_blades_plot=8):
     fig : plotly.graph_objects.Figure
     """
     stages = results["stages_performance"]
-    stage_type = results["inputs"]["stage_type"]
+    turbine_type = results["inputs"]["turbine_type"]
     fig = go.Figure()
 
     # Track which legend entries have been shown so each appears once only.
@@ -195,7 +195,7 @@ def plot_turbine_blades(results, N_points=200, N_blades_plot=8):
             )
         )
 
-    if stage_type == "axial":
+    if turbine_type == "axial":
 
         def draw_stage(out, x_offset):
             def draw_row(*, geom, x0, beta_in, beta_out, color, label):
@@ -253,7 +253,7 @@ def plot_turbine_blades(results, N_points=200, N_blades_plot=8):
             fig, xtitle="Axial direction", ytitle="Tangential direction", equal=True
         )
 
-    elif stage_type == "radial":
+    elif turbine_type == "radial":
 
         def draw_stage(out):
             def draw_row(geom, color, label):
@@ -306,13 +306,20 @@ def plot_turbine_blades(results, N_points=200, N_blades_plot=8):
         for st in stages:
             draw_stage(st)
 
+        # r_max = 1.05 * stages[-1]["flow_stations"][-1]["r"]
+        # fig.update_xaxes(range=[0.0, r_max])
+        # fig.update_yaxes(range=[0.0, r_max])
+        # _style_axes(fig, xtitle="x direction", ytitle="y direction", equal=True)
+
         r_max = 1.05 * stages[-1]["flow_stations"][-1]["r"]
-        fig.update_xaxes(range=[0.0, r_max])
-        fig.update_yaxes(range=[0.0, r_max])
         _style_axes(fig, xtitle="x direction", ytitle="y direction", equal=True)
+        # Set ranges AFTER scaleanchor, and constrain the domain so the box holds.
+        fig.update_xaxes(range=[0.0, r_max], constrain="domain")
+        fig.update_yaxes(range=[0.0, r_max], constrain="domain")
+
 
     else:
-        raise ValueError(f"Invalid stage type: {stage_type!r}")
+        raise ValueError(f"Invalid stage type: {turbine_type!r}")
 
     fig.update_layout(template="simple_white", margin=dict(l=30, r=30, t=30, b=30))
     return fig
@@ -338,27 +345,29 @@ def _get_velocity_components(fs, use_mach):
     )
 
 
-def _add_triangle(fig, v_t, v_m, w_t, w_m, color, row, show_legend, name):
+def _add_triangle(fig, v_t, v_m, w_t, w_m, color, show_legend, name):
     """
-    Draw one velocity triangle on a subplot: v and w from the shared origin,
-    and the blade vector u closing from the tip of w to the tip of v. The
-    meridional component (y) is stored negated so the triangle points downward,
-    matching the mpl inverted-y convention.
+    Draw one velocity triangle on a single (non-subplot) figure: v and w from
+    the shared origin, and the blade vector u closing from the tip of w to the
+    tip of v.
+
+    The meridional component (y) is stored with its true positive sign; the
+    downward-pointing appearance is produced by inverting the y-axis range in
+    the caller, not by negating the data. This way the tick labels read positive
+    meridional Mach increasing downward.
     """
 
     def seg(x0, y0, x1, y1, legend):
         fig.add_trace(
             go.Scatter(
                 x=[x0, x1],
-                y=[-y0, -y1],
+                y=[y0, y1],
                 mode="lines",
                 line=dict(color=color, width=2),
                 name=name,
                 legendgroup=name,
                 showlegend=legend,
-            ),
-            row=row,
-            col=1,
+            )
         )
 
     seg(0.0, 0.0, v_t, v_m, show_legend)  # absolute v (carries legend)
@@ -366,106 +375,92 @@ def _add_triangle(fig, v_t, v_m, w_t, w_m, color, row, show_legend, name):
     seg(w_t, w_m, v_t, v_m, False)  # blade u (closes triangle)
 
 
-def plot_velocity_triangles_turbine(result, mode="mach"):
+def plot_velocity_triangle_stage(st, scale_tangen, scale_merid, use_mach, title=None):
     """
-    Rotor velocity triangles of every stage stacked in a single column,
-    stage 1 at the top, shared axes. Mirror of the mpl function.
+    Build ONE self-contained figure with the rotor velocity triangles (inlet and
+    outlet) of a single stage.
+
+    This replaces the previous subplot-stacking approach: rather than packing all
+    stages into one figure with shared axes (which fought the responsive GUI
+    layout), each stage gets its own standalone figure. The caller stacks them in
+    the page, one per row. Each figure carries its own legend and axis titles and
+    is fully independent.
 
     Parameters
     ----------
-    result : dict
-        Output of compute_turbine_performance().
-    mode : {"mach", "velocity"}
+    st : dict
+        One entry of result["stages_performance"].
+    scale_tangen, scale_merid : float
+        Shared tangential/meridional magnitudes (max across all stages), so every
+        stage's figure uses the SAME axis extents and the triangles are directly
+        comparable from row to row.
+    use_mach : bool
+        True -> Mach numbers, False -> m/s.
+    title : str, optional
+        Title shown above the figure (e.g. "Stage 2").
 
     Returns
     -------
     fig : plotly.graph_objects.Figure
     """
-    use_mach = {"mach": True, "velocity": False}.get(mode)
-    if use_mach is None:
-        raise ValueError(f"mode must be 'mach' or 'velocity', got {mode!r}")
     if use_mach:
         xlabel, ylabel = "Tangential Mach [-]", "Meridional Mach [-]"
     else:
         xlabel, ylabel = "Tangential velocity [m/s]", "Meridional velocity [m/s]"
 
-    stages = result["stages_performance"]
-    n_stages = len(stages)
+    v3_t, v3_m, w3_t, w3_m = _get_velocity_components(st["flow_stations"][2], use_mach)
+    v4_t, v4_m, w4_t, w4_m = _get_velocity_components(st["flow_stations"][3], use_mach)
 
-    # Shared extents across all stages and both rotor stations.
-    tangential_mags, meridional_mags = [], []
-    for st in stages:
-        for idx in (2, 3):
-            v_t, v_m, w_t, w_m = _get_velocity_components(
-                st["flow_stations"][idx], use_mach
-            )
-            tangential_mags += [abs(v_t), abs(w_t)]
-            meridional_mags += [abs(v_m), abs(w_m)]
-    scale_tangen = max((t for t in tangential_mags if np.isfinite(t)))
-    scale_merid = max((m for m in meridional_mags if np.isfinite(m)))
+    fig = go.Figure()
+    _add_triangle(fig, v3_t, v3_m, w3_t, w3_m, COLOR_INLET, True, "Rotor inlet")
+    _add_triangle(fig, v4_t, v4_m, w4_t, w4_m, COLOR_OUTLET, True, "Rotor outlet")
 
-    fig = make_subplots(
-        rows=n_stages,
-        cols=1,
-        shared_xaxes=True,
-        vertical_spacing=0.04,
-    )
+    # Origin crosshairs.
+    fig.add_hline(y=0.0, line=dict(color="black", width=0.5))
+    fig.add_vline(x=0.0, line=dict(color="black", width=0.5))
 
+    # Padding factors. y_top_frac gives a little headroom ABOVE the origin
+    # (negative meridional side); pad gives generous room on the triangle side so
+    # the heads/tips are never clipped at the axis edge.
     pad = 1.25
     y_top_frac = 0.25
-    for i, st in enumerate(stages, 1):
-        v3_t, v3_m, w3_t, w3_m = _get_velocity_components(
-            st["flow_stations"][2], use_mach
-        )
-        v4_t, v4_m, w4_t, w4_m = _get_velocity_components(
-            st["flow_stations"][3], use_mach
-        )
-        show = i == 1
-        _add_triangle(fig, v3_t, v3_m, w3_t, w3_m, COLOR_INLET, i, show, "Rotor inlet")
-        _add_triangle(
-            fig, v4_t, v4_m, w4_t, w4_m, COLOR_OUTLET, i, show, "Rotor outlet"
-        )
 
-        # Origin crosshairs.
-        fig.add_hline(y=0.0, line=dict(color="black", width=0.5), row=i, col=1)
-        fig.add_vline(x=0.0, line=dict(color="black", width=0.5), row=i, col=1)
-
-        # Axis limits. y stored negated (downward), so the visible range runs
-        # from -pad*scale_merid (bottom) up to +y_top_frac*pad*scale_merid.
-        fig.update_xaxes(
-            range=[-pad * scale_tangen, pad * scale_tangen],
-            showline=True,
-            mirror=True,
-            linewidth=1,
-            linecolor="black",
-            ticks="inside",
-            tickfont=dict(size=TICK_FONT_SIZE),
-            row=i,
-            col=1,
-        )
-        fig.update_yaxes(
-            range=[-pad * scale_merid, y_top_frac * pad * scale_merid],
-            scaleanchor=f"x{'' if i == 1 else i}",
-            scaleratio=1.0,
-            showline=True,
-            mirror=True,
-            linewidth=1,
-            linecolor="black",
-            ticks="inside",
-            tickfont=dict(size=TICK_FONT_SIZE),
-            row=i,
-            col=1,
-        )
-
-    # Shared axis titles: x only on the bottom panel, y centered via annotation.
     fig.update_xaxes(
-        title_text=xlabel, title_font=dict(size=AXIS_FONT_SIZE), row=n_stages, col=1
+        range=[-pad * scale_tangen, pad * scale_tangen],
+        title_text=xlabel,
+        title_font=dict(size=AXIS_FONT_SIZE),
+        showline=True,
+        mirror=True,
+        linewidth=1,
+        linecolor="black",
+        ticks="inside",
+        tickfont=dict(size=TICK_FONT_SIZE),
     )
+    fig.update_yaxes(
+        # Inverted axis: the FIRST element (top of the axis) is the small
+        # negative-side headroom, the SECOND element (bottom) is the padded
+        # positive meridional extent. Because element[0] < element[1] would
+        # normally plot upward, we write them high-to-low so the axis descends:
+        # i.e. top = +y_top_frac*..., bottom = -pad*... in display terms. The
+        # explicit padded range (instead of autorange="reversed") guarantees the
+        # triangle tips at +scale_merid are fully inside the frame.
+        range=[pad * scale_merid, -y_top_frac * pad * scale_merid],
+        title_text=ylabel,
+        title_font=dict(size=AXIS_FONT_SIZE),
+        showline=True,
+        mirror=True,
+        linewidth=1,
+        linecolor="black",
+        ticks="inside",
+        tickfont=dict(size=TICK_FONT_SIZE),
+    )
+
     fig.update_layout(
         template="simple_white",
-        height=260 * n_stages + 80,
-        width=560,
-        margin=dict(l=80, r=30, t=30, b=60),
+        height=340,
+        autosize=True,
+        margin=dict(l=70, r=30, t=40 if title else 30, b=55),
+        title=dict(text=title, font=dict(size=AXIS_FONT_SIZE)) if title else None,
         legend=dict(
             orientation="v",
             x=0.98,
@@ -477,18 +472,56 @@ def plot_velocity_triangles_turbine(result, mode="mach"):
             borderwidth=1,
         ),
     )
-    # Single shared y-label, centered on the stack.
-    fig.add_annotation(
-        text=ylabel,
-        textangle=-90,
-        xref="paper",
-        yref="paper",
-        x=-0.13,
-        y=0.5,
-        showarrow=False,
-        font=dict(size=AXIS_FONT_SIZE),
-    )
     return fig
+
+
+def plot_velocity_triangles_turbine(result, mode="mach"):
+    """
+    Rotor velocity triangles for every stage, as a LIST of standalone figures
+    (one per stage), stage 1 first.
+
+    The shared axis extents are computed once across all stages so the per-stage
+    figures are directly comparable. The caller (GUI) places each figure in its
+    own row.
+
+    Parameters
+    ----------
+    result : dict
+        Output of compute_turbine_performance().
+    mode : {"mach", "velocity"}
+
+    Returns
+    -------
+    list[plotly.graph_objects.Figure]
+        One figure per stage, in stage order.
+    """
+    use_mach = {"mach": True, "velocity": False}.get(mode)
+    if use_mach is None:
+        raise ValueError(f"mode must be 'mach' or 'velocity', got {mode!r}")
+
+    stages = result["stages_performance"]
+
+    # Shared extents across all stages and both rotor stations, so every stage's
+    # figure uses identical axis limits and the triangles are comparable.
+    tangential_mags, meridional_mags = [], []
+    for st in stages:
+        for idx in (2, 3):
+            v_t, v_m, w_t, w_m = _get_velocity_components(
+                st["flow_stations"][idx], use_mach
+            )
+            tangential_mags += [abs(v_t), abs(w_t)]
+            meridional_mags += [abs(v_m), abs(w_m)]
+    scale_tangen = max((t for t in tangential_mags if np.isfinite(t)))
+    scale_merid = max((m for m in meridional_mags if np.isfinite(m)))
+
+    figs = []
+    for i, st in enumerate(stages, 1):
+        figs.append(
+            plot_velocity_triangle_stage(
+                st, scale_tangen, scale_merid, use_mach, title=f"Stage {i}"
+            )
+        )
+    return figs
 
 
 # =============================================================================

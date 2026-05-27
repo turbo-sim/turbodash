@@ -21,7 +21,7 @@ COLOR_ROTOR = "tab:blue"
 
 def plot_turbine_meridional_channel(results, ax=None):
     stages = results["stages_performance"]
-    stage_type = results["inputs"]["stage_type"]
+    turbine_type = results["inputs"]["turbine_type"]
 
     def plot_axial(ax):
         intercascade_gap_factor = 2  # number openings to use as gap between stages
@@ -104,12 +104,12 @@ def plot_turbine_meridional_channel(results, ax=None):
     else:
         fig = ax.get_figure()
 
-    if stage_type == "axial":
+    if turbine_type == "axial":
         plot_axial(ax)
-    elif stage_type == "radial":
+    elif turbine_type == "radial":
         plot_radial(ax)
     else:
-        raise ValueError(f"Invalid stage type: {stage_type!r}")
+        raise ValueError(f"Invalid stage type: {turbine_type!r}")
 
     ax.set_ylabel("Radial direction")
     ax.set_aspect("equal", adjustable="box")
@@ -138,10 +138,10 @@ def plot_turbine_blades(results, ax=None, N_points=200, N_blades_plot=8):
     fig, ax
     """
     stages = results["stages_performance"]
-    stage_type = results["inputs"]["stage_type"]
+    turbine_type = results["inputs"]["turbine_type"]
 
     def plot_axial(ax):
-        def draw_stage(out, x_offset):
+        def draw_stage(out, x_offset, stage_idx):
             def draw_row(*, geom, x0, beta_in, beta_out, color, label):
                 x_b, y_b, *_ = compute_blade_coordinates_cartesian(
                     camberline_type="linear_angle_change",
@@ -164,7 +164,7 @@ def plot_turbine_blades(results, ax=None, N_points=200, N_blades_plot=8):
                         y_b + y_shift,
                         color=color,
                         lw=1.5,
-                        label=label if i == 0 else None,
+                        label=label if (stage_idx == 0 and i == 0) else None,
                     )
 
             stator_geom = out["geometry"]["stator"]
@@ -193,8 +193,8 @@ def plot_turbine_blades(results, ax=None, N_points=200, N_blades_plot=8):
             )
 
         x_cursor = 0.0
-        for st in stages:
-            x_cursor = draw_stage(st, x_offset=x_cursor)
+        for j, st in enumerate(stages):
+            x_cursor = draw_stage(st, x_offset=x_cursor, stage_idx=j)
             x_cursor += st["geometry"]["rotor"]["opening"]  # interstage gap
 
         ax.set_aspect("equal", adjustable="box")
@@ -203,7 +203,7 @@ def plot_turbine_blades(results, ax=None, N_points=200, N_blades_plot=8):
         ax.set_ylim(0, N_blades_plot * stages[0]["geometry"]["stator"]["spacing"])
 
     def plot_radial(ax):
-        def draw_stage(out):
+        def draw_stage(out, stage_idx):
             def draw_row(geom, color, label):
                 x_b, y_b, *_ = compute_blade_coordinates_radial(
                     "linear_angle_change",
@@ -242,14 +242,14 @@ def plot_turbine_blades(results, ax=None, N_points=200, N_blades_plot=8):
                         st * x_b + ct * y_b,
                         color=color,
                         lw=1.5,
-                        label=label if i == 0 else None,
+                        label=label if (stage_idx == 0 and i == 0) else None,
                     )
 
             draw_row(out["geometry"]["stator"], color=COLOR_STATOR, label="Stator")
             draw_row(out["geometry"]["rotor"], color=COLOR_ROTOR, label="Rotor")
 
-        for st in stages:
-            draw_stage(st)
+        for j, st in enumerate(stages):
+            draw_stage(st, stage_idx=j)
 
         r_max = 1.05 * stages[-1]["flow_stations"][-1]["r"]
         ax.set_xlim(0.0, r_max)
@@ -264,12 +264,12 @@ def plot_turbine_blades(results, ax=None, N_points=200, N_blades_plot=8):
     else:
         fig = ax.get_figure()
 
-    if stage_type == "axial":
+    if turbine_type == "axial":
         plot_axial(ax)
-    elif stage_type == "radial":
+    elif turbine_type == "radial":
         plot_radial(ax)
     else:
-        raise ValueError(f"Invalid stage type: {stage_type!r}")
+        raise ValueError(f"Invalid stage type: {turbine_type!r}")
 
     ax.legend()
     fig.tight_layout(pad=1)

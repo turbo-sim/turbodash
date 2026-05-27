@@ -51,7 +51,8 @@ Unit conventions
     Efficiencies %, pressures bar, temperatures K, lengths mm, power kW,
     velocities m/s, angles deg, dimensionless -.
 """
-
+import os
+import yaml
 import xlwings as xw
 from .core_turbine import compute_turbine_performance
 
@@ -255,7 +256,7 @@ def _append_dict(rows, prefix, d):
 @xw.func
 @xw.arg("names", ndim=1)
 @xw.arg("values", ndim=1)
-def excel_turbine_calculator(names, values):
+def meanline_caculator_full(names, values):
     """Run the multistage meanline turbine model and return all results.
 
     Accepts two Excel column ranges (names, values). Overall parameters use
@@ -311,3 +312,167 @@ def excel_turbine_calculator(names, values):
             _append_dict(rows, f"{sp}.station.{j}", station)
 
     return rows
+
+
+
+
+
+# ===========================================================================
+# Simplified UDF (baseline config + scalar overrides)
+# ===========================================================================
+# A lighter entry point for quick studies. Instead of specifying every input,
+# the user points at a baseline YAML config (which carries the per-stage
+# geometry and all defaults) and overrides only the overall operating-point
+# scalars that change between runs: fluid, inlet properties, exit pressure,
+# mass flow, blade velocity ratio, and rotational speed. The per-stage design
+# (angles, reaction, radius/velocity ratios, Zweifel numbers, work split) is
+# taken straight from the baseline file. Returns a compact summary.
+#
+# Reuses the same compute_turbine_performance import, xlwings (xw), and _cache
+# as the full interface above.
+ 
+# Directory to resolve relative baseline config names against. By default the
+# folder containing this module; adjust if your configs live elsewhere.
+_CONFIG_DIR = os.path.dirname(os.path.abspath(__file__))
+ 
+
+def _apply_overrides(inputs, fluid_name, property_pair, property_in_1,
+                     property_in_2, pressure_exit, mass_flow_rate,
+                     blade_velocity_ratio, rotational_speed_type, rotational_speed_value):
+    """Override the overall operating-point scalars on a baseline inputs dict.
+ 
+    Per-stage data and any other overall keys (loss_model, inlet_flow_angle,
+    turbine_type, ...) are left exactly as the baseline file defines them. An
+    override is applied only when its argument is provided (not None / blank),
+    so a user can leave a cell empty in Excel to keep the baseline value.
+    """
+    def given(v):
+        return v is not None and not (isinstance(v, str) and v.strip() == "")
+ 
+    if given(fluid_name):
+        inputs["fluid_name"] = str(fluid_name).strip()
+    if given(property_pair):
+        inputs["inlet_property_pair"] = str(property_pair).strip()
+    if given(property_in_1):
+        inputs["inlet_property_1"] = float(property_in_1)
+    if given(property_in_2):
+        inputs["inlet_property_2"] = float(property_in_2)
+    if given(pressure_exit):
+        inputs["exit_pressure"] = float(pressure_exit)
+    if given(mass_flow_rate):
+        inputs["mass_flow_rate"] = float(mass_flow_rate)
+    if given(blade_velocity_ratio):
+        inputs["blade_velocity_ratio"] = float(blade_velocity_ratio)
+    if given(rotational_speed_type) and given(rotational_speed_value):
+        # Keep the baseline's rotational_speed.type; override only the value.
+        inputs["rotational_speed"]["type"] = rotational_speed_type
+        inputs["rotational_speed"]["value"] = float(rotational_speed_value)
+
+ 
+    return inputs
+
+def _num(value):
+    """Plain Python float from a Python number, NumPy scalar, or 0-d array."""
+    if hasattr(value, "item"):
+        try:
+            return float(value.item())
+        except (ValueError, TypeError):
+            return float(value)
+    return float(value)
+
+
+def _load_baseline_inputs(config_name):
+    """Load a baseline YAML and return its `inputs` dict.
+
+    Accepts either a hand-written config (top-level `inputs:` only) or a saved
+    turbine output (which also has `overall_performance` / `stages_performance`,
+    ignored here). The path may be absolute or relative to _CONFIG_DIR; a
+    missing '.yaml' extension is added.
+    """
+    name = str(config_name).strip()
+    if not name:
+        raise ValueError("config_name is empty")
+    if not os.path.splitext(name)[1]:
+        name += ".yaml"
+    path = name if os.path.isabs(name) else os.path.join(_CONFIG_DIR, name)
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Baseline config not found: {path}")
+
+    with open(path, "r", encoding="utf-8") as f:
+        cfg = yaml.safe_load(f) or {}
+    inputs = cfg.get("inputs")
+    if not inputs:
+        raise KeyError(f"No 'inputs' section in baseline config: {path}")
+    return inputs
+
+
+@xw.func
+def meanline_calculator(config_name, fluid_name, property_pair,
+                            property_in_1, property_in_2, pressure_exit,
+                            mass_flow_rate, blade_velocity_ratio,
+                            rotational_speed_type, rotational_speed_value):
+    """Run a multistage meanline turbine from a baseline config with overrides.
+ 
+    Loads the per-stage design and all defaults from a baseline YAML config,
+    then overrides the overall operating-point scalars passed as arguments.
+    Any argument left blank keeps the baseline value. Returns a compact
+    [name, value] summary.
+ 
+    Excel usage
+    -----------
+        =radial_turbine_meanline(config_name, fluid_name, property_pair,
+                                 property_in_1, property_in_2, pressure_exit,
+                                 mass_flow_rate, blade_velocity_ratio,
+                                 rotational_speed)
+ 
+    Parameters
+    ----------
+    config_name : str
+        Baseline YAML config (e.g. "config_radial" or "config_radial.yaml").
+        Absolute path, or relative to the module's _CONFIG_DIR. The per-stage
+        geometry comes from this file.
+    fluid_name : str               override, e.g. "Air"  (blank = keep baseline)
+    property_pair : str            override inlet property pair
+    property_in_1, property_in_2 : float   override inlet properties
+    pressure_exit : float          override exit pressure [Pa]
+    mass_flow_rate : float         override mass flow rate [kg/s]
+    blade_velocity_ratio : float   override blade speed ratio nu
+    rotational_speed : float       override rotational_speed.value
+ 
+    Returns
+    -------
+    list of [str, float]
+        Total-to-total efficiency [%], total-to-static efficiency [%],
+        actual power [kW], maximum Mach [-], inlet diameter [mm],
+        outlet diameter [mm], exit blade speed [m/s].
+    """   
+    inputs = _load_baseline_inputs(config_name)
+    inputs = _apply_overrides(
+        inputs, fluid_name, property_pair, property_in_1, property_in_2,
+        pressure_exit, mass_flow_rate, blade_velocity_ratio, rotational_speed_type, rotational_speed_value,
+    )
+    cfg = {"inputs": inputs}
+ 
+    # Reuse the same cache as the full interface.
+    cache_key = repr(cfg)
+    if cache_key not in _cache:
+        _cache[cache_key] = compute_turbine_performance(cfg)
+    out = _cache[cache_key]
+ 
+    op = out["overall_performance"]
+ 
+    return [
+        ["Total-to-total efficiency [%]", round(_num(op["efficiency_tt"]) * 100.0, 2)],
+        ["Total-to-static efficiency [%]", round(_num(op["efficiency_ts"]) * 100.0, 2)],
+        ["Actual power [kW]", round(_num(op["power_actual"]) * 1e-3, 2)],
+        ["Actual speed [rpm]", round(_num(op["rotational_speed"]), 2)],
+        ["Specific speed [-]", round(_num(op["specific_speed"]), 3)],
+        ["Maximum Mach number [-]", round(_num(op["maximum_mach_number"]), 3)],
+        ["Outlet diameter [mm]", round(_num(op["exit_rotor_diameter"]) * 1e3, 2)],
+        ["Exit blade speed [m/s]", round(_num(op["exit_blade_speed"]), 2)],
+    ]
+
+
+@xw.func
+def py_sum(a, b):
+    return a + b

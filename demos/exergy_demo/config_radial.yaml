@@ -1,7 +1,7 @@
 inputs:
+  turbine_type: radial
   loss_model: benner  # benner | kacker_okapuu | moustapha | isentropic
   fluid_name: air
-  stage_type: radial
   inlet_property_pair: PT_INPUTS
   inlet_property_1: 10e5
   inlet_property_2: 600

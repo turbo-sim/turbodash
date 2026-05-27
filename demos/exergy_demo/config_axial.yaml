@@ -1,6 +1,7 @@
 inputs:
+  turbine_type: axial
+  loss_model: benner  # benner | kacker_okapuu | moustapha | isentropic
   fluid_name: air
-  stage_type: axial
   inlet_property_pair: PT_INPUTS
   inlet_property_1: 10e5    # stage-1 inlet pressure [Pa], from Macchi row 19
   inlet_property_2: 600     # stage-1 inlet temperature [K]

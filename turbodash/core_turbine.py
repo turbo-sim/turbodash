@@ -360,7 +360,7 @@ def compute_loss_coefficient(
     return evaluate_loss_model(loss_model, loss_inputs)
 
 def compute_blade_row_geometry(
-    stage_type,
+    turbine_type,
     r_in,
     r_out,
     H_in,
@@ -381,13 +381,13 @@ def compute_blade_row_geometry(
     """
 
     # Chord definition
-    if stage_type == "radial":
+    if turbine_type == "radial":
         meridional_chord = r_out - r_in
-    elif stage_type == "axial":
+    elif turbine_type == "axial":
         # Hardcoded aspect ratio AR = 2.0 for axial blades
         meridional_chord = (1 / 2.00) * 0.5 * (H_in + H_out)
     else:
-        raise ValueError(f"Invalid stage type: {stage_type}")
+        raise ValueError(f"Invalid stage type: {turbine_type}")
 
     # Integer number of blades from Zweifel criterion
     angle_in = np.deg2rad(angle_in_deg)
@@ -405,12 +405,12 @@ def compute_blade_row_geometry(
 
     # Opening (cosine rule)
     s_out = 2 * np.pi * r_out / N_blades
-    if stage_type == "radial":
+    if turbine_type == "radial":
         o = s_out * np.cos(np.abs(angle_out) - 0.5 * (2.0 * np.pi / N_blades))
-    elif stage_type == "axial":
+    elif turbine_type == "axial":
         o = s_out * np.cos(angle_out)
     else:
-        raise ValueError(f"Invalid stage type: {stage_type}")
+        raise ValueError(f"Invalid stage type: {turbine_type}")
 
     # Flaring angle
     height = 0.5 * (H_in + H_out)
@@ -430,11 +430,17 @@ def compute_blade_row_geometry(
     # ------------------------------------------------------------------
     pitch = s_mean
     leading_edge_diameter = 2.0 * leading_edge_radius
-    hub_tip_ratio_in = (r_in - 0.5 * H_in) / (r_in + 0.5 * H_in)
     A_out = 2.0 * np.pi * r_out * H_out
     A_throat = A_out * (o / s_out)  # exit area scaled by opening/pitch
     tip_clearance = tip_clearance_to_height * height
     stagger_angle_deg = np.rad2deg(stagger_angle)
+    if turbine_type == "radial":
+        hub_tip_ratio_in = 1.00
+    elif turbine_type == "axial":
+        hub_tip_ratio_in = (r_in - 0.5 * H_in) / (r_in + 0.5 * H_in)
+    else:
+        raise ValueError(f"Invalid stage type: {turbine_type}")
+
 
     # Return complete dictionary
     return dict(
@@ -487,7 +493,7 @@ def compute_stage_performance(
     meridional_velocity_ratio_34,
     zweiffel_stator,
     zweiffel_rotor,
-    stage_type="axial",
+    turbine_type="axial",
     loss_model="benner",
 ):
     """
@@ -716,7 +722,7 @@ def compute_stage_performance(
  
     # Stator
     stator_geom = compute_blade_row_geometry(
-        stage_type=stage_type,
+        turbine_type=turbine_type,
         r_in=r_1,
         r_out=r_2,
         H_in=H_1,
@@ -729,7 +735,7 @@ def compute_stage_performance(
  
     # Rotor
     rotor_geom = compute_blade_row_geometry(
-        stage_type=stage_type,
+        turbine_type=turbine_type,
         r_in=r_3,
         r_out=r_4,
         H_in=H_3,
@@ -865,6 +871,7 @@ def compute_stage_performance(
         # --- rotor geometry / kinematics ---
         "exit_blade_speed": u_4,
         "exit_rotor_diameter": 2.0 * r_4,
+        "maximum_mach_number": np.max(Ma_rel),
         # --- dimensionless design parameters ---
         "specific_speed": specific_speed,
         "blade_velocity_ratio": nu,
@@ -1058,7 +1065,7 @@ def compute_turbine_performance(cfg):
     # 1. Global boundary conditions and design inputs
     # ---------------------------------------------------------------
     fluid_name = inp["fluid_name"]
-    stage_type = inp.get("stage_type", "axial")
+    turbine_type = inp.get("turbine_type", "axial")
     mass_flow_rate = float(inp["mass_flow_rate"])
     p_exit = float(inp["exit_pressure"])
     nu_global = float(inp["blade_velocity_ratio"])
@@ -1232,7 +1239,7 @@ def compute_turbine_performance(cfg):
             meridional_velocity_ratio_34=m_34,
             zweiffel_stator=float(stg_current["zweiffel_stator"]),
             zweiffel_rotor=float(stg_current["zweiffel_rotor"]),
-            stage_type=stage_type,
+            turbine_type=turbine_type,
             loss_model=inp["loss_model"],
         )
         # Label the stage. The only per-stage identifier carried in the output;
@@ -1280,6 +1287,9 @@ def compute_turbine_performance(cfg):
     U_exit = omega * st4_last["r"]
     r_exit = st4_last["r"]
 
+    # Maximum Mach number across the whole turbine: check every station in every stage.
+    Ma_max = max(s["stage_performance"]["maximum_mach_number"] for s in stages_output)
+
     # Overall specific speed: defined on the whole-machine isentropic drop
     # and the overall isentropic exit density (state_4s)
     V_4s = mass_flow_rate / state_4s.d
@@ -1303,6 +1313,7 @@ def compute_turbine_performance(cfg):
         # --- rotor geometry / kinematics ---
         "exit_blade_speed": U_exit,
         "exit_rotor_diameter": 2.0 * r_exit,
+        "maximum_mach_number": Ma_max,
         # --- dimensionless design parameters ---
         "specific_speed": specific_speed,
         "blade_velocity_ratio": nu_global,

@@ -46,7 +46,7 @@ def main():
 OVERALL_DEFAULTS = dict(
     loss_model="benner",
     fluid_name="Air",
-    turbine_type="radial",
+    turbine_type="axial",
     inlet_property_pair="PT_INPUTS",
     inlet_property_1=5e5,
     inlet_property_2=600.0,
@@ -58,8 +58,10 @@ OVERALL_DEFAULTS = dict(
     rotational_speed_value=0.7,
 )
 
-# Per-stage defaults. New stages are seeded from this.
-STAGE_DEFAULTS = dict(
+# Per-stage defaults. Two sets: one for axial stages and one for radial
+# stages. The radial set is identical to the axial set except that all four
+# radius ratios are set equal to 1.0.
+STAGE_DEFAULTS_RADIAL = dict(
     work_fraction_split=1.0,
     stator_exit_angle=70.0,
     degree_reaction=0.5,
@@ -73,6 +75,27 @@ STAGE_DEFAULTS = dict(
     zweiffel_stator=0.7,
     zweiffel_rotor=0.7,
 )
+
+STAGE_DEFAULTS_AXIAL = dict(
+    STAGE_DEFAULTS_RADIAL,
+    radius_ratio_01=1.0,
+    radius_ratio_12=1.0,
+    radius_ratio_23=1.0,
+    radius_ratio_34=1.0,
+)
+
+
+def stage_defaults_for(turbine_type):
+    """Return the per-stage default dict for the given turbine type."""
+    if turbine_type == "radial":
+        return dict(STAGE_DEFAULTS_RADIAL)
+    return dict(STAGE_DEFAULTS_AXIAL)
+
+
+# Backwards-compatible alias used throughout the module wherever a generic set
+# of stage defaults / the canonical list of stage keys is needed. Points at the
+# axial set (the historical default).
+STAGE_DEFAULTS = STAGE_DEFAULTS_AXIAL
 
 # Per-stage fields: (cfg_key, label, min, max, step). Labels carry the full
 # variable name with symbol and unit. Order = display order. Each renders as a
@@ -435,27 +458,58 @@ def overall_accordion():
         ],
     )
 
-
 def save_load_row():
+    button_style = {
+        "width": "100%",
+        "padding": "10px 16px",
+        "fontWeight": "600",
+        "fontSize": "14px",
+        "borderRadius": "6px",
+        "margin": "0",
+        "boxSizing": "border-box",
+    }
+    cell_style = {
+        "flex": "0 0 50%",
+        "maxWidth": "50%",
+        "minWidth": "0",
+        "boxSizing": "border-box",
+    }
     return html.Div(
         [
-            html.Button(
-                "Save current design",
-                id="save_button",
-                n_clicks=0,
-                style={"padding": "8px 16px", "fontWeight": "bold"},
-            ),
-            dcc.Upload(
-                id="load_button",
-                accept=".yaml,.yml",
-                children=html.Button(
-                    "Load previous design", style={"padding": "8px 16px", "fontWeight": "bold"}
+            html.Div(
+                dbc.Button(
+                    "Save design",
+                    id="save_button",
+                    n_clicks=0,
+                    color="primary",
+                    outline=True,
+                    style=button_style,
                 ),
+                style={**cell_style, "paddingRight": "6px"},
+            ),
+            html.Div(
+                dcc.Upload(
+                    id="load_button",
+                    accept=".yaml,.yml",
+                    style={"width": "100%", "display": "block"},
+                    style_active={},
+                    children=dbc.Button(
+                        "Load design",
+                        color="primary",
+                        outline=True,
+                        style=button_style,
+                    ),
+                ),
+                style={**cell_style, "paddingLeft": "6px"},
             ),
         ],
-        style=dict(display="flex", gap="12px", marginBottom="10px"),
+        style=dict(
+            display="flex",
+            marginBottom="16px",
+            width="100%",
+            boxSizing="border-box",
+        ),
     )
-
 
 controls = html.Div(
     [
@@ -537,6 +591,7 @@ plots_grid = html.Div(
     children=[
         plot_card("Meridional channel", "meridional_plot"),
         plot_card("Blade-to-blade view", "blades_plot"),
+        plot_card("Efficiency trends", "efficiency_trends_plot"),
         plot_card("Loss distribution", "loss_plot"),
     ],
 )
@@ -708,20 +763,43 @@ app.layout = html.Div(
 
 
 # =========================================
-# Callback: maintain stage_data_store. Fires ONLY on +/- or load, never on a
-# value edit, so editing a parameter does not rebuild/collapse the accordion.
+# Callback: maintain stage_data_store. Fires on +/-, load, or a turbine-type
+# switch, never on an ordinary value edit, so editing a parameter does not
+# rebuild/collapse the accordion.
 # =========================================
 @app.callback(
     Output("stage_data_store", "data"),
     Input("stage_plus", "n_clicks"),
     Input("stage_minus", "n_clicks"),
     Input("loaded_cfg_store", "data"),
+    Input({"scope": "overall", "key": "turbine_type"}, "value"),
     State("stage_data_store", "data"),
+    State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "value"),
+    State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "id"),
     prevent_initial_call=True,
 )
-def update_stage_store(n_plus, n_minus, loaded_cfg, stages):
+def update_stage_store(
+    n_plus, n_minus, loaded_cfg, turbine_type, stages, live_values, live_ids
+):
     trigger = ctx.triggered_id
     stages = list(stages or [dict(STAGE_DEFAULTS)])
+
+    # Reconcile the store with the user's current live edits before doing
+    # anything else, so that add/remove operate on up-to-date values. (Loading
+    # and a type switch intentionally discard live edits, so skip there.)
+    if trigger in ("stage_plus", "stage_minus"):
+        for d, v in zip(live_ids or [], live_values or []):
+            si = d["stage"]
+            if 0 <= si < len(stages) and v is not None:
+                stages[si][d["key"]] = v
+
+    # Switching turbine type: reset ALL stages to the defaults for that type,
+    # keeping the current number of stages.
+    if trigger == {"scope": "overall", "key": "turbine_type"}:
+        if not turbine_type:
+            raise PreventUpdate
+        defaults = stage_defaults_for(turbine_type)
+        return [dict(defaults) for _ in stages]
 
     # Loading a config: replace the whole stage list from the YAML.
     if trigger == "loaded_cfg_store" and loaded_cfg:
@@ -735,12 +813,13 @@ def update_stage_store(n_plus, n_minus, loaded_cfg, stages):
             return new_stages
         raise PreventUpdate
 
-    # Add a stage: copy the last stage's values as the seed.
+    # Add a stage: copy the previous (last) stage's current values as the seed.
     if trigger == "stage_plus":
         seed = dict(stages[-1]) if stages else dict(STAGE_DEFAULTS)
         return stages + [seed]
 
-    # Remove a stage: never go below one.
+    # Remove a stage: drop the last one, leaving the others unchanged. Never go
+    # below one stage.
     if trigger == "stage_minus":
         return stages[:-1] if len(stages) > 1 else stages
 
@@ -796,6 +875,7 @@ def render_stage_accordion(stages):
     Output("meridional_plot", "figure"),
     Output("blades_plot", "figure"),
     Output("triangles_container", "children"),
+    Output("efficiency_trends_plot", "figure"),
     Output("loss_plot", "figure"),
     Output("perf_table", "children"),
     Output("geom_table", "children"),
@@ -812,8 +892,11 @@ def update_turbine(overall_values, stage_values, overall_ids, stage_ids, store_s
     overall = {d["key"]: v for d, v in zip(overall_ids or [], overall_values or [])}
 
     # Stage list rebuilt from the live number boxes; count comes from the store.
-    n = len(store_stages or [dict(STAGE_DEFAULTS)])
-    stages = [dict(STAGE_DEFAULTS) for _ in range(n)]
+    # The baseline defaults follow the selected turbine type so any key not
+    # carried by a live box falls back to the right per-type default.
+    defaults = stage_defaults_for(overall.get("turbine_type"))
+    n = len(store_stages or [dict(defaults)])
+    stages = [dict(defaults) for _ in range(n)]
     for d, v in zip(stage_ids or [], stage_values or []):
         si = d["stage"]
         if 0 <= si < n and v is not None:
@@ -834,6 +917,13 @@ def update_turbine(overall_values, stage_values, overall_ids, stage_ids, store_s
         )
         fig_loss = td.plotting_plotly_turbine.plot_turbine_loss_distribution(out)
 
+        # Overall efficiency trends vs blade velocity ratio (kinematic sweep).
+        nu_sweep = np.linspace(1e-3, 1.0, 100)
+        trends = td.core_turbine.compute_turbine_efficiency_trends(out, nu_sweep)
+        fig_efficiency_trends = (
+            td.plotting_plotly_turbine.plot_turbine_efficiency_trends(trends, out)
+        )
+
         # Wrap each per-stage figure in its own card row.
         triangles_children = [
             triangle_card(f"triangles_plot_{i}", fig)
@@ -852,6 +942,7 @@ def update_turbine(overall_values, stage_values, overall_ids, stage_ids, store_s
             fig_meridional,
             fig_blades,
             triangles_children,
+            fig_efficiency_trends,
             fig_loss,
             perf_tbl,
             geom_tbl,

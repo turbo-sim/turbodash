@@ -460,7 +460,14 @@ def meanline_calculator(config_name, fluid_name, property_pair,
     out = _cache[cache_key]
  
     op = out["overall_performance"]
- 
+
+    inlet_height = out["stages_performance"][0]["geometry"]["stator"]["height"]
+    outlet_height = out["stages_performance"][-1]["geometry"]["rotor"]["height"]
+    inlet_diameter = out["stages_performance"][0]["geometry"]["stator"]["radius_out"] * 2
+    outlet_diameter = out["stages_performance"][-1]["geometry"]["rotor"]["radius_out"] * 2
+    inlet_blade_speed = out["stages_performance"][0]["flow_stations"][0]["u"]
+    exit_blade_speed = out["stages_performance"][-1]["flow_stations"][-1]["u"]
+
     return [
         ["Total-to-total efficiency [%]", round(_num(op["efficiency_tt"]) * 100.0, 2)],
         ["Total-to-static efficiency [%]", round(_num(op["efficiency_ts"]) * 100.0, 2)],
@@ -468,8 +475,12 @@ def meanline_calculator(config_name, fluid_name, property_pair,
         ["Actual speed [rpm]", round(_num(op["rotational_speed"]), 2)],
         ["Specific speed [-]", round(_num(op["specific_speed"]), 3)],
         ["Maximum Mach number [-]", round(_num(op["maximum_mach_number"]), 3)],
-        ["Outlet diameter [mm]", round(_num(op["exit_rotor_diameter"]) * 1e3, 2)],
-        ["Exit blade speed [m/s]", round(_num(op["exit_blade_speed"]), 2)],
+        ["Inlet height [mm]", round(_num(inlet_height) * 1e3, 2)],
+        ["Outlet height [mm]", round(_num(outlet_height) * 1e3, 2)],
+        ["Inlet diameter [mm]", round(_num(inlet_diameter) * 1e3, 2)],
+        ["Outlet diameter [mm]", round(_num(outlet_diameter) * 1e3, 2)],
+        ["Inlet blade speed [m/s]", round(_num(inlet_blade_speed), 2)],
+        ["Exit blade speed [m/s]", round(_num(exit_blade_speed), 2)],        
     ]
 
 

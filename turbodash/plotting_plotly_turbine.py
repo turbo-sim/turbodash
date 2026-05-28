@@ -14,8 +14,8 @@ from .geom_blade import (
 # =============================================================================
 COLOR_STATOR = "#ff7f0e"  # orange (matches mpl "tab:orange")
 COLOR_ROTOR = "#1f77b4"  # blue   (matches mpl "tab:blue")
-COLOR_INLET = "#1f77b4"  # rotor inlet  (blue)
-COLOR_OUTLET = "#ff7f0e"  # rotor outlet (orange)
+COLOR_INLET = COLOR_STATOR  # rotor inlet  (blue)
+COLOR_OUTLET = COLOR_ROTOR  # rotor outlet (orange)
 LINE_WIDTH = 1.6
 
 AXIS_FONT_SIZE = 18
@@ -23,6 +23,7 @@ TICK_FONT_SIZE = 16
 AXIS_LINE_WIDTH = 2
 TICK_LENGTH = 6
 
+INTERCASCADE_GAP_FACTOR = 1.5
 
 def _style_axes(fig, *, xtitle, ytitle, equal=False, row=None, col=None):
     """Apply the shared simple_white axis styling used across the module."""
@@ -70,8 +71,8 @@ def plot_turbine_meridional_channel(results):
     def _line(x, y, color):
         fig.add_trace(
             go.Scatter(
-                x=x,
-                y=y,
+                x=[1000.0 * xi for xi in x],
+                y=[1000.0 * yi for yi in y],
                 mode="lines",
                 line=dict(color=color, width=LINE_WIDTH),
                 showlegend=False,
@@ -79,7 +80,6 @@ def plot_turbine_meridional_channel(results):
         )
 
     if turbine_type == "axial":
-        intercascade_gap_factor = 2
 
         def draw_stage(out, x_offset):
             fs = out["flow_stations"]
@@ -87,7 +87,7 @@ def plot_turbine_meridional_channel(results):
             H = [fs[k]["H"] for k in range(4)]
             x1 = x_offset
             x2 = x1 + out["geometry"]["stator"]["chord_meridional"]
-            x3 = x2 + out["geometry"]["stator"]["opening"] * intercascade_gap_factor
+            x3 = x2 + out["geometry"]["stator"]["opening"] * INTERCASCADE_GAP_FACTOR
             x4 = x3 + out["geometry"]["rotor"]["chord_meridional"]
             hub = [r[k] - H[k] / 2 for k in range(4)]
             tip = [r[k] + H[k] / 2 for k in range(4)]
@@ -107,19 +107,23 @@ def plot_turbine_meridional_channel(results):
             last = st["flow_stations"][-1]
             r_max = max(r_max, last["r"] + last["H"] / 2)
             x_cursor = (
-                x_exit + intercascade_gap_factor * st["geometry"]["rotor"]["opening"]
+                x_exit + INTERCASCADE_GAP_FACTOR * st["geometry"]["rotor"]["opening"]
             )
         x_end = (
             x_cursor
-            - intercascade_gap_factor * stages[-1]["geometry"]["rotor"]["opening"]
+            - INTERCASCADE_GAP_FACTOR * stages[-1]["geometry"]["rotor"]["opening"]
         )
 
-        dx = x_end * 0.05
-        fig.update_xaxes(range=[-dx, x_end + dx])
-        fig.update_yaxes(range=[0.0, 1.05 * r_max])
+        # Shared axial extent (mm), identical formula in plot_turbine_blades so
+        # both figures use the SAME x-range. Small symmetric margin around it.
+        x_lo = 0.0
+        x_hi = x_end
+        dx = 0.25 * (x_hi - x_lo)
         _style_axes(
-            fig, xtitle="Axial direction", ytitle="Radial direction", equal=True
+            fig, xtitle="Axial direction [mm]", ytitle="Radial direction [mm]", equal=True
         )
+        fig.update_yaxes(range=[0.0, 1000.0 * (1.05 * r_max)])
+        fig.update_xaxes(range=[1000.0 * (x_lo - dx), 1000.0 * (x_hi + dx)], constrain="domain", tickangle=-90)
 
     elif turbine_type == "radial":
 
@@ -146,13 +150,13 @@ def plot_turbine_meridional_channel(results):
                 x_min = min(x_min, -fs["H"] / 2)
                 x_max = max(x_max, fs["H"] / 2)
 
-        x_pad = 0.2 * (x_max - x_min)
-        r_pad = 0.2 * (r_max - r_min)
-        fig.update_xaxes(range=[x_min - x_pad, x_max + x_pad])
-        fig.update_yaxes(range=[0.0, r_max + r_pad])
+        x_pad = 2.00 * (x_max - x_min)
+        r_pad = 0.25 * (r_max - r_min)
         _style_axes(
-            fig, xtitle="Spanwise direction", ytitle="Radial direction", equal=True
+            fig, xtitle="Spanwise direction [mm]", ytitle="Radial direction [mm]", equal=True
         )
+        fig.update_xaxes(range=[1000.0 * (x_min - x_pad), 1000.0 * (x_max + x_pad)], constrain="domain", tickangle=-90)
+        fig.update_yaxes(range=[0.0, 1000.0 * (r_max + r_pad)], constrain="domain")
 
     else:
         raise ValueError(f"Invalid stage type: {turbine_type!r}")
@@ -164,7 +168,7 @@ def plot_turbine_meridional_channel(results):
 # =============================================================================
 # Plot turbine blades (multistage)
 # =============================================================================
-def plot_turbine_blades(results, N_points=51, N_blades_plot=8):
+def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
     """
     Blade cascades for a full multistage turbine, axial or radial.
     Mirror of the mpl function of the same name.
@@ -185,8 +189,8 @@ def plot_turbine_blades(results, N_points=51, N_blades_plot=8):
         _legend_shown[label] = True
         fig.add_trace(
             go.Scatter(
-                x=x,
-                y=y,
+                x=1000.0 * np.asarray(x),
+                y=1000.0 * np.asarray(y),
                 mode="lines",
                 line=dict(color=color, width=LINE_WIDTH),
                 name=label,
@@ -205,7 +209,7 @@ def plot_turbine_blades(results, N_points=51, N_blades_plot=8):
                     y1=0.0,
                     beta1=np.deg2rad(beta_in),
                     beta2=np.deg2rad(beta_out),
-                    chord_ax=geom["chord"],
+                    chord_ax=geom["chord_meridional"],
                     loc_max=geom["maximum_thickness_location"],
                     thickness_max=geom["maximum_thickness"],
                     thickness_trailing=geom["trailing_edge_thickness"],
@@ -229,7 +233,9 @@ def plot_turbine_blades(results, N_points=51, N_blades_plot=8):
             )
             draw_row(
                 geom=rotor_geom,
-                x0=x_offset + stator_geom["chord"] + stator_geom["opening"],
+                x0=x_offset
+                + stator_geom["chord_meridional"]
+                + INTERCASCADE_GAP_FACTOR * stator_geom["opening"],
                 beta_in=out["flow_stations"][2]["beta"],
                 beta_out=out["flow_stations"][3]["beta"],
                 color=COLOR_ROTOR,
@@ -237,21 +243,34 @@ def plot_turbine_blades(results, N_points=51, N_blades_plot=8):
             )
             return (
                 x_offset
-                + stator_geom["chord"]
-                + stator_geom["opening"]
-                + rotor_geom["chord"]
+                + stator_geom["chord_meridional"]
+                + INTERCASCADE_GAP_FACTOR * stator_geom["opening"]
+                + rotor_geom["chord_meridional"]
             )
 
         x_cursor = 0.0
         for st in stages:
             x_cursor = draw_stage(st, x_offset=x_cursor)
-            x_cursor += st["geometry"]["rotor"]["opening"]
+            x_cursor += INTERCASCADE_GAP_FACTOR * st["geometry"]["rotor"]["opening"]
 
+        # Shared axial extent (mm): identical formula to
+        # plot_turbine_meridional_channel so both figures use the SAME x-range.
+        x_mer = 0.0
+        for st in stages:
+            x_mer += st["geometry"]["stator"]["chord_meridional"]
+            x_mer += st["geometry"]["stator"]["opening"] * INTERCASCADE_GAP_FACTOR
+            x_mer += st["geometry"]["rotor"]["chord_meridional"]
+            x_mer += INTERCASCADE_GAP_FACTOR * st["geometry"]["rotor"]["opening"]
+        x_end = x_mer - INTERCASCADE_GAP_FACTOR * stages[-1]["geometry"]["rotor"]["opening"]
+        x_lo = 0.0
+        x_hi = x_end
+        dx = 0.25 * (x_hi - x_lo)
         y_top = N_blades_plot * stages[0]["geometry"]["stator"]["spacing"]
-        fig.update_yaxes(range=[0, y_top])
         _style_axes(
-            fig, xtitle="Axial direction", ytitle="Tangential direction", equal=True
+            fig, xtitle="Axial direction [mm]", ytitle="Tangential direction [mm]", equal=True
         )
+        fig.update_xaxes(range=[1000.0 * (x_lo - dx), 1000.0 * (x_hi + dx)], constrain="domain", tickangle=-90)
+        fig.update_yaxes(range=[0, 1000.0 * y_top])
 
     elif turbine_type == "radial":
 
@@ -271,12 +290,12 @@ def plot_turbine_blades(results, N_points=51, N_blades_plot=8):
                     geom["leading_edge_radius"],
                     N_points,
                 )
-                th = np.linspace(0.0, 2.0 * np.pi, 400)
+                th = np.linspace(0.0, 2.0 * np.pi, 200)
                 _line_black = dict(color="black", width=1.0)
                 fig.add_trace(
                     go.Scatter(
-                        x=geom["radius_in"] * np.cos(th),
-                        y=geom["radius_in"] * np.sin(th),
+                        x=1000.0 * geom["radius_in"] * np.cos(th),
+                        y=1000.0 * geom["radius_in"] * np.sin(th),
                         mode="lines",
                         line=_line_black,
                         showlegend=False,
@@ -284,8 +303,8 @@ def plot_turbine_blades(results, N_points=51, N_blades_plot=8):
                 )
                 fig.add_trace(
                     go.Scatter(
-                        x=geom["radius_out"] * np.cos(th),
-                        y=geom["radius_out"] * np.sin(th),
+                        x=1000.0 * geom["radius_out"] * np.cos(th),
+                        y=1000.0 * geom["radius_out"] * np.sin(th),
                         mode="lines",
                         line=_line_black,
                         showlegend=False,
@@ -303,20 +322,17 @@ def plot_turbine_blades(results, N_points=51, N_blades_plot=8):
             draw_row(out["geometry"]["stator"], COLOR_STATOR, "Stator")
             draw_row(out["geometry"]["rotor"], COLOR_ROTOR, "Rotor")
 
+        r_min, r_max = np.inf, 0.0
         for st in stages:
             draw_stage(st)
+            for fs in st["flow_stations"]:
+                r_min = min(r_min, fs["r"])
+                r_max = max(r_max, fs["r"])
 
-        # r_max = 1.05 * stages[-1]["flow_stations"][-1]["r"]
-        # fig.update_xaxes(range=[0.0, r_max])
-        # fig.update_yaxes(range=[0.0, r_max])
-        # _style_axes(fig, xtitle="x direction", ytitle="y direction", equal=True)
-
-        r_max = 1.05 * stages[-1]["flow_stations"][-1]["r"]
-        _style_axes(fig, xtitle="x direction", ytitle="y direction", equal=True)
-        # Set ranges AFTER scaleanchor, and constrain the domain so the box holds.
-        fig.update_xaxes(range=[0.0, r_max], constrain="domain")
-        fig.update_yaxes(range=[0.0, r_max], constrain="domain")
-
+        r_pad = 0.25 * (r_max - r_min)
+        _style_axes(fig, xtitle="x direction [mm]", ytitle="y direction [mm]", equal=True)
+        fig.update_xaxes(range=[0.0, 1000.0 * r_max], constrain="domain")
+        fig.update_yaxes(range=[0.0, 1000.0 * (r_max + r_pad)], constrain="domain")
 
     else:
         raise ValueError(f"Invalid stage type: {turbine_type!r}")
@@ -445,6 +461,9 @@ def plot_velocity_triangle_stage(st, scale_tangen, scale_merid, use_mach, title=
         # explicit padded range (instead of autorange="reversed") guarantees the
         # triangle tips at +scale_merid are fully inside the frame.
         range=[pad * scale_merid, -y_top_frac * pad * scale_merid],
+        scaleanchor="x",
+        scaleratio=1.0,
+        constrain="domain",
         title_text=ylabel,
         title_font=dict(size=AXIS_FONT_SIZE),
         showline=True,
@@ -622,4 +641,128 @@ def plot_turbine_loss_distribution(results):
         linecolor="black",
         gridcolor="#D9D9D9",
     )
+    return fig
+
+
+# =============================================================================
+# Plot overall efficiency trends vs blade velocity ratio
+# =============================================================================
+# Two distinct colors for the two efficiency lines (Magma samples, matching the
+# palette used elsewhere in the module).
+COLOR_ETA_TT = sample_colorscale("Magma", 0.35)[0]
+COLOR_ETA_TS = sample_colorscale("Magma", 0.70)[0]
+ 
+ 
+def plot_turbine_efficiency_trends(trends, results=None):
+    """
+    Single plot of the overall total-to-total and total-to-static efficiency
+    trends as a function of the (overall) blade-velocity ratio.
+
+    Parameters
+    ----------
+    trends : dict
+        Output of ``compute_turbine_efficiency_trends`` (core module). Must
+        provide ``"blade_velocity_ratio"``, ``"eta_tt"`` and ``"eta_ts"``.
+
+    results : dict, optional
+        Output of ``compute_turbine_performance``. If given, the current
+        design operating point (overall ``nu`` and its efficiencies) is marked
+        on the curves.
+
+    Returns
+    -------
+    fig : plotly.graph_objects.Figure
+    """
+    nu = np.asarray(trends["blade_velocity_ratio"], dtype=float)
+    eta_tt = np.asarray(trends["eta_tt"], dtype=float)
+    eta_ts = np.asarray(trends["eta_ts"], dtype=float)
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x=nu,
+            y=eta_tt,
+            mode="lines",
+            line=dict(color=COLOR_ETA_TT, width=2),
+            name="Total-to-total",
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=nu,
+            y=eta_ts,
+            mode="lines",
+            line=dict(color=COLOR_ETA_TS, width=2),
+            name="Total-to-static",
+        )
+    )
+
+    # Mark the current design operating point if the full results are provided.
+    if results is not None:
+
+        nu0 = float(results["inputs"]["blade_velocity_ratio"])
+        eta_tt0 = float(results["overall_performance"]["efficiency_tt"])
+        eta_ts0 = float(results["overall_performance"]["efficiency_ts"])
+
+        # Vertical line at design blade velocity ratio
+        fig.add_vline(
+            x=nu0,
+            line=dict(color="black", width=1.5, dash="dash"),
+        )
+
+        # Design-point markers
+        fig.add_trace(
+            go.Scatter(
+                x=[nu0, nu0],
+                y=[eta_tt0, eta_ts0],
+                mode="markers",
+                marker=dict(size=9, color="black"),
+                name="Design point",
+            )
+        )
+
+    fig.update_layout(
+        template="simple_white",
+        margin=dict(l=70, r=20, t=30, b=60),
+        legend=dict(
+            orientation="v",
+            x=0.98,
+            y=0.02,
+            xanchor="right",
+            yanchor="bottom",
+            bgcolor="rgba(255,255,255,0.85)",
+            bordercolor="black",
+            borderwidth=1,
+        ),
+    )
+
+    fig.update_xaxes(
+        title_text="Blade velocity ratio [-]",
+        title_font=dict(size=AXIS_FONT_SIZE),
+        tickfont=dict(size=TICK_FONT_SIZE),
+        range=[0.0, float(np.nanmax(nu))],
+        showline=True,
+        mirror=True,
+        linewidth=AXIS_LINE_WIDTH,
+        linecolor="black",
+        ticks="inside",
+        ticklen=TICK_LENGTH,
+    )
+
+    fig.update_yaxes(
+        title_text="Efficiency [-]",
+        title_font=dict(size=AXIS_FONT_SIZE),
+        tickfont=dict(size=TICK_FONT_SIZE),
+        range=[0.0, 1.0],
+        showline=True,
+        mirror=True,
+        linewidth=AXIS_LINE_WIDTH,
+        linecolor="black",
+        ticks="inside",
+        ticklen=TICK_LENGTH,
+        gridcolor="#D9D9D9",
+    )
+
     return fig

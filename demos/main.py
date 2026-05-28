@@ -8,7 +8,7 @@ import jaxprop as jxp
 td.set_plot_options()
 
 # yaml_path = "./config_axial.yaml"
-yaml_path = "./config_radial.yaml"
+yaml_path = "./exergy_demo/config_radial.yaml"
 with open(yaml_path, "r") as f:
     cfg = yaml.safe_load(f)
 
@@ -48,6 +48,14 @@ table = td.reporting_utils.flow_stations_table(out)
 # # # plotly — each opens its own browser tab
 # td.plotting_plotly_turbine.plot_turbine_meridional_channel(out).show()
 # td.plotting_plotly_turbine.plot_turbine_blades(out).show()
+
+# # nu_range = np.linspace(1e-3, 2.0, 250)
+# nu_range = np.asarray(0.2)
+# nu_range = np.linspace(0.01, 1, 100)
+# trends = td.core_turbine.compute_turbine_efficiency_trends(out, nu_range)
+# td.plotting_plotly_turbine.plot_turbine_efficiency_trends(trends, out).show()
+
+
 # figs = td.plotting_plotly_turbine.plot_velocity_triangles_turbine(out, mode="mach")
 # for fig in figs:
 #     fig.show()

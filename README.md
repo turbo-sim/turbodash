@@ -38,12 +38,12 @@ poetry install
 
 Once installed, launch the interactive calculator dashboard with:
 ```bash
-python -c "import turbodash; turbodash.launch_app()"
+python -c "import turbodash; turbodash.launch_app_turbine()"
 ```
 
 Or if you installed from source with Poetry:
 ```bash
-poetry run python -c "import turbodash; turbodash.launch_app()"
+poetry run python -c "import turbodash; turbodash.launch_app_turbine()"
 ```
 
 This will start a local server and open the dashboard in your web browser.

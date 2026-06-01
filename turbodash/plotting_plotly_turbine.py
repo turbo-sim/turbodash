@@ -712,13 +712,16 @@ def plot_turbine_efficiency_trends(trends, results=None):
             line=dict(color="black", width=1.5, dash="dash"),
         )
 
-        # Design-point markers
         fig.add_trace(
             go.Scatter(
                 x=[nu0, nu0],
                 y=[eta_tt0, eta_ts0],
                 mode="markers",
-                marker=dict(size=9, color="black"),
+                marker=dict(
+                    size=9,
+                    color="white",
+                    line=dict(color="black", width=1.5),
+                ),
                 name="Design point",
             )
         )

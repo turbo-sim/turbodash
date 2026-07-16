@@ -7,9 +7,8 @@ import jaxprop as jxp
 
 td.set_plot_options()
 
-# yaml_path = "./config_axial.yaml"
-# yaml_path = "./exergy_demo/config_radial.yaml"
-yaml_path = "./stage_geometry/turbine_axial.yaml"
+
+yaml_path = "./turbine_axial.yaml"
 with open(yaml_path, "r") as f:
     cfg = yaml.safe_load(f)
 
@@ -22,7 +21,10 @@ print(f"compute_turbine_performance: {elapsed*1e3:.2f} ms")
 
 # Plot turbine design
 fig = td.plotting_mpl.plot_turbine_meridional_channel(out)
-fig = td.plotting_mpl.plot_turbine_blades(out)
+fig = td.plotting_mpl.plot_turbine_blades(out)   # @Srinivas: This is the function that plots the blades
+#TODO: inspect the function that plots the turbine blades
+#TODO: generate better blades for impulse cascade (changing the parametrization and the input parameter values)
+#TODO: export the blade coordinates for meshing
 fig = td.plotting_mpl.plot_velocity_triangles_turbine(out, mode="mach")
 fig = td.plotting_mpl.plot_turbine_loss_distribution(out)
 

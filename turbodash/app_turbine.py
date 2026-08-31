@@ -152,7 +152,7 @@ def _prettify(name):
 # Documentation layout
 # =========================
 docs_path = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)),
+    os.path.dirname(__file__),
     "docs",
     "documentation.md",
 )

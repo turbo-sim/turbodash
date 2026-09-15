@@ -3,7 +3,12 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from plotly.colors import sample_colorscale
 
-from .geom_blade import (
+# from .geom_blade import (
+#     compute_blade_coordinates_radial,
+#     compute_blade_coordinates_cartesian,
+# )
+
+from .geom_blade_update import (
     compute_blade_coordinates_radial,
     compute_blade_coordinates_cartesian,
 )
@@ -204,7 +209,7 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
         def draw_stage(out, x_offset):
             def draw_row(*, geom, x0, beta_in, beta_out, color, label):
                 x_b, y_b, *_ = compute_blade_coordinates_cartesian(
-                    camberline_type="linear_angle_change",
+                    camberline_type="curvature_based",
                     x1=x0,
                     y1=0.0,
                     beta1=np.deg2rad(beta_in),
@@ -277,7 +282,7 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
         def draw_stage(out):
             def draw_row(geom, color, label):
                 x_b, y_b, *_ = compute_blade_coordinates_radial(
-                    "linear_angle_change",
+                    "curvature_based",
                     geom["radius_in"],
                     geom["radius_out"],
                     np.deg2rad(geom["metal_angle_in"]),
@@ -286,7 +291,7 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
                     geom["maximum_thickness_location"],
                     geom["maximum_thickness"],
                     geom["trailing_edge_thickness"],
-                    np.deg2rad(geom["maximum_thickness_location"]),
+                    np.deg2rad(geom["trailing_edge_wedge_angle"]),
                     geom["leading_edge_radius"],
                     N_points,
                 )

@@ -1,0 +1,76 @@
+yaml_path: C:\Users\sprdi\OneDrive - Danmarks Tekniske Universitet\Srinivas\Meanline_code\turbodash\demos\cyclopentane_case\cyclopentane_6.yaml
+stage_number: 1
+span_sections: 11
+profile_points: 2000
+camberline_type: curvature_based
+thickness_model: NACA
+length_scale: 1.0
+recompute: false
+section_point_count: 5000
+span:
+- section_index: 0
+  span_fraction: 0.0
+  r_in: 0.3046981812253729
+  r_out: 0.3046981812256901
+  beta_in_deg: 72.75865616004626
+  beta_out_deg: -53.530972121148366
+- section_index: 1
+  span_fraction: 0.1
+  r_in: 0.3211974253511251
+  r_out: 0.32119742535137885
+  beta_in_deg: 70.95191588592625
+  beta_out_deg: -55.29410027653981
+- section_index: 2
+  span_fraction: 0.2
+  r_in: 0.3376966694768773
+  r_out: 0.3376966694770676
+  beta_in_deg: 68.91946799628387
+  beta_out_deg: -56.89903319356884
+- section_index: 3
+  span_fraction: 0.30000000000000004
+  r_in: 0.35419591360262953
+  r_out: 0.35419591360275643
+  beta_in_deg: 66.61509594367969
+  beta_out_deg: -58.36560526169102
+- section_index: 4
+  span_fraction: 0.4
+  r_in: 0.37069515772838174
+  r_out: 0.3706951577284452
+  beta_in_deg: 63.981551177687045
+  beta_out_deg: -59.7105543943526
+- section_index: 5
+  span_fraction: 0.5
+  r_in: 0.38719440185413395
+  r_out: 0.38719440185413395
+  beta_in_deg: 60.94808688579476
+  beta_out_deg: -60.94808688558567
+- section_index: 6
+  span_fraction: 0.6000000000000001
+  r_in: 0.4036936459798862
+  r_out: 0.4036936459798227
+  beta_in_deg: 57.42809465113344
+  beta_out_deg: -62.09032676360468
+- section_index: 7
+  span_fraction: 0.7000000000000001
+  r_in: 0.42019289010563843
+  r_out: 0.4201928901055115
+  beta_in_deg: 53.317804400426226
+  beta_out_deg: -63.14767530291002
+- section_index: 8
+  span_fraction: 0.8
+  r_in: 0.43669213423139064
+  r_out: 0.43669213423120024
+  beta_in_deg: 48.49814265026926
+  beta_out_deg: -64.1291003292019
+- section_index: 9
+  span_fraction: 0.9
+  r_in: 0.45319137835714285
+  r_out: 0.45319137835688905
+  beta_in_deg: 42.843722037961314
+  beta_out_deg: -65.0423703772611
+- section_index: 10
+  span_fraction: 1.0
+  r_in: 0.46969062248289506
+  r_out: 0.46969062248257776
+  beta_in_deg: 36.24515969687117
+  beta_out_deg: -65.89424529607167

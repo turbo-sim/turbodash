@@ -736,6 +736,7 @@ _GEOMETRY_SPECS = [
     ("Blade count", "-", "blade_count", 0, 1.0),
     ("Radius in", "mm", "radius_in", 2, 1e3),
     ("Radius out", "mm", "radius_out", 2, 1e3),
+    ("Hub-tip ratio at inlet", "-", "hub_tip_ratio_in", 4, 1.0),
     ("Height", "mm", "height", 2, 1e3),
     ("Chord", "mm", "chord", 2, 1e3),
     ("Spacing", "mm", "spacing", 2, 1e3),

@@ -59,12 +59,14 @@ OVERALL_DEFAULTS = dict(
 )
 
 BLADE_GEOMETRY_DEFAULTS = {
+    "stator.aspect_ratio": 2.0,
     "stator.maximum_thickness_to_chord": 0.30,
     "stator.maximum_thickness_location": 0.30,
     "stator.leading_edge_radius_to_max_thickness": 0.50,
     "stator.trailing_edge_thickness_to_opening": 0.07,
     "stator.trailing_edge_wedge_angle": 5.0,
     "stator.leading_edge_wedge_angle": 30.0,
+    "rotor.aspect_ratio": 2.0,
     "rotor.maximum_thickness_to_chord": 0.30,
     "rotor.maximum_thickness_location": 0.30,
     "rotor.leading_edge_radius_to_max_thickness": 0.50,
@@ -157,6 +159,11 @@ STAGE_FIELDS = [
 LOSS_MODEL_OPTIONS = ["benner", "kacker_okapuu", "moustapha", "isentropic"]
 
 BLADE_GEOMETRY_FIELDS = [
+    (
+        "aspect_ratio",
+        "Aspect ratio, height / meridional chord (axial) [-]",
+        0.1, 10.0, 0.1,
+    ),
     (
         "maximum_thickness_to_chord",
         "Maximum thickness / meridional chord [-]",

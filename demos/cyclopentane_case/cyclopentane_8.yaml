@@ -28,6 +28,7 @@ inputs:
     zweiffel_rotor: 0.9
     blade_geometry:
       stator:
+        aspect_ratio: 2.0
         maximum_thickness_to_chord: 0.3
         maximum_thickness_location: 0.3
         leading_edge_radius_to_max_thickness: 0.5
@@ -35,6 +36,7 @@ inputs:
         trailing_edge_wedge_angle: 5
         leading_edge_wedge_angle: 5
       rotor:
+        aspect_ratio: 2.0
         maximum_thickness_to_chord: 0.3
         maximum_thickness_location: 0.5
         leading_edge_radius_to_max_thickness: 0.05

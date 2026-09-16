@@ -151,8 +151,6 @@ STAGE_FIELDS = [
     ("radius_ratio_12", ["Radius ratio, r₁/r₂"], 0.10, 1.20, 0.001),
     ("radius_ratio_23", ["Radius ratio, r₂/r₃"], 0.10, 1.20, 0.001),
     ("radius_ratio_34", ["Radius ratio, r₃/r₄"], 0.10, 1.20, 0.001),
-    ("zweiffel_stator", ["Zweifel coefficient (stator)"], 0.1, 2.0, 0.001),
-    ("zweiffel_rotor", ["Zweifel coefficient (rotor)"], 0.1, 2.0, 0.001),
 ]
 
 # Loss-model dropdown: internal value -> pretty label (Title Case, spaces).
@@ -352,7 +350,18 @@ def make_stage_accordion_item(stage_idx, stage_values):
         )
         for (key, label, lo, hi, step) in STAGE_FIELDS
     ]
+    geometry_items = []
     for row in ("stator", "rotor"):
+        zweiffel_key = f"zweiffel_{row}"
+        zweiffel_control = stage_linked(
+            stage_idx,
+            zweiffel_key,
+            "Zweifel coefficient [-]",
+            0.1,
+            2.0,
+            0.001,
+            stage_values.get(zweiffel_key, STAGE_DEFAULTS[zweiffel_key]),
+        )
         row_geometry = stage_values.get("blade_geometry", {}).get(row, {})
         geometry_controls = [
             stage_linked(
@@ -369,15 +378,24 @@ def make_stage_accordion_item(stage_idx, stage_values):
             )
             for key, label, lo, hi, step in BLADE_GEOMETRY_FIELDS
         ]
-        fields.append(
-            html.Details(
-                open=True,
-                children=[
-                    html.Summary(f"{row.title()} blade geometry", style=LABEL_STYLE),
-                    *geometry_controls,
-                ]
+        geometry_items.append(
+            dbc.AccordionItem(
+                title=accordion_title(f"{row.title()} blade geometry"),
+                item_id=row,
+                children=html.Div(
+                    [zweiffel_control, *geometry_controls],
+                    style={"paddingTop": "6px"},
+                ),
             )
         )
+    fields.append(
+        dbc.Accordion(
+            id=f"stage-{stage_idx}-blade-geometry",
+            always_open=True,
+            active_item=["stator", "rotor"],
+            children=geometry_items,
+        )
+    )
     return dbc.AccordionItem(
         title=accordion_title(f"Stage {stage_idx + 1}"),
         item_id=f"stage-{stage_idx}",

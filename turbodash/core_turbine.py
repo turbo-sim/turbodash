@@ -17,6 +17,7 @@ _STAGE_REQUIRED_VARS = (
     "zweiffel_stator",
     "zweiffel_rotor",
     "work_fraction_split",
+    "blade_geometry",
 )
 
 
@@ -359,6 +360,24 @@ def compute_loss_coefficient(
     loss_inputs = {"flow": flow, "geometry": geometry, "loss_model": loss_model}
     return evaluate_loss_model(loss_model, loss_inputs)
 
+# def compute_blade_row_geometry(
+#     turbine_type,
+#     r_in,
+#     r_out,
+#     H_in,
+#     H_out,
+#     angle_in_deg,
+#     angle_out_deg,
+#     zweiffel,
+#     tip_clearance_to_height,
+#     maximum_thickness_to_chord=0.30, # 0.30
+#     maximum_thickness_location=0.5, # 0.30
+#     leading_edge_radius_to_max_thickness= 0.05, # 0.50
+#     trailing_edge_thickness_to_opening=0.07, 
+#     trailing_edge_wedge_angle=5.0,
+#     leading_edge_wedge_angle=5.0, # 30.0
+# ):
+
 def compute_blade_row_geometry(
     turbine_type,
     r_in,
@@ -369,23 +388,27 @@ def compute_blade_row_geometry(
     angle_out_deg,
     zweiffel,
     tip_clearance_to_height,
-    maximum_thickness_to_chord=0.3,
-    maximum_thickness_location=0.25,
-    leading_edge_radius_to_max_thickness=0.50,
-    trailing_edge_thickness_to_opening=0.05,
-    trailing_edge_wedge_angle=10.0,
-    leading_edge_wedge_angle=30.0,
+    blade_geometry,
 ):
     """
     Compute parameters required to define the blade row geometry and for the loss models
     """
 
+    maximum_thickness_to_chord = blade_geometry["maximum_thickness_to_chord"]
+    maximum_thickness_location = blade_geometry["maximum_thickness_location"]
+    leading_edge_radius_to_max_thickness = blade_geometry["leading_edge_radius_to_max_thickness"]
+    trailing_edge_thickness_to_opening = blade_geometry["trailing_edge_thickness_to_opening"]
+    trailing_edge_wedge_angle = blade_geometry["trailing_edge_wedge_angle"]
+    leading_edge_wedge_angle = blade_geometry["leading_edge_wedge_angle"]
+
     # Chord definition
     if turbine_type == "radial":
         meridional_chord = np.maximum(r_out - r_in, 1e-6)
     elif turbine_type == "axial":
-        # Hardcoded aspect ratio AR = 2.0 for axial blades
-        meridional_chord = (1 / 2.00) * 0.5 * (H_in + H_out)
+        aspect_ratio = blade_geometry["aspect_ratio"]
+        if not np.isfinite(aspect_ratio) or aspect_ratio <= 0:
+            raise ValueError("blade_geometry.aspect_ratio must be finite and positive")
+        meridional_chord = 0.5 * (H_in + H_out) / aspect_ratio
     else:
         raise ValueError(f"Invalid stage type: {turbine_type}")
 
@@ -420,6 +443,8 @@ def compute_blade_row_geometry(
     maximum_thickness = meridional_chord * maximum_thickness_to_chord
     leading_edge_radius = maximum_thickness * leading_edge_radius_to_max_thickness
     trailing_edge_thickness = o * trailing_edge_thickness_to_opening
+
+    # leading_edge_radius = trailing_edge_thickness/2
 
     stagger_angle = 0.5 * (angle_in + angle_out)
     chord = meridional_chord / np.cos(stagger_angle)
@@ -492,6 +517,7 @@ def compute_stage_performance(
     meridional_velocity_ratio_34,
     zweiffel_stator,
     zweiffel_rotor,
+    blade_geometry,
     turbine_type="axial",
     loss_model="benner",
 ):
@@ -730,6 +756,7 @@ def compute_stage_performance(
         angle_out_deg=alpha_2,
         zweiffel=zweiffel_stator,
         tip_clearance_to_height=0.0,  # no tip clearance in stator
+        blade_geometry=blade_geometry["stator"],
     )
  
     # Rotor
@@ -743,6 +770,7 @@ def compute_stage_performance(
         angle_out_deg=beta_4,
         zweiffel=zweiffel_rotor,
         tip_clearance_to_height=0.01,  # 1% tip clearance in rotor
+        blade_geometry=blade_geometry["rotor"],
     )
  
     # ------------------------------------------------------------------
@@ -1242,6 +1270,7 @@ def compute_turbine_performance(cfg):
             zweiffel_rotor=float(stg_current["zweiffel_rotor"]),
             turbine_type=turbine_type,
             loss_model=inp["loss_model"],
+            blade_geometry=stg_current["blade_geometry"],
         )
         # Label the stage. The only per-stage identifier carried in the output;
         stage_result["name"] = str(stg_current["name"])

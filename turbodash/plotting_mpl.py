@@ -1,11 +1,15 @@
 import numpy as np
-import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 from matplotlib.ticker import FormatStrFormatter
 
-from .geom_blade import (
+# from .geom_blade import (
+#     compute_blade_coordinates_radial,
+#     compute_blade_coordinates_cartesian,
+# )
+
+from .geom_blade_update import (
     compute_blade_coordinates_radial,
     compute_blade_coordinates_cartesian,
 )
@@ -17,6 +21,7 @@ from .geom_blade import (
 
 COLOR_STATOR = "tab:orange"
 COLOR_ROTOR = "tab:blue"
+INTERCASCADE_GAP_FACTOR = 1.5
 
 
 def plot_turbine_meridional_channel(results, ax=None):
@@ -24,15 +29,13 @@ def plot_turbine_meridional_channel(results, ax=None):
     turbine_type = results["inputs"]["turbine_type"]
 
     def plot_axial(ax):
-        intercascade_gap_factor = 2  # number openings to use as gap between stages
-
         def draw_stage(out, x_offset):
             fs = out["flow_stations"]
             r = [fs[k]["r"] for k in range(4)]
             H = [fs[k]["H"] for k in range(4)]
             x1 = x_offset
             x2 = x1 + out["geometry"]["stator"]["chord_meridional"]
-            x3 = x2 + out["geometry"]["stator"]["opening"] * intercascade_gap_factor
+            x3 = x2 + out["geometry"]["stator"]["opening"] * INTERCASCADE_GAP_FACTOR
             x4 = x3 + out["geometry"]["rotor"]["chord_meridional"]
             hub = [r[k] - H[k] / 2 for k in range(4)]
             tip = [r[k] + H[k] / 2 for k in range(4)]
@@ -52,11 +55,11 @@ def plot_turbine_meridional_channel(results, ax=None):
             last = st["flow_stations"][-1]
             r_max = max(r_max, last["r"] + last["H"] / 2)
             x_cursor = (
-                x_exit + intercascade_gap_factor * st["geometry"]["rotor"]["opening"]
+                x_exit + INTERCASCADE_GAP_FACTOR * st["geometry"]["rotor"]["opening"]
             )
         x_end = (
             x_cursor
-            - intercascade_gap_factor * stages[-1]["geometry"]["rotor"]["opening"]
+            - INTERCASCADE_GAP_FACTOR * stages[-1]["geometry"]["rotor"]["opening"]
         )
 
         dx = x_end * 0.05
@@ -117,7 +120,7 @@ def plot_turbine_meridional_channel(results, ax=None):
     return fig
 
 
-def plot_turbine_blades(results, ax=None, N_points=200, N_blades_plot=8):
+def plot_turbine_blades(results, ax=None, N_points=201, N_blades_plot=8):
     """
     Plot blade cascades for a full turbine, axial or radial.
     Stage type is read from the first stage's inputs.
@@ -129,9 +132,9 @@ def plot_turbine_blades(results, ax=None, N_points=200, N_blades_plot=8):
     ax : matplotlib axis, optional
         Axis to draw on; created if None.
     N_points : int
-        Points per blade camberline. Default 500.
+        Points per blade camberline. Default 201.
     N_blades_plot : int
-        Number of blades to plot per row (axial only). Default 4.
+        Number of blades to plot per row (axial only). Default 8.
 
     Returns
     -------
@@ -144,12 +147,12 @@ def plot_turbine_blades(results, ax=None, N_points=200, N_blades_plot=8):
         def draw_stage(out, x_offset, stage_idx):
             def draw_row(*, geom, x0, beta_in, beta_out, color, label):
                 x_b, y_b, *_ = compute_blade_coordinates_cartesian(
-                    camberline_type="linear_angle_change",
+                    camberline_type="curvature_based",
                     x1=x0,
                     y1=0.0,
                     beta1=np.deg2rad(beta_in),
                     beta2=np.deg2rad(beta_out),
-                    chord_ax=geom["chord"],
+                    chord_ax=geom["chord_meridional"],
                     loc_max=geom["maximum_thickness_location"],
                     thickness_max=geom["maximum_thickness"],
                     thickness_trailing=geom["trailing_edge_thickness"],
@@ -179,7 +182,9 @@ def plot_turbine_blades(results, ax=None, N_points=200, N_blades_plot=8):
             )
             draw_row(
                 geom=rotor_geom,
-                x0=x_offset + stator_geom["chord"] + stator_geom["opening"],
+                x0=x_offset
+                + stator_geom["chord_meridional"]
+                + INTERCASCADE_GAP_FACTOR * stator_geom["opening"],
                 beta_in=out["flow_stations"][2]["beta"],
                 beta_out=out["flow_stations"][3]["beta"],
                 color=COLOR_ROTOR,
@@ -187,26 +192,39 @@ def plot_turbine_blades(results, ax=None, N_points=200, N_blades_plot=8):
             )
             return (
                 x_offset
-                + stator_geom["chord"]
-                + stator_geom["opening"]
-                + rotor_geom["chord"]
+                + stator_geom["chord_meridional"]
+                + INTERCASCADE_GAP_FACTOR * stator_geom["opening"]
+                + rotor_geom["chord_meridional"]
             )
 
         x_cursor = 0.0
         for j, st in enumerate(stages):
             x_cursor = draw_stage(st, x_offset=x_cursor, stage_idx=j)
-            x_cursor += st["geometry"]["rotor"]["opening"]  # interstage gap
+            x_cursor += INTERCASCADE_GAP_FACTOR * st["geometry"]["rotor"]["opening"]
+
+        x_mer = 0.0
+        for st in stages:
+            x_mer += st["geometry"]["stator"]["chord_meridional"]
+            x_mer += st["geometry"]["stator"]["opening"] * INTERCASCADE_GAP_FACTOR
+            x_mer += st["geometry"]["rotor"]["chord_meridional"]
+            x_mer += INTERCASCADE_GAP_FACTOR * st["geometry"]["rotor"]["opening"]
+        x_end = (
+            x_mer
+            - INTERCASCADE_GAP_FACTOR * stages[-1]["geometry"]["rotor"]["opening"]
+        )
+        dx = 0.25 * x_end
 
         ax.set_aspect("equal", adjustable="box")
         ax.set_xlabel("Axial direction")
         ax.set_ylabel("Tangential direction")
+        ax.set_xlim(-dx, x_end + dx)
         ax.set_ylim(0, N_blades_plot * stages[0]["geometry"]["stator"]["spacing"])
 
     def plot_radial(ax):
         def draw_stage(out, stage_idx):
             def draw_row(geom, color, label):
                 x_b, y_b, *_ = compute_blade_coordinates_radial(
-                    "linear_angle_change",
+                    "curvature_based",
                     geom["radius_in"],
                     geom["radius_out"],
                     np.deg2rad(geom["metal_angle_in"]),
@@ -215,7 +233,7 @@ def plot_turbine_blades(results, ax=None, N_points=200, N_blades_plot=8):
                     geom["maximum_thickness_location"],
                     geom["maximum_thickness"],
                     geom["trailing_edge_thickness"],
-                    np.deg2rad(geom["maximum_thickness_location"]),
+                    np.deg2rad(geom["trailing_edge_wedge_angle"]),
                     geom["leading_edge_radius"],
                     N_points,
                 )

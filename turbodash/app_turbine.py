@@ -58,6 +58,23 @@ OVERALL_DEFAULTS = dict(
     rotational_speed_value=0.7,
 )
 
+BLADE_GEOMETRY_DEFAULTS = {
+    "stator.aspect_ratio": 2.0,
+    "stator.maximum_thickness_to_chord": 0.30,
+    "stator.maximum_thickness_location": 0.30,
+    "stator.leading_edge_radius_to_max_thickness": 0.50,
+    "stator.trailing_edge_thickness_to_opening": 0.07,
+    "stator.trailing_edge_wedge_angle": 5.0,
+    "stator.leading_edge_wedge_angle": 30.0,
+    "rotor.aspect_ratio": 2.0,
+    "rotor.maximum_thickness_to_chord": 0.30,
+    "rotor.maximum_thickness_location": 0.30,
+    "rotor.leading_edge_radius_to_max_thickness": 0.50,
+    "rotor.trailing_edge_thickness_to_opening": 0.07,
+    "rotor.trailing_edge_wedge_angle": 5.0,
+    "rotor.leading_edge_wedge_angle": 30.0,
+}
+
 # Per-stage defaults. Two sets: one for axial stages and one for radial
 # stages. The radial set is identical to the axial set except that all four
 # radius ratios are set equal to 1.0.
@@ -74,6 +91,7 @@ STAGE_DEFAULTS_RADIAL = dict(
     radius_ratio_34=0.85,
     zweiffel_stator=0.7,
     zweiffel_rotor=0.7,
+    **BLADE_GEOMETRY_DEFAULTS,
 )
 
 STAGE_DEFAULTS_AXIAL = dict(
@@ -135,12 +153,40 @@ STAGE_FIELDS = [
     ("radius_ratio_12", ["Radius ratio, r₁/r₂"], 0.10, 1.20, 0.001),
     ("radius_ratio_23", ["Radius ratio, r₂/r₃"], 0.10, 1.20, 0.001),
     ("radius_ratio_34", ["Radius ratio, r₃/r₄"], 0.10, 1.20, 0.001),
-    ("zweiffel_stator", ["Zweifel coefficient (stator)"], 0.1, 2.0, 0.001),
-    ("zweiffel_rotor", ["Zweifel coefficient (rotor)"], 0.1, 2.0, 0.001),
 ]
 
 # Loss-model dropdown: internal value -> pretty label (Title Case, spaces).
 LOSS_MODEL_OPTIONS = ["benner", "kacker_okapuu", "moustapha", "isentropic"]
+
+BLADE_GEOMETRY_FIELDS = [
+    (
+        "aspect_ratio",
+        "Aspect ratio, height / meridional chord (axial) [-]",
+        0.1, 10.0, 0.1,
+    ),
+    (
+        "maximum_thickness_to_chord",
+        "Maximum thickness / meridional chord [-]",
+        0.001, 1.0, 0.001,
+    ),
+    (
+        "maximum_thickness_location",
+        "Maximum thickness location / chord [-]",
+        0.001, 0.999, 0.001,
+    ),
+    (
+        "leading_edge_radius_to_max_thickness",
+        "Leading-edge radius / maximum thickness [-]",
+        0.001, 1.0, 0.001,
+    ),
+    (
+        "trailing_edge_thickness_to_opening",
+        "Trailing-edge thickness / opening [-]",
+        0.001, 1.0, 0.001,
+    ),
+    ("trailing_edge_wedge_angle", "Trailing-edge wedge angle [deg]", 0.0, 89.0, 0.1),
+    ("leading_edge_wedge_angle", "Leading-edge wedge angle [deg]", 0.0, 89.0, 0.1),
+]
 
 
 def _prettify(name):
@@ -311,6 +357,52 @@ def make_stage_accordion_item(stage_idx, stage_values):
         )
         for (key, label, lo, hi, step) in STAGE_FIELDS
     ]
+    geometry_items = []
+    for row in ("stator", "rotor"):
+        zweiffel_key = f"zweiffel_{row}"
+        zweiffel_control = stage_linked(
+            stage_idx,
+            zweiffel_key,
+            "Zweifel coefficient [-]",
+            0.1,
+            2.0,
+            0.001,
+            stage_values.get(zweiffel_key, STAGE_DEFAULTS[zweiffel_key]),
+        )
+        row_geometry = stage_values.get("blade_geometry", {}).get(row, {})
+        geometry_controls = [
+            stage_linked(
+                stage_idx,
+                f"{row}.{key}",
+                label,
+                lo,
+                hi,
+                step,
+                stage_values.get(
+                    f"{row}.{key}",
+                    row_geometry.get(key, BLADE_GEOMETRY_DEFAULTS[f"{row}.{key}"]),
+                ),
+            )
+            for key, label, lo, hi, step in BLADE_GEOMETRY_FIELDS
+        ]
+        geometry_items.append(
+            dbc.AccordionItem(
+                title=accordion_title(f"{row.title()} blade geometry"),
+                item_id=row,
+                children=html.Div(
+                    [zweiffel_control, *geometry_controls],
+                    style={"paddingTop": "6px"},
+                ),
+            )
+        )
+    fields.append(
+        dbc.Accordion(
+            id=f"stage-{stage_idx}-blade-geometry",
+            always_open=True,
+            active_item=["stator", "rotor"],
+            children=geometry_items,
+        )
+    )
     return dbc.AccordionItem(
         title=accordion_title(f"Stage {stage_idx + 1}"),
         item_id=f"stage-{stage_idx}",
@@ -790,7 +882,9 @@ def update_stage_store(
     if trigger in ("stage_plus", "stage_minus"):
         for d, v in zip(live_ids or [], live_values or []):
             si = d["stage"]
-            if 0 <= si < len(stages) and v is not None:
+            if 0 <= si < len(stages) and (
+                v is not None or d["key"].startswith(("stator.", "rotor."))
+            ):
                 stages[si][d["key"]] = v
 
     # Switching turbine type: reset ALL stages to the defaults for that type,
@@ -809,6 +903,10 @@ def update_stage_store(
             for sc in cfg_stages:
                 merged = dict(STAGE_DEFAULTS)
                 merged.update({k: sc[k] for k in STAGE_DEFAULTS if k in sc})
+                for row in ("stator", "rotor"):
+                    row_geometry = sc.get("blade_geometry", {}).get(row, {})
+                    for key, *_ in BLADE_GEOMETRY_FIELDS:
+                        merged[f"{row}.{key}"] = row_geometry.get(key)
                 new_stages.append(merged)
             return new_stages
         raise PreventUpdate
@@ -899,8 +997,18 @@ def update_turbine(overall_values, stage_values, overall_ids, stage_ids, store_s
     stages = [dict(defaults) for _ in range(n)]
     for d, v in zip(stage_ids or [], stage_values or []):
         si = d["stage"]
-        if 0 <= si < n and v is not None:
+        if 0 <= si < n and (
+            v is not None or d["key"].startswith(("stator.", "rotor."))
+        ):
             stages[si][d["key"]] = v
+
+    if any(
+        stage.get(f"{row}.{key}") is None
+        for stage in stages
+        for row in ("stator", "rotor")
+        for key, *_ in BLADE_GEOMETRY_FIELDS
+    ):
+        raise PreventUpdate
 
     cfg = _assemble_cfg(overall, stages)
 
@@ -985,7 +1093,18 @@ def _assemble_cfg(overall, stages):
         "stages": [
             {
                 "name": f"stage_{i + 1}",
-                **{k: sv.get(k, STAGE_DEFAULTS[k]) for k in STAGE_DEFAULTS},
+                **{
+                    k: sv.get(k, STAGE_DEFAULTS[k])
+                    for k in STAGE_DEFAULTS
+                    if k not in BLADE_GEOMETRY_DEFAULTS
+                },
+                "blade_geometry": {
+                    row: {
+                        key: sv[f"{row}.{key}"]
+                        for key, *_ in BLADE_GEOMETRY_FIELDS
+                    }
+                    for row in ("stator", "rotor")
+                },
             }
             for i, sv in enumerate(stages)
         ],

@@ -10,7 +10,7 @@ import yaml
 
 CASE_DIR = Path(__file__).resolve().parent
 REPO_ROOT = CASE_DIR.parents[1]
-DEFAULT_YAML_PATH = CASE_DIR / "cyclopentane_7.yaml"
+DEFAULT_YAML_PATH = CASE_DIR / "cyclopentane_8.yaml"
 DEFAULT_OUTPUT_DIR = CASE_DIR / "turbogrid_rotor"
 
 

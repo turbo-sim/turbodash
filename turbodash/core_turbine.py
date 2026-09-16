@@ -405,8 +405,10 @@ def compute_blade_row_geometry(
     if turbine_type == "radial":
         meridional_chord = np.maximum(r_out - r_in, 1e-6)
     elif turbine_type == "axial":
-        # Hardcoded aspect ratio AR = 2.0 for axial blades
-        meridional_chord = (1 / 2.00) * 0.5 * (H_in + H_out)
+        aspect_ratio = blade_geometry["aspect_ratio"]
+        if not np.isfinite(aspect_ratio) or aspect_ratio <= 0:
+            raise ValueError("blade_geometry.aspect_ratio must be finite and positive")
+        meridional_chord = 0.5 * (H_in + H_out) / aspect_ratio
     else:
         raise ValueError(f"Invalid stage type: {turbine_type}")
 

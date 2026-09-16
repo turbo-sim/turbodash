@@ -4,7 +4,7 @@ import turbodash as td
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from turbodash.geom_blade_update import (
+from turbodash.geom_blade import (
     compute_blade_coordinates_cartesian,
     compute_blade_coordinates_radial,
 )

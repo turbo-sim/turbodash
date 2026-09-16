@@ -15,8 +15,8 @@ DEFAULT_OUTPUT_DIR = CASE_DIR / "output" / "turbogrid_rotor"
 
 
 def _load_compute_blade_coordinates_cartesian():
-    module_path = REPO_ROOT / "turbodash" / "geom_blade_update.py"
-    spec = importlib.util.spec_from_file_location("geom_blade_update_local", module_path)
+    module_path = REPO_ROOT / "turbodash" / "geom_blade.py"
+    spec = importlib.util.spec_from_file_location("geom_blade_local", module_path)
     if spec is None or spec.loader is None:
         raise ImportError(f"Could not load geometry module from {module_path}")
     module = importlib.util.module_from_spec(spec)

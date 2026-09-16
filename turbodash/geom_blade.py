@@ -23,6 +23,110 @@ def rotate_counterclockwise_2D(x, y, theta):
     return X, Y
 
 
+def _cumtrapz(y, x):
+    dx = x[1:] - x[:-1]
+    area = 0.5 * (y[1:] + y[:-1]) * dx
+    return jnp.concatenate([jnp.array([0.0], dtype=y.dtype), jnp.cumsum(area)])
+
+
+def open_uniform_knot_vector(n_control: int, degree: int, dtype=None):
+    if n_control < degree + 1:
+        raise ValueError("n_control must be >= degree + 1.")
+    if dtype is None:
+        dtype = jnp.asarray(1.0).dtype
+    n_knots = n_control + degree + 1
+    n_interior = n_knots - 2 * (degree + 1)
+    if n_interior > 0:
+        interior = jnp.linspace(0.0, 1.0, n_interior + 2, dtype=dtype)[1:-1]
+        return jnp.concatenate(
+            [
+                jnp.zeros(degree + 1, dtype=dtype),
+                interior,
+                jnp.ones(degree + 1, dtype=dtype),
+            ]
+        )
+    return jnp.concatenate(
+        [jnp.zeros(degree + 1, dtype=dtype), jnp.ones(degree + 1, dtype=dtype)]
+    )
+
+
+def basis_functions_at_u(u, degree: int, knots, n_control: int | None = None):
+    if n_control is None:
+        n_control = int(knots.shape[0] - degree - 1)
+    one = jnp.asarray(1.0, dtype=knots.dtype)
+    zero = jnp.asarray(0.0, dtype=knots.dtype)
+    u = jnp.asarray(u, dtype=knots.dtype)
+
+    left = knots[:n_control]
+    right = knots[1 : n_control + 1]
+    N = jnp.where((u >= left) & (u < right), one, zero)
+    N = N.at[n_control - 1].set(
+        jnp.where(jnp.isclose(u, knots[-1]), one, N[n_control - 1])
+    )
+
+    for p in range(1, degree + 1):
+        left_den = knots[p : p + n_control] - knots[:n_control]
+        right_den = knots[p + 1 : p + n_control + 1] - knots[1 : n_control + 1]
+        N_next = jnp.concatenate([N[1:], jnp.array([zero], dtype=N.dtype)])
+        left_term = jnp.where(
+            left_den > 0.0, ((u - knots[:n_control]) / left_den) * N, zero
+        )
+        right_term = jnp.where(
+            right_den > 0.0,
+            ((knots[p + 1 : p + n_control + 1] - u) / right_den) * N_next,
+            zero,
+        )
+        N = left_term + right_term
+    return N
+
+
+def basis_matrix(u, degree: int, knots, n_control: int | None = None):
+    u = jnp.asarray(u, dtype=knots.dtype)
+    if n_control is None:
+        n_control = int(knots.shape[0] - degree - 1)
+    return jax.vmap(lambda ui: basis_functions_at_u(ui, degree, knots, n_control))(u)
+
+
+def basis_derivative_at_u(u, degree: int, knots, n_control: int | None = None):
+    if degree < 1:
+        raise ValueError("degree must be >= 1.")
+    if n_control is None:
+        n_control = int(knots.shape[0] - degree - 1)
+
+    n_low = n_control + 1
+    N_low = basis_functions_at_u(u, degree - 1, knots, n_control=n_low)
+    zero = jnp.asarray(0.0, dtype=knots.dtype)
+    out = []
+    for i in range(n_control):
+        den_l = knots[i + degree] - knots[i]
+        den_r = knots[i + degree + 1] - knots[i + 1]
+        a = jnp.where(den_l > 0.0, degree * N_low[i] / den_l, zero)
+        b = jnp.where(den_r > 0.0, degree * N_low[i + 1] / den_r, zero)
+        out.append(a - b)
+    out = jnp.stack(out)
+
+    left_den = knots[degree + 1] - knots[1]
+    left = jnp.zeros(n_control, dtype=knots.dtype)
+    left = left.at[0].set(-degree / left_den)
+    left = left.at[1].set(degree / left_den)
+
+    right_den = knots[n_control + degree - 1] - knots[n_control - 1]
+    right = jnp.zeros(n_control, dtype=knots.dtype)
+    right = right.at[-2].set(-degree / right_den)
+    right = right.at[-1].set(degree / right_den)
+
+    out = jnp.where(jnp.isclose(u, knots[0]), left, out)
+    out = jnp.where(jnp.isclose(u, knots[-1]), right, out)
+    return out
+
+
+def basis_derivative_matrix(u, degree: int, knots, n_control: int | None = None):
+    u = jnp.asarray(u, dtype=knots.dtype)
+    if n_control is None:
+        n_control = int(knots.shape[0] - degree - 1)
+    return jax.vmap(lambda ui: basis_derivative_at_u(ui, degree, knots, n_control))(u)
+
+
 # --- thickness (NACA 4-series modified) ------------------------------------
 
 
@@ -80,6 +184,286 @@ def compute_thickness_distribution_NACA_modified(
         + D * x_norm**3
         + E * x_norm**4
     )
+
+
+def _is_bspline_thickness_model(thickness_model: str) -> bool:
+    return str(thickness_model).strip().lower() in {
+        "b_spline",
+        "bspline",
+        "quartic_bspline",
+    }
+
+
+def _default_bspline_thickness_control_points(
+    loc_max,
+    thickness_max,
+    thickness_trailing,
+    n_control: int,
+):
+    dtype = jnp.asarray(thickness_max + thickness_trailing + loc_max).dtype
+    u_cp = jnp.linspace(0.0, 1.0, n_control, dtype=dtype)
+    full_t = _default_bspline_full_thickness_profile(
+        u_cp,
+        loc_max,
+        thickness_max,
+        thickness_trailing,
+    )
+    full_t = full_t.at[0].set(0.0)
+    full_t = full_t.at[-1].set(thickness_trailing)
+    return full_t
+
+
+def _default_bspline_full_thickness_profile(
+    x,
+    loc_max,
+    thickness_max,
+    thickness_trailing,
+):
+    x = jnp.asarray(x)
+    loc = jnp.clip(loc_max, 1.0e-6, 1.0 - 1.0e-6)
+
+    s_left = jnp.clip(x / loc, 0.0, 1.0)
+    s_right = jnp.clip((x - loc) / (1.0 - loc), 0.0, 1.0)
+    h_left = s_left**2 * (3.0 - 2.0 * s_left)
+    h_right = s_right**2 * (3.0 - 2.0 * s_right)
+
+    return jnp.where(
+        x <= loc,
+        thickness_max * h_left,
+        thickness_max + (thickness_trailing - thickness_max) * h_right,
+    )
+
+
+def _leading_edge_half_thickness_term(x, chord, radius_leading):
+    x = jnp.clip(jnp.asarray(x), 0.0, 1.0)
+    coefficient = jnp.sqrt(jnp.maximum(2.0 * radius_leading / chord, 0.0))
+    return chord * coefficient * jnp.sqrt(x) * (1.0 - x) ** 2
+
+
+def _leading_edge_half_thickness_derivative(x, chord, radius_leading):
+    x = jnp.clip(jnp.asarray(x), 1.0e-12, 1.0)
+    coefficient = jnp.sqrt(jnp.maximum(2.0 * radius_leading / chord, 0.0))
+    return chord * coefficient * (
+        0.5 * (1.0 - x) ** 2 / jnp.sqrt(x)
+        - 2.0 * jnp.sqrt(x) * (1.0 - x)
+    )
+
+
+def _second_difference_matrix(n_control: int, dtype):
+    rows = []
+    for i in range(n_control - 2):
+        row = jnp.zeros(n_control, dtype=dtype)
+        row = row.at[i].set(1.0)
+        row = row.at[i + 1].set(-2.0)
+        row = row.at[i + 2].set(1.0)
+        rows.append(row)
+    return jnp.stack(rows) if rows else jnp.zeros((0, n_control), dtype=dtype)
+
+
+def compute_thickness_distribution_B_spline(
+    x_norm,
+    chord,
+    loc_max,
+    thickness_max,
+    thickness_trailing,
+    wedge_trailing,
+    radius_leading,
+    thickness_control_points=None,
+    degree: int = 4,
+):
+    x = jnp.clip(jnp.asarray(x_norm), 0.0, 1.0)
+    dtype = x.dtype
+
+    if thickness_control_points is None:
+        n_control = 11
+        target_from_control_points = False
+    else:
+        full_cp = jnp.asarray(thickness_control_points, dtype=dtype)
+        if full_cp.ndim != 1:
+            raise ValueError("thickness_control_points must be a 1D array.")
+        n_control = int(full_cp.shape[0])
+        target_from_control_points = True
+
+    if n_control < 7:
+        raise ValueError("Constrained B_spline thickness needs at least 7 control points.")
+
+    degree = int(min(degree, n_control - 1))
+    knots = open_uniform_knot_vector(n_control, degree, dtype=dtype)
+
+    loc = jnp.clip(jnp.asarray(loc_max, dtype=dtype), 1.0e-6, 1.0 - 1.0e-6)
+    half_tmax = 0.5 * jnp.asarray(thickness_max, dtype=dtype)
+    half_tte = 0.5 * jnp.asarray(thickness_trailing, dtype=dtype)
+    slope_te = -jnp.tan(0.5 * jnp.asarray(wedge_trailing, dtype=dtype))
+
+    n_fit = max(80, 8 * n_control)
+    u_fit = jnp.linspace(0.0, 1.0, n_fit, dtype=dtype)
+    B_fit = basis_matrix(u_fit, degree, knots, n_control)
+
+    if target_from_control_points:
+        degree_ref = int(min(degree, n_control - 1))
+        knots_ref = open_uniform_knot_vector(n_control, degree_ref, dtype=dtype)
+        target_full = basis_matrix(u_fit, degree_ref, knots_ref, n_control) @ full_cp
+    else:
+        target_full = _default_bspline_full_thickness_profile(
+            u_fit,
+            loc,
+            thickness_max,
+            thickness_trailing,
+        )
+
+    target_half_residual = (
+        0.5 * target_full
+        - _leading_edge_half_thickness_term(u_fit, chord, radius_leading)
+    )
+
+    A_eq = jnp.stack(
+        [
+            basis_functions_at_u(0.0, degree, knots, n_control),
+            basis_derivative_at_u(0.0, degree, knots, n_control),
+            basis_functions_at_u(loc, degree, knots, n_control),
+            basis_derivative_at_u(loc, degree, knots, n_control),
+            basis_functions_at_u(1.0, degree, knots, n_control),
+            basis_derivative_at_u(1.0, degree, knots, n_control),
+        ]
+    )
+    b_eq = jnp.asarray(
+        [
+            0.0,
+            0.0,
+            half_tmax - _leading_edge_half_thickness_term(loc, chord, radius_leading),
+            -_leading_edge_half_thickness_derivative(loc, chord, radius_leading),
+            half_tte,
+            chord * slope_te,
+        ],
+        dtype=dtype,
+    )
+
+    D2 = _second_difference_matrix(n_control, dtype)
+    smooth_weight = jnp.asarray(1.0e-6, dtype=dtype)
+    ridge = jnp.asarray(1.0e-12, dtype=dtype)
+    H = (
+        B_fit.T @ B_fit
+        + smooth_weight * (D2.T @ D2)
+        + ridge * jnp.eye(n_control, dtype=dtype)
+    )
+    rhs = B_fit.T @ target_half_residual
+
+    zeros = jnp.zeros((A_eq.shape[0], A_eq.shape[0]), dtype=dtype)
+    kkt = jnp.block([[H, A_eq.T], [A_eq, zeros]])
+    sol = jnp.linalg.solve(kkt, jnp.concatenate([rhs, b_eq]))
+    residual_cp = sol[:n_control]
+
+    half_t = (
+        _leading_edge_half_thickness_term(x, chord, radius_leading)
+        + basis_matrix(x, degree, knots, n_control) @ residual_cp
+    )
+    return half_t
+
+
+def _resolve_denton_leading_thickness(
+    thickness_leading,
+    radius_leading,
+    thickness_max,
+    thickness_trailing,
+):
+    te = jnp.maximum(thickness_trailing, 1.0e-12)
+    le_raw = jnp.where(thickness_leading > 0.0, thickness_leading, 2.0 * radius_leading)
+    le_max = jnp.maximum(0.95 * thickness_max, te + 1.0e-12)
+    return jnp.minimum(jnp.maximum(le_raw, te), le_max)
+
+
+def compute_thickness_distribution_Denton(
+    x_norm,
+    chord,
+    loc_max,
+    thickness_max,
+    thickness_trailing,
+    thickness_leading,
+    thickness_shape_exponent: float = 2.0,
+    radius_leading=0.0,
+):
+    eps = 1.0e-12
+    x = jnp.clip(jnp.asarray(x_norm), 0.0, 1.0)
+    x_tmax = jnp.clip(loc_max, 0.02, 0.98)
+    power = jnp.log(0.5) / jnp.log(jnp.maximum(x_tmax, eps))
+    x_trans = x**power
+
+    t_lin = thickness_leading + x * (thickness_trailing - thickness_leading)
+    t_add = thickness_max - (
+        thickness_leading + x_tmax * (thickness_trailing - thickness_leading)
+    )
+
+    shape_exponent = jnp.maximum(thickness_shape_exponent, 1.0e-6)
+    bell = 1.0 - (jnp.abs(x_trans - 0.5) ** shape_exponent) / jnp.maximum(
+        0.5**shape_exponent, eps
+    )
+    t_body = t_lin + t_add * bell
+
+    r_eff = jnp.maximum(radius_leading, 0.5 * jnp.maximum(thickness_leading, 0.0))
+    xmod_upper = jnp.minimum(0.30, 0.8 * x_tmax)
+    xmod_le = jnp.clip(2.0 * r_eff / jnp.maximum(chord, eps), 0.01, xmod_upper)
+    x_mle = x / jnp.maximum(xmod_le, eps)
+    fac_le_inner = jnp.sqrt(jnp.maximum(0.0, 1.0 - jnp.abs(x_mle - 1.0) ** 3.0))
+    fac_le = jnp.where(x <= xmod_le, fac_le_inner, 1.0)
+    t_full = jnp.maximum(t_body * fac_le, 0.0)
+    t_full = t_full.at[0].set(0.0)
+    t_full = t_full.at[-1].set(jnp.maximum(thickness_trailing, eps))
+    return 0.5 * t_full
+
+
+def compute_thickness_distribution(
+    x_norm,
+    chord,
+    loc_max,
+    thickness_max,
+    thickness_trailing,
+    wedge_trailing,
+    radius_leading,
+    thickness_model: str = "denton",
+    thickness_control_points=None,
+    thickness_leading: float = 0.0,
+    thickness_shape_exponent: float = 2.0,
+):
+    thickness_model_normalized = str(thickness_model).strip().lower()
+    if _is_bspline_thickness_model(thickness_model):
+        return compute_thickness_distribution_B_spline(
+            x_norm,
+            chord,
+            loc_max,
+            thickness_max,
+            thickness_trailing,
+            wedge_trailing,
+            radius_leading,
+            thickness_control_points=thickness_control_points,
+        )
+    if thickness_model_normalized == "denton":
+        leading_thickness = _resolve_denton_leading_thickness(
+            thickness_leading,
+            radius_leading,
+            thickness_max,
+            thickness_trailing,
+        )
+        return compute_thickness_distribution_Denton(
+            x_norm,
+            chord,
+            loc_max,
+            thickness_max,
+            thickness_trailing,
+            leading_thickness,
+            thickness_shape_exponent,
+            radius_leading,
+        )
+    if thickness_model_normalized == "naca":
+        return compute_thickness_distribution_NACA_modified(
+            x_norm,
+            chord,
+            loc_max,
+            thickness_max,
+            thickness_trailing,
+            wedge_trailing,
+            radius_leading,
+        )
+    raise ValueError(f"Unsupported thickness_model: {thickness_model}")
 
 
 # --- camberline primitives --------------------------------------------------
@@ -240,8 +624,136 @@ def compute_camberline_linear_slope_change_polar(
     return x, y, r, theta, metal_angle, phi, stagger
 
 
+def default_impulse_curvature_control_points(total_camber_rad, n_control: int = 8):
+    if n_control < 4:
+        raise ValueError("n_control must be at least 4.")
+    dtype = jnp.asarray(total_camber_rad).dtype
+    sign = jnp.where(total_camber_rad >= 0.0, 1.0, -1.0)
+    return sign * jnp.ones(n_control, dtype=dtype)
+
+
+def default_curvature_control_points(total_camber_rad, n_control: int = 8):
+    return default_impulse_curvature_control_points(total_camber_rad, n_control)
+
+
+def _curvature_angle_residual(k, a1, b1, total_camber):
+    s_in = k * (0.0 - b1)
+    s_out = k * (a1 - b1)
+    return jnp.arctan(s_out) - jnp.arctan(s_in) - total_camber
+
+
+def _curvature_angle_residual_derivative(k, a1, b1):
+    s_in = k * (0.0 - b1)
+    s_out = k * (a1 - b1)
+    return ((a1 - b1) / (1.0 + s_out * s_out)) - ((-b1) / (1.0 + s_in * s_in))
+
+
+def _solve_curvature_scaling_factor(a1, b1, total_camber):
+    eps = 1.0e-12
+    tan_tc = jnp.tan(total_camber)
+    p = (a1 * b1) - (b1 * b1)
+    det = (a1 * a1) + (4.0 * p * tan_tc * tan_tc)
+    sq = jnp.sqrt(jnp.maximum(det, 0.0))
+    den = 2.0 * p * tan_tc
+
+    k1 = (-a1 + sq) / (den + eps)
+    k2 = (-a1 - sq) / (den + eps)
+    r1 = jnp.abs(_curvature_angle_residual(k1, a1, b1, total_camber))
+    r2 = jnp.abs(_curvature_angle_residual(k2, a1, b1, total_camber))
+    k_quad = jnp.where(r1 <= r2, k1, k2)
+
+    k_lin = total_camber / (a1 + eps)
+    bad_quad = (jnp.abs(den) < 1.0e-10) | (det < 0.0) | (~jnp.isfinite(k_quad))
+    k0 = jnp.where(
+        jnp.abs(total_camber) < 1.0e-14,
+        0.0,
+        jnp.where(bad_quad, k_lin, k_quad),
+    )
+
+    def newton_body(_, k):
+        f = _curvature_angle_residual(k, a1, b1, total_camber)
+        df = _curvature_angle_residual_derivative(k, a1, b1)
+        k_new = k - f / (df + eps)
+        return jnp.where(jnp.isfinite(k_new), k_new, k)
+
+    return lax.fori_loop(0, 10, newton_body, k0)
+
+
+def _evaluate_curvature_profile(u, curvature_cp):
+    n_control = int(curvature_cp.shape[0])
+    if n_control < 4:
+        raise ValueError("curvature_cp must contain at least 4 control points.")
+    knots = open_uniform_knot_vector(n_control, degree=3, dtype=curvature_cp.dtype)
+    return basis_matrix(u, degree=3, knots=knots, n_control=n_control) @ curvature_cp
+
+
+def _curvature_core(u, metal_angle_in, metal_angle_out, curvature_cp):
+    base_curv = _evaluate_curvature_profile(u, curvature_cp)
+    int_curv = _cumtrapz(base_curv, u)
+    int_slope = _cumtrapz(int_curv, u)
+
+    a1 = int_curv[-1]
+    b1 = int_slope[-1]
+    total_camber = metal_angle_out - metal_angle_in
+    k = _solve_curvature_scaling_factor(a1, b1, total_camber)
+
+    slope_local = k * (int_curv - b1)
+    camber_local = k * (int_slope - u * b1)
+    stagger = metal_angle_in - jnp.arctan(slope_local[0])
+    metal_angle = jnp.arctan(slope_local) + stagger
+    return camber_local, slope_local, metal_angle, stagger
+
+
+def compute_camberline_curvature_based_cart(
+    x1, y1, metal_angle1, metal_angle2, c_ax, u, curvature_cp=None
+):
+    if curvature_cp is None:
+        curvature_cp = default_curvature_control_points(
+            metal_angle2 - metal_angle1, n_control=8
+        )
+    curvature_cp = jnp.asarray(curvature_cp)
+    camber_uv, slope_uv, metal_angle, stagger = _curvature_core(
+        u, metal_angle1, metal_angle2, curvature_cp
+    )
+
+    chord = c_ax / jnp.maximum(jnp.cos(stagger), 1.0e-12)
+    cts = jnp.cos(stagger)
+    sts = jnp.sin(stagger)
+    x = x1 + chord * (u * cts - camber_uv * sts)
+    y = y1 + chord * (u * sts + camber_uv * cts)
+    dydx = jnp.tan(metal_angle)
+    _ = slope_uv
+    return x, y, dydx, stagger, chord
+
+
+def compute_camberline_curvature_based_polar(
+    r1, r2, metal_angle1, metal_angle2, theta0, u, curvature_cp=None
+):
+    if curvature_cp is None:
+        curvature_cp = default_curvature_control_points(
+            metal_angle2 - metal_angle1, n_control=8
+        )
+    curvature_cp = jnp.asarray(curvature_cp)
+    _, _, metal_angle, _ = _curvature_core(
+        u, metal_angle1, metal_angle2, curvature_cp
+    )
+
+    r = r1 + u * (r2 - r1)
+    drdu = r2 - r1
+    dtheta_du = jnp.tan(metal_angle) * drdu / jnp.maximum(r, 1.0e-12)
+    theta = theta0 + _cumtrapz(dtheta_du, u)
+
+    x = r * jnp.cos(theta)
+    y = r * jnp.sin(theta)
+    phi = metal_angle + theta
+    d_theta = theta[-1] - theta[0]
+    stagger = jnp.arctan2(r2 * jnp.sin(d_theta), (r2 * jnp.cos(d_theta) - r1))
+    chord = _chord_from_theta(r1, r2, theta[0], theta[-1])
+    return x, y, r, theta, metal_angle, phi, stagger, chord
+
+
 def compute_camberline_radial(
-    camberline_type, r1, r2, metal_angle1, metal_angle2, theta0, u
+    camberline_type, r1, r2, metal_angle1, metal_angle2, theta0, u, curvature_cp=None
 ):
     if camberline_type == "straight":
         x, y, r, theta, metal_angle, phi, stagger = compute_camberline_straight_polar(
@@ -264,6 +776,10 @@ def compute_camberline_radial(
             compute_camberline_linear_slope_change_polar(
                 r1, r2, metal_angle1, metal_angle2, theta0, u
             )
+        )
+    elif camberline_type == "curvature_based":
+        return compute_camberline_curvature_based_polar(
+            r1, r2, metal_angle1, metal_angle2, theta0, u, curvature_cp=curvature_cp
         )
     elif camberline_type == "circular_arc_conformal":
         x, y, r, theta, metal_angle, phi, stagger = (
@@ -306,18 +822,30 @@ def compute_blade_coordinates_radial(
     wedge_trailing,
     radius_leading,
     N_points,
+    thickness_model: str = "NACA",
+    curvature_cp=None,
+    thickness_control_points=None,
+    thickness_leading: float = 0.0,
+    thickness_shape_exponent: float = 2.0,
 ):
     seg = int(jnp.ceil(N_points / 3.0))
     u = jnp.linspace(0.0, 1.0, seg)
     x_c, y_c, _, theta, _, phi, stagger, chord = compute_camberline_radial(
-        camberline_type, r1, r2, metal_angle1, metal_angle2, theta0, u
+        camberline_type,
+        r1,
+        r2,
+        metal_angle1,
+        metal_angle2,
+        theta0,
+        u,
+        curvature_cp=curvature_cp,
     )
     x_norm = (x_c - r1 * jnp.cos(theta0)) / chord
     y_norm = (y_c - r1 * jnp.sin(theta0)) / chord
     x_norm_rot, _ = rotate_counterclockwise_2D(x_norm, y_norm, -(stagger + theta0))
     x_norm_rot = jnp.abs(x_norm_rot)
 
-    half_t = compute_thickness_distribution_NACA_modified(
+    half_t = compute_thickness_distribution(
         x_norm_rot,
         chord,
         loc_max,
@@ -325,6 +853,10 @@ def compute_blade_coordinates_radial(
         thickness_trailing,
         wedge_trailing,
         radius_leading,
+        thickness_model=thickness_model,
+        thickness_control_points=thickness_control_points,
+        thickness_leading=thickness_leading,
+        thickness_shape_exponent=thickness_shape_exponent,
     )
 
     x_lower = x_c + half_t * jnp.sin(phi)
@@ -367,12 +899,24 @@ def compute_blade_coordinates_cartesian(
     wedge_trailing,
     radius_leading,
     N_points,
+    thickness_model: str = "NACA",
+    curvature_cp=None,
+    thickness_control_points=None,
+    thickness_leading: float = 0.0,
+    thickness_shape_exponent: float = 2.0,
 ):
 
     # Camberline
     u = jnp.linspace(0.0, 1.0, N_points)
     x_c, y_c, dydx, stagger, chord = compute_camberline_cartesian(
-        camberline_type, x1, y1, beta1, beta2, chord_ax, u
+        camberline_type,
+        x1,
+        y1,
+        beta1,
+        beta2,
+        chord_ax,
+        u,
+        curvature_cp=curvature_cp,
     )
 
     # Normalize along stagger
@@ -382,7 +926,7 @@ def compute_blade_coordinates_cartesian(
     x_norm_rot = jnp.abs(x_rot)
 
     # Thickness
-    half_t = compute_thickness_distribution_NACA_modified(
+    half_t = compute_thickness_distribution(
         x_norm_rot,
         chord,
         loc_max,
@@ -390,6 +934,10 @@ def compute_blade_coordinates_cartesian(
         thickness_trailing,
         wedge_trailing,
         radius_leading,
+        thickness_model=thickness_model,
+        thickness_control_points=thickness_control_points,
+        thickness_leading=thickness_leading,
+        thickness_shape_exponent=thickness_shape_exponent,
     )
 
     # Impose thickness along ±normal
@@ -433,8 +981,18 @@ def compute_blade_coordinates_cartesian(
 
 
 def compute_camberline_cartesian(
-    camberline_type: str, x1, y1, metal_angle1, metal_angle2, c_ax, u
+    camberline_type: str, x1, y1, metal_angle1, metal_angle2, c_ax, u, curvature_cp=None
 ):
+    if camberline_type == "curvature_based":
+        return compute_camberline_curvature_based_cart(
+            x1,
+            y1,
+            metal_angle1,
+            metal_angle2,
+            c_ax,
+            u,
+            curvature_cp=curvature_cp,
+        )
     if camberline_type == "NACA":
         x, y, stagger, dydx = _compute_camberline_NACA(
             x1, y1, metal_angle1, metal_angle2, c_ax, u

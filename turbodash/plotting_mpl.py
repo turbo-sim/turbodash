@@ -4,12 +4,7 @@ import matplotlib.pyplot as plt
 
 from matplotlib.ticker import FormatStrFormatter
 
-# from .geom_blade import (
-#     compute_blade_coordinates_radial,
-#     compute_blade_coordinates_cartesian,
-# )
-
-from .geom_blade_update import (
+from .geom_blade import (
     compute_blade_coordinates_radial,
     compute_blade_coordinates_cartesian,
 )

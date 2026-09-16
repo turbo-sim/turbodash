@@ -3,12 +3,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from plotly.colors import sample_colorscale
 
-# from .geom_blade import (
-#     compute_blade_coordinates_radial,
-#     compute_blade_coordinates_cartesian,
-# )
-
-from .geom_blade_update import (
+from .geom_blade import (
     compute_blade_coordinates_radial,
     compute_blade_coordinates_cartesian,
 )

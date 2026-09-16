@@ -83,11 +83,6 @@ venv/
 env/
 ENV/
 
-# Results folders
-# Legacy blade export directories
-/demos/cyclopentane_case/blade_coordinates/
-/demos/cyclopentane_case/rotor_3d_free_vortex/
-/demos/cyclopentane_case/turbogrid_rotor/
 
 # Current exports and generated results
 **/output/

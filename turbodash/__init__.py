@@ -14,8 +14,7 @@ else:
 from .core_stage import *
 from .graphics import *
 from . import core_turbine
-# from . import geom_blade as geometry
-from .import geom_blade_update as geometry
+from . import geom_blade as geometry
 from . import plotting_mpl as mpl
 from . import plotting_plotly_stage as plotly
 

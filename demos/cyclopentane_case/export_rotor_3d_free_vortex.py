@@ -18,8 +18,8 @@ DEFAULT_OUTPUT_DIR = CASE_DIR / "output" / "rotor_3d_free_vortex"
 
 
 def _load_compute_blade_coordinates_cartesian():
-    module_path = REPO_ROOT / "turbodash" / "geom_blade_update.py"
-    spec = importlib.util.spec_from_file_location("geom_blade_update_local", module_path)
+    module_path = REPO_ROOT / "turbodash" / "geom_blade.py"
+    spec = importlib.util.spec_from_file_location("geom_blade_local", module_path)
     if spec is None or spec.loader is None:
         raise ImportError(f"Could not load geometry module from {module_path}")
     module = importlib.util.module_from_spec(spec)
@@ -296,12 +296,12 @@ def build_parser():
     parser.add_argument(
         "--camberline-type",
         default="curvature_based",
-        help="Camberline type passed to geom_blade_update. Default: curvature_based.",
+        help="Camberline type passed to geom_blade. Default: curvature_based.",
     )
     parser.add_argument(
         "--thickness-model",
         default="NACA",
-        help="Thickness model passed to geom_blade_update. Default: NACA.",
+        help="Thickness model passed to geom_blade. Default: NACA.",
     )
     parser.add_argument(
         "--length-scale",

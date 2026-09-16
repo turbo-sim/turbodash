@@ -10,3 +10,4 @@
   - We should find a nice way to spacify the axial location of subsequent blades in axial turbines, now I think that its only a visual thing in the plot blades functions
   - How does turbogrid process multirow cases? Is it a single hub/shourd file for the entire machine and several blade files? or is it one hub and shroud file per blade?
   - We should have a buttom to expor teh turbogrid files from the web app (as a zip folder?)
+  - Add hub to tip ratio at the exit of the row to the geometry table in the app

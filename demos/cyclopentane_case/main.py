@@ -15,7 +15,7 @@ td.set_plot_options()
 
 
 CASE_DIR = Path(__file__).resolve().parent
-BLADE_EXPORT_POINTS = 2000
+BLADE_EXPORT_POINTS = 200
 yaml_path = CASE_DIR / "cyclopentane_8.yaml"
 with open(yaml_path, "r") as f:
     cfg = yaml.safe_load(f)

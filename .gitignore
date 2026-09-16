@@ -20,20 +20,32 @@ MANIFEST
 
 # Compiled Python files
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
 
 # Visual Studio Code specific
-.vscode/         # VS Code settings and cache
-settings.json    # VS Code settings file
-*.code-workspace # VS Code workspace file
+.vscode/
+settings.json
+*.code-workspace
 
-# Other
-*.log
-*.tmp
-*.bak
-.DS_Store       # Mac OS X desktop services store
-*.swp           # Vim swap files
+# Other editor settings
+.idea/
+
+# Operating system metadata
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+
+# Testing, coverage, and analysis caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
 
 # Sphinx generated files
 _build/
@@ -54,6 +66,7 @@ environment.pickle
 *.log
 *.bak
 *.swp
+*.swo
 *.bak~
 *.cache
 *.tmp
@@ -61,9 +74,22 @@ environment.pickle
 
 # Environment directories
 .env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+.venv/
 venv/
+env/
+ENV/
 
 # Results folders
+# Legacy blade export directories
+/demos/cyclopentane_case/blade_coordinates/
+/demos/cyclopentane_case/rotor_3d_free_vortex/
+/demos/cyclopentane_case/turbogrid_rotor/
+
+# Current exports and generated results
 **/output/
 **/output*/
 **/results/

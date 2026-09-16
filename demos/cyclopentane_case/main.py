@@ -134,7 +134,7 @@ fig = td.plotting_mpl.plot_turbine_blades(out)   # @Srinivas: This is the functi
 #TODO: generate better blades for impulse cascade (changing the parametrization and the input parameter values)
 exported_blade_files = export_turbine_blade_coordinates(
     out,
-    output_dir=CASE_DIR / "blade_coordinates",
+    output_dir=CASE_DIR / "output" / "blade_coordinates",
     N_points=BLADE_EXPORT_POINTS,
 )
 print("Exported blade coordinate CSV files:")

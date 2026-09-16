@@ -14,7 +14,7 @@ REPO_ROOT = CASE_DIR.parents[1]
 
 
 DEFAULT_YAML_PATH = CASE_DIR / "cyclopentane_6.yaml"
-DEFAULT_OUTPUT_DIR = CASE_DIR / "rotor_3d_free_vortex"
+DEFAULT_OUTPUT_DIR = CASE_DIR / "output" / "rotor_3d_free_vortex"
 
 
 def _load_compute_blade_coordinates_cartesian():

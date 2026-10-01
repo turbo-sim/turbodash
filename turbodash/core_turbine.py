@@ -460,8 +460,10 @@ def compute_blade_row_geometry(
     stagger_angle_deg = np.rad2deg(stagger_angle)
     if turbine_type == "radial":
         hub_tip_ratio_in = 1.00
+        hub_tip_ratio_out = 1.00
     elif turbine_type == "axial":
         hub_tip_ratio_in = (r_in - 0.5 * H_in) / (r_in + 0.5 * H_in)
+        hub_tip_ratio_out = (r_out - 0.5 * H_out) / (r_out + 0.5 * H_out)
     else:
         raise ValueError(f"Invalid stage type: {turbine_type}")
 
@@ -491,6 +493,7 @@ def compute_blade_row_geometry(
         trailing_edge_wedge_angle=trailing_edge_wedge_angle,
         stagger_angle=stagger_angle_deg,
         hub_tip_ratio_in=hub_tip_ratio_in,
+        hub_tip_ratio_out=hub_tip_ratio_out,
         tip_clearance=tip_clearance,
         A_out=A_out,
         A_throat=A_throat,

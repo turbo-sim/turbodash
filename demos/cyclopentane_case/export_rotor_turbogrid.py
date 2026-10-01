@@ -215,6 +215,46 @@ def write_profile_curve(path: Path, sections, *, length_scale: float):
                 )
 
 
+def compute_axial_domain(
+    sections,
+    *,
+    chord_ax: float,
+    inlet_extension_fraction: float,
+    outlet_extension_fraction: float,
+):
+    for name, value in (
+        ("chord_ax", chord_ax),
+        ("inlet_extension_fraction", inlet_extension_fraction),
+        ("outlet_extension_fraction", outlet_extension_fraction),
+    ):
+        if not np.isfinite(value) or value <= 0.0:
+            raise ValueError(f"{name} must be finite and positive.")
+    if not sections:
+        raise ValueError("At least one blade section is required.")
+    coordinates = np.concatenate(
+        [np.asarray(section["x"], dtype=float) for section in sections]
+    )
+    if coordinates.size == 0 or not np.all(np.isfinite(coordinates)):
+        raise ValueError("Blade axial coordinates must be nonempty and finite.")
+
+    blade_x_min = float(np.min(coordinates))
+    blade_x_max = float(np.max(coordinates))
+    inlet_length = inlet_extension_fraction * chord_ax
+    outlet_length = outlet_extension_fraction * chord_ax
+    return {
+        "length_unit": "m",
+        "chord_meridional": chord_ax,
+        "blade_x_min": blade_x_min,
+        "blade_x_max": blade_x_max,
+        "inlet_extension_fraction": inlet_extension_fraction,
+        "outlet_extension_fraction": outlet_extension_fraction,
+        "inlet_length": inlet_length,
+        "outlet_length": outlet_length,
+        "x_min": blade_x_min - inlet_length,
+        "x_max": blade_x_max + outlet_length,
+    }
+
+
 def write_endwall_curve(path: Path, *, radius: float, x_min: float, x_max: float, length_scale: float):
     points = np.array(
         [
@@ -253,7 +293,9 @@ def write_bladegen_inf(
     path.write_text(text)
 
 
-def write_metadata(path: Path, *, args, stage, sections, hub_radius, shroud_radius):
+def write_metadata(
+    path: Path, *, args, stage, sections, hub_radius, shroud_radius, axial_domain
+):
     rotor_geom = stage["geometry"]["rotor"]
     metadata = {
         "yaml_path": str(args.yaml_path),
@@ -269,6 +311,7 @@ def write_metadata(path: Path, *, args, stage, sections, hub_radius, shroud_radi
         "profile_points_written_per_section": len(ordered_closed_profile(sections[0])["x"]),
         "hub_radius": float(hub_radius),
         "shroud_radius": float(shroud_radius),
+        "axial_domain": axial_domain,
         "sections": [
             {
                 "section_index": index,
@@ -290,8 +333,6 @@ def export_rotor_turbogrid(args):
     rotor_inlet = stage["flow_stations"][2]
     rotor_outlet = stage["flow_stations"][3]
 
-    args.output_dir.mkdir(parents=True, exist_ok=True)
-
     span_fractions = np.linspace(
         args.hub_shroud_offset_fraction,
         1.0 - args.hub_shroud_offset_fraction,
@@ -308,9 +349,22 @@ def export_rotor_turbogrid(args):
         for span_fraction in span_fractions
     ]
 
-    x_margin = args.axial_margin_fraction * _as_float(rotor_geom["chord_meridional"])
-    x_min = -x_margin
-    x_max = _as_float(rotor_geom["chord_meridional"]) + x_margin
+    axial_domain = compute_axial_domain(
+        sections,
+        chord_ax=_as_float(rotor_geom["chord_meridional"]),
+        inlet_extension_fraction=(
+            args.axial_margin_fraction
+            if args.inlet_extension_fraction is None
+            else args.inlet_extension_fraction
+        ),
+        outlet_extension_fraction=(
+            args.axial_margin_fraction
+            if args.outlet_extension_fraction is None
+            else args.outlet_extension_fraction
+        ),
+    )
+    x_min = axial_domain["x_min"]
+    x_max = axial_domain["x_max"]
 
     hub_radius = min(
         span_radius(_as_float(rotor_inlet["r"]), _as_float(rotor_inlet["H"]), 0.0),
@@ -332,6 +386,7 @@ def export_rotor_turbogrid(args):
     inf_path = args.output_dir / inf_name
     metadata_path = args.output_dir / "turbogrid_export_metadata.yaml"
 
+    args.output_dir.mkdir(parents=True, exist_ok=True)
     write_profile_curve(profile_path, sections, length_scale=args.length_scale)
     write_endwall_curve(
         hub_path,
@@ -363,6 +418,7 @@ def export_rotor_turbogrid(args):
         sections=sections,
         hub_radius=hub_radius,
         shroud_radius=shroud_radius,
+        axial_domain=axial_domain,
     )
     return inf_path, profile_path, hub_path, shroud_path, metadata_path, sections
 
@@ -393,8 +449,25 @@ def build_parser():
     parser.add_argument(
         "--axial-margin-fraction",
         type=float,
-        default=0.25,
-        help="Hub/shroud curve extension upstream and downstream, as a chord fraction.",
+        default=1.0,
+        help=(
+            "Default inlet and outlet extensions, as meridional chord fractions "
+            "beyond the blade axial bounds. Default: 1.0. "
+            "Overridden separately by --inlet-extension-fraction and "
+            "--outlet-extension-fraction."
+        ),
+    )
+    parser.add_argument(
+        "--inlet-extension-fraction",
+        type=float,
+        default=None,
+        help="Upstream extension in meridional chords; defaults to --axial-margin-fraction.",
+    )
+    parser.add_argument(
+        "--outlet-extension-fraction",
+        type=float,
+        default=None,
+        help="Downstream extension in meridional chords; defaults to --axial-margin-fraction.",
     )
     parser.add_argument(
         "--length-scale",

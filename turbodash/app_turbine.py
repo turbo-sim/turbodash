@@ -22,6 +22,7 @@ from dash import (
     dash_table,
 )
 from dash.exceptions import PreventUpdate
+from turbodash.app_turbogrid import register_turbogrid_callbacks, turbogrid_export_panel
 
 
 # =========================
@@ -33,6 +34,7 @@ app = Dash(
     external_stylesheets=[dbc.themes.BOOTSTRAP],
 )
 server = app.server
+register_turbogrid_callbacks(app)
 
 
 def main():
@@ -343,7 +345,7 @@ def accordion_title(text):
     return html.Span(text, style={"fontWeight": "bold", "fontSize": "15px"})
 
 
-def make_stage_accordion_item(stage_idx, stage_values):
+def make_stage_accordion_item(stage_idx, stage_values, turbine_type):
     """Build one AccordionItem for a single stage from a values dict."""
     fields = [
         stage_linked(
@@ -384,6 +386,7 @@ def make_stage_accordion_item(stage_idx, stage_values):
                 ),
             )
             for key, label, lo, hi, step in BLADE_GEOMETRY_FIELDS
+            if key != "aspect_ratio" or turbine_type != "radial"
         ]
         geometry_items.append(
             dbc.AccordionItem(
@@ -841,7 +844,7 @@ app.layout = html.Div(
                                         "overflowY": "auto",
                                         "padding": "20px",
                                     },
-                                    children=[plots, tables],
+                                    children=[plots, tables, turbogrid_export_panel()],
                                 ),
                             ],
                         )
@@ -952,11 +955,15 @@ def sync_stage_slider_input(slider_val, input_val):
     Output("stages_accordion_container", "children"),
     Output("stage_count_label", "children"),
     Input("stage_data_store", "data"),
+    State({"scope": "overall", "key": "turbine_type"}, "value"),
     prevent_initial_call=False,
 )
-def render_stage_accordion(stages):
+def render_stage_accordion(stages, turbine_type):
     stages = stages or [dict(STAGE_DEFAULTS)]
-    items = [make_stage_accordion_item(i, sv) for i, sv in enumerate(stages)]
+    items = [
+        make_stage_accordion_item(i, sv, turbine_type)
+        for i, sv in enumerate(stages)
+    ]
     accordion = dbc.Accordion(
         id="stages_accordion",
         always_open=True,

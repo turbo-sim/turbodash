@@ -96,6 +96,10 @@ def plot_turbine_meridional_channel(results, ax=None):
         ax.set_ylim(0.0, r_max + r_pad)
         ax.set_xlabel("Spanwise direction")
 
+    def plot_radial_inflow(ax):
+        # TODO: to be completed by Leonardo
+        pass
+    
     if ax is None:
         figsize = (6, 5)
         fig, ax = plt.subplots(figsize=figsize)
@@ -106,6 +110,8 @@ def plot_turbine_meridional_channel(results, ax=None):
         plot_axial(ax)
     elif turbine_type == "radial":
         plot_radial(ax)
+    elif turbine_type == "radial_inflow":
+        plot_radial_inflow(ax)
     else:
         raise ValueError(f"Invalid stage type: {turbine_type!r}")
 

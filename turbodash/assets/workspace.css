@@ -1,0 +1,132 @@
+/* Geometry and mesh workspaces follow the companion TurboMoC studio layout.
+   Keep these rules scoped so the existing meanline app retains its styling. */
+.td-workspace {
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 54px);
+    min-height: 0;
+    overflow: hidden;
+    color: #233541;
+    background: #f2f5f6;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 14px;
+}
+.td-sidebar {
+    flex: 0 0 350px;
+    width: 350px;
+    min-width: 0;
+    padding: 16px 14px;
+    overflow-y: auto;
+    border-right: 1px solid #cdd8dd;
+    background: #e8eef1;
+}
+.td-workspace-main {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+    padding: 14px 16px 24px;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+}
+.td-workspace h4 {font-size: 20px; font-weight: 600; margin-bottom: 10px;}
+.td-workspace .card {border-color: #ccd8dd; border-radius: 6px;}
+.td-workspace .card-header {background: #f7fafb; font-weight: 600;}
+.td-sidebar .card-body {padding: 12px;}
+.td-sidebar .form-label {font-size: 12px; margin-bottom: 4px;}
+.td-sidebar .form-control, .td-sidebar input {font-size: 13px;}
+.td-sidebar .Select {font-size: 13px;}
+.td-sidebar .Select-menu-outer {z-index: 10;}
+.td-row-settings, .td-plot-group {
+    border: 1px solid #ccd8dd;
+    border-radius: 6px;
+    background: #fff;
+    margin-bottom: 12px;
+}
+.td-row-settings > summary, .td-plot-group > summary {
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: #f7fafb;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.td-row-settings[open] > summary, .td-plot-group[open] > summary {
+    border-bottom: 1px solid #dce4e8;
+    border-radius: 6px 6px 0 0;
+}
+.td-row-settings > div {padding: 10px 12px;}
+.td-row-settings > .td-parameter {padding: 7px 12px;}
+.td-row-settings > button {margin: 8px 12px 12px;}
+.td-row-settings > pre {padding: 0 12px;}
+.td-row-settings > .progress {padding: 0; margin: 10px 12px;}
+.td-row-settings .td-row-settings {margin: 10px 8px;}
+.td-row-settings .td-row-settings > summary {font-size: 13px;}
+.td-row-settings label {display: block; font-size: 12px; margin-bottom: 4px;}
+.td-row-settings input[type="number"] {width: 100%; min-width: 0;}
+.td-plot-pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+    padding: 8px;
+    align-items: stretch;
+}
+.td-plot-pair > * {min-width: 0;}
+.td-engineering-plot {display: flex; flex-direction: column; height: 39vh; min-height: 320px; max-height: 480px;}
+.td-engineering-plot > .dash-graph {flex: 1 1 0; min-height: 0;}
+.td-engineering-plot > h5, .td-plot-group > h5 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+    padding: 9px 12px;
+    background: #f7fafb;
+    border-bottom: 1px solid #dce4e8;
+}
+.td-vtk-viewport {display: flex; align-items: stretch; min-width: 0;}
+.td-vtk-frame {flex: 1 1 0; min-width: 0; padding: 8px;}
+.td-vtk-host {
+    width: 100%;
+    height: 54vh;
+    min-height: 390px;
+    max-height: 700px;
+    position: relative;
+    background: #fafbfc;
+}
+.td-vtk-display {
+    flex: 0 0 245px;
+    width: 245px;
+    min-width: 0;
+    padding: 14px;
+    background: #fafcfc;
+    border-left: 1px solid #d6e0e5;
+    max-height: 74vh;
+    overflow-y: auto;
+    font-size: 13px;
+}
+.td-vtk-display > strong {display: block; margin-bottom: 12px;}
+.td-vtk-display h4 {font-size: 15px; margin: 0 0 10px;}
+.td-display-section h5 {font-size: 13px; font-weight: 600; margin-bottom: 9px;}
+.td-vtk-display label {display: block; padding: 3px 0;}
+.td-vtk-display input[type="checkbox"] {margin-right: 7px;}
+.td-vtk-display input[type="number"] {max-width: 85px; padding: 4px 6px;}
+.td-display-section {margin: 12px 0; padding-top: 10px; border-top: 1px solid #dce4e8;}
+.td-display-section > summary {font-weight: 600; cursor: pointer; padding-bottom: 7px;}
+.td-display-row-count {display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px;}
+.td-vtk-display .Select {font-size: 12px;}
+.td-workspace .js-plotly-plot .plotly .modebar {background: transparent !important;}
+@media (max-width: 1200px) {
+    .td-sidebar {flex-basis: 300px; width: 300px;}
+    .td-vtk-display {flex-basis: 220px; width: 220px; padding: 12px;}
+}
+@media (max-width: 1000px) {
+    .td-workspace {height: auto; min-height: calc(100vh - 54px); overflow: visible; align-items: flex-start;}
+    .td-sidebar {flex-basis: 280px; width: 280px; overflow: visible;}
+    .td-workspace-main {overflow: visible;}
+    .td-plot-pair {grid-template-columns: minmax(0, 1fr);}
+    .td-vtk-viewport {flex-direction: column;}
+    .td-vtk-display {flex: none; width: 100%; max-height: none; border-left: 0; border-top: 1px solid #d6e0e5;}
+}
+@media (max-width: 700px) {
+    .td-workspace {flex-direction: column;}
+    .td-sidebar {flex: none; width: 100%; border-right: 0; border-bottom: 1px solid #cdd8dd;}
+    .td-workspace-main {width: 100%; padding: 12px 8px;}
+}

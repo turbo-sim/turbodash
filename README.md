@@ -14,6 +14,8 @@
 - Lightweight, dependency-minimal design based on Plotly Dash.
 - Automatic synchronization between sliders and numeric inputs.
 - Support import/export of configuration files.
+- Three working tabs: meanline calculation, turbine geometry, and mesh generation/inspection.
+- Optional TurboMoC integration for cylindrical axial blade models (STL), periodic 3D passage meshes (Gmsh/CGNS), and VTK geometry/mesh visualization with cell-quality inspection.
 - Documentation describing the derivation of governing equations.  
 
 ## 🛠️ Installation
@@ -22,7 +24,7 @@
 
 Install the latest stable release directly from PyPI:
 ```bash
-pip install turbodash
+pip install turbodash-core
 ```
 
 **From source (Poetry):**
@@ -33,6 +35,22 @@ git clone https://github.com/turbo-sim/turbodash.git
 cd turbodash
 poetry install
 ```
+
+**Enable 3D geometry and meshing:**
+
+For development with the companion repository, install it in the same Python
+environment as Turbodash. From the `turbodash` directory:
+
+```bash
+python -m pip install -e .
+python -m pip install -e ../method_of_characteristics
+```
+
+Alternatively, `poetry install -E mesh` installs the tested TurboMoC Git revision
+recorded in `poetry.lock`. With pip, use `python -m pip install -e ".[mesh]"`.
+The meanline calculator remains available without this optional dependency.
+See [the integration assessment and mesh workflow](docs/turbomoc_meshing.md)
+for assumptions, outputs, and the Python API.
 
 ## 🚀 Run the app locally
 
@@ -49,7 +67,7 @@ poetry run python -c "import turbodash; turbodash.launch_app_turbine()"
 This will start a local server and open the dashboard in your web browser.
 
 ## Documentation
-The theoretical derivation of the governing equations, efficiency definitions, and validation against analytical special cases are available directly in the app under the Documentation tab.
+The theoretical derivation of the governing equations, efficiency definitions, and validation against analytical special cases are available in the expandable Documentation section of the Meanline tab.
 
 ## License
 This project is released under the MIT License.

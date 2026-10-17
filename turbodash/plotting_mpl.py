@@ -3,6 +3,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 from matplotlib.ticker import FormatStrFormatter
+from .core_turbine import get_blade_row_geometry
 
 from .geom_blade import (
     compute_blade_coordinates_radial,
@@ -20,7 +21,8 @@ INTERCASCADE_GAP_FACTOR = 1.5
 
 
 def plot_turbine_meridional_channel(results, ax=None):
-    stages = results["stages_performance"]
+    stages = [dict(stage, geometry={row: get_blade_row_geometry(stage, row)
+              for row in ("stator", "rotor")}) for stage in results["stages_performance"]]
     turbine_type = results["inputs"]["turbine_type"]
 
     def plot_axial(ax):
@@ -125,6 +127,8 @@ def plot_turbine_blades(results, ax=None, N_points=201, N_blades_plot=8):
     """
     Plot blade cascades for a full turbine, axial or radial.
     Stage type is read from the first stage's inputs.
+    Axial views use continuous meanline geometry; radial full annuli use the
+    separate integer realization.
 
     Parameters
     ----------
@@ -141,7 +145,8 @@ def plot_turbine_blades(results, ax=None, N_points=201, N_blades_plot=8):
     -------
     fig, ax
     """
-    stages = results["stages_performance"]
+    stages = [dict(stage, geometry={row: get_blade_row_geometry(stage, row)
+              for row in ("stator", "rotor")}) for stage in results["stages_performance"]]
     turbine_type = results["inputs"]["turbine_type"]
 
     def plot_axial(ax):
@@ -253,7 +258,7 @@ def plot_turbine_blades(results, ax=None, N_points=201, N_blades_plot=8):
                 )
 
                 dtheta = 2.0 * np.pi / geom["blade_count"]
-                for i in range(geom["blade_count"]):
+                for i in range(int(geom["blade_count"])):
                     rot = i * dtheta
                     ct, st = np.cos(rot), np.sin(rot)
                     ax.plot(
@@ -264,8 +269,8 @@ def plot_turbine_blades(results, ax=None, N_points=201, N_blades_plot=8):
                         label=label if (stage_idx == 0 and i == 0) else None,
                     )
 
-            draw_row(out["geometry"]["stator"], color=COLOR_STATOR, label="Stator")
-            draw_row(out["geometry"]["rotor"], color=COLOR_ROTOR, label="Rotor")
+            draw_row(get_blade_row_geometry(out, "stator", turbine_type="radial", discrete=True), color=COLOR_STATOR, label="Stator")
+            draw_row(get_blade_row_geometry(out, "rotor", turbine_type="radial", discrete=True), color=COLOR_ROTOR, label="Rotor")
 
         for j, st in enumerate(stages):
             draw_stage(st, stage_idx=j)

@@ -823,7 +823,7 @@ tables = html.Div(
             },
             children=[
                 table_card("Overall performance", "perf_table"),
-                table_card("Geometry", "geom_table"),
+                table_card("Meanline geometry", "geom_table"),
             ],
         ),
         html.Div(
@@ -1067,9 +1067,16 @@ def update_turbine(overall_values, stage_values, overall_ids, stage_ids, store_s
         out = td.core_turbine.compute_turbine_performance(cfg)
 
         fig_meridional = td.plotting_plotly_turbine.plot_turbine_meridional_channel(out)
-        fig_blades = td.plotting_plotly_turbine.plot_turbine_blades(
-            out, N_points=500, N_blades_plot=8
-        )
+        try:
+            fig_blades = td.plotting_plotly_turbine.plot_turbine_blades(
+                out, N_points=500, N_blades_plot=8
+            )
+        except ValueError as error:
+            # Physical profile construction must not discard a meanline solve.
+            fig_blades = {"data": [], "layout": {"annotations": [{
+                "text": f"Blade geometry unavailable: {error}", "showarrow": False,
+                "xref": "paper", "yref": "paper", "x": 0.5, "y": 0.5,
+            }]}}
         # Now returns a LIST of figures, one per stage.
         triangle_figs = td.plotting_plotly_turbine.plot_velocity_triangles_turbine(
             out, mode="mach"

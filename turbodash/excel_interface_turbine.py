@@ -54,7 +54,7 @@ Unit conventions
 import os
 import yaml
 import xlwings as xw
-from .core_turbine import compute_turbine_performance
+from .core_turbine import compute_turbine_performance, get_blade_row_geometry
 
 _cache = {}
 
@@ -106,6 +106,8 @@ _UNITS = {
     "beta": ("deg", 1.0),
     # --- counts ---
     "blade_count": ("-", 1.0),
+    "blade_count_continuous": ("-", 1.0),
+    "blade_count_integer": ("-", 1.0),
     # --- velocities ---
     "spouting_velocity": ("m/s", 1.0),
     "exit_blade_speed": ("m/s", 1.0),
@@ -299,8 +301,9 @@ def meanline_caculator_full(names, values):
         _append_dict(rows, f"{sp}.performance", stage["stage_performance"])
 
         for component in ("stator", "rotor"):
-            _append_section(rows, f"Stage {i} geometry ({component})")
-            _append_dict(rows, f"{sp}.{component}", stage["geometry"][component])
+            _append_section(rows, f"Stage {i} meanline geometry ({component})")
+            geometry = get_blade_row_geometry(stage, component)
+            _append_dict(rows, f"{sp}.{component}", {key: value for key, value in geometry.items() if value is not None})
 
         if "losses" in stage:
             for component in ("stator", "rotor"):

@@ -24,6 +24,7 @@ import numpy as np
 from scipy.interpolate import make_interp_spline
 
 from .geom_blade import compute_blade_coordinates_cartesian
+from .core_turbine import get_blade_row_geometry
 
 
 _INSTALL_MESSAGE = (
@@ -92,7 +93,7 @@ def _row_inputs(results, stage_index, row):
     start = 0 if row == "stator" else 2
     try:
         inlet, outlet = stage["flow_stations"][start:start + 2]
-        geometry = stage["geometry"][row]
+        geometry = get_blade_row_geometry(stage, row, turbine_type="axial", discrete=True)
         radii = [_positive(item["r"], "Mean radius") for item in (inlet, outlet)]
         heights = [_positive(item["H"], "Blade height") for item in (inlet, outlet)]
         if any(radius <= height / 2 for radius, height in zip(radii, heights)):
@@ -241,7 +242,9 @@ def build_blade_row(results, stage_index=0, row="stator", *, options=None):
     fingerprint = hashlib.sha256(json.dumps(source_row | {"options": options},
                                             sort_keys=True, allow_nan=False).encode()).hexdigest()
     metadata = {"stage_index": int(stage_index), "stage_number": int(stage_index + 1), "row": row,
-                "blade_count": count, "coordinate_units": "mm", "axis_of_rotation": "Z",
+                "blade_count": count, "blade_count_integer": count,
+                "blade_count_continuous": geometry.get("blade_count_continuous"),
+                "coordinate_units": "mm", "axis_of_rotation": "Z",
                 "cgns_coordinate_units": "m", "endwall_model": "cylindrical_average",
                 "spanwise_model": "constant_midspan_metal_angles",
                 "flattened_meanline": flattened, "notes": notes,

@@ -67,6 +67,12 @@ poetry run python -c "import turbodash; turbodash.launch_app_turbine()"
 This will start a local server and open the dashboard in your web browser.
 
 ## Documentation
+
+The turbine apps use continuous blade counts for meanline losses and efficiency,
+and separate integer geometry for physical visualization, meshing and export.
+See [the geometry calculation policy and API](docs/meanline_geometry.md) for
+result fields, compatibility notes and verification.
+
 The theoretical derivation of the governing equations, efficiency definitions, and validation against analytical special cases are available in the expandable Documentation section of the Meanline tab.
 
 ## License

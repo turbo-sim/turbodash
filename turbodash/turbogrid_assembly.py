@@ -5,6 +5,7 @@ from numbers import Integral
 import numpy as np
 
 from .export_turbogrid import _make_section, _positive, _station_geometry
+from .core_turbine import get_blade_row_geometry
 
 
 def build_assembly_layout(
@@ -54,7 +55,7 @@ def build_assembly_layout(
         for row_name, inlet_index in (("stator", 0), ("rotor", 2)):
             row_id = f"stage_{stage_number:02d}/{row_name}"
             try:
-                geometry = stage["geometry"][row_name]
+                geometry = get_blade_row_geometry(stage, row_name, turbine_type="axial", discrete=True)
                 chord = _positive(geometry["chord_meridional"], "Meridional chord")
                 blade_count = _positive(geometry["blade_count"], "Blade count")
                 if not blade_count.is_integer():

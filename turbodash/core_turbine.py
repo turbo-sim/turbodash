@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import numpy as np
 import jaxprop as jxp
 
@@ -391,7 +393,11 @@ def compute_blade_row_geometry(
     blade_geometry,
 ):
     """
-    Compute parameters required to define the blade row geometry and for the loss models
+    Compute continuous meanline geometry for the loss models.
+
+    The Zweifel criterion defines a real-valued blade count. Integer geometry
+    is a separate realization; use :func:`realize_blade_row_geometry` at the
+    visualization, meshing or export boundary.
     """
 
     maximum_thickness_to_chord = blade_geometry["maximum_thickness_to_chord"]
@@ -412,7 +418,7 @@ def compute_blade_row_geometry(
     else:
         raise ValueError(f"Invalid stage type: {turbine_type}")
 
-    # Integer number of blades from Zweifel criterion
+    # Continuous number of blades from the existing Zweifel criterion
     angle_in = np.deg2rad(angle_in_deg)
     angle_out = np.deg2rad(angle_out_deg)
     s_mean = (
@@ -421,18 +427,7 @@ def compute_blade_row_geometry(
         * meridional_chord
         / (np.cos(angle_out) ** 2 * np.abs(np.tan(angle_in) - np.tan(angle_out)))
     )   
-    N_blades = int(np.ceil(np.pi * (r_in + r_out) / s_mean))
-    s_mean = (np.pi * (r_in + r_out)) / N_blades
-    solidity = meridional_chord / s_mean
-
-    # Opening (cosine rule)
-    s_out = 2 * np.pi * r_out / N_blades
-    if turbine_type == "radial":
-        o = s_out * np.cos(np.abs(angle_out) - 0.5 * (2.0 * np.pi / N_blades))
-    elif turbine_type == "axial":
-        o = s_out * np.cos(angle_out)
-    else:
-        raise ValueError(f"Invalid stage type: {turbine_type}")
+    N_blades = float(np.pi * (r_in + r_out) / s_mean)
 
     # Flaring angle
     height = 0.5 * (H_in + H_out)
@@ -442,20 +437,14 @@ def compute_blade_row_geometry(
     # Miscellaneous quantities for plotting
     maximum_thickness = meridional_chord * maximum_thickness_to_chord
     leading_edge_radius = maximum_thickness * leading_edge_radius_to_max_thickness
-    trailing_edge_thickness = o * trailing_edge_thickness_to_opening
-
-    # leading_edge_radius = trailing_edge_thickness/2
-
     stagger_angle = 0.5 * (angle_in + angle_out)
     chord = meridional_chord / np.cos(stagger_angle)
 
     # ------------------------------------------------------------------
     # Extra quantities required by the loss models
     # ------------------------------------------------------------------
-    pitch = s_mean
     leading_edge_diameter = 2.0 * leading_edge_radius
     A_out = 2.0 * np.pi * r_out * H_out
-    A_throat = A_out * (o / s_out)  # exit area scaled by opening/pitch
     tip_clearance = tip_clearance_to_height * height
     stagger_angle_deg = np.rad2deg(stagger_angle)
     if turbine_type == "radial":
@@ -468,19 +457,15 @@ def compute_blade_row_geometry(
         raise ValueError(f"Invalid stage type: {turbine_type}")
 
 
-    # Return complete dictionary
-    return dict(
-        blade_count=N_blades,
+    # Count-independent quantities form the common template for both views.
+    geometry = dict(
+        blade_count_continuous=N_blades,
         radius_in=r_in,
         radius_out=r_out,
         height=height,
         chord=chord,
         chord_meridional=meridional_chord,
         meridional_chord=meridional_chord,  # loss-model alias
-        spacing=s_mean,
-        pitch=pitch,  # loss-model name for spacing
-        opening=o,
-        solidity=solidity,
         aspect_ratio=aspect_ratio,
         flaring_angle=flaring_angle,
         maximum_thickness=maximum_thickness,
@@ -489,17 +474,108 @@ def compute_blade_row_geometry(
         leading_edge_diameter=leading_edge_diameter,
         leading_edge_angle=angle_in_deg,
         leading_edge_wedge_angle=leading_edge_wedge_angle,
-        trailing_edge_thickness=trailing_edge_thickness,
+        trailing_edge_thickness_to_opening=trailing_edge_thickness_to_opening,
         trailing_edge_wedge_angle=trailing_edge_wedge_angle,
         stagger_angle=stagger_angle_deg,
         hub_tip_ratio_in=hub_tip_ratio_in,
         hub_tip_ratio_out=hub_tip_ratio_out,
         tip_clearance=tip_clearance,
         A_out=A_out,
-        A_throat=A_throat,
         metal_angle_in=angle_in_deg,
         metal_angle_out=angle_out_deg,
     )
+    return _geometry_with_blade_count(geometry, turbine_type, N_blades, discrete=False)
+
+
+def _geometry_with_blade_count(geometry, turbine_type, blade_count, *, discrete):
+    """Recompute every count-dependent quantity using one shared formula set."""
+    count = float(blade_count)
+    if not np.isfinite(count) or count <= 0:
+        raise ValueError("Blade count must be finite and positive.")
+    result = dict(geometry)
+    spacing = np.pi * (geometry["radius_in"] + geometry["radius_out"]) / count
+    spacing_out = 2 * np.pi * geometry["radius_out"] / count
+    angle_out = np.deg2rad(geometry["metal_angle_out"])
+    if turbine_type == "radial":
+        opening = spacing_out * np.cos(np.abs(angle_out) - 0.5 * (2.0 * np.pi / count))
+    elif turbine_type == "axial":
+        opening = spacing_out * np.cos(angle_out)
+    else:
+        raise ValueError(f"Invalid stage type: {turbine_type}")
+    result.update(
+        blade_count=int(count) if discrete else count,
+        blade_count_integer=int(count) if discrete else None,
+        spacing=spacing,
+        pitch=spacing,
+        opening=opening,
+        solidity=geometry["chord_meridional"] / spacing,
+        trailing_edge_thickness=opening * geometry["trailing_edge_thickness_to_opening"],
+        A_throat=geometry["A_out"] * (opening / spacing_out),
+    )
+    return result
+
+
+def realize_blade_row_geometry(geometry_meanline, turbine_type, *, blade_count=None):
+    """Return independent integer geometry without recalculating performance.
+
+    By default the count is rounded up, preserving the previous realization
+    policy. An explicitly chosen integer count can also be supplied. Pitch,
+    opening, solidity, trailing-edge thickness and throat area are recomputed
+    together; the continuous count and all count-independent dimensions remain.
+    """
+    if blade_count is None:
+        continuous = float(geometry_meanline["blade_count_continuous"])
+        if not np.isfinite(continuous) or continuous <= 0:
+            raise ValueError("Continuous blade count must be finite and positive.")
+        blade_count = np.ceil(continuous)
+    count = float(blade_count)
+    if isinstance(blade_count, (bool, np.bool_)) or not np.isfinite(count) or count < 1 or not count.is_integer():
+        raise ValueError("Integer blade count must be a positive integer.")
+    return _geometry_with_blade_count(geometry_meanline, turbine_type, int(count), discrete=True)
+
+
+def get_blade_row_geometry(stage, row, *, turbine_type=None, discrete=False):
+    """Read either geometry view, including geometry-only legacy saved results.
+
+    Physical consumers realize only the requested row, without mutating the
+    result. A stored ``geometry_discrete`` (for an explicitly selected count)
+    takes precedence. Legacy geometry is already discrete and is used as saved;
+    a fractional legacy count is rejected rather than silently reinterpreted.
+    """
+    if row not in ("stator", "rotor"):
+        raise ValueError("row must be 'stator' or 'rotor'.")
+    meanline = stage.get("geometry_meanline")
+    if not discrete:
+        return (meanline if meanline is not None else stage["geometry"])[row]
+    stored = stage.get("geometry_discrete")
+    if stored is not None and row in stored:
+        geometry = stored[row]
+    elif meanline is not None:
+        return realize_blade_row_geometry(meanline[row], turbine_type)
+    else:
+        geometry = stage["geometry"][row]
+    count = float(geometry["blade_count"])
+    if not np.isfinite(count) or count < 1 or not count.is_integer():
+        raise ValueError("Blade count must be an integer.")
+    return geometry
+
+
+def realize_turbine_geometry(results):
+    """Return a copy with both geometry views, preserving all meanline results.
+
+    Normal solves leave ``geometry_discrete`` unset (None). Physical consumers
+    can realize a selected row lazily through ``get_blade_row_geometry``; this
+    helper materializes every row for inspection or saving. ``geometry`` remains
+    a compatibility alias for ``geometry_meanline`` in new results.
+    """
+    result = deepcopy(results)
+    turbine_type = result["inputs"]["turbine_type"]
+    for stage in result["stages_performance"]:
+        stage["geometry_discrete"] = {
+            row: dict(get_blade_row_geometry(stage, row, turbine_type=turbine_type, discrete=True))
+            for row in ("stator", "rotor")
+        }
+    return result
 
 
 def compute_stage_performance(
@@ -915,10 +991,12 @@ def compute_stage_performance(
     }
  
     # Cascade geometry
-    out["geometry"] = {
+    out["geometry_meanline"] = {
         "stator": stator_geom,
         "rotor": rotor_geom,
     }
+    out["geometry_discrete"] = None  # Generated only for physical geometry consumers.
+    out["geometry"] = out["geometry_meanline"]  # Compatibility alias for numerical callers.
     
     # Cascade losses
     out["losses"] = {

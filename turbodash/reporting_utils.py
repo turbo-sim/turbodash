@@ -1,3 +1,6 @@
+from .core_turbine import get_blade_row_geometry
+
+
 def print_dict(data, indent=0, return_output=False):
     """
     Recursively prints nested dictionaries and lists with indentation,
@@ -505,10 +508,12 @@ def _print_geometry(out):
 
     cols = []
     for i, s in enumerate(stages, 1):
-        cols.append((f"S{i}", s["geometry"]["stator"]))
-        cols.append((f"R{i}", s["geometry"]["rotor"]))
+        cols.append((f"S{i}", get_blade_row_geometry(s, "stator")))
+        cols.append((f"R{i}", get_blade_row_geometry(s, "rotor")))
 
-    keys = list(cols[0][1].keys())
+    keys = [key for key in cols[0][1] if key not in ("blade_count", "blade_count_integer")]
+    if "blade_count_continuous" not in keys:
+        keys.insert(0, "blade_count")  # Legacy saved geometry.
 
     mm_keys = {
         "radius_in", "radius_out", "height", "chord", "chord_meridional",
@@ -525,8 +530,8 @@ def _print_geometry(out):
             return "mm", 1e3, 2
         if key in deg_keys:
             return "deg", 1.0, 2
-        if key == "blade_count":
-            return "-", 1.0, 0
+        if key in ("blade_count", "blade_count_continuous"):
+            return "-", 1.0, 3
         return "-", 1.0, 4
 
     label_w = 30
@@ -536,7 +541,7 @@ def _print_geometry(out):
 
     print()
     print(rule)
-    print("Turbine geometry report")
+    print("Turbine meanline geometry report")
     print(rule)
     print(head)
     print(rule)
@@ -733,7 +738,7 @@ def overall_performance_table(out):
 # Geometry rows to display, in order: (label, unit, key, prec, scale).
 # Only these quantities are shown.
 _GEOMETRY_SPECS = [
-    ("Blade count", "-", "blade_count", 0, 1.0),
+    ("Meanline blade count", "-", "blade_count", 3, 1.0),
     ("Radius in", "mm", "radius_in", 2, 1e3),
     ("Radius out", "mm", "radius_out", 2, 1e3),
     ("Hub-tip ratio at inlet", "-", "hub_tip_ratio_in", 4, 1.0),
@@ -772,8 +777,8 @@ def geometry_table(out):
     # (col_id, label, geometry-dict) per blade row, in flow order.
     cols = []
     for i, s in enumerate(stages, 1):
-        cols.append((f"s{i}", f"S{i}", s["geometry"]["stator"]))
-        cols.append((f"r{i}", f"R{i}", s["geometry"]["rotor"]))
+        cols.append((f"s{i}", f"S{i}", get_blade_row_geometry(s, "stator")))
+        cols.append((f"r{i}", f"R{i}", get_blade_row_geometry(s, "rotor")))
 
     columns = [{"name": "Quantity", "id": "quantity"}]
     for col_id, label, _ in cols:

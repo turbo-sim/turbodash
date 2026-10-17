@@ -2,6 +2,7 @@ import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from plotly.colors import sample_colorscale
+from .core_turbine import get_blade_row_geometry
 
 from .geom_blade import (
     compute_blade_coordinates_radial,
@@ -64,7 +65,8 @@ def plot_turbine_meridional_channel(results):
     -------
     fig : plotly.graph_objects.Figure
     """
-    stages = results["stages_performance"]
+    stages = [dict(stage, geometry={row: get_blade_row_geometry(stage, row)
+              for row in ("stator", "rotor")}) for stage in results["stages_performance"]]
     turbine_type = results["inputs"]["turbine_type"]
     fig = go.Figure()
 
@@ -173,11 +175,15 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
     Blade cascades for a full multistage turbine, axial or radial.
     Mirror of the mpl function of the same name.
 
+    Axial cascades show continuous meanline pitch and profiles. A radial full
+    annulus uses integer geometry, realized independently of performance.
+
     Returns
     -------
     fig : plotly.graph_objects.Figure
     """
-    stages = results["stages_performance"]
+    stages = [dict(stage, geometry={row: get_blade_row_geometry(stage, row)
+              for row in ("stator", "rotor")}) for stage in results["stages_performance"]]
     turbine_type = results["inputs"]["turbine_type"]
     fig = go.Figure()
 
@@ -311,7 +317,7 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
                     )
                 )
 
-                N = int(round(geom["blade_count"]))
+                N = int(geom["blade_count"])
                 dtheta = 2.0 * np.pi / N
                 for i in range(N):
                     ct, st_ = np.cos(i * dtheta), np.sin(i * dtheta)
@@ -319,8 +325,8 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
                         ct * x_b - st_ * y_b, st_ * x_b + ct * y_b, color, label
                     )
 
-            draw_row(out["geometry"]["stator"], COLOR_STATOR, "Stator")
-            draw_row(out["geometry"]["rotor"], COLOR_ROTOR, "Rotor")
+            draw_row(get_blade_row_geometry(out, "stator", turbine_type="radial", discrete=True), COLOR_STATOR, "Stator")
+            draw_row(get_blade_row_geometry(out, "rotor", turbine_type="radial", discrete=True), COLOR_ROTOR, "Rotor")
 
         r_min, r_max = np.inf, 0.0
         for st in stages:

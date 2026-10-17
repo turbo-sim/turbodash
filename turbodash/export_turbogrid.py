@@ -10,6 +10,7 @@ import numpy as np
 import yaml
 
 from .geom_blade import compute_blade_coordinates_cartesian
+from .core_turbine import get_blade_row_geometry
 
 
 def _positive(value, name):
@@ -31,7 +32,7 @@ def _station_geometry(station):
 def _make_section(stage, row, span_fraction, profile_points, camberline_type, thickness_model):
     inlet_index = 0 if row == "stator" else 2
     inlet, outlet = stage["flow_stations"][inlet_index:inlet_index + 2]
-    geometry = stage["geometry"][row]
+    geometry = get_blade_row_geometry(stage, row, turbine_type="axial", discrete=True)
     mean_in, height_in = _station_geometry(inlet)
     mean_out, height_out = _station_geometry(outlet)
     radius_in = mean_in + (span_fraction - 0.5) * height_in
@@ -165,7 +166,7 @@ def build_turbogrid_files(
                     _make_section(stage, row, span, profile_points, camberline_type, thickness_model)
                     for span in spans
                 ]
-                geometry = stage["geometry"][row]
+                geometry = get_blade_row_geometry(stage, row, turbine_type="axial", discrete=True)
                 chord = _positive(geometry["chord_meridional"], "Meridional chord")
                 blade_count = _positive(geometry["blade_count"], "Blade count")
                 if not blade_count.is_integer():

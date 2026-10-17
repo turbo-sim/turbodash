@@ -111,7 +111,7 @@ def geometry_panel():
     return html.Div([
         html.Aside([
             html.H4("Turbine geometry"),
-            html.P("Edit the stage and blade parameters here or in Meanline. Both views use the same design.", className="small text-muted"),
+            html.P("Edit the stage and blade parameters here or in Meanline. Physical geometry rounds blade counts up and recomputes pitch and profile dimensions. Meanline performance uses continuous counts.", className="small text-muted"),
             html.Details([
                 html.Summary("Inspect and export a row"),
                 _row_selector("geometry"),

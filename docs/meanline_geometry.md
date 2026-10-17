@@ -110,3 +110,7 @@ remove the separate 60-degree loss-correlation branch, Benner penetration/cap
 effects, invalid velocity triangles or the near-zero-turning Zweifel spacing
 singularity. Zweifel sizing and all empirical loss formulas are unchanged.
 Smoothness alone does not validate the model.
+
+The geometry policy is independent of the subsequent
+[Benner penetration bound](benner_penetration.md). Its smooth half-height
+cap changes primary-loss weighting without changing either geometry view.

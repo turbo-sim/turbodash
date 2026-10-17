@@ -13,6 +13,9 @@ from .loss_coefficient_conversion import (
     convert_kinetic_energy_to_stagnation_pressure_loss,
 )
 
+PENETRATION_MAX_RATIO = 0.5
+PENETRATION_TRANSITION_HALF_WIDTH = 0.05
+
 _FLOW_KEYS = {
     "Re_in",
     "Re_out",
@@ -131,6 +134,7 @@ def compute_losses(input_parameters):
         cascade_type_id,
         delta_height_ref,
         beta_des,
+        options.get("penetration_transition_half_width", PENETRATION_TRANSITION_HALF_WIDTH),
     )
 
     return losses
@@ -144,9 +148,16 @@ def _compute_losses_benner_jit(
     cascade_type_id: int,
     delta_height_ref,
     beta_des,
+    penetration_transition_half_width=PENETRATION_TRANSITION_HALF_WIDTH,
 ):
     # Calculate inlet displacement thickness to height ratio
+    _require_positive_finite(flow_parameters["Re_in"], "Inlet Reynolds number")
+    _require_nonnegative_finite(delta_height_ref, "Reference displacement-thickness ratio")
     delta_height = delta_height_ref * (flow_parameters["Re_in"] / 3e5) ** (-1 / 7)
+    diagnostics = get_penetration_diagnostics(
+        flow_parameters, geometry, delta_height,
+        transition_half_width=penetration_transition_half_width,
+    )
 
     # Profile loss coefficient
     Y_p = lm_ko.get_profile_loss(flow_parameters, geometry, cascade_type_id)
@@ -163,13 +174,18 @@ def _compute_losses_benner_jit(
     # Incidence loss coefficient
     Y_inc = get_incidence_loss(flow_parameters, geometry, beta_des, cascade_type_id)
 
-    # Penetration depth to blade height ratio
-    ZTE = get_penetration_depth(flow_parameters, geometry, delta_height)
-
-    # Correct profile losses according to penetration depth
-    Y_p = Y_p * (1 - ZTE)
-    Y_te = Y_te * (1 - ZTE)
-    Y_inc = Y_inc * (1 - ZTE)
+    # Use one area-partition weight for the complete primary-loss group.
+    weight = diagnostics["primary_loss_weight"]
+    diagnostics.update(
+        profile_loss_unweighted=Y_p,
+        trailing_loss_unweighted=Y_te,
+        incidence_loss_unweighted=Y_inc,
+        primary_loss_unweighted=Y_p + Y_te + Y_inc,
+        primary_loss_weighted=weight * (Y_p + Y_te + Y_inc),
+    )
+    Y_p = Y_p * weight
+    Y_te = Y_te * weight
+    Y_inc = Y_inc * weight
 
     return {
         "loss_profile": Y_p,
@@ -178,6 +194,9 @@ def _compute_losses_benner_jit(
         "loss_secondary": Y_s,
         "loss_clearance": Y_cl,
         "loss_total": Y_p + Y_te + Y_inc + Y_s + Y_cl,
+        # Metadata, never an additional term in the loss sum. Values precede
+        # any optional tuning factors applied by the loss-model dispatcher.
+        "diagnostics": diagnostics,
     }
 
 
@@ -504,7 +523,82 @@ def get_incidence_parameter(
     return chi
 
 
-def get_penetration_depth(flow_parameters, geometry, delta_height):
+def _require_positive_finite(value, name):
+    value = jnp.asarray(value)
+    if not jnp.all(jnp.isfinite(value) & (value > 0)):
+        raise ValueError(f"{name} must be finite and positive.")
+
+
+def _require_nonnegative_finite(value, name):
+    value = jnp.asarray(value)
+    if not jnp.all(jnp.isfinite(value) & (value >= 0)):
+        raise ValueError(f"{name} must be finite and nonnegative.")
+
+
+def limit_penetration_depth(
+    penetration_raw_ratio, *, transition_half_width=PENETRATION_TRANSITION_HALF_WIDTH,
+):
+    """Monotone C2 approximation to min(raw penetration / H, 0.5).
+
+    Preserve the raw correlation below 0.5 - d and saturate exactly at 0.5
+    above 0.5 + d. The default d=0.05 gives a 0.45--0.55 transition. This is
+    numerical regularization of the physical bound, not an empirical refit.
+    Nonfinite or negative predictions are rejected, never hidden by capping.
+    Scalars and NumPy arrays are supported; this module is not JAX-traceable.
+    """
+    raw = jnp.asarray(penetration_raw_ratio, dtype=float)
+    _require_nonnegative_finite(raw, "Raw penetration ratio")
+    d = jnp.asarray(transition_half_width, dtype=float)
+    if d.ndim != 0 or not jnp.isfinite(d) or not 0 < d < PENETRATION_MAX_RATIO:
+        raise ValueError("Penetration transition half-width must be finite and between 0 and 0.5.")
+    lower, upper = PENETRATION_MAX_RATIO - d, PENETRATION_MAX_RATIO + d
+    if not lower < PENETRATION_MAX_RATIO < upper:
+        raise ValueError("Penetration transition half-width is too small to represent.")
+    # Clip before dividing/powers to keep unused branches finite even for the
+    # largest finite floating-point raw input.
+    t = (jnp.clip(raw, lower, upper) - lower) / (2 * d)
+    transition = lower + 2 * d * (t - t**3 + 0.5 * t**4)
+    return jnp.where(raw <= lower, raw,
+                     jnp.where(raw >= upper, PENETRATION_MAX_RATIO, transition))
+
+
+def get_penetration_diagnostics(
+    flow_parameters, geometry, delta_height,
+    *, transition_half_width=PENETRATION_TRANSITION_HALF_WIDTH,
+):
+    """Raw prediction, bounded area weight and its correlation-domain status.
+
+    Height is full mean blade height; aspect ratio uses true chord. Raw values
+    above half height are retained as bounded extrapolations, not validated
+    predictions of merged secondary flows. Diagnostics are not loss terms.
+    """
+    diagnostics = _get_raw_penetration_diagnostics(flow_parameters, geometry, delta_height)
+    raw = diagnostics["penetration_raw_ratio"]
+    effective = limit_penetration_depth(raw, transition_half_width=transition_half_width)
+    diagnostics.update(
+        penetration_effective_ratio=effective,
+        primary_loss_weight=1 - effective,
+        penetration_smoothing_active=(raw > PENETRATION_MAX_RATIO - transition_half_width)
+        & (raw < PENETRATION_MAX_RATIO + transition_half_width),
+        penetration_outside_model_domain=raw > PENETRATION_MAX_RATIO,
+    )
+    return diagnostics
+
+
+def get_penetration_depth(
+    flow_parameters, geometry, delta_height,
+    *, transition_half_width=PENETRATION_TRANSITION_HALF_WIDTH,
+):
+    """Return the effective penetration / full height used for primary losses.
+
+    The published raw correlation is available as get_penetration_depth_raw;
+    get_penetration_diagnostics also retains domain and smoothing flags.
+    """
+    raw = get_penetration_depth_raw(flow_parameters, geometry, delta_height)
+    return limit_penetration_depth(raw, transition_half_width=transition_half_width)
+
+
+def get_penetration_depth_raw(flow_parameters, geometry, delta_height):
     r"""
     Calculated the penetration depth of the passage vortex separation line relative to the blade span.
 
@@ -541,30 +635,49 @@ def get_penetration_depth(flow_parameters, geometry, delta_height):
     Returns
     -------
     float
-        Spanwise penetration depth of the passage vortex relative to the mean blade height.
+        Unbounded penetration relative to full mean blade height. Values above
+        0.5 are outside the non-overlapping-endwall construction.
 
     """
 
-    beta_in = flow_parameters["beta_in"]
-    beta_out = flow_parameters["beta_out"]
-    meridional_chord = geometry["meridional_chord"]
-    pitch = geometry["pitch"]
-    chord = geometry["chord"]
-    height = geometry["height"]
+    return _get_raw_penetration_diagnostics(flow_parameters, geometry, delta_height)["penetration_raw_ratio"]
+
+
+def _get_raw_penetration_diagnostics(flow_parameters, geometry, delta_height):
+    beta_in = jnp.asarray(flow_parameters["beta_in"])
+    beta_out = jnp.asarray(flow_parameters["beta_out"])
+    for angle in (beta_in, beta_out):
+        if not jnp.all(jnp.isfinite(angle) & (jnp.abs(angle) < 90)):
+            raise ValueError("Benner flow angles must be finite and strictly between -90 and 90 degrees.")
+    for key in ("meridional_chord", "pitch", "chord", "height"):
+        _require_positive_finite(geometry[key], f"Benner {key}")
+    _require_nonnegative_finite(delta_height, "Inlet displacement-thickness ratio")
+    meridional_chord = jnp.asarray(geometry["meridional_chord"])
+    pitch = jnp.asarray(geometry["pitch"])
+    chord = jnp.asarray(geometry["chord"])
+    height = jnp.asarray(geometry["height"])
 
     # Convergence ratio from Benner et al.[2006]
     CR = math.cosd(beta_in) / math.cosd(beta_out)
 
     # Axial blade solidity
-    BSx = meridional_chord / pitch
+    with jnp.errstate(over="ignore", divide="ignore", invalid="ignore"):
+        BSx = meridional_chord / pitch
+        AR = height / chord
+        Ft = F_t(BSx, beta_in, beta_out)
+        Z_TE = 0.10 * Ft**0.79 / jnp.sqrt(CR) / AR**0.55 + 32.70 * jnp.asarray(delta_height)**2
+    _require_positive_finite(CR, "Benner convergence ratio")
+    _require_positive_finite(AR, "Benner true-chord aspect ratio")
+    _require_nonnegative_finite(Ft, "Benner tangential loading parameter")
+    _require_nonnegative_finite(Z_TE, "Raw penetration ratio")
 
-    # Aspect ratio
-    AR = height / chord
-    Ft = F_t(BSx, beta_in, beta_out)
-    Z_TE = 0.10 * Ft**0.79 / jnp.sqrt(CR) / (AR) ** 0.55 + 32.70 * delta_height**2
-    Z_TE = jnp.minimum(Z_TE, 0.99)  # TODO: smoothing
-
-    return Z_TE
+    return {
+        "penetration_raw_ratio": Z_TE,
+        "tangential_loading_parameter": Ft,
+        "convergence_ratio": CR,
+        "aspect_ratio_true_chord": AR,
+        "inlet_displacement_thickness_height_ratio": jnp.asarray(delta_height),
+    }
 
 
 def F_t(BSx, beta_in, beta_out):
@@ -574,7 +687,8 @@ def F_t(BSx, beta_in, beta_out):
 
     .. math::
 
-        F_t = 2\frac{s}{c_\mathrm{ax}}\cos^2(\beta_m)(\tan(\beta_\mathrm{in} - \beta_\mathrm{out}))
+        F_t = 2\frac{s}{c_\mathrm{ax}}\cos^2(\beta_m)
+              (|\tan(\beta_\mathrm{in})| + |\tan(\beta_\mathrm{out})|)
 
     where:
 
@@ -582,6 +696,10 @@ def F_t(BSx, beta_in, beta_out):
         - :math:`c_\mathrm{ax}` is the axial chord.
         - :math:`\beta_m = \tan^{-1}(0.5(\tan(\beta_\mathrm{in}) + \tan(\beta_\mathrm{out})))` is the mean vector angle.
         - :math:`\beta_\mathrm{in}` and :math:`\beta_\mathrm{out}` is the inlet and outlet relative flow angle.
+
+    This documents the existing implementation. The signed-tangent convention
+    in the reference differs for same-sign angles and requires a separate
+    correlation audit; it is not changed by the penetration limiter.
 
     Parameters
     ----------

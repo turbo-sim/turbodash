@@ -73,6 +73,9 @@ and separate integer geometry for physical visualization, meshing and export.
 See [the geometry calculation policy and API](docs/meanline_geometry.md) for
 result fields, compatibility notes and verification.
 
+The Benner loss model uses a smooth half-height penetration bound.
+See [the model policy and diagnostics](docs/benner_penetration.md).
+
 The theoretical derivation of the governing equations, efficiency definitions, and validation against analytical special cases are available in the expandable Documentation section of the Meanline tab.
 
 ## License

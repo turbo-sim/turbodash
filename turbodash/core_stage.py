@@ -270,11 +270,13 @@ def compute_stage_meanline(
     radius_ratio_23,
     radius_ratio_34,
     height_radius_ratio,
-    zweiffel_stator,
-    zweiffel_rotor,
-    loss_coeff_stator,
-    loss_coeff_rotor,
+    zweiffel_stator=None,
+    zweiffel_rotor=None,
+    loss_coeff_stator=0.05,
+    loss_coeff_rotor=0.06,
     stage_type="radial",
+    solidity_chord_stator=None,
+    solidity_chord_rotor=None,
 ):
     """
     Meanline turbine stage model with geometry sizing.
@@ -283,7 +285,7 @@ def compute_stage_meanline(
     - Constant meridional velocity
     - Isentropic state reconstruction using (h, s)
     - Geometry from continuity + dimensionless parameters
-    - Blade count from Zweifel criterion
+    - Physical blade count from true-chord solidity (legacy Zweifel accepted)
     """
 
     # ------------------------------------------------------------------
@@ -530,6 +532,7 @@ def compute_stage_meanline(
         angle_in_deg=alpha_1,
         angle_out_deg=alpha_2,
         zweiffel=zweiffel_stator,
+        solidity_chord=solidity_chord_stator,
     )
 
     # Rotor
@@ -542,6 +545,7 @@ def compute_stage_meanline(
         angle_in_deg=beta_3,
         angle_out_deg=beta_4,
         zweiffel=zweiffel_rotor,
+        solidity_chord=solidity_chord_rotor,
     )
 
     # ------------------------------------------------------------------
@@ -572,9 +576,12 @@ def compute_stage_meanline(
         "height_radius_ratio": height_radius_ratio,
         "zweiffel_stator": zweiffel_stator,
         "zweiffel_rotor": zweiffel_rotor,
+        "solidity_chord_stator": solidity_chord_stator,
+        "solidity_chord_rotor": solidity_chord_rotor,
         "loss_coeff_stator": loss_coeff_stator,
         "loss_coeff_rotor": loss_coeff_rotor,
     }
+    out["inputs"] = {key: value for key, value in out["inputs"].items() if value is not None}
 
     # Performance metrics
     out["stage_performance"] = {
@@ -714,16 +721,20 @@ def compute_blade_row_geometry(
     H_out,
     angle_in_deg,
     angle_out_deg,
-    zweiffel,
+    zweiffel=None,
     maximum_thickness_to_chord=0.3,
     maximum_thickness_location=0.25,
     leading_edge_radius_to_max_thickness=0.50,
     trailing_edge_thickness_to_opening=0.05,
     trailing_edge_wedge_angle=10.0,
+    solidity_chord=None,
 ):
     """
     Compute blade chord, spacing, blade count, opening, and solidity
-    using Zweifel criterion and return full geometry dictionary
+    using true-chord solidity. Legacy Zweifel is accepted instead. This older
+    constant-loss stage calculator retains its physical integer geometry view;
+    ``chord`` retains its historical meridional meaning and ``chord_true`` is
+    the true chord used to define solidity.
 
     Parameters
     ----------
@@ -740,23 +751,32 @@ def compute_blade_row_geometry(
 
     # Chord definition
     if stage_type == "radial":
-        meridional_chord = r_out - r_in
+        meridional_chord = abs(r_out - r_in)
     elif stage_type == "axial":
         meridional_chord = 0.75 * 0.5 * (H_in + H_out)
     else:
         raise ValueError(f"Invalid stage type: {stage_type}")
 
-    # Integer number of blades from Zweifel criterion
+    from .core_turbine import validate_blade_spacing
+    specification = {} if solidity_chord is None else {"solidity_chord": solidity_chord}
+    validate_blade_spacing(specification, zweiffel)
+    if not np.isfinite(meridional_chord) or meridional_chord <= 0:
+        raise ValueError("Meridional chord must be finite and positive.")
     angle_in = np.deg2rad(angle_in_deg)
     angle_out = np.deg2rad(angle_out_deg)
-    s_mean = (
-        0.5
-        * zweiffel
-        * meridional_chord
-        / (np.cos(angle_out) ** 2 * np.abs(np.tan(angle_in) - np.tan(angle_out)))
-    )
+    chord_true = meridional_chord / np.cos(0.5 * (angle_in + angle_out))
+    if solidity_chord is not None:
+        s_mean = chord_true / float(solidity_chord)
+    else:
+        turning = np.cos(angle_out) ** 2 * abs(np.tan(angle_in) - np.tan(angle_out))
+        if not np.isfinite(turning) or turning <= 0:
+            raise ValueError("Legacy Zweifel sizing is undefined at zero turning; prescribe solidity_chord.")
+        s_mean = 0.5 * float(zweiffel) * meridional_chord / turning
 
-    N_blades = int(np.ceil(np.pi * (r_in + r_out) / s_mean))
+    count_continuous = float(np.pi * (r_in + r_out) / s_mean)
+    if not np.isfinite(count_continuous) or count_continuous <= 0:
+        raise ValueError("Continuous blade count must be finite and positive.")
+    N_blades = int(np.ceil(count_continuous))
     s_mean = (np.pi * (r_in + r_out)) / N_blades
     solidity = meridional_chord / s_mean
 
@@ -782,13 +802,20 @@ def compute_blade_row_geometry(
     # Return complete dictionary
     return dict(
         blade_count=N_blades,
+        blade_count_continuous=count_continuous,
+        blade_count_integer=N_blades,
         radius_in=r_in,
         radius_out=r_out,
         height=height,
         chord=meridional_chord,
+        chord_meridional=meridional_chord,
+        chord_true=chord_true,
         spacing=s_mean,
         opening=o,
         solidity=solidity,
+        solidity_meridional=solidity,
+        solidity_chord=chord_true / s_mean,
+        pitch_to_chord=s_mean / chord_true,
         aspect_ratio=aspect_ratio,
         flaring_angle=flaring_angle,
         maximum_thickness=maximum_thickness,
@@ -799,6 +826,26 @@ def compute_blade_row_geometry(
         metal_angle_in=angle_in_deg,
         metal_angle_out=angle_out_deg,
     )
+
+
+def convert_stage_config_to_solidity(cfg):
+    """Translate a saved legacy constant-loss stage to true-chord inputs once."""
+    from copy import deepcopy
+    converted = deepcopy(cfg)
+    inputs = converted.get("inputs", converted)
+    legacy_rows = [row for row in ("stator", "rotor") if f"zweiffel_{row}" in inputs]
+    if not legacy_rows:
+        return converted
+    arguments = dict(inputs)
+    if "inlet_property_pair" in arguments:
+        arguments["inlet_property_pair_string"] = arguments.pop("inlet_property_pair")
+    result = compute_stage_meanline(**arguments)
+    for row in legacy_rows:
+        geometry = result["geometry"][row]
+        inputs[f"solidity_chord_{row}"] = float(geometry["chord_true"] * geometry["blade_count_continuous"]
+                                               / (np.pi * (geometry["radius_in"] + geometry["radius_out"])))
+        inputs.pop(f"zweiffel_{row}")
+    return converted
 
 
 def _fmt(value, unit="-", width=10, prec=4):
@@ -850,6 +897,8 @@ def _fmt_geom(key, value):
         "radius_out",
         "height",
         "chord",
+        "chord_true",
+        "chord_meridional",
         "spacing",
         "opening",
         "maximum_thickness",
@@ -1022,6 +1071,8 @@ def geometry_table(out):
             "radius_out",
             "height",
             "chord",
+            "chord_true",
+            "chord_meridional",
             "spacing",
             "opening",
             "maximum_thickness",

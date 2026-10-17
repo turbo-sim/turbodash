@@ -16,8 +16,6 @@ _STAGE_REQUIRED_VARS = (
     "radius_ratio_12",
     "radius_ratio_23",
     "radius_ratio_34",
-    "zweiffel_stator",
-    "zweiffel_rotor",
     "work_fraction_split",
     "blade_geometry",
 )
@@ -388,18 +386,19 @@ def compute_blade_row_geometry(
     H_out,
     angle_in_deg,
     angle_out_deg,
-    zweiffel,
-    tip_clearance_to_height,
-    blade_geometry,
+    zweiffel=None,
+    tip_clearance_to_height=0.0,
+    blade_geometry=None,
 ):
     """
     Compute continuous meanline geometry for the loss models.
 
-    The Zweifel criterion defines a real-valued blade count. Integer geometry
-    is a separate realization; use :func:`realize_blade_row_geometry` at the
-    visualization, meshing or export boundary.
+    Specify ``blade_geometry['solidity_chord'] = true chord / mean pitch``.
+    Legacy inputs can supply ``zweiffel`` instead, but not both. Integer
+    geometry is realized separately at visualization, meshing or export.
     """
 
+    validate_blade_spacing(blade_geometry, zweiffel)
     maximum_thickness_to_chord = blade_geometry["maximum_thickness_to_chord"]
     maximum_thickness_location = blade_geometry["maximum_thickness_location"]
     leading_edge_radius_to_max_thickness = blade_geometry["leading_edge_radius_to_max_thickness"]
@@ -409,7 +408,9 @@ def compute_blade_row_geometry(
 
     # Chord definition
     if turbine_type == "radial":
-        meridional_chord = np.maximum(r_out - r_in, 1e-6)
+        meridional_chord = abs(r_out - r_in)
+        if not np.isfinite(meridional_chord) or meridional_chord <= 0:
+            raise ValueError("A radial blade row needs distinct finite inlet and outlet radii.")
     elif turbine_type == "axial":
         aspect_ratio = blade_geometry["aspect_ratio"]
         if not np.isfinite(aspect_ratio) or aspect_ratio <= 0:
@@ -418,15 +419,24 @@ def compute_blade_row_geometry(
     else:
         raise ValueError(f"Invalid stage type: {turbine_type}")
 
-    # Continuous number of blades from the existing Zweifel criterion
+    # True chord is defined before spacing; no loading inversion is needed
+    # when chord solidity is prescribed.
     angle_in = np.deg2rad(angle_in_deg)
     angle_out = np.deg2rad(angle_out_deg)
-    s_mean = (
-        0.5
-        * zweiffel
-        * meridional_chord
-        / (np.cos(angle_out) ** 2 * np.abs(np.tan(angle_in) - np.tan(angle_out)))
-    )   
+    stagger_angle = 0.5 * (angle_in + angle_out)
+    chord = meridional_chord / np.cos(stagger_angle)
+    if not np.isfinite(chord) or chord <= 0:
+        raise ValueError("True chord must be finite and positive.")
+    if "solidity_chord" in blade_geometry:
+        s_mean = chord / float(blade_geometry["solidity_chord"])
+        spacing_method = "solidity_chord"
+    else:
+        # Explicit compatibility path for archived configurations only.
+        turning = np.cos(angle_out) ** 2 * abs(np.tan(angle_in) - np.tan(angle_out))
+        if not np.isfinite(turning) or turning <= 0:
+            raise ValueError("Legacy Zweifel sizing is undefined at zero turning; prescribe solidity_chord.")
+        s_mean = 0.5 * float(zweiffel) * meridional_chord / turning
+        spacing_method = "zweifel_legacy"
     N_blades = float(np.pi * (r_in + r_out) / s_mean)
 
     # Flaring angle
@@ -437,8 +447,6 @@ def compute_blade_row_geometry(
     # Miscellaneous quantities for plotting
     maximum_thickness = meridional_chord * maximum_thickness_to_chord
     leading_edge_radius = maximum_thickness * leading_edge_radius_to_max_thickness
-    stagger_angle = 0.5 * (angle_in + angle_out)
-    chord = meridional_chord / np.cos(stagger_angle)
 
     # ------------------------------------------------------------------
     # Extra quantities required by the loss models
@@ -460,6 +468,7 @@ def compute_blade_row_geometry(
     # Count-independent quantities form the common template for both views.
     geometry = dict(
         blade_count_continuous=N_blades,
+        spacing_method=spacing_method,
         radius_in=r_in,
         radius_out=r_out,
         height=height,
@@ -509,10 +518,68 @@ def _geometry_with_blade_count(geometry, turbine_type, blade_count, *, discrete)
         pitch=spacing,
         opening=opening,
         solidity=geometry["chord_meridional"] / spacing,
+        solidity_meridional=geometry["chord_meridional"] / spacing,
+        solidity_chord=geometry["chord"] / spacing,
+        pitch_to_chord=spacing / geometry["chord"],
         trailing_edge_thickness=opening * geometry["trailing_edge_thickness_to_opening"],
         A_throat=geometry["A_out"] * (opening / spacing_out),
     )
     return result
+
+
+def validate_blade_spacing(blade_geometry, zweiffel=None):
+    """Require one finite positive chord solidity or an explicit legacy target."""
+    if not isinstance(blade_geometry, dict):
+        raise ValueError("Blade geometry must be a dictionary.")
+    solidity = blade_geometry.get("solidity_chord")
+    if "solidity_chord" in blade_geometry:
+        if zweiffel is not None:
+            raise ValueError("Specify solidity_chord or legacy Zweifel, not both for the same row.")
+        value, name = solidity, "solidity_chord"
+    else:
+        value, name = zweiffel, "legacy Zweifel"
+    if value is None:
+        raise ValueError("Specify a positive blade_geometry.solidity_chord for every blade row.")
+    array = np.asarray(value)
+    if array.ndim != 0 or isinstance(value, (bool, np.bool_)):
+        raise ValueError(f"{name} must be a finite positive scalar.")
+    try:
+        valid = np.isfinite(float(value)) and float(value) > 0
+    except (TypeError, ValueError):
+        valid = False
+    if not valid:
+        raise ValueError(f"{name} must be a finite positive scalar.")
+
+
+def convert_turbine_config_to_solidity(cfg, results=None):
+    """Convert legacy targets once, preserving each current continuous design.
+
+    Return a deep copy, retaining other configuration/results fields. Already
+    explicit solidity inputs need no solve. Legacy targets are removed after
+    deriving true-chord solidity at the supplied design point. Archived inputs
+    remain supported directly by the solver without this conversion.
+    """
+    converted = deepcopy(cfg)
+    inputs = converted.get("inputs", converted)
+    stages = inputs["stages"]
+    needs_solve = False
+    for stage in stages:
+        for row in ("stator", "rotor"):
+            geometry = stage["blade_geometry"][row]
+            validate_blade_spacing(geometry, stage.get(f"zweiffel_{row}"))
+            needs_solve |= "solidity_chord" not in geometry
+    if needs_solve:
+        results = compute_turbine_performance(cfg) if results is None else results
+        if len(results["stages_performance"]) != len(stages):
+            raise ValueError("Conversion results must contain the same number of stages.")
+    for i, stage in enumerate(stages):
+        for row in ("stator", "rotor"):
+            geometry = stage["blade_geometry"][row]
+            if "solidity_chord" not in geometry:
+                reference = get_blade_row_geometry(results["stages_performance"][i], row)
+                geometry["solidity_chord"] = float(reference["chord"] / reference["pitch"])
+            stage.pop(f"zweiffel_{row}", None)
+    return converted
 
 
 def realize_blade_row_geometry(geometry_meanline, turbine_type, *, blade_count=None):
@@ -578,6 +645,33 @@ def realize_turbine_geometry(results):
     return result
 
 
+def compute_blade_row_loading(geometry, inlet, outlet, mass_flow_rate, *, row):
+    """Flow-implied angular-momentum loading with explicit outlet references.
+
+    This diagnostic uses the isentropic station velocities, not loss-adjusted
+    shaft power. It accounts for unequal meridional velocities and radii and
+    never feeds a loading inversion back into pitch or the fitted Benner F_t.
+    """
+    if row not in ("stator", "rotor"):
+        raise ValueError("row must be stator or rotor.")
+    angular_momentum_change = inlet["r"] * inlet["v_t"] - outlet["r"] * outlet["v_t"]
+    torque = mass_flow_rate * angular_momentum_change
+    radius_reference = .5 * (inlet["r"] + outlet["r"])
+    speed = outlet["v"] if row == "stator" else outlet["w"]
+    kinetic_pressure = .5 * outlet["d"] * speed**2
+    denominator = radius_reference * outlet["H"] * geometry["chord_meridional"] * kinetic_pressure
+    coefficient = torque / geometry["blade_count"] / denominator if denominator > 0 else None
+    return {
+        "angular_momentum_change": angular_momentum_change,
+        "flow_torque": torque,
+        "reference_radius": radius_reference,
+        "reference_height": outlet["H"],
+        "reference_kinetic_pressure": kinetic_pressure,
+        "loading_coefficient_outlet_signed": coefficient,
+        "loading_coefficient_outlet": abs(coefficient) if coefficient is not None else None,
+    }
+
+
 def compute_stage_performance(
     fluid,
     state_in_0,
@@ -594,9 +688,9 @@ def compute_stage_performance(
     meridional_velocity_ratio_12,
     meridional_velocity_ratio_23,
     meridional_velocity_ratio_34,
-    zweiffel_stator,
-    zweiffel_rotor,
-    blade_geometry,
+    zweiffel_stator=None,
+    zweiffel_rotor=None,
+    blade_geometry=None,
     turbine_type="axial",
     loss_model="benner",
 ):
@@ -614,7 +708,7 @@ def compute_stage_performance(
     - Constant meridional velocity within each blade row
     - Isentropic state reconstruction using (h, s_01)
     - Geometry (heights, height-to-radius ratio) from continuity
-    - Blade count from the Zweifel criterion
+    - Continuous blade count from prescribed true-chord solidity
 
     Station numbering:
       1 = stator inlet
@@ -1100,6 +1194,12 @@ def compute_stage_performance(
         ),
     ]
  
+    out["loading"] = {
+        row: compute_blade_row_loading(out["geometry_meanline"][row],
+                                      out["flow_stations"][start], out["flow_stations"][start + 1],
+                                      mass_flow_rate, row=row)
+        for row, start in (("stator", 0), ("rotor", 2))
+    }
     return out
 
 # =============================================================================
@@ -1162,7 +1262,7 @@ def compute_turbine_performance(cfg):
     required = set(_STAGE_REQUIRED_VARS)
     for i, stg_current in enumerate(stages_cfg):
         missing = sorted(required - stg_current.keys())
-        extra = sorted(stg_current.keys() - required)
+        extra = sorted(stg_current.keys() - required - {"zweiffel_stator", "zweiffel_rotor"})
         problems = []
         if missing:
             problems.append(f"missing required keys: {missing}")
@@ -1170,12 +1270,19 @@ def compute_turbine_performance(cfg):
             problems.append(f"unexpected keys: {extra}")
         if problems:
             raise KeyError(f"Stage {i + 1} has " + "; ".join(problems))
+        for row in ("stator", "rotor"):
+            validate_blade_spacing(stg_current["blade_geometry"].get(row), stg_current.get(f"zweiffel_{row}"))
 
     # ---------------------------------------------------------------
     # 1. Global boundary conditions and design inputs
     # ---------------------------------------------------------------
     fluid_name = inp["fluid_name"]
     turbine_type = inp.get("turbine_type", "axial")
+    if turbine_type in ("radial_inflow", "radial_outflow"):
+        turbine_type = "radial"
+        inp = dict(inp, turbine_type=turbine_type)
+    if turbine_type not in ("axial", "radial"):
+        raise ValueError("turbine_type must be axial or radial.")
     mass_flow_rate = float(inp["mass_flow_rate"])
     p_exit = float(inp["exit_pressure"])
     nu_global = float(inp["blade_velocity_ratio"])
@@ -1347,8 +1454,8 @@ def compute_turbine_performance(cfg):
             meridional_velocity_ratio_12=m_12,
             meridional_velocity_ratio_23=m_23,
             meridional_velocity_ratio_34=m_34,
-            zweiffel_stator=float(stg_current["zweiffel_stator"]),
-            zweiffel_rotor=float(stg_current["zweiffel_rotor"]),
+            zweiffel_stator=stg_current.get("zweiffel_stator"),
+            zweiffel_rotor=stg_current.get("zweiffel_rotor"),
             turbine_type=turbine_type,
             loss_model=inp["loss_model"],
             blade_geometry=stg_current["blade_geometry"],

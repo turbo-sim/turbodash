@@ -511,7 +511,7 @@ def _print_geometry(out):
         cols.append((f"S{i}", get_blade_row_geometry(s, "stator")))
         cols.append((f"R{i}", get_blade_row_geometry(s, "rotor")))
 
-    keys = [key for key in cols[0][1] if key not in ("blade_count", "blade_count_integer")]
+    keys = [key for key in cols[0][1] if key not in ("blade_count", "blade_count_integer", "spacing_method")]
     if "blade_count_continuous" not in keys:
         keys.insert(0, "blade_count")  # Legacy saved geometry.
 
@@ -739,6 +739,9 @@ def overall_performance_table(out):
 # Only these quantities are shown.
 _GEOMETRY_SPECS = [
     ("Meanline blade count", "-", "blade_count", 3, 1.0),
+    ("Solidity, true chord / pitch", "-", "solidity_chord", 4, 1.0),
+    ("Solidity, meridional chord / pitch", "-", "solidity_meridional", 4, 1.0),
+    ("Pitch / true chord", "-", "pitch_to_chord", 4, 1.0),
     ("Radius in", "mm", "radius_in", 2, 1e3),
     ("Radius out", "mm", "radius_out", 2, 1e3),
     ("Hub-tip ratio at inlet", "-", "hub_tip_ratio_in", 4, 1.0),

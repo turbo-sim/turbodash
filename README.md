@@ -70,6 +70,9 @@ This will start a local server and open the dashboard in your web browser.
 
 The turbine apps use continuous blade counts for meanline losses and efficiency,
 and separate integer geometry for physical visualization, meshing and export.
+Axial and radial rows take true-chord solidity (`solidity_chord = chord / pitch`)
+as their spacing input. Existing Zweifel inputs remain supported for archived
+cases; the apps convert them at the loaded design point.
 See [the geometry calculation policy and API](docs/meanline_geometry.md) for
 result fields, compatibility notes and verification.
 

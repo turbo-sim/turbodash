@@ -1,6 +1,7 @@
+# Geometry inputs use true-chord solidity c/s.
 inputs:
   turbine_type: radial
-  loss_model: benner  # benner | kacker_okapuu | moustapha | isentropic
+  loss_model: benner
   fluid_name: air
   inlet_property_pair: PT_INPUTS
   inlet_property_1: 10e5
@@ -8,52 +9,98 @@ inputs:
   exit_pressure: 2e5
   mass_flow_rate: 10.0
   inlet_flow_angle: 0.0
-  blade_velocity_ratio: 0.2 
+  blade_velocity_ratio: 0.2
   rotational_speed:
-    type: specific  # specific | actual
+    type: specific
     value: 0.3
-
-
   stages:
   - name: one
     work_fraction_split: 1.0
     stator_exit_angle: 70.0
     degree_reaction: 0.5
-    meridional_velocity_ratio_12: 1.00
-    meridional_velocity_ratio_23: 1.00
-    meridional_velocity_ratio_34: 1.00
-    radius_ratio_01: 1.00
-    radius_ratio_12: 0.90
+    meridional_velocity_ratio_12: 1.0
+    meridional_velocity_ratio_23: 1.0
+    meridional_velocity_ratio_34: 1.0
+    radius_ratio_01: 1.0
+    radius_ratio_12: 0.9
     radius_ratio_23: 0.98
-    radius_ratio_34: 0.90
-    zweiffel_stator: 0.7
-    zweiffel_rotor: 0.7
-
+    radius_ratio_34: 0.9
+    blade_geometry:
+      stator:
+        aspect_ratio: 2.0
+        maximum_thickness_to_chord: 0.3
+        maximum_thickness_location: 0.3
+        leading_edge_radius_to_max_thickness: 0.5
+        trailing_edge_thickness_to_opening: 0.07
+        trailing_edge_wedge_angle: 5.0
+        leading_edge_wedge_angle: 30.0
+        solidity_chord: 1.1209982569657782
+      rotor:
+        aspect_ratio: 2.0
+        maximum_thickness_to_chord: 0.3
+        maximum_thickness_location: 0.3
+        leading_edge_radius_to_max_thickness: 0.5
+        trailing_edge_thickness_to_opening: 0.07
+        trailing_edge_wedge_angle: 5.0
+        leading_edge_wedge_angle: 30.0
+        solidity_chord: 1.2203130845302053
   - name: two
     work_fraction_split: 1.0
     stator_exit_angle: 70.0
     degree_reaction: 0.5
-    meridional_velocity_ratio_12: 1.00
-    meridional_velocity_ratio_23: 1.00
-    meridional_velocity_ratio_34: 1.00
+    meridional_velocity_ratio_12: 1.0
+    meridional_velocity_ratio_23: 1.0
+    meridional_velocity_ratio_34: 1.0
     radius_ratio_01: 0.98
-    radius_ratio_12: 0.90
+    radius_ratio_12: 0.9
     radius_ratio_23: 0.98
-    radius_ratio_34: 0.90
-    zweiffel_stator: 0.7
-    zweiffel_rotor: 0.7
-
+    radius_ratio_34: 0.9
+    blade_geometry:
+      stator:
+        aspect_ratio: 2.0
+        maximum_thickness_to_chord: 0.3
+        maximum_thickness_location: 0.3
+        leading_edge_radius_to_max_thickness: 0.5
+        trailing_edge_thickness_to_opening: 0.07
+        trailing_edge_wedge_angle: 5.0
+        leading_edge_wedge_angle: 30.0
+        solidity_chord: 1.4481766077869456
+      rotor:
+        aspect_ratio: 2.0
+        maximum_thickness_to_chord: 0.3
+        maximum_thickness_location: 0.3
+        leading_edge_radius_to_max_thickness: 0.5
+        trailing_edge_thickness_to_opening: 0.07
+        trailing_edge_wedge_angle: 5.0
+        leading_edge_wedge_angle: 30.0
+        solidity_chord: 1.4206385678894335
   - name: three
     work_fraction_split: 1.0
     stator_exit_angle: 70.0
     degree_reaction: 0.5
-    meridional_velocity_ratio_12: 1.00
-    meridional_velocity_ratio_23: 1.00
-    meridional_velocity_ratio_34: 1.00
+    meridional_velocity_ratio_12: 1.0
+    meridional_velocity_ratio_23: 1.0
+    meridional_velocity_ratio_34: 1.0
     radius_ratio_01: 0.98
-    radius_ratio_12: 0.90
+    radius_ratio_12: 0.9
     radius_ratio_23: 0.98
-    radius_ratio_34: 0.90
-    zweiffel_stator: 0.7
-    zweiffel_rotor: 0.7
-
+    radius_ratio_34: 0.9
+    blade_geometry:
+      stator:
+        aspect_ratio: 2.0
+        maximum_thickness_to_chord: 0.3
+        maximum_thickness_location: 0.3
+        leading_edge_radius_to_max_thickness: 0.5
+        trailing_edge_thickness_to_opening: 0.07
+        trailing_edge_wedge_angle: 5.0
+        leading_edge_wedge_angle: 30.0
+        solidity_chord: 1.2822649938638468
+      rotor:
+        aspect_ratio: 2.0
+        maximum_thickness_to_chord: 0.3
+        maximum_thickness_location: 0.3
+        leading_edge_radius_to_max_thickness: 0.5
+        trailing_edge_thickness_to_opening: 0.07
+        trailing_edge_wedge_angle: 5.0
+        leading_edge_wedge_angle: 30.0
+        solidity_chord: 1.1972958881811524

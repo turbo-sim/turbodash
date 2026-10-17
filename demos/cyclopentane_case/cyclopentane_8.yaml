@@ -1,3 +1,5 @@
+# Geometry inputs use true-chord solidity c/s.
+# Saved outputs below are legacy snapshots; recalculate inputs for current results.
 inputs:
   loss_model: benner
   fluid_name: Cyclopentane
@@ -24,8 +26,6 @@ inputs:
     radius_ratio_12: 1
     radius_ratio_23: 1
     radius_ratio_34: 1
-    zweiffel_stator: 0.7
-    zweiffel_rotor: 0.9
     blade_geometry:
       stator:
         aspect_ratio: 2.0
@@ -35,6 +35,7 @@ inputs:
         trailing_edge_thickness_to_opening: 0.07
         trailing_edge_wedge_angle: 5
         leading_edge_wedge_angle: 5
+        solidity_chord: 0.9003374385787601
       rotor:
         aspect_ratio: 2.0
         maximum_thickness_to_chord: 0.3
@@ -43,6 +44,7 @@ inputs:
         trailing_edge_thickness_to_opening: 0.07
         trailing_edge_wedge_angle: 5
         leading_edge_wedge_angle: 5
+        solidity_chord: 1.8866821666788665
 overall_performance:
   efficiency_ts: 0.8250513463636667
   efficiency_tt: 0.8853891540368065

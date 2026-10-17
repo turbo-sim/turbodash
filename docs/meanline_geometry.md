@@ -2,12 +2,50 @@
 
 The multistage turbine solver (`core_turbine`) uses continuous blade counts for
 performance. Physical geometry, meshing and TurboGrid export use a separate
-integer realization. The older single-stage solver (`core_stage`) is unchanged.
+integer realization. The older constant-loss single-stage solver (`core_stage`) also accepts
+solidity inputs while retaining its historical integer geometry view.
+
+## Geometry inputs
+
+Prescribe `blade_geometry.stator.solidity_chord` and
+`blade_geometry.rotor.solidity_chord` in each stage. This is true chord divided
+by mean circumferential pitch, `sigma_c = c / s`, for both axial and radial
+turbines. With the existing mean-angle chord projection, the solver uses
+`c = c_meridional / cos(stagger)` and `s = c / sigma_c`. Radial meridional chord
+is the absolute inlet-to-outlet radius difference. Radius ratios determine
+whether the turbine is radial inflow or outflow.
+
+```yaml
+blade_geometry:
+  stator:
+    solidity_chord: 1.1
+    # Other blade-shape inputs remain required.
+  rotor:
+    solidity_chord: 1.0
+```
+
+`solidity_chord` and `pitch_to_chord` describe true chord; the existing
+`solidity` output keeps its meridional-chord meaning and is also exposed as
+`solidity_meridional`. Integer realization recomputes all three ratios for the
+selected physical blade count, so realized solidity can differ from the input.
+
+Archived configurations may still supply `zweiffel_stator` / `zweiffel_rotor`
+instead. Supplying both specifications for a row is rejected. To migrate an
+old configuration while preserving its continuous geometry at the selected
+design, call `core.convert_turbine_config_to_solidity(cfg)`. This returns a copy
+and removes the legacy targets. Both turbine apps perform this conversion
+when loading an old configuration. Subsequent sweeps hold solidity fixed;
+they intentionally differ from sweeps that hold Zweifel fixed.
+
+For the older `core_stage` API, use `solidity_chord_stator` and
+`solidity_chord_rotor`, or `convert_stage_config_to_solidity(cfg)`. Its
+`geometry[...]["chord"]` remains meridional for compatibility;
+`chord_true` explicitly identifies the chord defining the new input.
 
 ## Calculation sequence
 
 1. Solve the existing velocity triangles and station states.
-2. Size continuous stator and rotor geometry from the existing Zweifel criterion.
+2. Size continuous stator and rotor geometry from their prescribed solidities.
 3. Evaluate every loss correlation and efficiency using that continuous geometry.
 4. When physical geometry is requested, round the count up with `ceil` and
    recompute all count-dependent geometry together. Do not rerun performance.
@@ -31,6 +69,7 @@ Each item in `result["stages_performance"]` contains:
 | `geometry_meanline` | Continuous `stator` and `rotor` dictionaries used by losses and performance. |
 | `geometry_discrete` | `None` after a solve; optional `stator`/`rotor` dictionaries materialized for physical geometry. |
 | `geometry` | Compatibility alias for `geometry_meanline` in new results. |
+| `loading` | Row angular-momentum loading diagnostics for the continuous design; these do not determine spacing. |
 
 Each new blade-row dictionary contains:
 
@@ -107,8 +146,9 @@ integration dependencies.
 
 Removing quantization eliminates the identified blade-count steps. It does not
 remove the separate 60-degree loss-correlation branch, Benner penetration/cap
-effects, invalid velocity triangles or the near-zero-turning Zweifel spacing
-singularity. Zweifel sizing and all empirical loss formulas are unchanged.
+effects, invalid velocity triangles or extrapolated profile losses. Prescribed solidity removes the near-zero-turning
+Zweifel spacing singularity; the optional legacy sizing path retains it.
+All empirical loss formulas are unchanged.
 Smoothness alone does not validate the model.
 
 The geometry policy is independent of the subsequent

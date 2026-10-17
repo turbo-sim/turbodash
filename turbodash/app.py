@@ -53,8 +53,8 @@ DEFAULTS = dict(
     rr_23=0.95,  # radius ratio 2-3
     rr_34=0.80,  # radius ratio 3-4
     HR_inlet=0.25,  # height-to-radius ratio at inlet
-    Z_stator=0.7,  # Zweifel coefficient (stator)
-    Z_rotor=0.7,  # Zweifel coefficient (rotor)
+    sigma_stator=1.1209982569657782,  # True-chord solidity (stator)
+    sigma_rotor=1.0478376504703781,  # True-chord solidity (rotor)
     xi_stator=0.05,  # loss coefficient (stator)
     xi_rotor=0.06,  # loss coefficient (rotor
 )
@@ -305,8 +305,8 @@ DESIGN_VARIABLES = [
     (["Radius ratio, r₂ / r₃"], "rr_23", 0.10, 1.00, 0.001),
     (["Radius ratio, r₃ / r₄"], "rr_34", 0.10, 1.00, 0.001),
     (["Inlet height-to-radius ratio, H₁ / r₁"], "HR_inlet", 0.01, 2.0, 0.005),
-    (["Zweifel (stator)"], "Z_stator", 0.1, 2.0, 0.01),
-    (["Zweifel (rotor)"], "Z_rotor", 0.1, 2.0, 0.01),
+    (["Solidity c/s (stator)"], "sigma_stator", 0.05, 5.0, 0.01),
+    (["Solidity c/s (rotor)"], "sigma_rotor", 0.05, 5.0, 0.01),
 ]
 
 
@@ -657,8 +657,8 @@ app.layout = html.Div(
     Input("rr_23_slider", "value"),
     Input("rr_34_slider", "value"),
     Input("HR_inlet_slider", "value"),
-    Input("Z_stator_slider", "value"),
-    Input("Z_rotor_slider", "value"),
+    Input("sigma_stator_slider", "value"),
+    Input("sigma_rotor_slider", "value"),
     Input("xi_stator_slider", "value"),
     Input("xi_rotor_slider", "value"),
 )
@@ -681,8 +681,8 @@ def update_turbine(
     rr_23,
     rr_34,
     HR_inlet,
-    Z_stator,
-    Z_rotor,
+    sigma_stator,
+    sigma_rotor,
     xi_stator,
     xi_rotor,
 ):
@@ -707,8 +707,8 @@ def update_turbine(
             radius_ratio_23=rr_23,
             radius_ratio_34=rr_34,
             height_radius_ratio=HR_inlet,
-            zweiffel_stator=Z_stator,
-            zweiffel_rotor=Z_rotor,
+            solidity_chord_stator=sigma_stator,
+            solidity_chord_rotor=sigma_rotor,
             loss_coeff_stator=xi_stator,
             loss_coeff_rotor=xi_rotor,
             stage_type=stage_type,
@@ -799,6 +799,7 @@ def load_design(contents):
     _, content_string = contents.split(",")
     decoded = base64.b64decode(content_string).decode("utf-8")
     cfg = yaml.safe_load(decoded) or {}
+    cfg = td.convert_stage_config_to_solidity(cfg)
     return cfg
 
 
@@ -873,8 +874,8 @@ register_link_value("rr_34", 0.10, 1.00, cfg_key="radius_ratio_34")
 register_link_value("m_12", 0.1, 2.0, cfg_key="meridional_velocity_ratio_12")
 register_link_value("m_23", 0.1, 2.0, cfg_key="meridional_velocity_ratio_23")
 register_link_value("m_34", 0.1, 2.0, cfg_key="meridional_velocity_ratio_34")
-register_link_value("Z_stator", 0.1, 1.5, cfg_key="zweiffel_stator")
-register_link_value("Z_rotor", 0.1, 1.5, cfg_key="zweiffel_rotor")
+register_link_value("sigma_stator", 0.05, 5.0, cfg_key="solidity_chord_stator")
+register_link_value("sigma_rotor", 0.05, 5.0, cfg_key="solidity_chord_rotor")
 register_link_value("xi_stator", 0.0, 0.5, cfg_key="loss_coeff_stator")
 register_link_value("xi_rotor", 0.0, 0.5, cfg_key="loss_coeff_rotor")
 

@@ -68,6 +68,8 @@ OVERALL_DEFAULTS = dict(
 )
 
 BLADE_GEOMETRY_DEFAULTS = {
+    "stator.solidity_chord": 1.1209982569657782,
+    "rotor.solidity_chord": 1.0493781455466982,
     "stator.aspect_ratio": 2.0,
     "stator.maximum_thickness_to_chord": 0.30,
     "stator.maximum_thickness_location": 0.30,
@@ -98,13 +100,12 @@ STAGE_DEFAULTS_RADIAL = dict(
     radius_ratio_12=0.85,
     radius_ratio_23=0.97,
     radius_ratio_34=0.85,
-    zweiffel_stator=0.7,
-    zweiffel_rotor=0.7,
     **BLADE_GEOMETRY_DEFAULTS,
 )
 
 STAGE_DEFAULTS_AXIAL = dict(
     STAGE_DEFAULTS_RADIAL,
+    **{"rotor.solidity_chord": 1.137411139662947},
     radius_ratio_01=1.0,
     radius_ratio_12=1.0,
     radius_ratio_23=1.0,
@@ -168,6 +169,7 @@ STAGE_FIELDS = [
 LOSS_MODEL_OPTIONS = ["benner", "kacker_okapuu", "moustapha", "isentropic"]
 
 BLADE_GEOMETRY_FIELDS = [
+    ("solidity_chord", "Solidity, true chord / pitch [-]", 0.05, 5.0, 0.001),
     (
         "aspect_ratio",
         "Aspect ratio, height / meridional chord (axial) [-]",
@@ -368,16 +370,6 @@ def make_stage_accordion_item(stage_idx, stage_values, turbine_type):
     ]
     geometry_items = []
     for row in ("stator", "rotor"):
-        zweiffel_key = f"zweiffel_{row}"
-        zweiffel_control = stage_linked(
-            stage_idx,
-            zweiffel_key,
-            "Zweifel coefficient [-]",
-            0.1,
-            2.0,
-            0.001,
-            stage_values.get(zweiffel_key, STAGE_DEFAULTS[zweiffel_key]),
-        )
         row_geometry = stage_values.get("blade_geometry", {}).get(row, {})
         geometry_controls = [
             stage_linked(
@@ -400,7 +392,7 @@ def make_stage_accordion_item(stage_idx, stage_values, turbine_type):
                 title=accordion_title(f"{row.title()} blade geometry"),
                 item_id=row,
                 children=html.Div(
-                    [zweiffel_control, *geometry_controls],
+                    geometry_controls,
                     style={"paddingTop": "6px"},
                 ),
             )
@@ -437,7 +429,7 @@ def geometry_stage_panel(stage_idx, stage_values, turbine_type):
                            *[field(key, label, lo, hi, step) for key, label, lo, hi, step in STAGE_FIELDS]],
                           className="td-row-settings")]
     for row in ("stator", "rotor"):
-        controls = [field(f"zweiffel_{row}", "Zweifel coefficient [-]", .1, 2, .001)]
+        controls = []
         controls.extend(field(f"{row}.{key}", label, lo, hi, step)
                         for key, label, lo, hi, step in BLADE_GEOMETRY_FIELDS
                         if key != "aspect_ratio" or turbine_type != "radial")
@@ -1201,6 +1193,7 @@ def load_design(contents):
     _, content_string = contents.split(",")
     decoded = base64.b64decode(content_string).decode("utf-8")
     cfg = yaml.safe_load(decoded) or {}
+    cfg = td.core_turbine.convert_turbine_config_to_solidity(cfg)
     return cfg
 
 

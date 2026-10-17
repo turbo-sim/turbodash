@@ -34,7 +34,7 @@ The analysis is based on steady, uniform flow through the stator and rotor rows 
 | $v_m$ | Meridional velocity |
 | $v_s$ | Spouting velocity |
 | $w$ | Relative velocity magnitude |
-| $Z$ | Zweifel parameter of the blades |
+| $\sigma_c$ | True-chord solidity, chord divided by mean pitch |
 | $\mathrm{EoS}(\cdot)$ | Equation of state operator |
 | **Greek symbols** | |
 | $\alpha$ | Absolute flow angle (from meridional direction) |
@@ -92,8 +92,8 @@ The following quantities are treated as independent input parameters for the mea
 - $\rho_{2,3}=r_2/r_3$, radius ratio across interspace
 - $\rho_{3,4}=r_3/r_4$, radius ratio across rotor
 - $H_1/r_1$, radius to height ratio at the inlet of the turbine
-- $Z_\mathrm{S}$, Zweifel parameter of the stator
-- $Z_\mathrm{R}$, Zweifel parameter of the rotor
+- $\sigma_{c,\mathrm{S}}=c_\mathrm{S}/s_{b,\mathrm{S}}$, true-chord solidity of the stator
+- $\sigma_{c,\mathrm{R}}=c_\mathrm{R}/s_{b,\mathrm{R}}$, true-chord solidity of the rotor
 - $AR_{\mathrm{S}}=\tfrac{1}{2}(H_1 +  H_2) / c_{\mathrm{S}}$, aspect ratio of the stator (axial only)
 - $AR_{\mathrm{R}}=\tfrac{1}{2}(H_3 +  H_4) / c_{\mathrm{R}}$, aspect ratio of the rotor (axial only)
 
@@ -466,14 +466,15 @@ For axial turbines, the meridional chord of the stator and rotor blades is obtai
 $$
 c_{\mathrm{m}} = \frac{H}{AR}
 $$
-Once the meridional chord is known, the blade spacing and number of blades, and cascade opening can be determined using the Zweifel criterion and the cosine rule:
+True chord is $c=c_\mathrm{m}/\cos\xi$, with the current stagger approximation
+$\xi=(\theta_\mathrm{in}+\theta_\mathrm{out})/2$. The geometry input is true-chord
+solidity $\sigma_c=c/s_\mathrm{b}$, distinct from meridional solidity
+$\sigma_m=c_\mathrm{m}/s_\mathrm{b}$. Pitch, continuous count and opening follow from:
 $$
 \begin{gather*}
-\frac{s_{\mathrm{b}}}{c_{\mathrm{m}}}
-= \frac{ Z/2}{\cos^{2} \theta_{\mathrm{out}}
-\left( \tan \theta_{\mathrm{in}} - \tan \theta_{\mathrm{out}} \right)} \\[2ex]
+s_{\mathrm{b}} = \frac{c}{\sigma_c} \\[2ex]
 N_{\mathrm{b}} = \frac{2 \pi}{s_{\mathrm{b}}} r_{\mathrm{mean}} = \frac{\pi}{s_{\mathrm{b}}} (r_{\mathrm{in}} + r_{\mathrm{out}}) \\[2ex]
-o = s_{\mathrm{b}} \cos\theta_{\mathrm{out}}
+o = \frac{2\pi r_\mathrm{out}}{N_\mathrm{b}}\cos\theta_{\mathrm{out}}
 \end{gather*}
 $$
 
@@ -486,18 +487,23 @@ $$
 
 For radial turbines, the meridional chord corresponds directly to the radial extent of the blade row and is given by
 $$
-c_{\mathrm{m}} = r_{\mathrm{out}} - r_{\mathrm{in}}
+c_{\mathrm{m}} = |r_{\mathrm{out}} - r_{\mathrm{in}}|
 $$
-The blade spacing, number of blades, and opening are then obtained using the same Zweifel criterion and a modified cosine rule corrected by the pitch angle:
+Both radial inflow and outflow use the same prescribed true-chord solidity.
+The opening uses outlet pitch and the existing angular-pitch correction:
 $$
 \begin{gather*}
-\frac{s_{\mathrm{b}}}{c_{\mathrm{m}}}
-= \frac{ Z/2}{\cos^{2} \theta_{\mathrm{out}}
-\left( \tan \theta_{\mathrm{in}} - \tan \theta_{\mathrm{out}} \right)}, \\[2ex]
+s_{\mathrm{b}} = \frac{c}{\sigma_c}, \qquad c=\frac{c_\mathrm{m}}{\cos\xi} \\[2ex]
 N_{\mathrm{b}} = \frac{2 \pi}{s_{\mathrm{b}}} r_{\mathrm{mean}} = \frac{\pi}{s_{\mathrm{b}}} (r_{\mathrm{in}} + r_{\mathrm{out}}) \\[2ex]
-o = s_{\mathrm{b}} \cos\!\left(\theta_{\mathrm{out}} - \tfrac{1}{2}{\theta_{\mathrm{b}}}\right)
+o = \frac{2\pi r_\mathrm{out}}{N_\mathrm{b}}\cos\!\left(|\theta_{\mathrm{out}}| - \frac{\pi}{N_\mathrm{b}}\right)
 \end{gather*}
 $$
+The multistage loss model uses the continuous count. Physical visualization,
+meshing and export realize a separate integer count and recompute pitch and
+profile dimensions. Legacy Zweifel input files remain readable; importing them
+in the app converts their current selected geometry to a fixed solidity once.
+This avoids dividing pitch by a vanishing angular-turning term.
+
 The flaring semi-angle is defined in the same way as for axial turbines:
 $$
 \tan \delta_{\mathrm{fl}} = \frac{H_{\mathrm{out}} - H_{\mathrm{in}}}{2\,c_{\mathrm{m}}}

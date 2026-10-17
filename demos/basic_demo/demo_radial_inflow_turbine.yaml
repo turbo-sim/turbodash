@@ -1,7 +1,8 @@
+# Geometry inputs use true-chord solidity c/s.
 inputs:
-  loss_model: benner  ## TODO: will need to be updated
+  loss_model: benner
   fluid_name: Air
-  turbine_type: radial_inflow
+  turbine_type: radial
   inlet_property_pair: PT_INPUTS
   inlet_property_1: 500000
   inlet_property_2: 600
@@ -24,22 +25,22 @@ inputs:
     radius_ratio_12: 1.1
     radius_ratio_23: 1.05
     radius_ratio_34: 1.2
-    zweiffel_stator: 0.7
-    zweiffel_rotor: 0.7
     blade_geometry:
       stator:
-    #     aspect_ratio: 2
         maximum_thickness_to_chord: 0.3
-    #     maximum_thickness_location: 0.3
-    #     leading_edge_radius_to_max_thickness: 0.5
-    #     trailing_edge_thickness_to_opening: 0.07
-    #     trailing_edge_wedge_angle: 5
-    #     leading_edge_wedge_angle: 30
+        aspect_ratio: 2.0
+        maximum_thickness_location: 0.3
+        leading_edge_radius_to_max_thickness: 0.5
+        trailing_edge_thickness_to_opening: 0.07
+        trailing_edge_wedge_angle: 5.0
+        leading_edge_wedge_angle: 30.0
+        solidity_chord: 1.1209982569657782
       rotor:
-    #     aspect_ratio: 2
         maximum_thickness_to_chord: 0.3
-    #     maximum_thickness_location: 0.3
-    #     leading_edge_radius_to_max_thickness: 0.5
-    #     trailing_edge_thickness_to_opening: 0.07
-    #     trailing_edge_wedge_angle: 5
-    #     leading_edge_wedge_angle: 30
+        aspect_ratio: 2.0
+        maximum_thickness_location: 0.3
+        leading_edge_radius_to_max_thickness: 0.5
+        trailing_edge_thickness_to_opening: 0.07
+        trailing_edge_wedge_angle: 5.0
+        leading_edge_wedge_angle: 30.0
+        solidity_chord: 1.216757241009723

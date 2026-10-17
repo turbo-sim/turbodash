@@ -75,6 +75,9 @@ _UNITS = {
     "blade_velocity_ratio": ("-", 1.0),
     "specific_speed": ("-", 1.0),
     "solidity": ("-", 1.0),
+    "solidity_chord": ("-", 1.0),
+    "solidity_meridional": ("-", 1.0),
+    "pitch_to_chord": ("-", 1.0),
     "aspect_ratio": ("-", 1.0),
     "maximum_thickness_location": ("-", 1.0),
     "hub_tip_ratio_in": ("-", 1.0),
@@ -214,7 +217,11 @@ def _parse_inputs(names, values):
             digits = prefix[len("stage"):]
             if digits.isdigit():
                 idx = int(digits)
-                stages_by_idx.setdefault(idx, {})[subkey] = _coerce(value)
+                stage = stages_by_idx.setdefault(idx, {})
+                keys = subkey.split(".")
+                for key in keys[:-1]:
+                    stage = stage.setdefault(key, {})
+                stage[keys[-1]] = _coerce(value)
                 continue
 
         # Nested rotational speed.
@@ -328,7 +335,7 @@ def meanline_caculator_full(names, values):
 # geometry and all defaults) and overrides only the overall operating-point
 # scalars that change between runs: fluid, inlet properties, exit pressure,
 # mass flow, blade velocity ratio, and rotational speed. The per-stage design
-# (angles, reaction, radius/velocity ratios, Zweifel numbers, work split) is
+# (angles, reaction, radius/velocity ratios, chord solidities, work split) is
 # taken straight from the baseline file. Returns a compact summary.
 #
 # Reuses the same compute_turbine_performance import, xlwings (xw), and _cache

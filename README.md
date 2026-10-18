@@ -46,8 +46,9 @@ python -m pip install -e .
 python -m pip install -e ../method_of_characteristics
 ```
 
-Alternatively, `poetry install -E mesh` installs the tested TurboMoC Git revision
-recorded in `poetry.lock`. With pip, use `python -m pip install -e ".[mesh]"`.
+Alternatively, `poetry install -E mesh` installs the published TurboMoC 1.2.0
+recorded in `poetry.lock`. With pip, use `python -m pip install -e ".[mesh]"`;
+for the published Turbodash package, use `python -m pip install "turbodash-core[mesh]"`.
 The stable meanline app does not require this optional dependency.
 See [the integration assessment and mesh workflow](docs/turbomoc_meshing.md)
 for assumptions, outputs, and the Python API.

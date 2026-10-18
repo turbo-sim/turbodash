@@ -3988,14 +3988,16 @@ test = ["argcomplete (>=3.0.3)", "mypy (>=1.7.0)", "pre-commit", "pytest (>=7.0,
 
 [[package]]
 name = "turbo-moc"
-version = "1.2.1"
+version = "1.2.0"
 description = "Method of Characteristics solvers for two-phase and single-phase nozzle/stator design (minimum-length and conventional/arc-flashing variants)."
 optional = true
-python-versions = ">=3.11,<3.14"
+python-versions = "<3.14,>=3.11"
 groups = ["main"]
 markers = "extra == \"mesh\""
-files = []
-develop = false
+files = [
+    {file = "turbo_moc-1.2.0-py3-none-any.whl", hash = "sha256:62ad8d4bf136305ebe60e3259784975cc8c64f326c8733c90b7fca7aa89eb0af"},
+    {file = "turbo_moc-1.2.0.tar.gz", hash = "sha256:42d0f4bc9e8f1df0300d4596a4b6ba5509f8441842d4bf5f615e4b31768042e4"},
+]
 
 [package.dependencies]
 dash = {version = ">=2.16", extras = ["diskcache"]}
@@ -4014,12 +4016,6 @@ scipy = "*"
 [package.extras]
 cad = ["cadquery"]
 fluent = ["ansys-fluent-core[reader] (>=0.38,<0.43)"]
-
-[package.source]
-type = "git"
-url = "https://github.com/turbo-sim/TurboMoC.git"
-reference = "65976c6f0a1b0b47569d1bfde5fcf53d21ad9d47"
-resolved_reference = "65976c6f0a1b0b47569d1bfde5fcf53d21ad9d47"
 
 [[package]]
 name = "typing-extensions"
@@ -4618,4 +4614,4 @@ mesh = ["turbo_moc"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.14"
-content-hash = "c28ea36774039d9603b6f930f0337f584332cf5b938dd5f317ac5550c4a7cee1"
+content-hash = "d7791d061edac894589ea50a6fef3d79737d83b10358e7cfeab11b034f8b620d"

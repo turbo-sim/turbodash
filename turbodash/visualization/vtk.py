@@ -1,6 +1,6 @@
 """Adapt Turbodash datasets to the installed TurboMoC VTK browser renderer.
 
-The renderer, orientation widget, cell-edge shader and quality colors are served
+The renderer, cell-edge shader and quality colors are served
 unchanged from ``turbo_moc.app.assets`` by :mod:`turbodash.visualization.vtk_assets`. This module
 only prepares display placement, controls and the scalar legend. Geometry and
 original mesh polygons, normals, cell IDs and quality values remain unchanged.
@@ -291,7 +291,7 @@ _RENDER = r"""function(data, surfaces, preferences, edges, fitClicks) {
     const noUpdate = window.dash_clientside.no_update;
     const pane = PANE;
     const studio = window.dash_clientside.studio;
-    if (!studio || !window.dash_vtk || !window.turbomocOrientation || !window.turbomocMeshEdges)
+    if (!studio || !window.dash_vtk || !window.turbomocMeshEdges)
         return [noUpdate, (data || {}).note || 'The VTK viewer is unavailable. Install the mesh extra.'];
     const rows = (data || {}).rows || [];
     preferences = preferences || {};

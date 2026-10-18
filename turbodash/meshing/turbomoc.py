@@ -286,11 +286,17 @@ def preview_blade_row(results, stage_index=0, row="stator", *, options=None):
 
 
 def _mesh_configuration(options):
+    """Use TurboMoC 1.2.0's supported controls and validated mesh algorithms.
+
+    Frontal-Delaunay (6) avoids the invalid recombined inflation topology found
+    with algorithm 8 for the rotor example. Without inflation, retain the
+    quadrilateral-oriented algorithm 8. Both paths retain full mesh validation.
+    """
     return {"mesh": {"numerics": {
         "terminal_output": False, "verbosity": 2,
         "blade_size": options["blade_size_mm"], "domain_size": options["domain_size_mm"],
-        "curvature_elements": 30, "algorithm": 8, "recombine": True,
-        "recombination_algorithm": 1, "recombine_minimum_quality": .1, "smoothing_steps": 5,
+        "curvature_elements": 30, "algorithm": 6 if options["inflation_enabled"] else 8, "recombine": True,
+        "recombination_algorithm": 1, "smoothing_steps": 5,
         "inflation_layers": {"enabled": options["inflation_enabled"],
                              "first_height": options["first_height_mm"],
                              "growth_ratio": options["inflation_growth"],
@@ -402,15 +408,8 @@ def _geometry_files(results, stage_index, row, options):
     design, metadata = build_blade_row(results, stage_index, row, options=options)
     preview = _preview(design, metadata)
     surface = dict(preview["surfaces"]["blade"])
-    # TurboMoC's preview adds a 0.5% display-only span overhang. Remove it
-    # from the physical STL. At fixed conformal q, the cylindrical mapping's
-    # radial AND axial coordinates scale with radius, so undo both together.
-    points = np.array(surface["points"], dtype=float).reshape(-1, 3)
-    radius = np.linalg.norm(points[:, :2], axis=1)
-    hub, height = metadata["hub_radius_mm"], metadata["height_mm"]
-    physical_radius = hub + (radius - hub + .005 * height) / 1.01
-    points *= (physical_radius / radius)[:, None]
-    surface["points"] = points.ravel().tolist()
+    # TurboMoC 1.2.0 caps its closed preview at the physical endwalls;
+    # export those coordinates directly without a span correction.
     files = {"blade.stl": _stl_bytes(surface),
              "geometry_metadata.json": json.dumps(metadata, indent=2, allow_nan=False).encode(),
              "design.json": json.dumps(_modules()["row"].design_data(design), allow_nan=False).encode()}

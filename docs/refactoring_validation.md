@@ -73,5 +73,10 @@ The two meanline APIs and all four applications remain distinct. The stable app
 starts without importing the optional experimental meshing/VTK stack. Physical
 consumers validate annulus geometry and realize integer blade counts; meanline
 studies retain signed geometry and efficiency. Existing stage-app documentation
-fallbacks, dependency versions, the TurboMoC pin, workbook UDF names, worker
+fallbacks, workbook UDF names, worker
 policies, console debug behavior and browser-opening launchers remain unchanged.
+
+For release 0.7.0, the optional TurboMoC dependency was changed to published
+version 1.2.0 and the adapter was checked against its renderer and mesher.
+The [integration guide](turbomoc_meshing.md) records the updated native mesh
+checks and the full result of 418 passed tests with one symlink-permission skip.

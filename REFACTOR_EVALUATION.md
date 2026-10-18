@@ -138,8 +138,7 @@ the corresponding `turbodash.io` module; workbook UDF names are unchanged.
 ## Preserved behavior
 
 The numerical models, geometry conventions, continuous sizing, physical integer
-realization, signed efficiencies, dependency versions and TurboMoC pin are
-unchanged. The two meanline APIs remain distinct. Loss models and `math.py`
+realization and signed efficiencies are unchanged. The two meanline APIs remain distinct. Loss models and `math.py`
 retain their paths. Reporting and export helpers have one implementation owner.
 No model dispatcher, `src/` layout, generic utility layer or app factory is added.
 
@@ -147,16 +146,24 @@ The final count of 411 passing tests follows removal of 14 compatibility-only
 checks from the earlier 425-test run. Calculation/report parity, application
 callbacks, job lifecycle, geometry, exports and scientific loss checks remain.
 
+Release 0.7.0 pins the optional mesh dependency to published TurboMoC 1.2.0
+so the package can be published on PyPI. The adapter uses that version's two
+renderer scripts and physical STL coordinates, and selects algorithm 6 for
+inflation meshes. With the optional stack installed, 418 tests passed and one
+Windows symlink case was skipped. All four apps also calculated from the built
+wheel. See the [meshing integration guide](docs/turbomoc_meshing.md) for the
+version-specific behavior and native mesh results.
+
 ## Remaining verification
 
-- [ ] Run the six skipped native meshing integration cases in an environment
-  with Gmsh and the required native dependencies.
-- [ ] Run the skipped Dash VTK renderer integration case with Dash VTK installed.
+- [x] Run the six native meshing integration cases with Gmsh and the required
+  native dependencies; passed against TurboMoC 1.2.0 for release 0.7.0.
+- [x] Run the Dash VTK renderer integration case with Dash VTK installed; passed.
 - [ ] Run the symlink artifact-access case with Windows symlink privileges.
 - [ ] Verify the Excel adapters inside Excel. Python import and configuration
   lookup checks passed; Excel-host execution was not exercised. External
   workbooks still need their module configuration updated to the current paths.
 
 These are verification limits, not unfinished package moves. The results above
-come from the completed refactor and cleanup checks; replacing this document
-does not constitute a new application or test run.
+come from the completed refactor, cleanup checks and subsequent 0.7.0 release
+compatibility checks.

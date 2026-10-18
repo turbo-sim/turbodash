@@ -13,9 +13,9 @@ characteristics nozzle calculation to construct a turbine blade.
 | Existing 3D export | `turbodash/io/turbogrid.py` and `io/turbogrid_assembly.py` | Preserve the TurboGrid workflow, including its separate free-vortex span model. It produces geometry for another mesher, not an in-app CFD mesh. |
 | General blade-row geometry | `turbo_moc.geometry.blade_row.Design`, `meridional_channel`, `rotor_blade` | Adapt Turbodash's three closed profile segments to SciPy B-splines, then reuse passage construction, containment checks and annular mapping. |
 | 2D reference mesh and 3D sweep | `turbo_moc.meshing.mesh_3d` | Call `reference_mesh`, `load_section`, `volume_mesh` and `export_mesh` directly. These reuse the package's sizing, inflation, recombination, periodic correspondence, volume validation and CGNS audit. |
-| 3D surface models | `turbo_moc.visualization.geometry_preview.preview_geometry` | Reuse closed surfaces for previews and binary STL download. Remove the upstream display-only blade overhang from the exported STL. |
+| 3D surface models | `turbo_moc.visualization.geometry_preview.preview_geometry` | Reuse closed surfaces for previews and binary STL download. Version 1.2.0 caps the blade at its physical endwalls; export its coordinates directly. |
 | Quality and cell inspection | `turbo_moc.meshing.inspection` | Reuse saved cell quality, physical slicing, spanwise layer extraction, threshold filtering and worst-cell selection. |
-| 3D rendering | TurboMoC's `studio.js`, `mesh_edges.js` and `orientation_cube.js`, using Dash VTK | Serve the installed package's renderer directly, including actor reuse, camera controls, original polygon edges, and cell-quality colors. Keep Plotly for the 2D and meanline plots. |
+| 3D rendering | TurboMoC's `studio.js` and `mesh_edges.js`, using Dash VTK | Serve the installed package's renderer directly, including actor reuse, camera controls, original polygon edges, and cell-quality colors. Keep Plotly for the 2D and meanline plots. |
 | Experimental app runtime | `turbodash/apps/turbine_experimental.py` | Keep meanline controls mounted across three tabs; use a separate subprocess for each Gmsh job. The stable meanline app remains in `apps/turbine.py`. |
 
 The current TurboMoC checkout already has general spline-based meridional
@@ -24,16 +24,22 @@ uses the narrower cylindrical axial case. The main reusable entry point is
 `Design`; the higher-level TurboMoC nozzle/stator workflow expects a converged
 MoC solution and would be the wrong source of a meanline turbine profile.
 
-The optional dependency is pinned to the published Git revision
-`65976c6f0a1b0b47569d1bfde5fcf53d21ad9d47`. Its geometry, meshing and preview code
-matches the local checkout assessed for this integration. The adapter uses
+The optional dependency is pinned to the published PyPI package `turbo_moc==1.2.0`
+so Turbodash's wheel and source distribution can be published on PyPI. The adapter uses
 `rotor_blade._flow_domain`, a private but generic contour-based passage builder;
 the pin and integration tests protect this boundary until TurboMoC exposes a
 public generic-profile constructor. No changes to the TurboMoC source are needed.
 
+With inflation enabled, the adapter selects Gmsh's Frontal-Delaunay algorithm 6
+before recombination. Algorithm 8 produced an invalid fluid topology for the
+rotor integration case with TurboMoC 1.2.0; algorithm 6 passes the same topology
+checks. Without inflation, the adapter retains algorithm 8. Version 1.2.0 does
+not expose the later `recombine_minimum_quality` control, so it is not passed.
+
 The 3D geometry and mesh viewers use VTK, as in TurboMoC.
-Turbodash serves the three renderer scripts from the installed package through
-an allowlisted route and reuses only the orientation widget's stylesheet.
+Turbodash serves the two renderer scripts from the installed package through
+an allowlisted route. Version 1.2.0 supports drag rotation, zoom and camera fitting;
+it does not include the orientation cube available in later development versions.
 The views stay mounted across tab changes; TurboMoC manages camera fitting,
 resizing and stable actors. No copy of its VTK rendering implementation is
 maintained in Turbodash.
@@ -74,8 +80,8 @@ python -c "import turbodash; turbodash.launch_app_experimental()"
 ```
 
 The second command installs the companion checkout in editable mode, so its
-meshing implementation is called directly. Alternatively, install the pinned
-optional dependency with `poetry install -E mesh` or
+meshing implementation is called directly. Alternatively, install the published
+TurboMoC 1.2.0 optional dependency with `poetry install -E mesh` or
 `python -m pip install -e ".[mesh]"`. The `turbodash-experimental` console command
 launches this three-tab workspace. The existing `turbodash` command and
 `turbodash.launch_app_turbine()` launch the stable meanline turbine app;
@@ -176,9 +182,13 @@ generation and export, artifact lifecycle, visualization, and app state guards.
 and direct reuse of the installed renderer.
 Mesh integration tests require the optional dependencies.
 
-The implementation was checked with real meshes for the saved axial demo:
-3,858 hexahedra plus 657 prisms for the stator, and 48,348 hexahedra plus 30
-prisms for the rotor with inflation. Both passed positive-Jacobian, periodic
+The 0.7.0 integration was checked against published TurboMoC 1.2.0, Gmsh 4.15.2,
+PyVista 0.49.1 and VTK 9.7.1. The full suite passed 418 tests, with one Windows
+symlink-permission skip. All four YAML-driven apps also calculated from the
+built wheel, and the experimental app served both renderer bundles.
+
+Real meshes for the saved axial demo contained 3,753 hexahedra plus 573 prisms
+for the stator, and 62,994 hexahedra for the rotor with inflation. Both passed positive-Jacobian, periodic
 correspondence and CGNS boundary-partition checks. These checks establish
 topology and export consistency; mesh resolution still requires a convergence
 study for the intended CFD calculation.

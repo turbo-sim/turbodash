@@ -1,0 +1,28 @@
+{
+  "policy": "Production get_profile_loss_blend; no runtime overrides",
+  "z_range": [
+    -1.2,
+    1.2
+  ],
+  "thickness_range": [
+    0.05,
+    0.4
+  ],
+  "settings": {
+    "Re_out": 500000.0,
+    "Ma_rel_in": 0.2,
+    "Ma_rel_out": 0.5,
+    "thickness_chord": 0.2,
+    "hub_tip_ratio": 0.8,
+    "chord": 0.05
+  },
+  "zero_turning_fraction": 0.9,
+  "asymptotic_fraction": 0.8,
+  "first_two_ordinates": "blended_reference_before_all_KO_corrections",
+  "third_ordinate": "final_KO_profile_loss",
+  "rows": {
+    "vary_alpha2": 4808,
+    "vary_pitch_chord": 4808,
+    "vary_thickness": 1760
+  }
+}

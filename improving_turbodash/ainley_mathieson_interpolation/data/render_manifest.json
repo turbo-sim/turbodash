@@ -1,0 +1,22 @@
+{
+  "figures": 3,
+  "formats": [
+    "png",
+    "pdf"
+  ],
+  "model_calls": 0,
+  "data_hashes": {
+    "vary_alpha2.csv": "71f753c89d8db2beef7a21b19d050f2ad8be1d465a99fe515ebb4c2ea1949a16",
+    "vary_pitch_chord.csv": "4baa8846f590be00a945058df3be132fecca7d3ec196cd5e9123b3c7e92122a9",
+    "vary_thickness.csv": "970ebd7629f38f4904f8312009ac6be3be596d061a86077039dbbe11fb93eb26"
+  },
+  "figure_hashes": {
+    "blend_alpha2.png": "c55a6315cb3ee53c97d3767dcf5227e27e1f8c32cc5e472cda503de5d6d15ca4",
+    "blend_alpha2.pdf": "c7c1a131eaedf97e87de3e96fd4b9248d36ba46964bc207af93811dc2679617b",
+    "blend_pitch_chord.png": "96ba43bbf53901f098e268ad3168a70ed191d8c38efc0583c577992646b6cde7",
+    "blend_pitch_chord.pdf": "ac068d3b42b03f9a67deaffa228a49787d2001d0af8053c616dfd2c48b1fe8c6",
+    "thickness_z.png": "5112114ca1b922a5188bce291ea408c461a6b5c49feca23dbc0accb94ba779a6",
+    "thickness_z.pdf": "a013643ac0f8d22e54a2ecc9657c55ba96934bbc22ba6df49827d456429692fc"
+  },
+  "renderer_sha256": "88f1aaf414918a3f2d399060211dadaa60ed86020634df8172fbfa7418ed3f30"
+}

@@ -1,0 +1,13 @@
+{
+  "import_seconds": 3.1489658000009513,
+  "calculation_and_csv_seconds": 7.4522262000009505,
+  "probe_and_validation_seconds": 3.9909525999992184,
+  "function_seconds_by_version": {
+    "baseline": 2.1943669998745463,
+    "candidate": 3.8179713998397347
+  },
+  "calculation_wall_seconds": 15.023118299999624,
+  "executable": "C:\\Users\\roagr\\AppData\\Local\\pypoetry\\Cache\\virtualenvs\\turbomachinery-special-course-fbPpiFVa-py3.13\\Scripts\\python.exe",
+  "python": "3.13.2",
+  "note": "200 base points plus shared refinement; no complete row/stage calls. Plotting is measured separately by render_saved.py."
+}

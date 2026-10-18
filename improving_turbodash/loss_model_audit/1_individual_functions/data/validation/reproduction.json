@@ -1,0 +1,27 @@
+{
+  "reference_files": 91,
+  "numeric_reference_differences": [],
+  "paired_sweeps": 78,
+  "supplemental": [
+    {
+      "file": "data/reynolds_review/samples.csv",
+      "paired_sweeps": 1,
+      "rows": 1052
+    },
+    {
+      "file": "data/profile_review/pitch_families.csv",
+      "paired_sweeps": 13,
+      "rows": 15574
+    },
+    {
+      "file": "data/profile_review/angle_transitions.csv",
+      "paired_sweeps": 10,
+      "rows": 53540
+    }
+  ],
+  "base_points": 200,
+  "checked_markdown_links": 406,
+  "broken_links": [],
+  "figures_checked": true,
+  "note": "Digests use parsed float.hex values and text/status fields, independent of compressed-file timestamps. References include the reviewed wider K1/K2 blends and unchanged rational Kp continuation. Preceding results remain in data/history/before_wider_compressibility_blends.zip."
+}

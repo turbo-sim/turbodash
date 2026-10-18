@@ -1,0 +1,370 @@
+{
+  "description": "Reviewed wider K1/K2 blends, with unchanged rational Kp continuation. Ordinary runs never refresh references.",
+  "review": "data/validation/reference_review.json",
+  "files": {
+    "data/profile_interpolation/vary_alpha2.csv": {
+      "rows": 4808,
+      "sha256": "4c4dab5c02dd796f979ecd2c24ca2ca9d1336d421dce495d55e37b17c18384c6"
+    },
+    "data/profile_interpolation/vary_pitch_chord.csv": {
+      "rows": 4808,
+      "sha256": "07cb131d4b7cbda06819a783e6770261394381aecbefe6658fcd2c7b33477fcc"
+    },
+    "data/profile_interpolation/vary_thickness.csv": {
+      "rows": 6010,
+      "sha256": "01aa866ed6bb3ac5c29876a1db27cf99b8b44435436da7849f79d09e5584c5d3"
+    },
+    "data/profile_review/angle_transitions.csv": {
+      "rows": 53540,
+      "sha256": "2e2e374e35b6e06d227c6055ea915924de334aea2d66ca2bdc16d805c183d95d"
+    },
+    "data/profile_review/model_propagation.csv": {
+      "rows": 144,
+      "sha256": "caebe00a212ba9225c75a48137366ad33d5173a6908534f868588476bd97d614"
+    },
+    "data/profile_review/pitch_families.csv": {
+      "rows": 15574,
+      "sha256": "843c4f4293fc45f6e36c15b3c71b331a8ae85beaa919170e6d3f628115524b79"
+    },
+    "data/profile_review/transition_probes.csv": {
+      "rows": 360,
+      "sha256": "dad637ca0774413d9b450b030810ab49e7abfaa226e295991e5bdfabeea06f81"
+    },
+    "data/provenance/fundamental_curvature_intervals.csv": {
+      "rows": 588,
+      "sha256": "66e97bbee91c9618e6a90e577355644c9901c187949fa4f45c7e0b41298b6870"
+    },
+    "data/provenance/fundamental_join_intervals.csv": {
+      "rows": 686,
+      "sha256": "e7e1ddcedba02d3c6e1c3723c02fae7b17c02937d903585604a2485d55848f0f"
+    },
+    "data/reynolds_review/samples.csv": {
+      "rows": 1052,
+      "sha256": "88c835c1661dee9d49c805da4759aee2389e5b4a813f55bae560b64e821aca2a"
+    },
+    "data/sweeps/fundamental_benner_incidence_incidence__rotor.csv.gz": {
+      "rows": 816,
+      "sha256": "e198b3ebe8de0c2af86a1e425c35d50af48ef4d74c0ed592a8aa8a6bbf4d6561"
+    },
+    "data/sweeps/fundamental_benner_incidence_incidence__stator.csv.gz": {
+      "rows": 786,
+      "sha256": "0ff81cf9485cda6549c904a26660ce684c5bdc78c846103ac8fc8765f14f34ca"
+    },
+    "data/sweeps/fundamental_benner_incidence_leading_edge_ratio__rotor.csv.gz": {
+      "rows": 436,
+      "sha256": "0ab1613b3565824ac032349e5912ca20534d774a3364a7e6470e10e340d4b61b"
+    },
+    "data/sweeps/fundamental_benner_incidence_leading_edge_ratio__stator.csv.gz": {
+      "rows": 436,
+      "sha256": "72fec477240f01b21cf368875b07cbbd587be97af7da9092f554356dd62c7b54"
+    },
+    "data/sweeps/fundamental_benner_incidence_ma_rel_out__rotor.csv.gz": {
+      "rows": 578,
+      "sha256": "9a36b12a2cc797e9d216c714f29cb0be26f83986c05575999416b7fb19b03bf7"
+    },
+    "data/sweeps/fundamental_benner_incidence_ma_rel_out__stator.csv.gz": {
+      "rows": 616,
+      "sha256": "366e7cd907b0adc127cd0c39a73dc1cfe8026f4165aaa2866c9da5397ba11c10"
+    },
+    "data/sweeps/fundamental_benner_incidence_pitch_chord__rotor.csv.gz": {
+      "rows": 476,
+      "sha256": "14d00058db5f58f3017cb205d52a967632a379b64f3770cfbf33b1dffed62e9e"
+    },
+    "data/sweeps/fundamental_benner_incidence_pitch_chord__stator.csv.gz": {
+      "rows": 476,
+      "sha256": "e525a0680999efce0203cd14c639f18d370208d2f8329a6894d445a137451c08"
+    },
+    "data/sweeps/fundamental_benner_incidence_wedge__rotor.csv.gz": {
+      "rows": 610,
+      "sha256": "b87d3bb020009fc6785154da6eb7c542306581c8c6a24e61488827382d5184f5"
+    },
+    "data/sweeps/fundamental_benner_incidence_wedge__stator.csv.gz": {
+      "rows": 492,
+      "sha256": "cbd4f4b032d286a085d8a1256058aeb95db6ca478f86ce44e90f0de2b6e72e23"
+    },
+    "data/sweeps/fundamental_benner_penetration_aspect_ratio__stator.csv.gz": {
+      "rows": 826,
+      "sha256": "0a02f201d23e9d335d8860d6b5f33454ff5475660029b9d99f718424744ddba6"
+    },
+    "data/sweeps/fundamental_benner_penetration_delta_ref__stator.csv.gz": {
+      "rows": 754,
+      "sha256": "9014d6e015fe56a40fdce9cce22dc5ed7b1fcaa9c25c99869ad035cb122247e0"
+    },
+    "data/sweeps/fundamental_benner_penetration_exit_angle__stator.csv.gz": {
+      "rows": 634,
+      "sha256": "10d00182b9ec63385738e905458c37589c1ceff225b4bdf64bfea369a7287dd6"
+    },
+    "data/sweeps/fundamental_benner_penetration_incidence__stator.csv.gz": {
+      "rows": 620,
+      "sha256": "1760db22dc9eb5c96c713c9a8ad5e05958487bbede0bb4c73bf92167293792fc"
+    },
+    "data/sweeps/fundamental_benner_penetration_pitch_chord__stator.csv.gz": {
+      "rows": 702,
+      "sha256": "048811aaf9cf1768c8e6f9c4461778531942fc6c73751fdbae2aeb78bb3c09c3"
+    },
+    "data/sweeps/fundamental_benner_penetration_re_in__stator.csv.gz": {
+      "rows": 502,
+      "sha256": "0329ca5d3c8803cffb8ee6b2f20746b9861087620a6932bde51057402eaf8a34"
+    },
+    "data/sweeps/fundamental_benner_secondary_aspect_ratio__stator.csv.gz": {
+      "rows": 546,
+      "sha256": "5246f17bf8396175f91f3eed35b50338cd0b7fa2bfdaa29a97315be0c92d7aad"
+    },
+    "data/sweeps/fundamental_benner_secondary_delta_ref__stator.csv.gz": {
+      "rows": 470,
+      "sha256": "a701854922efecdcc4f547436f8a0a4179a758383f9099a09c6dba3604b6fbed"
+    },
+    "data/sweeps/fundamental_benner_secondary_exit_angle__stator.csv.gz": {
+      "rows": 622,
+      "sha256": "1e0fbd60d3df63c4dc22c7bfe78ace42dd6d6e6bd14af773eadf1505e7406094"
+    },
+    "data/sweeps/fundamental_benner_secondary_incidence__stator.csv.gz": {
+      "rows": 458,
+      "sha256": "2f0973c9ea08a85f03092d1a490b1396a1cac4ad2df5379cb54ccbfb3428c098"
+    },
+    "data/sweeps/fundamental_benner_secondary_stagger__stator.csv.gz": {
+      "rows": 440,
+      "sha256": "a660e35f9d2d626ae6ecf7bc83eba778f8a4d3484a04eed693314a81827ff2cc"
+    },
+    "data/sweeps/fundamental_compressibility_mach.csv.gz": {
+      "rows": 688,
+      "sha256": "60ce70c293dfb48e9a9882bcfd600eddc0437af8c540646232f4a4768c76a27f"
+    },
+    "data/sweeps/fundamental_conversion_gamma.csv.gz": {
+      "rows": 518,
+      "sha256": "a876d1916d61e3670e30ee1fd887923e1fc2a4ecfc12d0faaf7c332b9ddee840"
+    },
+    "data/sweeps/fundamental_conversion_loss_g1.1_m0.2.csv.gz": {
+      "rows": 624,
+      "sha256": "7ba46467c65f11999c0f45f8797c5003a25132b4f0b40b5c9037a49a3c79f17e"
+    },
+    "data/sweeps/fundamental_conversion_loss_g1.1_m0.7.csv.gz": {
+      "rows": 696,
+      "sha256": "3f47cb4b0a3f4aaaed421dbe66df5a3b0dd1c35c0f51a3857113f28f52744625"
+    },
+    "data/sweeps/fundamental_conversion_loss_g1.1_m1.2.csv.gz": {
+      "rows": 678,
+      "sha256": "74329506aa4fcc656398fd8299d71e663cb748050085cb73b9cd169fe346daf2"
+    },
+    "data/sweeps/fundamental_conversion_loss_g1.1_m2.0.csv.gz": {
+      "rows": 696,
+      "sha256": "f2faf5d88e26b260039bcedf37b3aabcd77cf930428a19ec2180772a7fa244ea"
+    },
+    "data/sweeps/fundamental_conversion_loss_g1.33_m0.2.csv.gz": {
+      "rows": 652,
+      "sha256": "0d3da3fcd3fd31f368cb006d03dbd4d2bb730011be02c7467a0af87c76e91f78"
+    },
+    "data/sweeps/fundamental_conversion_loss_g1.33_m0.7.csv.gz": {
+      "rows": 724,
+      "sha256": "e38247e5fefb4ede3dc122ce4ab88d75908f36821c1f3c6b987d7d2eea466f1b"
+    },
+    "data/sweeps/fundamental_conversion_loss_g1.33_m1.2.csv.gz": {
+      "rows": 680,
+      "sha256": "2bdac5441b7fce9deb88e24bc4ca8233b3eac885e99ae6cb647ed7502b06796e"
+    },
+    "data/sweeps/fundamental_conversion_loss_g1.33_m2.0.csv.gz": {
+      "rows": 682,
+      "sha256": "bd9a3ae97f323c890b627fbce252801a8fc13690dbe1246db8aa2fb5f7c70fc6"
+    },
+    "data/sweeps/fundamental_conversion_loss_g1.4_m0.2.csv.gz": {
+      "rows": 652,
+      "sha256": "56e12134aba4bf4bcc949a22d836fc218e84dd7f63fcfa6ab6f5390709f183bb"
+    },
+    "data/sweeps/fundamental_conversion_loss_g1.4_m0.7.csv.gz": {
+      "rows": 708,
+      "sha256": "30bb54f69697bb2f53c1fae3bb9d474b1211fe5e6fa11d54d68a30e7261f8d09"
+    },
+    "data/sweeps/fundamental_conversion_loss_g1.4_m1.2.csv.gz": {
+      "rows": 662,
+      "sha256": "b7d5b9b0481b7a583caefcaa6fd55cfe253509b2e9784f64e9a8853a474acad3"
+    },
+    "data/sweeps/fundamental_conversion_loss_g1.4_m2.0.csv.gz": {
+      "rows": 678,
+      "sha256": "020019c0f4cefc1f8d8742ca131f95b9b7d1f94fb6d43673d056dd69932b8b61"
+    },
+    "data/sweeps/fundamental_conversion_mach_d0.001.csv.gz": {
+      "rows": 698,
+      "sha256": "8061f3278f38ae9e40107c4edd7d9033dc633448f61171156764571b299a9458"
+    },
+    "data/sweeps/fundamental_conversion_mach_d0.05.csv.gz": {
+      "rows": 640,
+      "sha256": "73d3c4b2db4816bf325fa247054bbca694c90d370bd699026b294a445e8665ac"
+    },
+    "data/sweeps/fundamental_conversion_mach_d0.3.csv.gz": {
+      "rows": 646,
+      "sha256": "eb337651cd5e06c723737ba545fc6267f81ed3b09668ba66a322c08d254ce2f6"
+    },
+    "data/sweeps/fundamental_conversion_mach_d0.8.csv.gz": {
+      "rows": 666,
+      "sha256": "b825735bd7ea5c9638d263aef98e8a2bd042544d09f7682799025e9b5c7c1901"
+    },
+    "data/sweeps/fundamental_hub_interpolation.csv.gz": {
+      "rows": 624,
+      "sha256": "14d32737c4bad2fb128c2ba25181317f59988e7aaa312a30c3f406272c81971d"
+    },
+    "data/sweeps/fundamental_incidence_chi.csv.gz": {
+      "rows": 562,
+      "sha256": "f08aacb023f3099f099d30ecc41cf566d31e993ab8b194b888a5c73d7f73441e"
+    },
+    "data/sweeps/fundamental_incidence_chi_detail.csv.gz": {
+      "rows": 530,
+      "sha256": "2318c5a315fde01a853f0c4bd3a5460e28bef111cf998ca334d752854ef96615"
+    },
+    "data/sweeps/fundamental_ko_clearance_aspect_ratio__rotor.csv.gz": {
+      "rows": 582,
+      "sha256": "7fbe8ebf488acff635ac316d8cf739b08dd5ead9a6066f1ef2ef0caca421f88a"
+    },
+    "data/sweeps/fundamental_ko_clearance_aspect_ratio__stator.csv.gz": {
+      "rows": 546,
+      "sha256": "5608fc6e919fa6df106ad3f8b92b26933b529e42364afb72ec78279aa0f81f95"
+    },
+    "data/sweeps/fundamental_ko_clearance_clearance__rotor.csv.gz": {
+      "rows": 494,
+      "sha256": "7a3b4f932ff47ce329dd20b12c3e82f865ab3c2ee12387453654eb21d1de97dc"
+    },
+    "data/sweeps/fundamental_ko_clearance_clearance__stator.csv.gz": {
+      "rows": 446,
+      "sha256": "741e2f7c54185bc3485fdd18e159144ab4d7f8573a35083463d98cd336a40239"
+    },
+    "data/sweeps/fundamental_ko_clearance_exit_angle__rotor.csv.gz": {
+      "rows": 622,
+      "sha256": "4da30ee6b1ce6a51bae4819c3a9e1e029ee91e68a8820ae74e5c9ac859293ead"
+    },
+    "data/sweeps/fundamental_ko_clearance_exit_angle__stator.csv.gz": {
+      "rows": 622,
+      "sha256": "8746dfd30a39a2c577e6eb0f80279f6ab43548e993a9884bc013460d60965826"
+    },
+    "data/sweeps/fundamental_ko_clearance_incidence__rotor.csv.gz": {
+      "rows": 458,
+      "sha256": "f2ac575b278b1df4b2ee6e8dae3d552d7a20506b47ea54379e79d5651abf55ee"
+    },
+    "data/sweeps/fundamental_ko_clearance_incidence__stator.csv.gz": {
+      "rows": 458,
+      "sha256": "8ad1032327bcff613089d0eb61224efc6e10061b9324aa70afd489734f25181f"
+    },
+    "data/sweeps/fundamental_ko_clearance_pitch_chord__rotor.csv.gz": {
+      "rows": 472,
+      "sha256": "1479fdc76acde28518a6c8c9d0adfeda3b7e8a234656be4cc5d3423ec09b86f5"
+    },
+    "data/sweeps/fundamental_ko_clearance_pitch_chord__stator.csv.gz": {
+      "rows": 472,
+      "sha256": "a70ecbb8aaeef12d3d4ed947880f50ecd343300f8b8105a0a853dbb9acea8aa0"
+    },
+    "data/sweeps/fundamental_ko_profile_exit_angle__stator.csv.gz": {
+      "rows": 724,
+      "sha256": "588fec2da340da957fdc44e147bebf6dc59e00ab16f2ed2a63b5e999c54b22a5"
+    },
+    "data/sweeps/fundamental_ko_profile_hub_tip__stator.csv.gz": {
+      "rows": 584,
+      "sha256": "55ac7c8d1d4ee3ef5fd6797cbcb240715289cab675198a99661257ffad89c81c"
+    },
+    "data/sweeps/fundamental_ko_profile_ma_rel_in__stator.csv.gz": {
+      "rows": 588,
+      "sha256": "1e7a40d13a0ee52edc43f7c6f8d2e8ba9c1e5c981ecd2ab543812a6ea2cbc2ec"
+    },
+    "data/sweeps/fundamental_ko_profile_ma_rel_out__stator.csv.gz": {
+      "rows": 638,
+      "sha256": "59a0ebe9351ad5008e2eacaafe6065e91ca14ad901607ad823f670b0d123fd61"
+    },
+    "data/sweeps/fundamental_ko_profile_pitch_chord__stator.csv.gz": {
+      "rows": 664,
+      "sha256": "6d0c2add773a4f3f1a6d49abd8df3081bf180feb5e1b0ae9ecc353414191055d"
+    },
+    "data/sweeps/fundamental_ko_profile_re_out__stator.csv.gz": {
+      "rows": 604,
+      "sha256": "a95ae9d78f357499b8e52d93c137a9e5b3277dd9713fc3d48321107d201c8a20"
+    },
+    "data/sweeps/fundamental_ko_profile_thickness_chord__stator.csv.gz": {
+      "rows": 528,
+      "sha256": "e0aa1639e89f584cf1210ab7934da36b49a78a49b6e186d4e826409c3fd93da0"
+    },
+    "data/sweeps/fundamental_ko_secondary_aspect_ratio__stator.csv.gz": {
+      "rows": 564,
+      "sha256": "3668204d1e24a09a5275cfe4808ad2bc5e394565e60a941fc3f255159c644c1f"
+    },
+    "data/sweeps/fundamental_ko_secondary_exit_angle__stator.csv.gz": {
+      "rows": 624,
+      "sha256": "528dd83377310d1a1b23a0bd57e9d52b7f20708e914addfacfc946b83b23ba9d"
+    },
+    "data/sweeps/fundamental_ko_secondary_incidence__stator.csv.gz": {
+      "rows": 458,
+      "sha256": "82ee830cd415af5bd045bd2e92cc521d04537b0f36e912bef58276e7eee478e0"
+    },
+    "data/sweeps/fundamental_ko_secondary_ma_rel_out__stator.csv.gz": {
+      "rows": 606,
+      "sha256": "0505e51d15e97ebcc150be29963d93db5f8133377e9bdfdad820a6b39544844b"
+    },
+    "data/sweeps/fundamental_ko_secondary_stagger__stator.csv.gz": {
+      "rows": 456,
+      "sha256": "1e4bb14f2f594c43b20037a7f8460c7527cf2289afb7c8502f13cf0472d50713"
+    },
+    "data/sweeps/fundamental_ko_trailing_exit_angle__stator.csv.gz": {
+      "rows": 648,
+      "sha256": "0e012e8c8f43d52b957977eee72f777872c49175c7fc4e11b6ee415f32e00528"
+    },
+    "data/sweeps/fundamental_ko_trailing_ma_rel_out__stator.csv.gz": {
+      "rows": 560,
+      "sha256": "4263c8ae907f01194c675be980e89239ae9e2f66b1ac7b4abdfcae132e1edb04"
+    },
+    "data/sweeps/fundamental_ko_trailing_trailing_ratio__stator.csv.gz": {
+      "rows": 758,
+      "sha256": "97034cb16ce9c8163d64c2e86cf99d0075f998016a1910e65af5836d15e1d42a"
+    },
+    "data/sweeps/fundamental_loading_inlet.csv.gz": {
+      "rows": 458,
+      "sha256": "4e874935a2542875540ee5c6f80b40e3bb43c429954ce8bb8e8c17f4344ebd82"
+    },
+    "data/sweeps/fundamental_moustapha_incidence_incidence__stator.csv.gz": {
+      "rows": 830,
+      "sha256": "449bc5711b1902dc4dfa78abf9b49fdc110deaf0f0fe3c3027cb235b5f3654f4"
+    },
+    "data/sweeps/fundamental_moustapha_incidence_leading_edge_ratio__stator.csv.gz": {
+      "rows": 562,
+      "sha256": "6ede19d3faf7907cdc0b59c92ea2cafe9f9438e75b450db6a2b80c26d4252bee"
+    },
+    "data/sweeps/fundamental_moustapha_incidence_ma_rel_out__stator.csv.gz": {
+      "rows": 612,
+      "sha256": "30a8fdcfc036149598e5baf57c8b26a6192be26bb867cef192d709b6f26b522d"
+    },
+    "data/sweeps/fundamental_moustapha_incidence_pitch_chord__stator.csv.gz": {
+      "rows": 592,
+      "sha256": "d9d382cc3125d481fac15c8408d6ebd203e79b0be421ef3c994953f9859bb20f"
+    },
+    "data/sweeps/fundamental_moustapha_secondary_incidence__stator.csv.gz": {
+      "rows": 458,
+      "sha256": "c209ec38ba318b57a4e79761b35d13877e9429fa4d0827474ef751c56b2bc8a2"
+    },
+    "data/sweeps/fundamental_moustapha_secondary_leading_edge_ratio__stator.csv.gz": {
+      "rows": 436,
+      "sha256": "ae0d3dfce9a25f081bdd026991246410bce10e784b9ff3a2cfafc398f59704be"
+    },
+    "data/sweeps/fundamental_nozzle_angle.csv.gz": {
+      "rows": 748,
+      "sha256": "237db4a222dc627f42aa4aa74173dd2cc1068de5124f7f6f664eaeab99577dc1"
+    },
+    "data/sweeps/fundamental_penetration_cap.csv.gz": {
+      "rows": 506,
+      "sha256": "f09e407b2463a0bc371ef5ec6b73266d5cdb6da3ab3ce87b7b956e1f0a3dbe88"
+    },
+    "data/sweeps/fundamental_smooth_absolute.csv.gz": {
+      "rows": 500,
+      "sha256": "d564dc59ba5ebd1e6a322274c8299330666f278849c5c1fe6c37b8ce51674618"
+    },
+    "data/sweeps/fundamental_smooth_bounds.csv.gz": {
+      "rows": 474,
+      "sha256": "bddb7ffaf7467269266d399d53a06c06af8979549311c238c9dedd8eeacf978f"
+    },
+    "data/validation/nozzle_directional_probes.csv": {
+      "rows": 240,
+      "sha256": "5e5570a5bf6042570b8608d8428a620f2c990b51f86e1e2e49e957b0c6008fa0"
+    },
+    "data/validation/samples.csv": {
+      "rows": 258,
+      "sha256": "bf6cff4aa5d66dec29b4f2760c6c3da57d7684bddd8244ba6eb59b70a414d6c6"
+    },
+    "data/validation/shrinking_probes.csv": {
+      "rows": 21,
+      "sha256": "8919856b20cde1cd7c5b465351c7265e6bbccf967b52d0b80a394a3717b76f0e"
+    }
+  }
+}

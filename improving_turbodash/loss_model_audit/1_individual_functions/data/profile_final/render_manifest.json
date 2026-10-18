@@ -1,0 +1,26 @@
+{
+  "figures": 5,
+  "model_calls": 0,
+  "derivative_recalculations": 0,
+  "files": {
+    "ko_profile_final_geometry.png": "e0734d92e8a5cc45d251d81eead03ef33f275abb57e9bfebc64c1f7f7ed2f42f",
+    "ko_profile_final_geometry.pdf": "09efada3b1fca1a4e462c5bae306d90bc9d51435aea96a0fe0fbf65ef8285373",
+    "ko_profile_final_mach_inlet.png": "14f413dc0c8938c84a623e0cdb699d973b606e6ff952a09dec41e6ff73f0544f",
+    "ko_profile_final_mach_inlet.pdf": "649342c3f9370494605de81b79c9958b62a0c9be005313f2b2312509bc96f053",
+    "ko_profile_final_mach_hub.png": "e2ac3dccd9a46bd7098d8ed37c9460263917b43bc46ebc4fc8ac94c06ca1b229",
+    "ko_profile_final_mach_hub.pdf": "d2bac49e070067e690455d3d39856f198c9ad28eb6fa6ba935d7f3d39fe9458a",
+    "ko_profile_final_components.png": "8faa6984227e2048887fbdd99d19aa0b39184388f337e51ead1b93067b929a86",
+    "ko_profile_final_components.pdf": "098ea78cc2da2a3d2f38fe63e0a2c06e2ac12e210d29344f26f6a58605c9733b",
+    "ko_profile_thickness_smoothness.png": "76cb2a5d4fe59c930777a2248bbdb66adc35bcc431d36ae35b637ab0b3d160a2",
+    "ko_profile_thickness_smoothness.pdf": "845eb49fd13d0e8e70ef81e5de9b5e5f7bf3e99617ae5e4605863be56ae97b9d"
+  },
+  "script_sha256": "e13b90f55493c65acbfb8c0f61032752b410bec83c950f96b019868dd864cff0",
+  "data_sha256": {
+    "geometry_spacing": "2c69021b160e19099b8e36d7842cd7b2b27e8fcebed870de91f971532452c4a6",
+    "geometry_angle": "0b9a66406ec53e345f806d5fee7fc433ffa8a45856c632edb70ed8fdaf3c15cd",
+    "mach_inlet": "e56caa039ac292980bb7645e012240f3a98dbe06568a1ab6a68197292b8964b5",
+    "mach_hub": "94f210a103e37c1c6c4ab9a7523e9ce27c49acfa624b33aa56376015b30e9df7",
+    "component_budget": "ae6bf5f38d21f60a6b7425e8a6037a186c29b47bca80a0f1e08f2cccc6f07bbb",
+    "thickness_factor": "7e35459ed241fe8c94742bd575790d0c6be2da1e5f0323c1e31a2eaa72999861"
+  }
+}

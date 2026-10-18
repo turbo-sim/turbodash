@@ -1,0 +1,83 @@
+{
+  "passed": true,
+  "renderer": "Installed VS Code Markdown+Math, dollar delimiters",
+  "katex_version": "0.13.11",
+  "modules": "C:\\Users\\roagr\\.vscode\\extensions\\goessner.mdmath-2.7.4\\node_modules",
+  "errors": [],
+  "markdown_files": 10,
+  "inline_equations": 69,
+  "display_equations": 4,
+  "local_links": 147,
+  "files": [
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/readme.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 14,
+      "sha256": "9af528348450ab6edee80009d43f41cc902930b5405a8443c44313e1f0a9e10b"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/01_blade_velocity_ratio.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 20,
+      "sha256": "53e1e2ff1636f0eaf0e5b5784182d23376d071af3ea89b5f504e2e69763b9bb3"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/02_reaction.md",
+      "inline_equations": 46,
+      "display_equations": 4,
+      "local_links": 28,
+      "sha256": "49b9305a44268a535cfc986bdab162be10278e35e05fcc2d14b387f78e0d0e21"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/03_stator_exit_angle.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 10,
+      "sha256": "05cb37297367db12636d8992d442aba23575a788b5328d7fa5d947d0cfad655f"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/04_solidity.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 8,
+      "sha256": "1672dc27081db45dd818da55a2b7b0f6e138c8d18970492c57773f9d5c58ff4f"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/05_meridional_ratio.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 8,
+      "sha256": "eb645793c555c6d68f2f466746cf404f235bb821c7727a17ec9391dc79d05b93"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/06_aspect_ratio.md",
+      "inline_equations": 5,
+      "display_equations": 0,
+      "local_links": 14,
+      "sha256": "3268a939aed8fd5fa7192cdfd3b55acae251894e5a1a689bd43b46b9ff23659a"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/07_trailing_edge_ratio.md",
+      "inline_equations": 2,
+      "display_equations": 0,
+      "local_links": 14,
+      "sha256": "1cae468ef2dbcc80e7d386e439a58723a66a6f2c55c9d1dbce2a93ac80614597"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/08_maximum_thickness_ratio.md",
+      "inline_equations": 2,
+      "display_equations": 0,
+      "local_links": 14,
+      "sha256": "6ab8384b3fb11e2f60c4d5eaa71a95801acae63d8533836893b5f54b51123516"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/09_method.md",
+      "inline_equations": 14,
+      "display_equations": 0,
+      "local_links": 17,
+      "sha256": "f878115f8d6783e3f8007481f3da5335d807f3ddeb777caa104f46d3c88f794f"
+    }
+  ]
+}

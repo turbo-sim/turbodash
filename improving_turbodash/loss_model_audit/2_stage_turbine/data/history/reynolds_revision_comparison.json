@@ -1,0 +1,1250 @@
+{
+  "comparison": "Current stage results versus the preserved v3 results before widening the revised Reynolds transition",
+  "historical_archive": "data/history/before_wider_reynolds.zip",
+  "archive_sha256": "7e68d722322ae0cf447b71ae857096138ae55d8aebe8baace8bc646bc46d149d",
+  "historical_file_hashes_verified_at_preservation": true,
+  "excluded_fields": [
+    "api_seconds"
+  ],
+  "csv_files_compared": 26,
+  "previous_model_unchanged": true,
+  "revised_model_changes_are_measured_not_required_to_be_zero": true,
+  "versions": {
+    "previous": {
+      "rows_compared": 5252,
+      "changed_rows": 0,
+      "changed_fields": {},
+      "max_abs_numeric_differences": {}
+    },
+    "revised": {
+      "rows_compared": 5252,
+      "changed_rows": 1151,
+      "changed_fields": {
+        "efficiency_ts": 1138,
+        "efficiency_tt": 1138,
+        "power_actual": 1138,
+        "stage_efficiency_ts": 1138,
+        "stage_efficiency_tt": 1138,
+        "driver_row_loss_fraction": 1139,
+        "stator_Y_total": 590,
+        "stator_driver_loss_fraction_total": 590,
+        "stator_Y_profile": 590,
+        "stator_driver_loss_fraction_profile": 590,
+        "rotor_Y_total": 714,
+        "rotor_driver_loss_fraction_total": 712,
+        "rotor_Y_profile": 722,
+        "rotor_driver_loss_fraction_profile": 722,
+        "rotor_component_sum_error": 232,
+        "energy_balance_error": 517,
+        "stator_component_sum_error": 107
+      },
+      "max_abs_numeric_differences": {
+        "efficiency_ts": 0.5019120661961196,
+        "efficiency_tt": 1.2048951555552492,
+        "power_actual": 19398.325135451276,
+        "stage_efficiency_ts": 0.5019120661961196,
+        "stage_efficiency_tt": 1.2048951555552492,
+        "driver_row_loss_fraction": 0.5019120661961125,
+        "stator_Y_total": 0.0006084781480009613,
+        "stator_driver_loss_fraction_total": 0.00030428495057197025,
+        "stator_Y_profile": 0.0006084781480009613,
+        "stator_driver_loss_fraction_profile": 0.0003042849505719668,
+        "rotor_Y_total": 4.054620085274678,
+        "rotor_driver_loss_fraction_total": 0.5019120661961125,
+        "rotor_Y_profile": 4.054620085274678,
+        "rotor_driver_loss_fraction_profile": 0.5019120661961125,
+        "rotor_component_sum_error": 5.551115123125783e-17,
+        "energy_balance_error": 7.105427357601002e-15,
+        "stator_component_sum_error": 2.7755575615628914e-17
+      }
+    }
+  },
+  "studies": [
+    {
+      "csv": "eps0_exit_angle.csv",
+      "case": "0",
+      "study": "exit_angle",
+      "versions": {
+        "previous": {
+          "points": 200,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "exception": 92,
+            "ok": 108
+          },
+          "current_status_counts": {
+            "exception": 92,
+            "ok": 108
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 200,
+          "changed_rows": 78,
+          "historical_status_counts": {
+            "exception": 92,
+            "ok": 108
+          },
+          "current_status_counts": {
+            "exception": 92,
+            "ok": 108
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.000441436659399691,
+            "efficiency_tt": 0.027976237710209517,
+            "driver_row_loss_fraction": 0.00044143665939973264,
+            "stator_Y_total": 0.00018920710128145918,
+            "rotor_Y_total": 0.0006032785686889142,
+            "stator_Y_profile": 0.0001892071012814557,
+            "rotor_Y_profile": 0.0006032785686889142
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps0_meridional_ratio.csv",
+      "case": "0",
+      "study": "meridional_ratio",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 11,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 3.14492055880633e-05,
+            "efficiency_tt": 3.532942618100776e-05,
+            "driver_row_loss_fraction": 3.1449205587980034e-05,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 6.106445478362699e-05,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 6.106445478362872e-05
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps0_reaction.csv",
+      "case": "0",
+      "study": "reaction",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "exception": 2,
+            "ok": 199
+          },
+          "current_status_counts": {
+            "exception": 2,
+            "ok": 199
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 25,
+          "historical_status_counts": {
+            "exception": 2,
+            "ok": 199
+          },
+          "current_status_counts": {
+            "exception": 2,
+            "ok": 199
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.00019130282122103992,
+            "efficiency_tt": 0.00020185621968926704,
+            "driver_row_loss_fraction": 0.00019130282122122033,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0003374830668991524,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0003374830668991524
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps0_rotor_aspect_ratio.csv",
+      "case": "0",
+      "study": "rotor_aspect_ratio",
+      "versions": {
+        "previous": {
+          "points": 206,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 206
+          },
+          "current_status_counts": {
+            "ok": 206
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 206,
+          "changed_rows": 123,
+          "historical_status_counts": {
+            "ok": 206
+          },
+          "current_status_counts": {
+            "ok": 206
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.00019428943011701172,
+            "efficiency_tt": 0.00020637209556884084,
+            "driver_row_loss_fraction": 0.00019428943011700478,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0003772488970244445,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0003772488970244445
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps0_rotor_maximum_thickness_ratio.csv",
+      "case": "0",
+      "study": "rotor_maximum_thickness_ratio",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps0_rotor_trailing_edge_ratio.csv",
+      "case": "0",
+      "study": "rotor_trailing_edge_ratio",
+      "versions": {
+        "previous": {
+          "points": 203,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 203
+          },
+          "current_status_counts": {
+            "ok": 203
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 203,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 203
+          },
+          "current_status_counts": {
+            "ok": 203
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps0_solidity.csv",
+      "case": "0",
+      "study": "solidity",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps0_speed_r025.csv",
+      "case": "0",
+      "study": "speed_r025",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 55,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 3.2248805040602235e-05,
+            "efficiency_tt": 4.569076740668088e-05,
+            "driver_row_loss_fraction": 3.224880504061611e-05,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.00011780247699539476,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.00011780247699539649
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps0_speed_r050.csv",
+      "case": "0",
+      "study": "speed_r050",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 7,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.00013614721686761033,
+            "efficiency_tt": 0.00014506155721316638,
+            "driver_row_loss_fraction": 0.0001361472168676381,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.00026355244583413373,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0002635524458341372
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps0_speed_r075.csv",
+      "case": "0",
+      "study": "speed_r075",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 5,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.00024525625709959087,
+            "efficiency_tt": 0.0002842701041280149,
+            "driver_row_loss_fraction": 0.00024525625709953536,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0003233221903370942,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0003233221903370838
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps0_stator_aspect_ratio.csv",
+      "case": "0",
+      "study": "stator_aspect_ratio",
+      "versions": {
+        "previous": {
+          "points": 206,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 206
+          },
+          "current_status_counts": {
+            "ok": 206
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 206,
+          "changed_rows": 78,
+          "historical_status_counts": {
+            "ok": 206
+          },
+          "current_status_counts": {
+            "ok": 206
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.000304284950572109,
+            "efficiency_tt": 0.0003232081274919807,
+            "driver_row_loss_fraction": 0.00030428495057197025,
+            "stator_Y_total": 0.0006084781480009613,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0006084781480009613,
+            "rotor_Y_profile": 0.0
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps0_stator_maximum_thickness_ratio.csv",
+      "case": "0",
+      "study": "stator_maximum_thickness_ratio",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps0_stator_trailing_edge_ratio.csv",
+      "case": "0",
+      "study": "stator_trailing_edge_ratio",
+      "versions": {
+        "previous": {
+          "points": 203,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 203
+          },
+          "current_status_counts": {
+            "ok": 203
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 203,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 203
+          },
+          "current_status_counts": {
+            "ok": 203
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps80_exit_angle.csv",
+      "case": "80",
+      "study": "exit_angle",
+      "versions": {
+        "previous": {
+          "points": 200,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "exception": 102,
+            "ok": 98
+          },
+          "current_status_counts": {
+            "exception": 102,
+            "ok": 98
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 200,
+          "changed_rows": 79,
+          "historical_status_counts": {
+            "exception": 102,
+            "ok": 98
+          },
+          "current_status_counts": {
+            "exception": 102,
+            "ok": 98
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.00026140962750342833,
+            "efficiency_tt": 0.0003114753920918645,
+            "driver_row_loss_fraction": 0.0002614096275033173,
+            "stator_Y_total": 0.0004538928217255045,
+            "rotor_Y_total": 0.00013735482439548863,
+            "stator_Y_profile": 0.00045389282172549755,
+            "rotor_Y_profile": 0.00013735482439549036
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps80_meridional_ratio.csv",
+      "case": "80",
+      "study": "meridional_ratio",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 20,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 3.4437566893252836e-05,
+            "efficiency_tt": 3.868808670148827e-05,
+            "driver_row_loss_fraction": 3.443756689322508e-05,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 6.688119869155407e-05,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 6.688119869155407e-05
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps80_reaction.csv",
+      "case": "80",
+      "study": "reaction",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "exception": 4,
+            "ok": 197
+          },
+          "current_status_counts": {
+            "exception": 4,
+            "ok": 197
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 154,
+          "historical_status_counts": {
+            "exception": 4,
+            "ok": 197
+          },
+          "current_status_counts": {
+            "exception": 4,
+            "ok": 197
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.5019120661961196,
+            "efficiency_tt": 1.2048951555552492,
+            "driver_row_loss_fraction": 0.5019120661961125,
+            "stator_Y_total": 4.2953331474027134e-05,
+            "rotor_Y_total": 4.054620085274678,
+            "stator_Y_profile": 4.2953331474027134e-05,
+            "rotor_Y_profile": 4.054620085274678
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps80_rotor_aspect_ratio.csv",
+      "case": "80",
+      "study": "rotor_aspect_ratio",
+      "versions": {
+        "previous": {
+          "points": 206,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 206
+          },
+          "current_status_counts": {
+            "ok": 206
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 206,
+          "changed_rows": 75,
+          "historical_status_counts": {
+            "ok": 206
+          },
+          "current_status_counts": {
+            "ok": 206
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0001691262345482336,
+            "efficiency_tt": 0.00018060952852938517,
+            "driver_row_loss_fraction": 0.0001691262345481087,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0003284600602553034,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.00032846006025530686
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps80_rotor_maximum_thickness_ratio.csv",
+      "case": "80",
+      "study": "rotor_maximum_thickness_ratio",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps80_rotor_trailing_edge_ratio.csv",
+      "case": "80",
+      "study": "rotor_trailing_edge_ratio",
+      "versions": {
+        "previous": {
+          "points": 203,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 203
+          },
+          "current_status_counts": {
+            "ok": 203
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 203,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 203
+          },
+          "current_status_counts": {
+            "ok": 203
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps80_solidity.csv",
+      "case": "80",
+      "study": "solidity",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps80_speed_r025.csv",
+      "case": "80",
+      "study": "speed_r025",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 158,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 6.303653584882607e-05,
+            "efficiency_tt": 9.550921330803153e-05,
+            "driver_row_loss_fraction": 6.303653584889546e-05,
+            "stator_Y_total": 7.346269685168383e-05,
+            "rotor_Y_total": 0.00022435404806940562,
+            "stator_Y_profile": 7.346269685169077e-05,
+            "rotor_Y_profile": 0.00022435404806941256
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps80_speed_r050.csv",
+      "case": "80",
+      "study": "speed_r050",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 76,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.00015942742741592575,
+            "efficiency_tt": 0.00017082888466601887,
+            "driver_row_loss_fraction": 0.00015942742741600902,
+            "stator_Y_total": 0.00024204829309201759,
+            "rotor_Y_total": 0.00030868718861494504,
+            "stator_Y_profile": 0.00024204829309201759,
+            "rotor_Y_profile": 0.0003086871886149485
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps80_speed_r075.csv",
+      "case": "80",
+      "study": "speed_r075",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 111,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.00028858225859551556,
+            "efficiency_tt": 0.00033505464376004657,
+            "driver_row_loss_fraction": 0.00028858225859557107,
+            "stator_Y_total": 0.000596124094557754,
+            "rotor_Y_total": 0.00038048292917367,
+            "stator_Y_profile": 0.000596124094557747,
+            "rotor_Y_profile": 0.00038048292917367
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps80_stator_aspect_ratio.csv",
+      "case": "80",
+      "study": "stator_aspect_ratio",
+      "versions": {
+        "previous": {
+          "points": 206,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 206
+          },
+          "current_status_counts": {
+            "ok": 206
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 206,
+          "changed_rows": 96,
+          "historical_status_counts": {
+            "ok": 206
+          },
+          "current_status_counts": {
+            "ok": 206
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0003017732342621704,
+            "efficiency_tt": 0.00032226296356951956,
+            "driver_row_loss_fraction": 0.00030177323426221203,
+            "stator_Y_total": 0.0006033193066935227,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0006033193066935158,
+            "rotor_Y_profile": 0.0
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps80_stator_maximum_thickness_ratio.csv",
+      "case": "80",
+      "study": "stator_maximum_thickness_ratio",
+      "versions": {
+        "previous": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 201,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 201
+          },
+          "current_status_counts": {
+            "ok": 201
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        }
+      }
+    },
+    {
+      "csv": "eps80_stator_trailing_edge_ratio.csv",
+      "case": "80",
+      "study": "stator_trailing_edge_ratio",
+      "versions": {
+        "previous": {
+          "points": 203,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 203
+          },
+          "current_status_counts": {
+            "ok": 203
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        },
+        "revised": {
+          "points": 203,
+          "changed_rows": 0,
+          "historical_status_counts": {
+            "ok": 203
+          },
+          "current_status_counts": {
+            "ok": 203
+          },
+          "max_abs_performance_differences": {
+            "efficiency_ts": 0.0,
+            "efficiency_tt": 0.0,
+            "driver_row_loss_fraction": 0.0,
+            "stator_Y_total": 0.0,
+            "rotor_Y_total": 0.0,
+            "stator_Y_profile": 0.0,
+            "rotor_Y_profile": 0.0
+          }
+        }
+      }
+    }
+  ]
+}

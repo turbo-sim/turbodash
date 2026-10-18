@@ -1,0 +1,46 @@
+{
+  "value_samples": 258,
+  "base_samples": 200,
+  "spacing_ratio": 20116581250119.555,
+  "retained_derivative_samples": 221,
+  "maximum_linear_gradient_error": 3.7912961659003486e-10,
+  "maximum_tiny_linear_gradient_error": 6.198478535812952e-10,
+  "shrinking_probe_findings": [
+    {
+      "feature": "linear",
+      "version": "known_function",
+      "x": 0.0,
+      "field": "value",
+      "classification": "smooth at resolved tolerance (not proof of global validity)",
+      "jump": -4.440892098500626e-16,
+      "left_derivative": 3.0000000039720476,
+      "right_derivative": 3.000000026176508,
+      "final_h": 1e-08,
+      "tolerance": "jump 1e-8*max(1,|Y|); scaled slope 1e-4*max(1,|dY/dscaled_x|); last 3 intervals for convergence"
+    },
+    {
+      "feature": "genuine_kink",
+      "version": "known_function",
+      "x": 0.0,
+      "field": "value",
+      "classification": "derivative kink",
+      "jump": 0.0,
+      "left_derivative": -2.0,
+      "right_derivative": 3.0000000000000004,
+      "final_h": 1e-08,
+      "tolerance": "jump 1e-8*max(1,|Y|); scaled slope 1e-4*max(1,|dY/dscaled_x|); last 3 intervals for convergence"
+    },
+    {
+      "feature": "genuine_jump",
+      "version": "known_function",
+      "x": 0.0,
+      "field": "value",
+      "classification": "finite value jump",
+      "jump": 1.0,
+      "left_derivative": 0.0,
+      "right_derivative": 0.0,
+      "final_h": 1e-08,
+      "tolerance": "jump 1e-8*max(1,|Y|); scaled slope 1e-4*max(1,|dY/dscaled_x|); last 3 intervals for convergence"
+    }
+  ]
+}

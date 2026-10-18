@@ -1,0 +1,33 @@
+{
+  "full_api_evaluations": 376,
+  "points_per_version": 94,
+  "status_counts": {
+    "ok": 376
+  },
+  "acoustic_switch_reaction_eps80": 0.774982301837849,
+  "zero_quality_reaction_eps80": 0.7749828372,
+  "installed_property_code": {
+    "path": "C:\\Users\\roagr\\AppData\\Local\\pypoetry\\Cache\\virtualenvs\\turbomachinery-special-course-fbPpiFVa-py3.13\\Lib\\site-packages\\jaxprop\\coolprop\\core_calculations.py",
+    "sha256": "b1c3b3ad4a0d5b4a07c7ea0b4caeba224ff3686de82676e11aac63055100f0b3",
+    "first_line": 199,
+    "excerpt": "    if mfrac_V < 1e-6:\n        a = a_L\n    elif mfrac_V > 1.0 - 1e-6:\n        a = a_V\n    else:\n        a = (1 / rho / comp_HEM) ** 0.5\n",
+    "interpretation": "Below vapor mass fraction 1e-6 the HEM mixture sound speed is replaced by saturated-liquid sound speed."
+  },
+  "source_sha256": {
+    "turbodash/core_turbine.py": "7bfb9ca303ddba914c126519ede33c6603c40970a6d9c52e3f49abd6fd24054d",
+    "improving_turbodash/loss_model_audit/2_stage_turbine/scripts/reaction_jump_diagnostics.py": "b965179dea3eaae3d1369547096a32818549ebdd1033d8edb2ca8cb4fd2acaaa",
+    "improving_turbodash/loss_model_audit/2_stage_turbine/inputs/R245fa_turbine_0_final.yaml": "874f8f2d4010d66ad50529f45aa8c67d4ed532dec5393277eb5eb61a8cabda31",
+    "improving_turbodash/loss_model_audit/2_stage_turbine/inputs/R245fa_turbine_80_final.yaml": "28d205e8c932521be8e4a8b6e4907dcd2b4d716d3a13551e29e93bdccc0729dc",
+    "turbodash/loss_models/loss_model_kacker_okapuu.py": "197794ed5736c997b865e43860ffeccdaf4dfd21dbc2f99b2191f4a28abab28d",
+    "turbodash/loss_models/loss_model_benner.py": "ce5e2aae37a04718c0ad8b6801b67be2e7824fdacd407affcb00e279ff46d649",
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "3551d08bf9b66a0ae003855db71b3910e3c7110e7543766f9236299c40629737",
+    "turbodash/loss_models_new/loss_model_benner.py": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba"
+  },
+  "csv_sha256": "3469d9d4d2fb46da6d4c48d8770d7335c4becfe84e61595213d0e18645f6b153",
+  "max_profile_decomposition_error": 2.7755575615628914e-17,
+  "coefficient_caveat": "The existing driver directly uses returned pressure-loss coefficients in its energy-loss estimate; this audit retains that convention.",
+  "conclusions": {
+    "efficiency_jump": "The installed property backend switches sound-speed model below quality 1e-6, abruptly lowering inlet Mach and removing rotor shock loss.",
+    "stator_plateau": "Fixed reference geometry ratios and nearly constant liquid properties leave a slowly varying Reynolds correction; no reference-angle floor is involved."
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "figures": 4,
+  "formats": [
+    "png",
+    "pdf"
+  ],
+  "model_calls": 0,
+  "derivative_recalculations": 0,
+  "data_hashes": {
+    "vary_alpha2.csv": "4ece9037bdb8f2f921838efa84301cc81363f785f64fe7f2de2465da5f6c75f7",
+    "vary_pitch_chord.csv": "4baa8846f590be00a945058df3be132fecca7d3ec196cd5e9123b3c7e92122a9",
+    "vary_thickness.csv": "8585c705d4582ecf37a725228fa55937c6ec62a4854c89dac6d5855fda3a3078",
+    "thickness_z_zero_zoom.csv": "f9ac875546f4c7d18a283a7de220fcf8cde59c497cf4677c20cae30c5f252a8f",
+    "thickness_z_zero_limits.csv": "cc94b796ff64220da8b662e2ac8064f752636e2f11f191249877eacec4f06e13"
+  },
+  "figure_hashes": {
+    "ko_profile_blend_alpha2.png": "120b132449ea1028834b41022a6a20c1e7fa193547be10c0ee1ab796f48c713b",
+    "ko_profile_blend_alpha2.pdf": "bbe9e003f1e61d11d7366d7d791fcaa8988d7428b6dd747d25c775b0e83f16cd",
+    "ko_profile_blend_pitch_chord.png": "05b710837292787d38f5767c65ba9b2e3f30b22935c8090ad890090f0e47d073",
+    "ko_profile_blend_pitch_chord.pdf": "dcb6aa3083d213b526bd913da632efe0c099dfcd574621ed687f39a5e70b93b9",
+    "ko_profile_thickness_z.png": "22f2b509f915e1c8eed838f9d60dda097a10df1de27c0f44bc94b86c9246a280",
+    "ko_profile_thickness_z.pdf": "76d29f0336b7d28cc382d9704041a2faeed73e2dcfd9ab98cdd9e6e671db2b40",
+    "ko_profile_thickness_z_zero_zoom.png": "ff36266b2ba8f5fbbe13330c24b68a4ffb75c5e124d616dd8ed3abc0aa5d596e",
+    "ko_profile_thickness_z_zero_zoom.pdf": "cbc497c2ee238ea1efd9fad6f3789552ff409dcf58b3a6dd05c4f74c1f05cc27"
+  },
+  "renderer_sha256": "a60e2545f859e4d3716b0cf823686ae3b4845533aee0a6c40e6b1ca0211b5a29"
+}

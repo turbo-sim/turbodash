@@ -1,0 +1,21 @@
+{
+  "figures": 4,
+  "model_calls": 0,
+  "files": {
+    "ko_shock_hub_factor.png": "27fa29d5f280b0662c87d8cbe30913032fde0d1a0fbaff81d402da97af53aa12",
+    "ko_shock_hub_factor.pdf": "23a9bd592d41f50b03027e4bbfe294e67cf9fe370a9240701a0b8ef5a844279c",
+    "ko_shock_hub_tip.png": "22c6e372b812c5fa187e824bee10d2ff6a9942a633ab40c3379ba30b3d8cb876",
+    "ko_shock_hub_tip.pdf": "836b7273efd71fce60f88b15c95692046658e0644486e8727b482ad7e19414aa",
+    "ko_shock_exit_mach.png": "ba42559b23d4bdbf7b926a26a34b39f9bc020b6522a89829475123f79103eea3",
+    "ko_shock_exit_mach.pdf": "fcb06179d283e25c807e73c26036e5027b7c43e6f6a7fd0bcfcd3df397c12a58",
+    "ko_shock_onset.png": "a8ae07e01a00156f8d3d776d611fb09c02e443f8be1823d239a6a42a30f22ad2",
+    "ko_shock_onset.pdf": "b98f5daa03256ac57e124f0eb1120bf849b2f36979d08136730ef5895831cb22"
+  },
+  "script_sha256": "d2bb8557cb34ab2ce6e4d2cc7ffcab99bfa8819a739026bba9e63f63886d905a",
+  "data_sha256": {
+    "hub_factor": "a1cd5a23f369e4d646ebd6c3814f09e92098629cde1149ac11b285384a86707b",
+    "hub_tip": "8ee016b464ff69551717e9bd05010ec58c336f1652a4408675d68319e45ab835",
+    "exit_mach": "f2f79d31b41457be1c12637b5a3746b74da527e145fd613c5a45734125bf6805",
+    "onset": "b28ffa95fc104464464079bbdfeeba5012ec375df7b9bf8b58029eeed2934fa0"
+  }
+}

@@ -1,0 +1,850 @@
+{
+  "description": "Byte-for-byte copies; source paths relative to the repository root; destination paths relative to 1_individual_functions. Navigation manifests are adapted separately.",
+  "files": [
+    {
+      "path": "figures/benner_incidence_incidence.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_incidence_incidence.png",
+      "sha256": "4ea52528600cb37fc7e9148549a72c515f7a4bb11cb4184fceb8ba81f593b035"
+    },
+    {
+      "path": "figures/benner_incidence_leading_edge_ratio.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_incidence_leading_edge_ratio.png",
+      "sha256": "5a0179f4bd7a6ed3dc680c59e4ae0035f2c03ea4ec717a5f0cf1b772e05f11c1"
+    },
+    {
+      "path": "figures/benner_incidence_ma_rel_out.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_incidence_Ma_rel_out.png",
+      "sha256": "69aa920f4e083e781f0e6ea03571d98bec7c420afc819cf58a897ac4b0cca642"
+    },
+    {
+      "path": "figures/benner_incidence_pitch_chord.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_incidence_pitch_chord.png",
+      "sha256": "8ae582013b3d84d2ba29a7870258cbdf6b91801412ef79fec3159dcef94e948d"
+    },
+    {
+      "path": "figures/benner_incidence_wedge.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_incidence_wedge.png",
+      "sha256": "8439fe389f1fcea4efd4139870b673973dd97f2b23cd4b5d2fc84aaa45b12a84"
+    },
+    {
+      "path": "figures/benner_penetration_aspect_ratio.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_penetration_aspect_ratio.png",
+      "sha256": "723f0ae4d8245a131710ad9e1debf6d62c3329f7f8e81bf4730784f53b6927eb"
+    },
+    {
+      "path": "figures/benner_penetration_delta_ref.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_penetration_delta_ref.png",
+      "sha256": "4e450054cc99dbe5e3d41d251141449835786257e6bd7a553370a3e3bc31d88f"
+    },
+    {
+      "path": "figures/benner_penetration_exit_angle.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_penetration_exit_angle.png",
+      "sha256": "97b73ab5ea9814a764aa9c7edf4aab5d17fdb30b1a30ab32d98a412d53acefdf"
+    },
+    {
+      "path": "figures/benner_penetration_incidence.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_penetration_incidence.png",
+      "sha256": "7d969c68c469b907f9c1849aaee11b0635dfade88307849bed84157b4d3b831b"
+    },
+    {
+      "path": "figures/benner_penetration_pitch_chord.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_penetration_pitch_chord.png",
+      "sha256": "9d06f70647e7c92a1a513cba89a02c540336bfe11fc858cce6fd83c66e48c0a9"
+    },
+    {
+      "path": "figures/benner_penetration_re_in.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_penetration_Re_in.png",
+      "sha256": "ccc0339424832f3422668ec2ef90681f6f71c2fa47314cdc49eb77a5397c2007"
+    },
+    {
+      "path": "figures/benner_secondary_aspect_ratio.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_secondary_aspect_ratio.png",
+      "sha256": "1840efb7b8a230362c045974eb67ffd11f8814dbd573ea6abb81b16a251e3649"
+    },
+    {
+      "path": "figures/benner_secondary_delta_ref.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_secondary_delta_ref.png",
+      "sha256": "f3c77359bbd6f74b254a9d1e73e7f9e93cab726cfddc200f0519177f00a1efce"
+    },
+    {
+      "path": "figures/benner_secondary_exit_angle.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_secondary_exit_angle.png",
+      "sha256": "d32e62a17f9c316d905d606f6b44aaf2f11230fe0e55f5146c6f119e1f03b2b2"
+    },
+    {
+      "path": "figures/benner_secondary_incidence.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_secondary_incidence.png",
+      "sha256": "3fa9d8186f8198d83a1fad45bb46d97bb0ddab5d0df3abd29269c15f23de9159"
+    },
+    {
+      "path": "figures/benner_secondary_stagger.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/benner_secondary_stagger.png",
+      "sha256": "5f144488d89dc84a94e9631fe203f7f1e7fe3a322a9d27343e729e7c750e9d6e"
+    },
+    {
+      "path": "figures/compressibility_mach.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/compressibility_mach.png",
+      "sha256": "488f540f38bc7fce0693073736cf0ccfd73391bd45adfdf602ae14f46847c2e5"
+    },
+    {
+      "path": "figures/conversion_gamma.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_gamma.png",
+      "sha256": "0e5cfe5faf7b6c5c9422fdc952ac41a3c511cff32ad52436754287dc1f348b78"
+    },
+    {
+      "path": "figures/conversion_loss_g1.1_m0.2.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_loss_g1.1_M0.2.png",
+      "sha256": "e0403be04e24f70b3c2d0b0112eec610404e4d66e6873fdc849a1fbfa508f2d6"
+    },
+    {
+      "path": "figures/conversion_loss_g1.1_m0.7.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_loss_g1.1_M0.7.png",
+      "sha256": "4380075e3f0f23574be4266d4ccbcee8d396980adaf22324db8ca866a583f735"
+    },
+    {
+      "path": "figures/conversion_loss_g1.1_m1.2.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_loss_g1.1_M1.2.png",
+      "sha256": "da484ea0f108f9c7566dc0589eee93a0bd60c6dbf43c4617a8ce48b247bbf416"
+    },
+    {
+      "path": "figures/conversion_loss_g1.1_m2.0.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_loss_g1.1_M2.0.png",
+      "sha256": "98f113e26022fe11e80ac9e2bc84c4ef29ee64de4ff66321dfe4747458daf484"
+    },
+    {
+      "path": "figures/conversion_loss_g1.33_m0.2.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_loss_g1.33_M0.2.png",
+      "sha256": "93789265cc6e42b5c6d47588a8139cda9caddc4c837deb8ba7a245180eb524c0"
+    },
+    {
+      "path": "figures/conversion_loss_g1.33_m0.7.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_loss_g1.33_M0.7.png",
+      "sha256": "9987755d6c53f1f902a148225b1d77bb0d614d3b4a97d9feeb6f570c54cdf0c1"
+    },
+    {
+      "path": "figures/conversion_loss_g1.33_m1.2.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_loss_g1.33_M1.2.png",
+      "sha256": "69584dc20f6d06d2bfbd9e6316026a67c3167cbfbb5749d6dbaa932ee4fbc821"
+    },
+    {
+      "path": "figures/conversion_loss_g1.33_m2.0.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_loss_g1.33_M2.0.png",
+      "sha256": "c769701261c8267235b21a8194c46ec569225eabadd0ddee98b993b5f4ad9756"
+    },
+    {
+      "path": "figures/conversion_loss_g1.4_m0.2.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_loss_g1.4_M0.2.png",
+      "sha256": "e4e401fb9624bfe100f4ad5e2b9b9b39aaf4d6b888569ca9c3123a5bfe65e815"
+    },
+    {
+      "path": "figures/conversion_loss_g1.4_m0.7.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_loss_g1.4_M0.7.png",
+      "sha256": "db649b7d2723caba34563e5fabd92f6b05d16e90e9f7849b9a9dcf5914f36203"
+    },
+    {
+      "path": "figures/conversion_loss_g1.4_m1.2.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_loss_g1.4_M1.2.png",
+      "sha256": "1ba258b1c89cf6cc447635706f729699ee775743dc16335b5deeb1590d385f9a"
+    },
+    {
+      "path": "figures/conversion_loss_g1.4_m2.0.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_loss_g1.4_M2.0.png",
+      "sha256": "902137434b4f5f1411c91eaa5dfbc93ab12725610f5242600e4eac38f337cfaa"
+    },
+    {
+      "path": "figures/conversion_mach_d0.001.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_mach_d0.001.png",
+      "sha256": "c2a2df6d3fc1b042ae7c7afac26fae25df41901e07dde411eac69cb299741736"
+    },
+    {
+      "path": "figures/conversion_mach_d0.05.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_mach_d0.05.png",
+      "sha256": "490d5b1c8893a56770204bf05950f4e3fc340fc6bd45aab43a5f9804e742f99c"
+    },
+    {
+      "path": "figures/conversion_mach_d0.3.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_mach_d0.3.png",
+      "sha256": "851852b1299f0e4811b8efbd2eac8843854de6c434ab969bec11feb2c113f897"
+    },
+    {
+      "path": "figures/conversion_mach_d0.8.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/conversion_mach_d0.8.png",
+      "sha256": "239d378088bf105d7825d0155c6182d32a52c19f0fbe7a0f267c05b9552266b5"
+    },
+    {
+      "path": "figures/hub_interpolation.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/hub_interpolation.png",
+      "sha256": "f502b8ee8f4ee7df243ff1fcc498d91f30ece7d26537f672564353e81add2994"
+    },
+    {
+      "path": "figures/incidence_chi.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/incidence_chi.png",
+      "sha256": "14b2a17270c1b0dc199b8d996d04b8656bafa740bfc27aa8885d0163ef3bc1e9"
+    },
+    {
+      "path": "figures/incidence_chi_detail.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/incidence_chi_detail.png",
+      "sha256": "bae536563435baed67f1c9723de378a94e40fc4523549cf56773ee6289778b16"
+    },
+    {
+      "path": "figures/ko_clearance_aspect_ratio.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_clearance_aspect_ratio.png",
+      "sha256": "a28092e3c0efcd44c8303d798d433800f6a34843113588f06e791f50c82e1244"
+    },
+    {
+      "path": "figures/ko_clearance_clearance.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_clearance_clearance.png",
+      "sha256": "38b05b95536c456daba6bd9a014448584ede0e858dd10b96376718debcc1e761"
+    },
+    {
+      "path": "figures/ko_clearance_exit_angle.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_clearance_exit_angle.png",
+      "sha256": "62fa46b25dae4b9eef25ca85ff63265f2e47f960d13dde39ea69d2b1451e3c69"
+    },
+    {
+      "path": "figures/ko_clearance_incidence.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_clearance_incidence.png",
+      "sha256": "f6833aaaa98258833c1c24c92308d07c83225aca6ceb9b078bfa977c20d75fe4"
+    },
+    {
+      "path": "figures/ko_clearance_pitch_chord.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_clearance_pitch_chord.png",
+      "sha256": "c5a48eaeb1e2e31808034dbe4f8a71108fb360ece0bbf95e8d5e65ff8cd64617"
+    },
+    {
+      "path": "figures/ko_profile_exit_angle.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_profile_exit_angle.png",
+      "sha256": "c40f47efe9ad42534e035855aacd42149be0bea4d4011d7b657780f79c932ebf"
+    },
+    {
+      "path": "figures/ko_profile_hub_tip.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_profile_hub_tip.png",
+      "sha256": "f7c1100a977e4d0139e1110728b6b70f87b3fbae922929b0ce9944f204f886d6"
+    },
+    {
+      "path": "figures/ko_profile_ma_rel_in.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_profile_Ma_rel_in.png",
+      "sha256": "bc2c9645bf04624cf9304554f8713db30b29ff201de2446f742d2cff6b5e0f06"
+    },
+    {
+      "path": "figures/ko_profile_ma_rel_out.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_profile_Ma_rel_out.png",
+      "sha256": "0f18d8947337876e53098986859ddc55e1a95267a2fa41b887d5501fa2e8faad"
+    },
+    {
+      "path": "figures/ko_profile_pitch_chord.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_profile_pitch_chord.png",
+      "sha256": "ea230f34d626c96baea960c7b863069ac29490cf69e06a1fc7073659e03d0a9e"
+    },
+    {
+      "path": "figures/ko_profile_re_out.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_profile_Re_out.png",
+      "sha256": "fde4817b2bb25e2f75843ea7b20277bb478546d25f4b6b2ac8baee92f067011b"
+    },
+    {
+      "path": "figures/ko_profile_thickness_chord.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_profile_thickness_chord.png",
+      "sha256": "26c2bda57924b449e1cee023dc99fa7701370915aeacd6458a41b8837b6e1879"
+    },
+    {
+      "path": "figures/ko_secondary_aspect_ratio.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_secondary_aspect_ratio.png",
+      "sha256": "a0978d2bff5a8969e4e4af73f2b37a470e50d883c2b4e7bb737e18065ed1b9c7"
+    },
+    {
+      "path": "figures/ko_secondary_exit_angle.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_secondary_exit_angle.png",
+      "sha256": "1de90a284476993bdc15cfee78740fdca360e278bda8e52bfcfeb86c4d602d13"
+    },
+    {
+      "path": "figures/ko_secondary_incidence.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_secondary_incidence.png",
+      "sha256": "3eba075db7bcfd1f1752a23884dfa7c16b6102d1dd1345bad5997d55c563b881"
+    },
+    {
+      "path": "figures/ko_secondary_ma_rel_out.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_secondary_Ma_rel_out.png",
+      "sha256": "86fcf08176a2d48618cb3dd257e83f6ed7c38754232ba826ee2bea6466bd6f65"
+    },
+    {
+      "path": "figures/ko_secondary_stagger.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_secondary_stagger.png",
+      "sha256": "d4a9ffa851d992c77b94bcc194dc62a6381cfc0946151313bd94a7af3b2104dc"
+    },
+    {
+      "path": "figures/ko_trailing_exit_angle.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_trailing_exit_angle.png",
+      "sha256": "b1154338a032e4fb0da8b6b57fdb8d24d95d5fbca8d8a8658df6c2cef621d677"
+    },
+    {
+      "path": "figures/ko_trailing_ma_rel_out.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_trailing_Ma_rel_out.png",
+      "sha256": "1c1efad89a18dfd62c59fcad301af1c151ea8dd2bdc53a5731c5b26ace8b0b91"
+    },
+    {
+      "path": "figures/ko_trailing_trailing_ratio.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/ko_trailing_trailing_ratio.png",
+      "sha256": "700d4552ac360ba8e665168cb8dacff31020fd67ac15a4a3fab0903a05714b6a"
+    },
+    {
+      "path": "figures/loading_inlet.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/loading_inlet.png",
+      "sha256": "813c564827717ee79437aac2293f82cc2be333e459a4a6d109852640fb488576"
+    },
+    {
+      "path": "figures/moustapha_incidence_incidence.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/moustapha_incidence_incidence.png",
+      "sha256": "8685a7aa5d0de87afe1ecbb1fb41df664c909bc9256cfa014e72c747dc214e70"
+    },
+    {
+      "path": "figures/moustapha_incidence_leading_edge_ratio.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/moustapha_incidence_leading_edge_ratio.png",
+      "sha256": "fb7f82050fbe2a813ec39eb44517175af6ff96132f6dda910d22abbc099088d4"
+    },
+    {
+      "path": "figures/moustapha_incidence_ma_rel_out.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/moustapha_incidence_Ma_rel_out.png",
+      "sha256": "4ca174e8d957ac47e3243e28b2a53c3879441aa734a7618bb5590aa59d79f69e"
+    },
+    {
+      "path": "figures/moustapha_incidence_pitch_chord.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/moustapha_incidence_pitch_chord.png",
+      "sha256": "8ec42c3d318fef20ee931239cfb609f4d4f04460875ccea50d825477586921e9"
+    },
+    {
+      "path": "figures/moustapha_secondary_incidence.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/moustapha_secondary_incidence.png",
+      "sha256": "fd9a1ac6f76e6b44b40cd7df5669b3f05e996d6c9bd0ca670b249f10e2d1b81f"
+    },
+    {
+      "path": "figures/moustapha_secondary_leading_edge_ratio.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/moustapha_secondary_leading_edge_ratio.png",
+      "sha256": "cf9a9ca1e7e7c4c508d6ae15cc2fdd8a87d54534f23aabc72ea0dfea948f3c78"
+    },
+    {
+      "path": "figures/nozzle_angle.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/nozzle_angle.png",
+      "sha256": "966ffb940bdf29082026243ff5330dc136256f5588aecd222ff1ede75ece5b36"
+    },
+    {
+      "path": "figures/penetration_cap.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/penetration_cap.png",
+      "sha256": "dbcf38b02425d42561ce52cfff461eaddc8a85fbf9788915a991e5379aa43d71"
+    },
+    {
+      "path": "figures/smooth_absolute.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/smooth_absolute.png",
+      "sha256": "44250096f04a7517f81edeaac5da2c6af989c2713964191ef82d72bdf444c155"
+    },
+    {
+      "path": "figures/smooth_bounds.png",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/plots/fundamental/smooth_bounds.png",
+      "sha256": "788004ed43a6c81ad06d4e5a3dfba2d1be3262ea9459e9e15edbf451e4832287"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_incidence_incidence__rotor.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_incidence_incidence__rotor.csv.gz",
+      "sha256": "1e2ca8b70996ef6b988e5bd021748f683e1c5e09c88a99135bdb1f88d7421a68"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_incidence_incidence__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_incidence_incidence__stator.csv.gz",
+      "sha256": "d8cf5b2d359fc87b0c16185841f753de5a0f18f6572c2bed61a771279cd7d2e1"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_incidence_leading_edge_ratio__rotor.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_incidence_leading_edge_ratio__rotor.csv.gz",
+      "sha256": "d1ff08cd6d24b401ee39cd87828f17ddf433eb2c530db4825602dac54164ae3e"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_incidence_leading_edge_ratio__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_incidence_leading_edge_ratio__stator.csv.gz",
+      "sha256": "c32ff34f84a8c6f7b45059ff2754f0db9a9c8fdf417d7f5f5dbd31fc86d30163"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_incidence_ma_rel_out__rotor.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_incidence_Ma_rel_out__rotor.csv.gz",
+      "sha256": "b72d661ac240c3e0d1744135af145bda164fe84acb6c91733f24011ad546be74"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_incidence_ma_rel_out__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_incidence_Ma_rel_out__stator.csv.gz",
+      "sha256": "4b275998aee612168a6e1b2fa6c29655a14a5228ca2441e72b5cc2168633fa42"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_incidence_pitch_chord__rotor.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_incidence_pitch_chord__rotor.csv.gz",
+      "sha256": "bcb55222347c541050843a7fef7513b2a0e68b0df31535a2433da680496f0a58"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_incidence_pitch_chord__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_incidence_pitch_chord__stator.csv.gz",
+      "sha256": "33cf75d3ced2cea00aa9d633601e93d45608820c126a2a7496dc163b85926915"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_incidence_wedge__rotor.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_incidence_wedge__rotor.csv.gz",
+      "sha256": "e24d25104dfdd7bf0c99a832d1688c78f5da1a9c81fdb627d56c4487eb9e1731"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_incidence_wedge__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_incidence_wedge__stator.csv.gz",
+      "sha256": "64f7cc33b8f447efeb552dd4630c6dc50dd44d5f4b2c01fb15d7352ad6ff9b21"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_penetration_aspect_ratio__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_penetration_aspect_ratio__stator.csv.gz",
+      "sha256": "b88e80411bc28eb82648c1b0a8d0de03419417c626cf1b278915973d1768e43b"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_penetration_delta_ref__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_penetration_delta_ref__stator.csv.gz",
+      "sha256": "43d7e0d3086a9630c0003c7acc26ab309eb06a602eaedefa9ca0c1d40e34d124"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_penetration_exit_angle__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_penetration_exit_angle__stator.csv.gz",
+      "sha256": "85f8dd223ca3b64fc95b45acc0e06fe2cab5d8645c3d8e91eca868d5c85c80a9"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_penetration_incidence__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_penetration_incidence__stator.csv.gz",
+      "sha256": "892d36bc35926fcc359793e1eee2cc542e43f836efb73c5aba5ae6ab38426e69"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_penetration_pitch_chord__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_penetration_pitch_chord__stator.csv.gz",
+      "sha256": "5c9fc74cd7b709782986d66b7f9c91e708bf0285cf46e1af970e16ae117d5184"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_penetration_re_in__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_penetration_Re_in__stator.csv.gz",
+      "sha256": "21d925f7a67c65e693dbe495c9e8577c2239da64a025badd0e2079668fc2ff76"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_secondary_aspect_ratio__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_secondary_aspect_ratio__stator.csv.gz",
+      "sha256": "3677f1c68b3eeba993665965fc43996f303108918250b76318511d95ad1195cf"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_secondary_delta_ref__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_secondary_delta_ref__stator.csv.gz",
+      "sha256": "2d4377c43b73a9f3b79320ed09ad60448fa4b9c5b101963f63e7a46e4729e890"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_secondary_exit_angle__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_secondary_exit_angle__stator.csv.gz",
+      "sha256": "a42dbe94f40080a88e8e3eb5336c5e9bea371d40cad5525ec25bc2d4c68a90d3"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_secondary_incidence__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_secondary_incidence__stator.csv.gz",
+      "sha256": "f877571bd546ca0de05bfcabb2eaf925c9f8fd799466b7deacefcdc99e776819"
+    },
+    {
+      "path": "data/sweeps/fundamental_benner_secondary_stagger__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_benner_secondary_stagger__stator.csv.gz",
+      "sha256": "633bf7f20318f55ac540947d56544564ac70b0a6778286ea1b360be220510f5d"
+    },
+    {
+      "path": "data/sweeps/fundamental_compressibility_mach.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_compressibility_mach.csv.gz",
+      "sha256": "fe252ecd9b969ea4962c621791593a3a456928129fbb9e588a96ec1d1990f70c"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_gamma.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_gamma.csv.gz",
+      "sha256": "050ae042f93f6a370c269deba8b7d025168bd2c53b0a6c170c0165f791dcf52c"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_loss_g1.1_m0.2.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_loss_g1.1_M0.2.csv.gz",
+      "sha256": "52a7d07f6a2ffeca33e2f3b5c8fbe9442ed0467df345632c0ca9a94abfc8805d"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_loss_g1.1_m0.7.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_loss_g1.1_M0.7.csv.gz",
+      "sha256": "cbabadedc07d4ebb5e9aa2dd385699019d69c976b96e6e949c2fc46b62016d5f"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_loss_g1.1_m1.2.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_loss_g1.1_M1.2.csv.gz",
+      "sha256": "92d8b6d999f4233b69dd6fe912fb751f4537f4d69616b2864c1640c6d2f702e3"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_loss_g1.1_m2.0.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_loss_g1.1_M2.0.csv.gz",
+      "sha256": "4f05770f941f32ddb1171a1c5a4ed881c24ff283cd8a798cd87c7cab237f292e"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_loss_g1.33_m0.2.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_loss_g1.33_M0.2.csv.gz",
+      "sha256": "cc87f4594a54a6d17542c311462bbd028699b0e51383ea6dde792322d7f919b4"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_loss_g1.33_m0.7.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_loss_g1.33_M0.7.csv.gz",
+      "sha256": "e31b5e3549b0a83b308868e0fc566087c653951b03735d40602df3ae747e0d02"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_loss_g1.33_m1.2.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_loss_g1.33_M1.2.csv.gz",
+      "sha256": "628f3f37060805e0016abc199129e3294613f863090e24bc20ce4151508066e5"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_loss_g1.33_m2.0.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_loss_g1.33_M2.0.csv.gz",
+      "sha256": "4484383dcbe0332666c8edf31fde20ad3f656ef35e10dd9ecc6b97065f4ae1ee"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_loss_g1.4_m0.2.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_loss_g1.4_M0.2.csv.gz",
+      "sha256": "2749053b8b97b725a86da002a156f26a6fd4b7bd97b808d703f46a6f89f7b8e4"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_loss_g1.4_m0.7.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_loss_g1.4_M0.7.csv.gz",
+      "sha256": "c054373098a02f0c02a73c47060d5a4b18034783a7f128c34415d06cbb919925"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_loss_g1.4_m1.2.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_loss_g1.4_M1.2.csv.gz",
+      "sha256": "15414acc694c236617c6fd888263e1a198302629faf035a6af077e63e864cb62"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_loss_g1.4_m2.0.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_loss_g1.4_M2.0.csv.gz",
+      "sha256": "40ea21a4b743b12dd8768acffd29e37eebd1e1199697f3659a63dcce6bb4e41d"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_mach_d0.001.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_mach_d0.001.csv.gz",
+      "sha256": "2dee48fcc702966a07c2025001d365d2deb89949a3fe87f45634a0e3f0372447"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_mach_d0.05.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_mach_d0.05.csv.gz",
+      "sha256": "75b8fc29947944970de0cdbbebf789183e83b7e38318f20418fcd4f086766d9b"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_mach_d0.3.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_mach_d0.3.csv.gz",
+      "sha256": "b079b42abdda633e3b6debd3c400b96422d3ed8fbd993458e0a1883aa9f74e72"
+    },
+    {
+      "path": "data/sweeps/fundamental_conversion_mach_d0.8.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_conversion_mach_d0.8.csv.gz",
+      "sha256": "46c3bc351e593b23f93e70f92e78a4985261303fa774f1df316d8657ae370d60"
+    },
+    {
+      "path": "data/sweeps/fundamental_hub_interpolation.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_hub_interpolation.csv.gz",
+      "sha256": "499b8bdfc942193f8697db70d2a572498fa341079cafefc4e1b42dfeb671ea58"
+    },
+    {
+      "path": "data/sweeps/fundamental_incidence_chi.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_incidence_chi.csv.gz",
+      "sha256": "9dd996b9c5905c09415602cfcd05e734fb80a7a7c2249e7049be8f0b423a1d00"
+    },
+    {
+      "path": "data/sweeps/fundamental_incidence_chi_detail.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_incidence_chi_detail.csv.gz",
+      "sha256": "8c79d1a583d5e997bc347914f90c64bbe696c14616520a56ac90bc4f67d56209"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_clearance_aspect_ratio__rotor.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_clearance_aspect_ratio__rotor.csv.gz",
+      "sha256": "9110b8870e94ec51551ce232700da73517c55949b060ad7e20e737133322841a"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_clearance_aspect_ratio__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_clearance_aspect_ratio__stator.csv.gz",
+      "sha256": "7be39b5f725ec5dc27d56eacf3aebfb4d24053d8c854ff5f6b83377eea1de448"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_clearance_clearance__rotor.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_clearance_clearance__rotor.csv.gz",
+      "sha256": "45410df8e3e680bd5a4cf25d4266f6962bc6313a66e9c74ee1d8e539bd57e013"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_clearance_clearance__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_clearance_clearance__stator.csv.gz",
+      "sha256": "ce2743db5b50587ef06b7976f3130521a49c8d787d6114b06b5b90c173b3aaaa"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_clearance_exit_angle__rotor.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_clearance_exit_angle__rotor.csv.gz",
+      "sha256": "128f4d55435b94350ed76921a53ec592174b449372ecdd879d80e3119071a59b"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_clearance_exit_angle__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_clearance_exit_angle__stator.csv.gz",
+      "sha256": "1c89e538a1aa9c43a24406046f3012f1a383718f6059881037b74965673358bd"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_clearance_incidence__rotor.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_clearance_incidence__rotor.csv.gz",
+      "sha256": "0332c6dceb5017a7578cfee22d9c55fb6b2545f539c20474a7e8e3c897a9f5ca"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_clearance_incidence__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_clearance_incidence__stator.csv.gz",
+      "sha256": "0ea12cfad525c2158969bf7a11b1b0d7e3b5303d98e29fb69f34cc31f15c9964"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_clearance_pitch_chord__rotor.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_clearance_pitch_chord__rotor.csv.gz",
+      "sha256": "3f45e9289bed84d13ffa87bd67f03f4bd75852fc4201ccce3bc0ff9da8156e97"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_clearance_pitch_chord__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_clearance_pitch_chord__stator.csv.gz",
+      "sha256": "2ddb629b0c90fb8cea1f4a6f8880a174da732fdef66cc859edb0aeeb2b4f42b2"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_profile_exit_angle__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_profile_exit_angle__stator.csv.gz",
+      "sha256": "9780f0f6eb319fedbccfe6faff46fbfce61bb4b5ed20b70e8f4bec31136f068d"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_profile_hub_tip__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_profile_hub_tip__stator.csv.gz",
+      "sha256": "fb3fa773c4c4013c1e6a44623e3ab9cfc8cb82ccd937fd09751ae57b953da4de"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_profile_ma_rel_in__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_profile_Ma_rel_in__stator.csv.gz",
+      "sha256": "b772d88bfddbcd70e2ce8d188c0ced639031d9e2446d058be8f298af4b195c2f"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_profile_ma_rel_out__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_profile_Ma_rel_out__stator.csv.gz",
+      "sha256": "bacb851671ee5b8b0f48b7c8bff9725572dae75a8ba2a62507319608cbbd91f7"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_profile_pitch_chord__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_profile_pitch_chord__stator.csv.gz",
+      "sha256": "a3e3fd16d57c2844c236ae22508ef242ae2029a07aba00f60e4151b399e374ea"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_profile_re_out__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_profile_Re_out__stator.csv.gz",
+      "sha256": "104e0dfcce38fdd8ec342f01adb9825cbf6245fdc023bda42465898de6d976d4"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_profile_thickness_chord__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_profile_thickness_chord__stator.csv.gz",
+      "sha256": "1f6a7e14c65cc7edf4e12fa65d90f92782092c3a5497ba7c22f383d273d4dfc0"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_secondary_aspect_ratio__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_secondary_aspect_ratio__stator.csv.gz",
+      "sha256": "b3a61e89bf89571d756ddb880d21120dc767b9366615feca3c7413dca0c388d6"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_secondary_exit_angle__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_secondary_exit_angle__stator.csv.gz",
+      "sha256": "e33ebcdb0256c6257ca8d534d572947b50055d00c4f6452006097d81adc74035"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_secondary_incidence__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_secondary_incidence__stator.csv.gz",
+      "sha256": "eeaf12771e5433f68f56ad8db7c331ba16647ac50e9b59e310b25e12cd6a5c39"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_secondary_ma_rel_out__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_secondary_Ma_rel_out__stator.csv.gz",
+      "sha256": "526b5271eee9a6e1af331cfaf64a911ea031f7bbf6d7d110716f542ec764afb0"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_secondary_stagger__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_secondary_stagger__stator.csv.gz",
+      "sha256": "6be3566a5b17dfdfe88885e21a740aa627c85c72d90b18c627a4f684ad5d773f"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_trailing_exit_angle__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_trailing_exit_angle__stator.csv.gz",
+      "sha256": "8d3d9324852099ca20df55f05a9b7ef85157f7abf4d95b4387711f75d4d711d0"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_trailing_ma_rel_out__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_trailing_Ma_rel_out__stator.csv.gz",
+      "sha256": "755da259b2ef1af1f990587e07497a6e0d3fadee05f90aa869523133f34c4137"
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_trailing_trailing_ratio__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_ko_trailing_trailing_ratio__stator.csv.gz",
+      "sha256": "2c3c3be03a862fc111f116777666891dd6f8a791a3289ae95ac49aab4434e073"
+    },
+    {
+      "path": "data/sweeps/fundamental_loading_inlet.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_loading_inlet.csv.gz",
+      "sha256": "aa68509022d302513989e6d617f2cae1985aa02f41af12bb5ad1b2c3148114c0"
+    },
+    {
+      "path": "data/sweeps/fundamental_moustapha_incidence_incidence__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_moustapha_incidence_incidence__stator.csv.gz",
+      "sha256": "f8f1743d66873c3b0243ac89cdcbcba01c0999923be352a6a2b5c7030b3ad5c7"
+    },
+    {
+      "path": "data/sweeps/fundamental_moustapha_incidence_leading_edge_ratio__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_moustapha_incidence_leading_edge_ratio__stator.csv.gz",
+      "sha256": "0d927dbb160dda73f92eba1053520dbe682adef0caaad9b4ff66ad29b527e972"
+    },
+    {
+      "path": "data/sweeps/fundamental_moustapha_incidence_ma_rel_out__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_moustapha_incidence_Ma_rel_out__stator.csv.gz",
+      "sha256": "749e22e2ae69c583e8ada6cef0095ffa76cd0c0d0c541e765f35755631f8589d"
+    },
+    {
+      "path": "data/sweeps/fundamental_moustapha_incidence_pitch_chord__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_moustapha_incidence_pitch_chord__stator.csv.gz",
+      "sha256": "25572a16f4cbd1fc1db385ec0d8dfdc0c0a17b85d753663a622c182779878118"
+    },
+    {
+      "path": "data/sweeps/fundamental_moustapha_secondary_incidence__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_moustapha_secondary_incidence__stator.csv.gz",
+      "sha256": "e0ebb825969749d88d6c1ef98a0981bad320ecbe0a0a7b032bae0a709b73a633"
+    },
+    {
+      "path": "data/sweeps/fundamental_moustapha_secondary_leading_edge_ratio__stator.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_moustapha_secondary_leading_edge_ratio__stator.csv.gz",
+      "sha256": "f12548fc4bded28bb0e19c4632c6a9ae98d40b3deea2b562c85b9c7d6b3900fe"
+    },
+    {
+      "path": "data/sweeps/fundamental_nozzle_angle.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_nozzle_angle.csv.gz",
+      "sha256": "95c0e2ea3d8fa6ed52920443194a8fbbfa4c2d86c87ef9979285886e6b51fa1a"
+    },
+    {
+      "path": "data/sweeps/fundamental_penetration_cap.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_penetration_cap.csv.gz",
+      "sha256": "ec3a15194d2022a7b3b8f58a3209ef5214a047ff32de2ef41c3387114974efe8"
+    },
+    {
+      "path": "data/sweeps/fundamental_smooth_absolute.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_smooth_absolute.csv.gz",
+      "sha256": "3d8839968309f74b4bf84bb712c551aeca9e5d0bea04306b7aabf84b3dba613a"
+    },
+    {
+      "path": "data/sweeps/fundamental_smooth_bounds.csv.gz",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental/data/fundamental_smooth_bounds.csv.gz",
+      "sha256": "90cbcebf79dbe18aca9100500b4ba1e377571dc57f98091c8b04bed7295d959b"
+    },
+    {
+      "path": "data/provenance/fundamental_curvature_intervals.csv",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental_curvature_intervals.csv",
+      "sha256": "732e65c489739ba3bf1fbe3073d7ddf74375c704cc855de01d730bae85e182ee"
+    },
+    {
+      "path": "data/provenance/fundamental_join_findings.json",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental_join_findings.json",
+      "sha256": "33b5e22e2a5ed6bbe4228b675492e46e0f636833dc3833071943d410a135e446"
+    },
+    {
+      "path": "data/provenance/fundamental_join_intervals.csv",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/fundamental_join_intervals.csv",
+      "sha256": "f48a0ef348b6f9059ae864a15d805460ee301c99ec2a82eb91b080394c06220a"
+    },
+    {
+      "path": "data/provenance/model_comparison.csv",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/model_comparison.csv",
+      "sha256": "76bb95972c80e5741b8c83492ca76658b38ce180bfdd5335ef7d091c93a449aa"
+    },
+    {
+      "path": "data/provenance/plot_manifest.json",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/plot_manifest.json",
+      "sha256": "efac902fa9ee8b0f4127fc3e9cdb4fd33c88f8a366783d939a12a3d8f670364c"
+    },
+    {
+      "path": "data/provenance/render_manifest.json",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/render_manifest.json",
+      "sha256": "1513df7636ed27f54621896db0ddd1d75b42cc7132130f7ea0598a0ad8d73fde"
+    },
+    {
+      "path": "data/provenance/run_summary.json",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/run_summary.json",
+      "sha256": "9b2e8704e1fa77192ec78ef0800a659edba90160471ab39ed5c9c351052a8ea7"
+    },
+    {
+      "path": "data/provenance/source_manifest.json",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/source_manifest.json",
+      "sha256": "6a6366cc7f5a3fdfb1ce2d6e475f8eb7a9692d11502b9599b2957585ad22736f"
+    },
+    {
+      "path": "data/provenance/sweep_manifest.json",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/sweep_manifest.json",
+      "sha256": "5dbb326e729bb104659effec3f6cd4f9ccb622db15c292fc402c36cf696f6c39"
+    },
+    {
+      "path": "data/provenance/timings.json",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/timings.json",
+      "sha256": "acf6058039fd835597e1de4cff23cbc3268fb9d89bfd34653112729aab502e6e"
+    },
+    {
+      "path": "data/provenance/validation.json",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/results/validation.json",
+      "sha256": "d02f6c49d7cb5791c55e473f69798df9299fb44db30c33e48a1bf8473f7ae2e7"
+    },
+    {
+      "path": "data/validation/nozzle_directional_probes.csv",
+      "source": "improving_turbodash/loss_model_audit/results/derivative_validation/nozzle_directional_probes.csv",
+      "sha256": "2bded221f627c0c2b266b2df4c5d189afa1f775bb3763d8cba001247c1b97204"
+    },
+    {
+      "path": "data/validation/nozzle_directional_summary.json",
+      "source": "improving_turbodash/loss_model_audit/results/derivative_validation/nozzle_directional_summary.json",
+      "sha256": "7d8c244f92db3a2cae0634b1ad4fbf9c63e48ac05137dc0a54b5cdb541dc7764"
+    },
+    {
+      "path": "data/validation/samples.csv",
+      "source": "improving_turbodash/loss_model_audit/results/derivative_validation/samples.csv",
+      "sha256": "f630a9e9646385a395ec4a49530234852a1920cab25e7ce811f2e083c728a5eb"
+    },
+    {
+      "path": "data/validation/shrinking_probes.csv",
+      "source": "improving_turbodash/loss_model_audit/results/derivative_validation/shrinking_probes.csv",
+      "sha256": "6b2ac257e40d3d0240b2811b89b8476b5e9f2337910c4ee8d61449d61680697f"
+    },
+    {
+      "path": "data/validation/summary.json",
+      "source": "improving_turbodash/loss_model_audit/results/derivative_validation/summary.json",
+      "sha256": "00bb8f0fd309398b32b92562a4fe71c28af201cc7dc89cf4c4c2a7fb698d0ec6"
+    },
+    {
+      "path": "figures/features_and_gaps_validation.png",
+      "source": "improving_turbodash/loss_model_audit/plots/derivative_validation/features_and_gaps_validation.png",
+      "sha256": "1a74c365b4b61c44c8726fbd610d91923051623fc667317a36e627df06694068"
+    },
+    {
+      "path": "figures/near_constant_validation.png",
+      "source": "improving_turbodash/loss_model_audit/plots/derivative_validation/near_constant_validation.png",
+      "sha256": "62c1bc114cd373f39d51bef5da48b37ae4008f95981632d38c6537e3f737fba9"
+    },
+    {
+      "path": "data/validation/pytest_final.txt",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/pytest_final.txt",
+      "sha256": "98abe19084f2d7e5c3c4686539c9652883c6f8fbbde9636e904fe5853ba68731"
+    },
+    {
+      "path": "data/validation/pytest_final.xml",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/pytest_final.xml",
+      "sha256": "56b6114329bdf2f32b1d07f59b8c44563f0c4722501ee2e6cf82ebe1ad01e5fc"
+    },
+    {
+      "path": "data/validation/pytest_audit.txt",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/pytest_audit.txt",
+      "sha256": "df9b98a602d135cce51db30305d1dd21ea83c2396a84052f88f8d467be755c68"
+    },
+    {
+      "path": "data/validation/pytest_audit.xml",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/pytest_audit.xml",
+      "sha256": "f305a3ec0c8a4dbfd17a036660ee071cddd68b419abff036d8b85b1a00debb8c"
+    },
+    {
+      "path": "data/validation/incidence_conversion_pytest.xml",
+      "source": "improving_turbodash/loss_model_audit/revisions/refined/incidence_conversion_pytest.xml",
+      "sha256": "71eb8549e3f6264fbbef915dab94dedde65f8fda40ff49e127c15dd3ec762346"
+    }
+  ]
+}

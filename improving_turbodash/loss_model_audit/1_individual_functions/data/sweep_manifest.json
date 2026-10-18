@@ -1,0 +1,5712 @@
+[
+  {
+    "id": "fundamental_ko_profile_pitch_chord__stator",
+    "group": "ko_profile_pitch_chord",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Geometry: c,H,metal angles fixed; pitch changes; opening/pitch, TE/opening fixed; A_out=pitch*H and A_throat=opening*H rescaled. Solidity=1/(s/c), not independent. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 332,
+    "lo": 0.05,
+    "hi": 5,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_profile_pitch_chord__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_profile",
+    "variable": "pitch_chord",
+    "function_seconds_by_version": {
+      "baseline": 0.051019299988183775,
+      "candidate": 0.12496859997736465
+    },
+    "elapsed_seconds": 0.20197879999977886,
+    "found_branches": [
+      {
+        "field": "floor_margin",
+        "target": 0,
+        "x": 1.6301223529301336,
+        "version": "baseline"
+      }
+    ],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_profile": {
+          "retained": 284,
+          "finite_values": 332
+        },
+        "blend_before_floor": {
+          "retained": 284,
+          "finite_values": 332
+        },
+        "floor": {
+          "retained": 284,
+          "finite_values": 332
+        },
+        "floor_margin": {
+          "retained": 284,
+          "finite_values": 332
+        }
+      },
+      "candidate": {
+        "Y_profile": {
+          "retained": 284,
+          "finite_values": 332
+        },
+        "blend_before_floor": {
+          "retained": 284,
+          "finite_values": 332
+        },
+        "floor": {
+          "retained": 284,
+          "finite_values": 332
+        },
+        "floor_margin": {
+          "retained": 284,
+          "finite_values": 332
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 332,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 332,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_profile_exit_angle__stator",
+    "group": "ko_profile_exit_angle",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Fixed geometry/opening; exit magnitude=30..80 deg, retaining the sign of the reference exit metal angle (or reference flow if absent). Gauging_angle is stored unsigned. No reverse-direction exit sweep. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 362,
+    "lo": 30,
+    "hi": 80,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_profile_exit_angle__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_profile",
+    "variable": "exit_angle",
+    "function_seconds_by_version": {
+      "baseline": 0.0542784000026586,
+      "candidate": 0.1389026000051672
+    },
+    "elapsed_seconds": 0.22097299999950337,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_profile": {
+          "retained": 332,
+          "finite_values": 362
+        },
+        "blend_before_floor": {
+          "retained": 332,
+          "finite_values": 362
+        },
+        "floor": {
+          "retained": 332,
+          "finite_values": 362
+        },
+        "floor_margin": {
+          "retained": 332,
+          "finite_values": 362
+        }
+      },
+      "candidate": {
+        "Y_profile": {
+          "retained": 332,
+          "finite_values": 362
+        },
+        "blend_before_floor": {
+          "retained": 332,
+          "finite_values": 362
+        },
+        "floor": {
+          "retained": 332,
+          "finite_values": 362
+        },
+        "floor_margin": {
+          "retained": 332,
+          "finite_values": 362
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 362,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 362,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_profile_Re_out__stator",
+    "group": "ko_profile_Re_out",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Flow probe: only outlet Reynolds changes; penetration unchanged, profile Re correction active. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 302,
+    "lo": 10000.0,
+    "hi": 10000000.0,
+    "log": true,
+    "data_path": "data/sweeps/fundamental_ko_profile_re_out__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_profile",
+    "variable": "Re_out",
+    "function_seconds_by_version": {
+      "baseline": 0.04217650002465234,
+      "candidate": 0.11397199997009011
+    },
+    "elapsed_seconds": 0.17882170000120823,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_profile": {
+          "retained": 290,
+          "finite_values": 302
+        },
+        "blend_before_floor": {
+          "retained": 290,
+          "finite_values": 302
+        },
+        "floor": {
+          "retained": 290,
+          "finite_values": 302
+        },
+        "floor_margin": {
+          "retained": 290,
+          "finite_values": 302
+        }
+      },
+      "candidate": {
+        "Y_profile": {
+          "retained": 290,
+          "finite_values": 302
+        },
+        "blend_before_floor": {
+          "retained": 290,
+          "finite_values": 302
+        },
+        "floor": {
+          "retained": 290,
+          "finite_values": 302
+        },
+        "floor_margin": {
+          "retained": 290,
+          "finite_values": 302
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 302,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 302,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_profile_Ma_rel_in__stator",
+    "group": "ko_profile_Ma_rel_in",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Flow probe: only inlet Mach changes; prescribed pressures and Re fixed. Do not interpret as a physical thermodynamic path. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 294,
+    "lo": 0,
+    "hi": 3,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_profile_ma_rel_in__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_profile",
+    "variable": "Ma_rel_in",
+    "function_seconds_by_version": {
+      "baseline": 0.05148880000888312,
+      "candidate": 0.10852109997722437
+    },
+    "elapsed_seconds": 0.17795079999996233,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_profile": {
+          "retained": 276,
+          "finite_values": 294
+        },
+        "blend_before_floor": {
+          "retained": 276,
+          "finite_values": 294
+        },
+        "floor": {
+          "retained": 276,
+          "finite_values": 294
+        },
+        "floor_margin": {
+          "retained": 276,
+          "finite_values": 294
+        }
+      },
+      "candidate": {
+        "Y_profile": {
+          "retained": 276,
+          "finite_values": 294
+        },
+        "blend_before_floor": {
+          "retained": 276,
+          "finite_values": 294
+        },
+        "floor": {
+          "retained": 276,
+          "finite_values": 294
+        },
+        "floor_margin": {
+          "retained": 276,
+          "finite_values": 294
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 294,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 294,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_profile_Ma_rel_out__stator",
+    "group": "ko_profile_Ma_rel_out",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Flow probe: only outlet Mach changes; prescribed pressures and Re fixed. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 319,
+    "lo": 0,
+    "hi": 3,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_profile_ma_rel_out__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_profile",
+    "variable": "Ma_rel_out",
+    "function_seconds_by_version": {
+      "baseline": 0.05530499998349114,
+      "candidate": 0.11665749998792307
+    },
+    "elapsed_seconds": 0.19029650000084075,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_profile": {
+          "retained": 296,
+          "finite_values": 318
+        },
+        "blend_before_floor": {
+          "retained": 297,
+          "finite_values": 319
+        },
+        "floor": {
+          "retained": 297,
+          "finite_values": 319
+        },
+        "floor_margin": {
+          "retained": 297,
+          "finite_values": 319
+        }
+      },
+      "candidate": {
+        "Y_profile": {
+          "retained": 297,
+          "finite_values": 319
+        },
+        "blend_before_floor": {
+          "retained": 297,
+          "finite_values": 319
+        },
+        "floor": {
+          "retained": 297,
+          "finite_values": 319
+        },
+        "floor_margin": {
+          "retained": 297,
+          "finite_values": 319
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 318,
+        "nonfinite": 1,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 319,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_profile_thickness_chord__stator",
+    "group": "ko_profile_thickness_chord",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Geometry: only maximum thickness=true chord*ratio changes; LE diameter fixed to isolate profile thickness exponent. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 264,
+    "lo": 0.01,
+    "hi": 0.6,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_profile_thickness_chord__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_profile",
+    "variable": "thickness_chord",
+    "function_seconds_by_version": {
+      "baseline": 0.045184900005551754,
+      "candidate": 0.12218629999733821
+    },
+    "elapsed_seconds": 0.18525100000078965,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_profile": {
+          "retained": 254,
+          "finite_values": 264
+        },
+        "blend_before_floor": {
+          "retained": 254,
+          "finite_values": 264
+        },
+        "floor": {
+          "retained": 254,
+          "finite_values": 264
+        },
+        "floor_margin": {
+          "retained": 254,
+          "finite_values": 264
+        }
+      },
+      "candidate": {
+        "Y_profile": {
+          "retained": 254,
+          "finite_values": 264
+        },
+        "blend_before_floor": {
+          "retained": 254,
+          "finite_values": 264
+        },
+        "floor": {
+          "retained": 254,
+          "finite_values": 264
+        },
+        "floor_margin": {
+          "retained": 254,
+          "finite_values": 264
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 264,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 264,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_profile_hub_tip__stator",
+    "group": "ko_profile_hub_tip",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Only hub/tip input varied; interpolate after current smooth preprocessing. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 292,
+    "lo": 0.05,
+    "hi": 1,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_profile_hub_tip__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_profile",
+    "variable": "hub_tip",
+    "function_seconds_by_version": {
+      "baseline": 0.0432227999845054,
+      "candidate": 0.10505539998666791
+    },
+    "elapsed_seconds": 0.16349129999980505,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_profile": {
+          "retained": 277,
+          "finite_values": 292
+        },
+        "blend_before_floor": {
+          "retained": 277,
+          "finite_values": 292
+        },
+        "floor": {
+          "retained": 277,
+          "finite_values": 292
+        },
+        "floor_margin": {
+          "retained": 277,
+          "finite_values": 292
+        }
+      },
+      "candidate": {
+        "Y_profile": {
+          "retained": 277,
+          "finite_values": 292
+        },
+        "blend_before_floor": {
+          "retained": 277,
+          "finite_values": 292
+        },
+        "floor": {
+          "retained": 277,
+          "finite_values": 292
+        },
+        "floor_margin": {
+          "retained": 277,
+          "finite_values": 292
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 292,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 292,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_secondary_aspect_ratio__stator",
+    "group": "ko_secondary_aspect_ratio",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Geometry: true chord fixed, H varied; gap/H and delta_ref/H fixed; row passage areas rescaled. Flow prescribed, not a mass-flow-closed redesign. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 282,
+    "lo": 0.05,
+    "hi": 10,
+    "log": true,
+    "data_path": "data/sweeps/fundamental_ko_secondary_aspect_ratio__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_secondary",
+    "variable": "aspect_ratio",
+    "function_seconds_by_version": {
+      "baseline": 0.029059799997412483,
+      "candidate": 0.032710200033761794
+    },
+    "elapsed_seconds": 0.07011769999917306,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_secondary": {
+          "retained": 272,
+          "finite_values": 282
+        }
+      },
+      "candidate": {
+        "Y_secondary": {
+          "retained": 272,
+          "finite_values": 282
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 282,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 282,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_secondary_incidence__stator",
+    "group": "ko_secondary_incidence",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Fixed geometry and beta_des; beta_in=metal_in+offset, offset=-30..30 deg. All other flow values fixed. Samples outside -90<beta_in<90 are recorded as invalid, not clipped. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 229,
+    "lo": -30,
+    "hi": 30,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_secondary_incidence__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_secondary",
+    "variable": "incidence",
+    "function_seconds_by_version": {
+      "baseline": 0.01808580000033544,
+      "candidate": 0.02613609999389155
+    },
+    "elapsed_seconds": 0.05098840000027849,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_secondary": {
+          "retained": 222,
+          "finite_values": 229
+        }
+      },
+      "candidate": {
+        "Y_secondary": {
+          "retained": 222,
+          "finite_values": 229
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 229,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 229,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_secondary_exit_angle__stator",
+    "group": "ko_secondary_exit_angle",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Fixed geometry/opening; exit magnitude=30..80 deg, retaining the sign of the reference exit metal angle (or reference flow if absent). Gauging_angle is stored unsigned. No reverse-direction exit sweep. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 312,
+    "lo": 30,
+    "hi": 80,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_secondary_exit_angle__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_secondary",
+    "variable": "exit_angle",
+    "function_seconds_by_version": {
+      "baseline": 0.025928999995812774,
+      "candidate": 0.03649399999267189
+    },
+    "elapsed_seconds": 0.07076389999929233,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_secondary": {
+          "retained": 293,
+          "finite_values": 312
+        }
+      },
+      "candidate": {
+        "Y_secondary": {
+          "retained": 293,
+          "finite_values": 312
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 312,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 312,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_secondary_Ma_rel_out__stator",
+    "group": "ko_secondary_Ma_rel_out",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Flow probe: only outlet Mach changes; prescribed pressures and Re fixed. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 303,
+    "lo": 0,
+    "hi": 3,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_secondary_ma_rel_out__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_secondary",
+    "variable": "Ma_rel_out",
+    "function_seconds_by_version": {
+      "baseline": 0.02374860000963963,
+      "candidate": 0.03532090000408061
+    },
+    "elapsed_seconds": 0.06853840000076161,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_secondary": {
+          "retained": 284,
+          "finite_values": 302
+        }
+      },
+      "candidate": {
+        "Y_secondary": {
+          "retained": 285,
+          "finite_values": 303
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 302,
+        "nonfinite": 1,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 303,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_secondary_stagger__stator",
+    "group": "ko_secondary_stagger",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Geometry: true chord fixed; meridional chord=c*cos(stagger) recomputed. Opening/metal and other geometry fixed. Partial geometry probe, not a closed blade-shape construction. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 228,
+    "lo": -89.9,
+    "hi": 89.9,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_secondary_stagger__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_secondary",
+    "variable": "stagger",
+    "function_seconds_by_version": {
+      "baseline": 0.024207300002672127,
+      "candidate": 0.050892400004158844
+    },
+    "elapsed_seconds": 0.08223229999930481,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_secondary": {
+          "retained": 221,
+          "finite_values": 228
+        }
+      },
+      "candidate": {
+        "Y_secondary": {
+          "retained": 221,
+          "finite_values": 228
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 228,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 228,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_clearance_clearance__stator",
+    "group": "ko_clearance_clearance",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Geometry: only tip gap=full height*ratio changes; report stator and rotor separately. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 223,
+    "lo": 0,
+    "hi": 0.1,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_clearance_clearance__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_clearance",
+    "variable": "clearance",
+    "function_seconds_by_version": {
+      "baseline": 0.014074500000788248,
+      "candidate": 0.017709400008243392
+    },
+    "elapsed_seconds": 0.037012100001447834,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_clearance": {
+          "retained": 223,
+          "finite_values": 223
+        }
+      },
+      "candidate": {
+        "Y_clearance": {
+          "retained": 223,
+          "finite_values": 223
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 223,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 223,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_clearance_clearance__rotor",
+    "group": "ko_clearance_clearance",
+    "family": "rotor",
+    "kind": "fundamental",
+    "rule": "Geometry: only tip gap=full height*ratio changes; report stator and rotor separately. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 247,
+    "lo": 0,
+    "hi": 0.1,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_clearance_clearance__rotor.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_clearance",
+    "variable": "clearance",
+    "function_seconds_by_version": {
+      "baseline": 0.014621100004660548,
+      "candidate": 0.013286799990964937
+    },
+    "elapsed_seconds": 0.03434629999901517,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_clearance": {
+          "retained": 247,
+          "finite_values": 247
+        }
+      },
+      "candidate": {
+        "Y_clearance": {
+          "retained": 247,
+          "finite_values": 247
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 247,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 247,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_clearance_aspect_ratio__stator",
+    "group": "ko_clearance_aspect_ratio",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Geometry: true chord fixed, H varied; gap/H and delta_ref/H fixed; row passage areas rescaled. Flow prescribed, not a mass-flow-closed redesign. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 273,
+    "lo": 0.05,
+    "hi": 10,
+    "log": true,
+    "data_path": "data/sweeps/fundamental_ko_clearance_aspect_ratio__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_clearance",
+    "variable": "aspect_ratio",
+    "function_seconds_by_version": {
+      "baseline": 0.01566300000922638,
+      "candidate": 0.015386899975055712
+    },
+    "elapsed_seconds": 0.036743399999977555,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_clearance": {
+          "retained": 263,
+          "finite_values": 273
+        }
+      },
+      "candidate": {
+        "Y_clearance": {
+          "retained": 263,
+          "finite_values": 273
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 273,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 273,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_clearance_aspect_ratio__rotor",
+    "group": "ko_clearance_aspect_ratio",
+    "family": "rotor",
+    "kind": "fundamental",
+    "rule": "Geometry: true chord fixed, H varied; gap/H and delta_ref/H fixed; row passage areas rescaled. Flow prescribed, not a mass-flow-closed redesign. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 291,
+    "lo": 0.05,
+    "hi": 10,
+    "log": true,
+    "data_path": "data/sweeps/fundamental_ko_clearance_aspect_ratio__rotor.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_clearance",
+    "variable": "aspect_ratio",
+    "function_seconds_by_version": {
+      "baseline": 0.0180724999809172,
+      "candidate": 0.014947800005757017
+    },
+    "elapsed_seconds": 0.042557299999316456,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_clearance": {
+          "retained": 281,
+          "finite_values": 291
+        }
+      },
+      "candidate": {
+        "Y_clearance": {
+          "retained": 281,
+          "finite_values": 291
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 291,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 291,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_clearance_incidence__stator",
+    "group": "ko_clearance_incidence",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Fixed geometry and beta_des; beta_in=metal_in+offset, offset=-30..30 deg. All other flow values fixed. Samples outside -90<beta_in<90 are recorded as invalid, not clipped. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 229,
+    "lo": -30,
+    "hi": 30,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_clearance_incidence__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_clearance",
+    "variable": "incidence",
+    "function_seconds_by_version": {
+      "baseline": 0.013535700012653251,
+      "candidate": 0.011500900021928828
+    },
+    "elapsed_seconds": 0.030418100001043058,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_clearance": {
+          "retained": 222,
+          "finite_values": 229
+        }
+      },
+      "candidate": {
+        "Y_clearance": {
+          "retained": 222,
+          "finite_values": 229
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 229,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 229,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_clearance_incidence__rotor",
+    "group": "ko_clearance_incidence",
+    "family": "rotor",
+    "kind": "fundamental",
+    "rule": "Fixed geometry and beta_des; beta_in=metal_in+offset, offset=-30..30 deg. All other flow values fixed. Samples outside -90<beta_in<90 are recorded as invalid, not clipped. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 229,
+    "lo": -30,
+    "hi": 30,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_clearance_incidence__rotor.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_clearance",
+    "variable": "incidence",
+    "function_seconds_by_version": {
+      "baseline": 0.015335400008552824,
+      "candidate": 0.0127364999952988
+    },
+    "elapsed_seconds": 0.03839260000131617,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_clearance": {
+          "retained": 222,
+          "finite_values": 229
+        }
+      },
+      "candidate": {
+        "Y_clearance": {
+          "retained": 222,
+          "finite_values": 229
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 229,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 229,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_clearance_exit_angle__stator",
+    "group": "ko_clearance_exit_angle",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Fixed geometry/opening; exit magnitude=30..80 deg, retaining the sign of the reference exit metal angle (or reference flow if absent). Gauging_angle is stored unsigned. No reverse-direction exit sweep. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 311,
+    "lo": 30,
+    "hi": 80,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_clearance_exit_angle__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_clearance",
+    "variable": "exit_angle",
+    "function_seconds_by_version": {
+      "baseline": 0.023435499981133034,
+      "candidate": 0.01850469999044435
+    },
+    "elapsed_seconds": 0.04845500000010361,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_clearance": {
+          "retained": 293,
+          "finite_values": 311
+        }
+      },
+      "candidate": {
+        "Y_clearance": {
+          "retained": 293,
+          "finite_values": 311
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 311,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 311,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_clearance_exit_angle__rotor",
+    "group": "ko_clearance_exit_angle",
+    "family": "rotor",
+    "kind": "fundamental",
+    "rule": "Fixed geometry/opening; exit magnitude=30..80 deg, retaining the sign of the reference exit metal angle (or reference flow if absent). Gauging_angle is stored unsigned. No reverse-direction exit sweep. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 311,
+    "lo": 30,
+    "hi": 80,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_clearance_exit_angle__rotor.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_clearance",
+    "variable": "exit_angle",
+    "function_seconds_by_version": {
+      "baseline": 0.019142100001772633,
+      "candidate": 0.01809500000854314
+    },
+    "elapsed_seconds": 0.04499460000079125,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_clearance": {
+          "retained": 293,
+          "finite_values": 311
+        }
+      },
+      "candidate": {
+        "Y_clearance": {
+          "retained": 293,
+          "finite_values": 311
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 311,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 311,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_clearance_pitch_chord__stator",
+    "group": "ko_clearance_pitch_chord",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Geometry: c,H,metal angles fixed; pitch changes; opening/pitch, TE/opening fixed; A_out=pitch*H and A_throat=opening*H rescaled. Solidity=1/(s/c), not independent. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 236,
+    "lo": 0.05,
+    "hi": 5,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_clearance_pitch_chord__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_clearance",
+    "variable": "pitch_chord",
+    "function_seconds_by_version": {
+      "baseline": 0.015720999992481666,
+      "candidate": 0.012198200000057113
+    },
+    "elapsed_seconds": 0.034045900001729024,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_clearance": {
+          "retained": 231,
+          "finite_values": 236
+        }
+      },
+      "candidate": {
+        "Y_clearance": {
+          "retained": 231,
+          "finite_values": 236
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 236,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 236,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_clearance_pitch_chord__rotor",
+    "group": "ko_clearance_pitch_chord",
+    "family": "rotor",
+    "kind": "fundamental",
+    "rule": "Geometry: c,H,metal angles fixed; pitch changes; opening/pitch, TE/opening fixed; A_out=pitch*H and A_throat=opening*H rescaled. Solidity=1/(s/c), not independent. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 236,
+    "lo": 0.05,
+    "hi": 5,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_clearance_pitch_chord__rotor.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_clearance",
+    "variable": "pitch_chord",
+    "function_seconds_by_version": {
+      "baseline": 0.015538300003754557,
+      "candidate": 0.012597899993124884
+    },
+    "elapsed_seconds": 0.0337760000002163,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_clearance": {
+          "retained": 231,
+          "finite_values": 236
+        }
+      },
+      "candidate": {
+        "Y_clearance": {
+          "retained": 231,
+          "finite_values": 236
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 236,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 236,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_trailing_trailing_ratio__stator",
+    "group": "ko_trailing_trailing_ratio",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Geometry: only TE thickness=opening*ratio changes; blade opening and angles fixed. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 379,
+    "lo": 0,
+    "hi": 0.8,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_trailing_trailing_ratio__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_trailing",
+    "variable": "trailing_ratio",
+    "function_seconds_by_version": {
+      "baseline": 0.05080629999793018,
+      "candidate": 0.08774080000148388
+    },
+    "elapsed_seconds": 0.16324470000108704,
+    "found_branches": [
+      {
+        "field": "trailing_ratio_preprocessed",
+        "target": 0.2,
+        "x": 0.17822848942429104,
+        "version": "baseline"
+      },
+      {
+        "field": "trailing_ratio_preprocessed",
+        "target": 0.2,
+        "x": 0.2,
+        "version": "candidate"
+      }
+    ],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_trailing": {
+          "retained": 300,
+          "finite_values": 379
+        },
+        "delta_phi2_raw": {
+          "retained": 300,
+          "finite_values": 379
+        },
+        "trailing_ratio_preprocessed": {
+          "retained": 300,
+          "finite_values": 379
+        },
+        "trailing_ratio_raw": {
+          "retained": 300,
+          "finite_values": 379
+        }
+      },
+      "candidate": {
+        "Y_trailing": {
+          "retained": 300,
+          "finite_values": 379
+        },
+        "delta_phi2_raw": {
+          "retained": 300,
+          "finite_values": 379
+        },
+        "trailing_ratio_preprocessed": {
+          "retained": 300,
+          "finite_values": 379
+        },
+        "trailing_ratio_raw": {
+          "retained": 300,
+          "finite_values": 379
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 379,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 379,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_trailing_exit_angle__stator",
+    "group": "ko_trailing_exit_angle",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Fixed geometry/opening; exit magnitude=30..80 deg, retaining the sign of the reference exit metal angle (or reference flow if absent). Gauging_angle is stored unsigned. No reverse-direction exit sweep. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 324,
+    "lo": 30,
+    "hi": 80,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_trailing_exit_angle__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_trailing",
+    "variable": "exit_angle",
+    "function_seconds_by_version": {
+      "baseline": 0.04492019997269381,
+      "candidate": 0.0715029999937542
+    },
+    "elapsed_seconds": 0.1373383999998623,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_trailing": {
+          "retained": 305,
+          "finite_values": 324
+        },
+        "delta_phi2_raw": {
+          "retained": 305,
+          "finite_values": 324
+        },
+        "trailing_ratio_preprocessed": {
+          "retained": 305,
+          "finite_values": 324
+        },
+        "trailing_ratio_raw": {
+          "retained": 305,
+          "finite_values": 324
+        }
+      },
+      "candidate": {
+        "Y_trailing": {
+          "retained": 305,
+          "finite_values": 324
+        },
+        "delta_phi2_raw": {
+          "retained": 305,
+          "finite_values": 324
+        },
+        "trailing_ratio_preprocessed": {
+          "retained": 305,
+          "finite_values": 324
+        },
+        "trailing_ratio_raw": {
+          "retained": 305,
+          "finite_values": 324
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 324,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 324,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_ko_trailing_Ma_rel_out__stator",
+    "group": "ko_trailing_Ma_rel_out",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Flow probe: only outlet Mach changes; prescribed pressures and Re fixed. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 280,
+    "lo": 0,
+    "hi": 3,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_ko_trailing_ma_rel_out__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_trailing",
+    "variable": "Ma_rel_out",
+    "function_seconds_by_version": {
+      "baseline": 0.03132200000982266,
+      "candidate": 0.07584869999664079
+    },
+    "elapsed_seconds": 0.12208739999914542,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_trailing": {
+          "retained": 265,
+          "finite_values": 280
+        },
+        "delta_phi2_raw": {
+          "retained": 265,
+          "finite_values": 280
+        },
+        "trailing_ratio_preprocessed": {
+          "retained": 265,
+          "finite_values": 280
+        },
+        "trailing_ratio_raw": {
+          "retained": 265,
+          "finite_values": 280
+        }
+      },
+      "candidate": {
+        "Y_trailing": {
+          "retained": 265,
+          "finite_values": 280
+        },
+        "delta_phi2_raw": {
+          "retained": 265,
+          "finite_values": 280
+        },
+        "trailing_ratio_preprocessed": {
+          "retained": 265,
+          "finite_values": 280
+        },
+        "trailing_ratio_raw": {
+          "retained": 265,
+          "finite_values": 280
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 280,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 280,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_secondary_aspect_ratio__stator",
+    "group": "benner_secondary_aspect_ratio",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Geometry: true chord fixed, H varied; gap/H and delta_ref/H fixed; row passage areas rescaled. Flow prescribed, not a mass-flow-closed redesign. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 273,
+    "lo": 0.05,
+    "hi": 10,
+    "log": true,
+    "data_path": "data/sweeps/fundamental_benner_secondary_aspect_ratio__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_secondary",
+    "variable": "aspect_ratio",
+    "function_seconds_by_version": {
+      "baseline": 0.019478400005027652,
+      "candidate": 0.017003900020426954
+    },
+    "elapsed_seconds": 0.044783100000131526,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_secondary": {
+          "retained": 263,
+          "finite_values": 273
+        }
+      },
+      "candidate": {
+        "Y_secondary": {
+          "retained": 263,
+          "finite_values": 273
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 273,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 273,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_secondary_incidence__stator",
+    "group": "benner_secondary_incidence",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Fixed geometry and beta_des; beta_in=metal_in+offset, offset=-30..30 deg. All other flow values fixed. Samples outside -90<beta_in<90 are recorded as invalid, not clipped. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 229,
+    "lo": -30,
+    "hi": 30,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_secondary_incidence__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_secondary",
+    "variable": "incidence",
+    "function_seconds_by_version": {
+      "baseline": 0.014684800002214615,
+      "candidate": 0.013873400004740688
+    },
+    "elapsed_seconds": 0.035270100001071114,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_secondary": {
+          "retained": 222,
+          "finite_values": 229
+        }
+      },
+      "candidate": {
+        "Y_secondary": {
+          "retained": 222,
+          "finite_values": 229
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 229,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 229,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_secondary_exit_angle__stator",
+    "group": "benner_secondary_exit_angle",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Fixed geometry/opening; exit magnitude=30..80 deg, retaining the sign of the reference exit metal angle (or reference flow if absent). Gauging_angle is stored unsigned. No reverse-direction exit sweep. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 311,
+    "lo": 30,
+    "hi": 80,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_secondary_exit_angle__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_secondary",
+    "variable": "exit_angle",
+    "function_seconds_by_version": {
+      "baseline": 0.022634700000708108,
+      "candidate": 0.02070060000733065
+    },
+    "elapsed_seconds": 0.05285370000092371,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_secondary": {
+          "retained": 293,
+          "finite_values": 311
+        }
+      },
+      "candidate": {
+        "Y_secondary": {
+          "retained": 293,
+          "finite_values": 311
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 311,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 311,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_secondary_delta_ref__stator",
+    "group": "benner_secondary_delta_ref",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Prescribed boundary-layer reference/full height varied; Reynolds correction still applied. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 235,
+    "lo": 0,
+    "hi": 0.15,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_secondary_delta_ref__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_secondary",
+    "variable": "delta_ref",
+    "function_seconds_by_version": {
+      "baseline": 0.027976800005490077,
+      "candidate": 0.01898600002095918
+    },
+    "elapsed_seconds": 0.058320500000263564,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_secondary": {
+          "retained": 233,
+          "finite_values": 235
+        }
+      },
+      "candidate": {
+        "Y_secondary": {
+          "retained": 233,
+          "finite_values": 235
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 235,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 235,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_secondary_stagger__stator",
+    "group": "benner_secondary_stagger",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Geometry: true chord fixed; meridional chord=c*cos(stagger) recomputed. Opening/metal and other geometry fixed. Partial geometry probe, not a closed blade-shape construction. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 220,
+    "lo": -89.9,
+    "hi": 89.9,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_secondary_stagger__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_secondary",
+    "variable": "stagger",
+    "function_seconds_by_version": {
+      "baseline": 0.024613099996713572,
+      "candidate": 0.017167699987112428
+    },
+    "elapsed_seconds": 0.051523899999665446,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_secondary": {
+          "retained": 217,
+          "finite_values": 220
+        }
+      },
+      "candidate": {
+        "Y_secondary": {
+          "retained": 217,
+          "finite_values": 220
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 220,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 220,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_penetration_aspect_ratio__stator",
+    "group": "benner_penetration_aspect_ratio",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Geometry: true chord fixed, H varied; gap/H and delta_ref/H fixed; row passage areas rescaled. Flow prescribed, not a mass-flow-closed redesign. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 413,
+    "lo": 0.05,
+    "hi": 10,
+    "log": true,
+    "data_path": "data/sweeps/fundamental_benner_penetration_aspect_ratio__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_penetration",
+    "variable": "aspect_ratio",
+    "function_seconds_by_version": {
+      "baseline": 0.04431499997917854,
+      "candidate": 0.041026899983990006
+    },
+    "elapsed_seconds": 0.10843500000009954,
+    "found_branches": [
+      {
+        "field": "penetration_raw_ratio",
+        "target": 0.45,
+        "x": 0.26873045428472186,
+        "version": "baseline"
+      },
+      {
+        "field": "penetration_raw_ratio",
+        "target": 0.55,
+        "x": 0.18603279030787023,
+        "version": "baseline"
+      },
+      {
+        "field": "penetration_raw_ratio",
+        "target": 0.45,
+        "x": 0.26873045428472186,
+        "version": "candidate"
+      },
+      {
+        "field": "penetration_raw_ratio",
+        "target": 0.55,
+        "x": 0.18603279030787023,
+        "version": "candidate"
+      }
+    ],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "penetration_effective_ratio": {
+          "retained": 327,
+          "finite_values": 413
+        },
+        "penetration_raw_ratio": {
+          "retained": 327,
+          "finite_values": 413
+        },
+        "primary_loss_weight": {
+          "retained": 327,
+          "finite_values": 413
+        }
+      },
+      "candidate": {
+        "penetration_effective_ratio": {
+          "retained": 327,
+          "finite_values": 413
+        },
+        "penetration_raw_ratio": {
+          "retained": 327,
+          "finite_values": 413
+        },
+        "primary_loss_weight": {
+          "retained": 327,
+          "finite_values": 413
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 413,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 413,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_penetration_pitch_chord__stator",
+    "group": "benner_penetration_pitch_chord",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Geometry: c,H,metal angles fixed; pitch changes; opening/pitch, TE/opening fixed; A_out=pitch*H and A_throat=opening*H rescaled. Solidity=1/(s/c), not independent. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 351,
+    "lo": 0.05,
+    "hi": 5,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_penetration_pitch_chord__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_penetration",
+    "variable": "pitch_chord",
+    "function_seconds_by_version": {
+      "baseline": 0.03433149998090812,
+      "candidate": 0.034039099989968236
+    },
+    "elapsed_seconds": 0.08645339999930002,
+    "found_branches": [
+      {
+        "field": "penetration_raw_ratio",
+        "target": 0.45,
+        "x": 1.9971055358828935,
+        "version": "baseline"
+      },
+      {
+        "field": "penetration_raw_ratio",
+        "target": 0.55,
+        "x": 2.5799044769747814,
+        "version": "baseline"
+      },
+      {
+        "field": "penetration_raw_ratio",
+        "target": 0.45,
+        "x": 1.9971055358828935,
+        "version": "candidate"
+      },
+      {
+        "field": "penetration_raw_ratio",
+        "target": 0.55,
+        "x": 2.5799044769747814,
+        "version": "candidate"
+      }
+    ],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "penetration_effective_ratio": {
+          "retained": 266,
+          "finite_values": 351
+        },
+        "penetration_raw_ratio": {
+          "retained": 266,
+          "finite_values": 351
+        },
+        "primary_loss_weight": {
+          "retained": 266,
+          "finite_values": 351
+        }
+      },
+      "candidate": {
+        "penetration_effective_ratio": {
+          "retained": 266,
+          "finite_values": 351
+        },
+        "penetration_raw_ratio": {
+          "retained": 266,
+          "finite_values": 351
+        },
+        "primary_loss_weight": {
+          "retained": 266,
+          "finite_values": 351
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 351,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 351,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_penetration_incidence__stator",
+    "group": "benner_penetration_incidence",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Fixed geometry and beta_des; beta_in=metal_in+offset, offset=-30..30 deg. All other flow values fixed. Samples outside -90<beta_in<90 are recorded as invalid, not clipped. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 310,
+    "lo": -30,
+    "hi": 30,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_penetration_incidence__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_penetration",
+    "variable": "incidence",
+    "function_seconds_by_version": {
+      "baseline": 0.028473400005168514,
+      "candidate": 0.03296460000274237
+    },
+    "elapsed_seconds": 0.0803925000000163,
+    "found_branches": [
+      {
+        "field": "penetration_raw_ratio",
+        "target": 0.45,
+        "x": 24.59270810243293,
+        "version": "baseline"
+      },
+      {
+        "field": "penetration_raw_ratio",
+        "target": 0.45,
+        "x": 24.59270810243293,
+        "version": "candidate"
+      }
+    ],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "penetration_effective_ratio": {
+          "retained": 255,
+          "finite_values": 310
+        },
+        "penetration_raw_ratio": {
+          "retained": 255,
+          "finite_values": 310
+        },
+        "primary_loss_weight": {
+          "retained": 255,
+          "finite_values": 310
+        }
+      },
+      "candidate": {
+        "penetration_effective_ratio": {
+          "retained": 255,
+          "finite_values": 310
+        },
+        "penetration_raw_ratio": {
+          "retained": 255,
+          "finite_values": 310
+        },
+        "primary_loss_weight": {
+          "retained": 255,
+          "finite_values": 310
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 310,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 310,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_penetration_exit_angle__stator",
+    "group": "benner_penetration_exit_angle",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Fixed geometry/opening; exit magnitude=30..80 deg, retaining the sign of the reference exit metal angle (or reference flow if absent). Gauging_angle is stored unsigned. No reverse-direction exit sweep. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 317,
+    "lo": 30,
+    "hi": 80,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_penetration_exit_angle__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_penetration",
+    "variable": "exit_angle",
+    "function_seconds_by_version": {
+      "baseline": 0.03176640001038322,
+      "candidate": 0.02846240000690159
+    },
+    "elapsed_seconds": 0.07817810000051395,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "penetration_effective_ratio": {
+          "retained": 297,
+          "finite_values": 317
+        },
+        "penetration_raw_ratio": {
+          "retained": 297,
+          "finite_values": 317
+        },
+        "primary_loss_weight": {
+          "retained": 297,
+          "finite_values": 317
+        }
+      },
+      "candidate": {
+        "penetration_effective_ratio": {
+          "retained": 297,
+          "finite_values": 317
+        },
+        "penetration_raw_ratio": {
+          "retained": 297,
+          "finite_values": 317
+        },
+        "primary_loss_weight": {
+          "retained": 297,
+          "finite_values": 317
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 317,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 317,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_penetration_delta_ref__stator",
+    "group": "benner_penetration_delta_ref",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Prescribed boundary-layer reference/full height varied; Reynolds correction still applied. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 377,
+    "lo": 0,
+    "hi": 0.15,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_penetration_delta_ref__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_penetration",
+    "variable": "delta_ref",
+    "function_seconds_by_version": {
+      "baseline": 0.034890899991296465,
+      "candidate": 0.03531900000052701
+    },
+    "elapsed_seconds": 0.08848100000068371,
+    "found_branches": [
+      {
+        "field": "penetration_raw_ratio",
+        "target": 0.45,
+        "x": 0.08449858586023715,
+        "version": "baseline"
+      },
+      {
+        "field": "penetration_raw_ratio",
+        "target": 0.55,
+        "x": 0.10098571675199933,
+        "version": "baseline"
+      },
+      {
+        "field": "penetration_raw_ratio",
+        "target": 0.45,
+        "x": 0.08449858586023715,
+        "version": "candidate"
+      },
+      {
+        "field": "penetration_raw_ratio",
+        "target": 0.55,
+        "x": 0.10098571675199933,
+        "version": "candidate"
+      }
+    ],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "penetration_effective_ratio": {
+          "retained": 299,
+          "finite_values": 377
+        },
+        "penetration_raw_ratio": {
+          "retained": 299,
+          "finite_values": 377
+        },
+        "primary_loss_weight": {
+          "retained": 299,
+          "finite_values": 377
+        }
+      },
+      "candidate": {
+        "penetration_effective_ratio": {
+          "retained": 299,
+          "finite_values": 377
+        },
+        "penetration_raw_ratio": {
+          "retained": 299,
+          "finite_values": 377
+        },
+        "primary_loss_weight": {
+          "retained": 299,
+          "finite_values": 377
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 377,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 377,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_penetration_Re_in__stator",
+    "group": "benner_penetration_Re_in",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Flow probe: only inlet Reynolds changes; effective delta/H is recomputed as delta_ref*(Re_in/3e5)^(-1/7). Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 251,
+    "lo": 10000.0,
+    "hi": 10000000.0,
+    "log": true,
+    "data_path": "data/sweeps/fundamental_benner_penetration_re_in__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_penetration",
+    "variable": "Re_in",
+    "function_seconds_by_version": {
+      "baseline": 0.022750599984647124,
+      "candidate": 0.023447400002623908
+    },
+    "elapsed_seconds": 0.06368480000128329,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "penetration_effective_ratio": {
+          "retained": 245,
+          "finite_values": 251
+        },
+        "penetration_raw_ratio": {
+          "retained": 245,
+          "finite_values": 251
+        },
+        "primary_loss_weight": {
+          "retained": 245,
+          "finite_values": 251
+        }
+      },
+      "candidate": {
+        "penetration_effective_ratio": {
+          "retained": 245,
+          "finite_values": 251
+        },
+        "penetration_raw_ratio": {
+          "retained": 245,
+          "finite_values": 251
+        },
+        "primary_loss_weight": {
+          "retained": 245,
+          "finite_values": 251
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 251,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 251,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_incidence_incidence__stator",
+    "group": "benner_incidence_incidence",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Fixed geometry and beta_des; beta_in=metal_in+offset, offset=-30..30 deg. All other flow values fixed. Samples outside -90<beta_in<90 are recorded as invalid, not clipped. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 393,
+    "lo": -30,
+    "hi": 30,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_incidence_incidence__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_incidence",
+    "variable": "incidence",
+    "function_seconds_by_version": {
+      "baseline": 0.08886219999112654,
+      "candidate": 0.11761379998642951
+    },
+    "elapsed_seconds": 0.23468940000020666,
+    "found_branches": [
+      {
+        "field": "incidence_chi",
+        "target": 0,
+        "x": -4.088298655504097e-15,
+        "version": "baseline"
+      },
+      {
+        "field": "incidence_chi",
+        "target": 5,
+        "x": -14.917251189643249,
+        "version": "baseline"
+      },
+      {
+        "field": "incidence_chi",
+        "target": 0,
+        "x": -4.088298655504097e-15,
+        "version": "candidate"
+      },
+      {
+        "field": "incidence_chi",
+        "target": 5,
+        "x": -14.917251189643249,
+        "version": "candidate"
+      }
+    ],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_formula_unrestricted": {
+          "retained": 298,
+          "finite_values": 393
+        },
+        "Y_incidence": {
+          "retained": 298,
+          "finite_values": 393
+        },
+        "delta_phi2_limited": {
+          "retained": 298,
+          "finite_values": 393
+        },
+        "delta_phi2_raw": {
+          "retained": 298,
+          "finite_values": 393
+        },
+        "incidence_chi": {
+          "retained": 298,
+          "finite_values": 393
+        }
+      },
+      "candidate": {
+        "Y_formula_unrestricted": {
+          "retained": 298,
+          "finite_values": 393
+        },
+        "Y_incidence": {
+          "retained": 298,
+          "finite_values": 393
+        },
+        "delta_phi2_limited": {
+          "retained": 298,
+          "finite_values": 393
+        },
+        "delta_phi2_raw": {
+          "retained": 298,
+          "finite_values": 393
+        },
+        "incidence_chi": {
+          "retained": 298,
+          "finite_values": 393
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 393,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 393,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_incidence_incidence__rotor",
+    "group": "benner_incidence_incidence",
+    "family": "rotor",
+    "kind": "fundamental",
+    "rule": "Fixed geometry and beta_des; beta_in=metal_in+offset, offset=-30..30 deg. All other flow values fixed. Samples outside -90<beta_in<90 are recorded as invalid, not clipped. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 408,
+    "lo": -30,
+    "hi": 30,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_incidence_incidence__rotor.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_incidence",
+    "variable": "incidence",
+    "function_seconds_by_version": {
+      "baseline": 0.06825489999027923,
+      "candidate": 0.1044865999956528
+    },
+    "elapsed_seconds": 0.2045999000001757,
+    "found_branches": [
+      {
+        "field": "incidence_chi",
+        "target": 0,
+        "x": -4.088298655504097e-15,
+        "version": "baseline"
+      },
+      {
+        "field": "incidence_chi",
+        "target": 5,
+        "x": 14.917251189643242,
+        "version": "baseline"
+      },
+      {
+        "field": "incidence_chi",
+        "target": 0,
+        "x": -4.088298655504097e-15,
+        "version": "candidate"
+      },
+      {
+        "field": "incidence_chi",
+        "target": 5,
+        "x": 14.917251189643242,
+        "version": "candidate"
+      }
+    ],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_formula_unrestricted": {
+          "retained": 294,
+          "finite_values": 408
+        },
+        "Y_incidence": {
+          "retained": 294,
+          "finite_values": 408
+        },
+        "delta_phi2_limited": {
+          "retained": 294,
+          "finite_values": 408
+        },
+        "delta_phi2_raw": {
+          "retained": 294,
+          "finite_values": 408
+        },
+        "incidence_chi": {
+          "retained": 294,
+          "finite_values": 408
+        }
+      },
+      "candidate": {
+        "Y_formula_unrestricted": {
+          "retained": 294,
+          "finite_values": 408
+        },
+        "Y_incidence": {
+          "retained": 294,
+          "finite_values": 408
+        },
+        "delta_phi2_limited": {
+          "retained": 294,
+          "finite_values": 408
+        },
+        "delta_phi2_raw": {
+          "retained": 294,
+          "finite_values": 408
+        },
+        "incidence_chi": {
+          "retained": 294,
+          "finite_values": 408
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 408,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 408,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_incidence_leading_edge_ratio__stator",
+    "group": "benner_incidence_leading_edge_ratio",
+    "family": "stator, inlet offset=+10 deg",
+    "kind": "fundamental",
+    "rule": "Geometry: only LE diameter=true chord*ratio changes. Individual function only; no complete-row sum or penetration weighting. Fixed off-design inlet flow=metal+10 deg to expose geometric/Mach sensitivity.",
+    "base_points": 200,
+    "refined_points": 218,
+    "lo": 0.001,
+    "hi": 0.2,
+    "log": true,
+    "data_path": "data/sweeps/fundamental_benner_incidence_leading_edge_ratio__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_incidence",
+    "variable": "leading_edge_ratio",
+    "function_seconds_by_version": {
+      "baseline": 0.038737499997296254,
+      "candidate": 0.07434949998605589
+    },
+    "elapsed_seconds": 0.14046099999904982,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_formula_unrestricted": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "Y_incidence": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "delta_phi2_limited": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "delta_phi2_raw": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "incidence_chi": {
+          "retained": 218,
+          "finite_values": 218
+        }
+      },
+      "candidate": {
+        "Y_formula_unrestricted": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "Y_incidence": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "delta_phi2_limited": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "delta_phi2_raw": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "incidence_chi": {
+          "retained": 218,
+          "finite_values": 218
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 218,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 218,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_incidence_leading_edge_ratio__rotor",
+    "group": "benner_incidence_leading_edge_ratio",
+    "family": "rotor, inlet offset=+10 deg",
+    "kind": "fundamental",
+    "rule": "Geometry: only LE diameter=true chord*ratio changes. Individual function only; no complete-row sum or penetration weighting. Fixed off-design inlet flow=metal+10 deg to expose geometric/Mach sensitivity.",
+    "base_points": 200,
+    "refined_points": 218,
+    "lo": 0.001,
+    "hi": 0.2,
+    "log": true,
+    "data_path": "data/sweeps/fundamental_benner_incidence_leading_edge_ratio__rotor.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_incidence",
+    "variable": "leading_edge_ratio",
+    "function_seconds_by_version": {
+      "baseline": 0.04377980000936077,
+      "candidate": 0.07514689998424728
+    },
+    "elapsed_seconds": 0.14265379999960714,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_formula_unrestricted": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "Y_incidence": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "delta_phi2_limited": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "delta_phi2_raw": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "incidence_chi": {
+          "retained": 218,
+          "finite_values": 218
+        }
+      },
+      "candidate": {
+        "Y_formula_unrestricted": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "Y_incidence": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "delta_phi2_limited": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "delta_phi2_raw": {
+          "retained": 218,
+          "finite_values": 218
+        },
+        "incidence_chi": {
+          "retained": 218,
+          "finite_values": 218
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 218,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 218,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_incidence_wedge__stator",
+    "group": "benner_incidence_wedge",
+    "family": "stator, inlet offset=+10 deg",
+    "kind": "fundamental",
+    "rule": "Geometry: only leading-edge wedge angle (degrees) changes. Individual function only; no complete-row sum or penetration weighting. Fixed off-design inlet flow=metal+10 deg to expose geometric/Mach sensitivity.",
+    "base_points": 200,
+    "refined_points": 246,
+    "lo": 0.1,
+    "hi": 90,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_incidence_wedge__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_incidence",
+    "variable": "wedge",
+    "function_seconds_by_version": {
+      "baseline": 0.04493229999570758,
+      "candidate": 0.0761841000039567
+    },
+    "elapsed_seconds": 0.14810319999924104,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_formula_unrestricted": {
+          "retained": 239,
+          "finite_values": 246
+        },
+        "Y_incidence": {
+          "retained": 239,
+          "finite_values": 246
+        },
+        "delta_phi2_limited": {
+          "retained": 239,
+          "finite_values": 246
+        },
+        "delta_phi2_raw": {
+          "retained": 239,
+          "finite_values": 246
+        },
+        "incidence_chi": {
+          "retained": 239,
+          "finite_values": 246
+        }
+      },
+      "candidate": {
+        "Y_formula_unrestricted": {
+          "retained": 239,
+          "finite_values": 246
+        },
+        "Y_incidence": {
+          "retained": 239,
+          "finite_values": 246
+        },
+        "delta_phi2_limited": {
+          "retained": 239,
+          "finite_values": 246
+        },
+        "delta_phi2_raw": {
+          "retained": 239,
+          "finite_values": 246
+        },
+        "incidence_chi": {
+          "retained": 239,
+          "finite_values": 246
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 246,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 246,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_incidence_wedge__rotor",
+    "group": "benner_incidence_wedge",
+    "family": "rotor, inlet offset=+10 deg",
+    "kind": "fundamental",
+    "rule": "Geometry: only leading-edge wedge angle (degrees) changes. Individual function only; no complete-row sum or penetration weighting. Fixed off-design inlet flow=metal+10 deg to expose geometric/Mach sensitivity.",
+    "base_points": 200,
+    "refined_points": 305,
+    "lo": 0.1,
+    "hi": 90,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_incidence_wedge__rotor.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_incidence",
+    "variable": "wedge",
+    "function_seconds_by_version": {
+      "baseline": 0.05454960000679421,
+      "candidate": 0.08208300001570024
+    },
+    "elapsed_seconds": 0.16342040000017732,
+    "found_branches": [
+      {
+        "field": "incidence_chi",
+        "target": 5,
+        "x": 4.0614138045494945,
+        "version": "baseline"
+      },
+      {
+        "field": "incidence_chi",
+        "target": 5,
+        "x": 4.0614138045494945,
+        "version": "candidate"
+      }
+    ],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_formula_unrestricted": {
+          "retained": 259,
+          "finite_values": 305
+        },
+        "Y_incidence": {
+          "retained": 259,
+          "finite_values": 305
+        },
+        "delta_phi2_limited": {
+          "retained": 259,
+          "finite_values": 305
+        },
+        "delta_phi2_raw": {
+          "retained": 259,
+          "finite_values": 305
+        },
+        "incidence_chi": {
+          "retained": 259,
+          "finite_values": 305
+        }
+      },
+      "candidate": {
+        "Y_formula_unrestricted": {
+          "retained": 259,
+          "finite_values": 305
+        },
+        "Y_incidence": {
+          "retained": 259,
+          "finite_values": 305
+        },
+        "delta_phi2_limited": {
+          "retained": 259,
+          "finite_values": 305
+        },
+        "delta_phi2_raw": {
+          "retained": 259,
+          "finite_values": 305
+        },
+        "incidence_chi": {
+          "retained": 259,
+          "finite_values": 305
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 305,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 305,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_incidence_pitch_chord__stator",
+    "group": "benner_incidence_pitch_chord",
+    "family": "stator, inlet offset=+10 deg",
+    "kind": "fundamental",
+    "rule": "Geometry: c,H,metal angles fixed; pitch changes; opening/pitch, TE/opening fixed; A_out=pitch*H and A_throat=opening*H rescaled. Solidity=1/(s/c), not independent. Individual function only; no complete-row sum or penetration weighting. Fixed off-design inlet flow=metal+10 deg to expose geometric/Mach sensitivity.",
+    "base_points": 200,
+    "refined_points": 238,
+    "lo": 0.05,
+    "hi": 5,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_incidence_pitch_chord__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_incidence",
+    "variable": "pitch_chord",
+    "function_seconds_by_version": {
+      "baseline": 0.04154339999695367,
+      "candidate": 0.0578406000022369
+    },
+    "elapsed_seconds": 0.12375919999976759,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_formula_unrestricted": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "Y_incidence": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "delta_phi2_limited": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "delta_phi2_raw": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "incidence_chi": {
+          "retained": 231,
+          "finite_values": 238
+        }
+      },
+      "candidate": {
+        "Y_formula_unrestricted": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "Y_incidence": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "delta_phi2_limited": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "delta_phi2_raw": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "incidence_chi": {
+          "retained": 231,
+          "finite_values": 238
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 238,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 238,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_incidence_pitch_chord__rotor",
+    "group": "benner_incidence_pitch_chord",
+    "family": "rotor, inlet offset=+10 deg",
+    "kind": "fundamental",
+    "rule": "Geometry: c,H,metal angles fixed; pitch changes; opening/pitch, TE/opening fixed; A_out=pitch*H and A_throat=opening*H rescaled. Solidity=1/(s/c), not independent. Individual function only; no complete-row sum or penetration weighting. Fixed off-design inlet flow=metal+10 deg to expose geometric/Mach sensitivity.",
+    "base_points": 200,
+    "refined_points": 238,
+    "lo": 0.05,
+    "hi": 5,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_incidence_pitch_chord__rotor.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_incidence",
+    "variable": "pitch_chord",
+    "function_seconds_by_version": {
+      "baseline": 0.04115839999212767,
+      "candidate": 0.06177670000215585
+    },
+    "elapsed_seconds": 0.12775200000032783,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_formula_unrestricted": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "Y_incidence": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "delta_phi2_limited": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "delta_phi2_raw": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "incidence_chi": {
+          "retained": 231,
+          "finite_values": 238
+        }
+      },
+      "candidate": {
+        "Y_formula_unrestricted": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "Y_incidence": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "delta_phi2_limited": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "delta_phi2_raw": {
+          "retained": 231,
+          "finite_values": 238
+        },
+        "incidence_chi": {
+          "retained": 231,
+          "finite_values": 238
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 238,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 238,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_incidence_Ma_rel_out__stator",
+    "group": "benner_incidence_Ma_rel_out",
+    "family": "stator, inlet offset=+10 deg",
+    "kind": "fundamental",
+    "rule": "Flow probe: only outlet Mach changes; prescribed pressures and Re fixed. Individual function only; no complete-row sum or penetration weighting. Fixed off-design inlet flow=metal+10 deg to expose geometric/Mach sensitivity.",
+    "base_points": 200,
+    "refined_points": 308,
+    "lo": 0,
+    "hi": 3,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_incidence_ma_rel_out__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_incidence",
+    "variable": "Ma_rel_out",
+    "function_seconds_by_version": {
+      "baseline": 0.050718500002403744,
+      "candidate": 0.07796809999672405
+    },
+    "elapsed_seconds": 0.15250750000086555,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_formula_unrestricted": {
+          "retained": 290,
+          "finite_values": 308
+        },
+        "Y_incidence": {
+          "retained": 289,
+          "finite_values": 307
+        },
+        "delta_phi2_limited": {
+          "retained": 290,
+          "finite_values": 308
+        },
+        "delta_phi2_raw": {
+          "retained": 290,
+          "finite_values": 308
+        },
+        "incidence_chi": {
+          "retained": 290,
+          "finite_values": 308
+        }
+      },
+      "candidate": {
+        "Y_formula_unrestricted": {
+          "retained": 290,
+          "finite_values": 308
+        },
+        "Y_incidence": {
+          "retained": 290,
+          "finite_values": 308
+        },
+        "delta_phi2_limited": {
+          "retained": 290,
+          "finite_values": 308
+        },
+        "delta_phi2_raw": {
+          "retained": 290,
+          "finite_values": 308
+        },
+        "incidence_chi": {
+          "retained": 290,
+          "finite_values": 308
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 307,
+        "nonfinite": 1,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 308,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_benner_incidence_Ma_rel_out__rotor",
+    "group": "benner_incidence_Ma_rel_out",
+    "family": "rotor, inlet offset=+10 deg",
+    "kind": "fundamental",
+    "rule": "Flow probe: only outlet Mach changes; prescribed pressures and Re fixed. Individual function only; no complete-row sum or penetration weighting. Fixed off-design inlet flow=metal+10 deg to expose geometric/Mach sensitivity.",
+    "base_points": 200,
+    "refined_points": 289,
+    "lo": 0,
+    "hi": 3,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_benner_incidence_ma_rel_out__rotor.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_incidence",
+    "variable": "Ma_rel_out",
+    "function_seconds_by_version": {
+      "baseline": 0.051997600006870925,
+      "candidate": 0.07532859999810171
+    },
+    "elapsed_seconds": 0.1495335999989038,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_formula_unrestricted": {
+          "retained": 274,
+          "finite_values": 289
+        },
+        "Y_incidence": {
+          "retained": 273,
+          "finite_values": 288
+        },
+        "delta_phi2_limited": {
+          "retained": 274,
+          "finite_values": 289
+        },
+        "delta_phi2_raw": {
+          "retained": 274,
+          "finite_values": 289
+        },
+        "incidence_chi": {
+          "retained": 274,
+          "finite_values": 289
+        }
+      },
+      "candidate": {
+        "Y_formula_unrestricted": {
+          "retained": 274,
+          "finite_values": 289
+        },
+        "Y_incidence": {
+          "retained": 274,
+          "finite_values": 289
+        },
+        "delta_phi2_limited": {
+          "retained": 274,
+          "finite_values": 289
+        },
+        "delta_phi2_raw": {
+          "retained": 274,
+          "finite_values": 289
+        },
+        "incidence_chi": {
+          "retained": 274,
+          "finite_values": 289
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 288,
+        "nonfinite": 1,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 289,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_moustapha_incidence_incidence__stator",
+    "group": "moustapha_incidence_incidence",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Fixed geometry and beta_des; beta_in=metal_in+offset, offset=-30..30 deg. All other flow values fixed. Samples outside -90<beta_in<90 are recorded as invalid, not clipped. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 415,
+    "lo": -30,
+    "hi": 30,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_moustapha_incidence_incidence__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "moustapha_incidence",
+    "variable": "incidence",
+    "function_seconds_by_version": {
+      "baseline": 0.03270009999687318,
+      "candidate": 0.05201629997463897
+    },
+    "elapsed_seconds": 0.11767490000056569,
+    "found_branches": [
+      {
+        "field": "incidence_chi",
+        "target": 0,
+        "x": -4.088298655504097e-15,
+        "version": "baseline"
+      },
+      {
+        "field": "incidence_chi",
+        "target": 5,
+        "x": 0.03208056014034014,
+        "version": "baseline"
+      },
+      {
+        "field": "incidence_chi",
+        "target": 0,
+        "x": -4.088298655504097e-15,
+        "version": "candidate"
+      },
+      {
+        "field": "incidence_chi",
+        "target": 5,
+        "x": 0.03208056014034014,
+        "version": "candidate"
+      }
+    ],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_formula_unrestricted": {
+          "retained": 207,
+          "finite_values": 306
+        },
+        "Y_incidence": {
+          "retained": 211,
+          "finite_values": 310
+        },
+        "conversion_domain_margin": {
+          "retained": 310,
+          "finite_values": 415
+        },
+        "delta_phi2_raw": {
+          "retained": 310,
+          "finite_values": 415
+        },
+        "incidence_chi": {
+          "retained": 310,
+          "finite_values": 415
+        }
+      },
+      "candidate": {
+        "Y_formula_unrestricted": {
+          "retained": 207,
+          "finite_values": 306
+        },
+        "Y_incidence": {
+          "retained": 211,
+          "finite_values": 310
+        },
+        "conversion_domain_margin": {
+          "retained": 310,
+          "finite_values": 415
+        },
+        "delta_phi2_raw": {
+          "retained": 310,
+          "finite_values": 415
+        },
+        "incidence_chi": {
+          "retained": 310,
+          "finite_values": 415
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 306,
+        "nonfinite": 109,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 306,
+        "nonfinite": 109,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_moustapha_incidence_leading_edge_ratio__stator",
+    "group": "moustapha_incidence_leading_edge_ratio",
+    "family": "stator, inlet offset=+10 deg",
+    "kind": "fundamental",
+    "rule": "Geometry: only LE diameter=true chord*ratio changes. Individual function only; no complete-row sum or penetration weighting. Fixed off-design inlet flow=metal+10 deg to expose geometric/Mach sensitivity.",
+    "base_points": 200,
+    "refined_points": 281,
+    "lo": 0.001,
+    "hi": 0.2,
+    "log": true,
+    "data_path": "data/sweeps/fundamental_moustapha_incidence_leading_edge_ratio__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "moustapha_incidence",
+    "variable": "leading_edge_ratio",
+    "function_seconds_by_version": {
+      "baseline": 0.02052160000494041,
+      "candidate": 0.03402900001674425
+    },
+    "elapsed_seconds": 0.07512789999964298,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_formula_unrestricted": {
+          "retained": 133,
+          "finite_values": 133
+        },
+        "Y_incidence": {
+          "retained": 138,
+          "finite_values": 138
+        },
+        "conversion_domain_margin": {
+          "retained": 281,
+          "finite_values": 281
+        },
+        "delta_phi2_raw": {
+          "retained": 281,
+          "finite_values": 281
+        },
+        "incidence_chi": {
+          "retained": 281,
+          "finite_values": 281
+        }
+      },
+      "candidate": {
+        "Y_formula_unrestricted": {
+          "retained": 133,
+          "finite_values": 133
+        },
+        "Y_incidence": {
+          "retained": 138,
+          "finite_values": 138
+        },
+        "conversion_domain_margin": {
+          "retained": 281,
+          "finite_values": 281
+        },
+        "delta_phi2_raw": {
+          "retained": 281,
+          "finite_values": 281
+        },
+        "incidence_chi": {
+          "retained": 281,
+          "finite_values": 281
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 133,
+        "nonfinite": 148,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 133,
+        "nonfinite": 148,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_moustapha_incidence_pitch_chord__stator",
+    "group": "moustapha_incidence_pitch_chord",
+    "family": "stator, inlet offset=+10 deg",
+    "kind": "fundamental",
+    "rule": "Geometry: c,H,metal angles fixed; pitch changes; opening/pitch, TE/opening fixed; A_out=pitch*H and A_throat=opening*H rescaled. Solidity=1/(s/c), not independent. Individual function only; no complete-row sum or penetration weighting. Fixed off-design inlet flow=metal+10 deg to expose geometric/Mach sensitivity.",
+    "base_points": 200,
+    "refined_points": 296,
+    "lo": 0.05,
+    "hi": 5,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_moustapha_incidence_pitch_chord__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "moustapha_incidence",
+    "variable": "pitch_chord",
+    "function_seconds_by_version": {
+      "baseline": 0.020987499996408587,
+      "candidate": 0.03517090000968892
+    },
+    "elapsed_seconds": 0.07501070000034815,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_formula_unrestricted": {
+          "retained": 76,
+          "finite_values": 87
+        },
+        "Y_incidence": {
+          "retained": 79,
+          "finite_values": 90
+        },
+        "conversion_domain_margin": {
+          "retained": 281,
+          "finite_values": 296
+        },
+        "delta_phi2_raw": {
+          "retained": 281,
+          "finite_values": 296
+        },
+        "incidence_chi": {
+          "retained": 281,
+          "finite_values": 296
+        }
+      },
+      "candidate": {
+        "Y_formula_unrestricted": {
+          "retained": 76,
+          "finite_values": 87
+        },
+        "Y_incidence": {
+          "retained": 79,
+          "finite_values": 90
+        },
+        "conversion_domain_margin": {
+          "retained": 281,
+          "finite_values": 296
+        },
+        "delta_phi2_raw": {
+          "retained": 281,
+          "finite_values": 296
+        },
+        "incidence_chi": {
+          "retained": 281,
+          "finite_values": 296
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 87,
+        "nonfinite": 209,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 87,
+        "nonfinite": 209,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_moustapha_incidence_Ma_rel_out__stator",
+    "group": "moustapha_incidence_Ma_rel_out",
+    "family": "stator, inlet offset=+10 deg",
+    "kind": "fundamental",
+    "rule": "Flow probe: only outlet Mach changes; prescribed pressures and Re fixed. Individual function only; no complete-row sum or penetration weighting. Fixed off-design inlet flow=metal+10 deg to expose geometric/Mach sensitivity.",
+    "base_points": 200,
+    "refined_points": 306,
+    "lo": 0,
+    "hi": 3,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_moustapha_incidence_ma_rel_out__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "moustapha_incidence",
+    "variable": "Ma_rel_out",
+    "function_seconds_by_version": {
+      "baseline": 0.02190680001695,
+      "candidate": 0.034671100014747935
+    },
+    "elapsed_seconds": 0.07985259999986738,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y_formula_unrestricted": {
+          "retained": 0,
+          "finite_values": 0
+        },
+        "Y_incidence": {
+          "retained": 0,
+          "finite_values": 0
+        },
+        "conversion_domain_margin": {
+          "retained": 289,
+          "finite_values": 306
+        },
+        "delta_phi2_raw": {
+          "retained": 289,
+          "finite_values": 306
+        },
+        "incidence_chi": {
+          "retained": 289,
+          "finite_values": 306
+        }
+      },
+      "candidate": {
+        "Y_formula_unrestricted": {
+          "retained": 0,
+          "finite_values": 0
+        },
+        "Y_incidence": {
+          "retained": 0,
+          "finite_values": 0
+        },
+        "conversion_domain_margin": {
+          "retained": 289,
+          "finite_values": 306
+        },
+        "delta_phi2_raw": {
+          "retained": 289,
+          "finite_values": 306
+        },
+        "incidence_chi": {
+          "retained": 289,
+          "finite_values": 306
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 0,
+        "nonfinite": 306,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 0,
+        "nonfinite": 306,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_moustapha_secondary_incidence__stator",
+    "group": "moustapha_secondary_incidence",
+    "family": "stator",
+    "kind": "fundamental",
+    "rule": "Fixed geometry and beta_des; beta_in=metal_in+offset, offset=-30..30 deg. All other flow values fixed. Samples outside -90<beta_in<90 are recorded as invalid, not clipped. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 229,
+    "lo": -30,
+    "hi": 30,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_moustapha_secondary_incidence__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "moustapha_secondary",
+    "variable": "incidence",
+    "function_seconds_by_version": {
+      "baseline": 0.007047199964290485,
+      "candidate": 0.006204999997862615
+    },
+    "elapsed_seconds": 0.0189860000009503,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "secondary_factor": {
+          "retained": 222,
+          "finite_values": 229
+        }
+      },
+      "candidate": {
+        "secondary_factor": {
+          "retained": 222,
+          "finite_values": 229
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 229,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 229,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_moustapha_secondary_leading_edge_ratio__stator",
+    "group": "moustapha_secondary_leading_edge_ratio",
+    "family": "stator, inlet offset=+10 deg",
+    "kind": "fundamental",
+    "rule": "Geometry: only LE diameter=true chord*ratio changes. Individual function only; no complete-row sum or penetration weighting. Fixed off-design inlet flow=metal+10 deg to expose geometric/Mach sensitivity.",
+    "base_points": 200,
+    "refined_points": 218,
+    "lo": 0.001,
+    "hi": 0.2,
+    "log": true,
+    "data_path": "data/sweeps/fundamental_moustapha_secondary_leading_edge_ratio__stator.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "moustapha_secondary",
+    "variable": "leading_edge_ratio",
+    "function_seconds_by_version": {
+      "baseline": 0.0058778000056918245,
+      "candidate": 0.006074099994293647
+    },
+    "elapsed_seconds": 0.01789459999963583,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "secondary_factor": {
+          "retained": 218,
+          "finite_values": 218
+        }
+      },
+      "candidate": {
+        "secondary_factor": {
+          "retained": 218,
+          "finite_values": 218
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 218,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 218,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_nozzle_angle",
+    "group": "nozzle_angle",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Fixed geometry/opening; exit magnitude=30..80 deg, retaining the sign of the reference exit metal angle (or reference flow if absent). Gauging_angle is stored unsigned. No reverse-direction exit sweep. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 374,
+    "lo": 30,
+    "hi": 80,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_nozzle_angle.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_profile",
+    "variable": "exit_angle",
+    "function_seconds_by_version": {
+      "baseline": 0.0032339999961550348,
+      "candidate": 0.013893699977415963
+    },
+    "elapsed_seconds": 0.03320799999892188,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "impulse": {
+          "retained": 344,
+          "finite_values": 374
+        },
+        "reaction": {
+          "retained": 344,
+          "finite_values": 374
+        }
+      },
+      "candidate": {
+        "impulse": {
+          "retained": 344,
+          "finite_values": 374
+        },
+        "reaction": {
+          "retained": 344,
+          "finite_values": 374
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 374,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 374,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_penetration_cap",
+    "group": "penetration_cap",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct scalar helper input; all other arguments fixed. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 253,
+    "lo": 0,
+    "hi": 0.9,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_penetration_cap.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_penetration",
+    "variable": "raw_penetration",
+    "function_seconds_by_version": {
+      "baseline": 0.009442899996429333,
+      "candidate": 0.009276899989345111
+    },
+    "elapsed_seconds": 0.02703089999886288,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "effective": {
+          "retained": 243,
+          "finite_values": 253
+        },
+        "weight": {
+          "retained": 243,
+          "finite_values": 253
+        }
+      },
+      "candidate": {
+        "effective": {
+          "retained": 243,
+          "finite_values": 253
+        },
+        "weight": {
+          "retained": 243,
+          "finite_values": 253
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 253,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 253,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_incidence_chi",
+    "group": "incidence_chi",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct scalar helper input; all other arguments fixed. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 281,
+    "lo": -10,
+    "hi": 20,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_incidence_chi.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_incidence",
+    "variable": "chi",
+    "function_seconds_by_version": {
+      "baseline": 0.017353599994748947,
+      "candidate": 0.023784899971360574
+    },
+    "elapsed_seconds": 0.05316049999964889,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "limited": {
+          "retained": 263,
+          "finite_values": 281
+        },
+        "raw": {
+          "retained": 263,
+          "finite_values": 281
+        }
+      },
+      "candidate": {
+        "limited": {
+          "retained": 263,
+          "finite_values": 281
+        },
+        "raw": {
+          "retained": 263,
+          "finite_values": 281
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 281,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 281,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_loading_inlet",
+    "group": "loading_inlet",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "BSx=1; fixed inlet metal=40 deg, inlet=metal+offset, exit=-60 deg. No change in gauge direction.",
+    "base_points": 200,
+    "refined_points": 229,
+    "lo": -30,
+    "hi": 30,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_loading_inlet.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_penetration",
+    "variable": "incidence",
+    "function_seconds_by_version": {
+      "baseline": 0.0015502000260312343,
+      "candidate": 0.001456700016206014
+    },
+    "elapsed_seconds": 0.008648000000903266,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Ft": {
+          "retained": 222,
+          "finite_values": 229
+        }
+      },
+      "candidate": {
+        "Ft": {
+          "retained": 222,
+          "finite_values": 229
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 229,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 229,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_incidence_chi_detail",
+    "group": "incidence_chi_detail",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Local chi reference detail; original signed-increment convention preserved.",
+    "base_points": 200,
+    "refined_points": 265,
+    "lo": -0.15,
+    "hi": 0.1,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_incidence_chi_detail.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "benner_incidence",
+    "variable": "chi",
+    "function_seconds_by_version": {
+      "baseline": 0.016749300022638636,
+      "candidate": 0.0238679999984015
+    },
+    "elapsed_seconds": 0.05405109999992419,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "limited": {
+          "retained": 253,
+          "finite_values": 265
+        },
+        "raw": {
+          "retained": 253,
+          "finite_values": 265
+        }
+      },
+      "candidate": {
+        "limited": {
+          "retained": 253,
+          "finite_values": 265
+        },
+        "raw": {
+          "retained": 253,
+          "finite_values": 265
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 265,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 265,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_hub_interpolation",
+    "group": "hub_interpolation",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Only hub/tip input varied; interpolate after current smooth preprocessing. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 312,
+    "lo": 0.05,
+    "hi": 1,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_hub_interpolation.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_profile",
+    "variable": "hub_tip",
+    "function_seconds_by_version": {
+      "baseline": 0.022436000004745438,
+      "candidate": 0.01813619999848015
+    },
+    "elapsed_seconds": 0.05575460000000021,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "preprocessed": {
+          "retained": 297,
+          "finite_values": 312
+        },
+        "rotor": {
+          "retained": 297,
+          "finite_values": 312
+        },
+        "stator": {
+          "retained": 297,
+          "finite_values": 312
+        }
+      },
+      "candidate": {
+        "preprocessed": {
+          "retained": 297,
+          "finite_values": 312
+        },
+        "rotor": {
+          "retained": 297,
+          "finite_values": 312
+        },
+        "stator": {
+          "retained": 297,
+          "finite_values": 312
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 312,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 312,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_compressibility_mach",
+    "group": "compressibility_mach",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Flow probe: only outlet Mach changes; prescribed pressures and Re fixed. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 344,
+    "lo": 0,
+    "hi": 3,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_compressibility_mach.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "ko_profile",
+    "variable": "Ma_rel_out",
+    "function_seconds_by_version": {
+      "baseline": 0.010395799992693355,
+      "candidate": 0.021897599977819482
+    },
+    "elapsed_seconds": 0.05086389999996754,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "K1": {
+          "retained": 320,
+          "finite_values": 344
+        },
+        "K2": {
+          "retained": 319,
+          "finite_values": 343
+        },
+        "Kp": {
+          "retained": 319,
+          "finite_values": 343
+        }
+      },
+      "candidate": {
+        "K1": {
+          "retained": 320,
+          "finite_values": 344
+        },
+        "K2": {
+          "retained": 320,
+          "finite_values": 344
+        },
+        "Kp": {
+          "retained": 320,
+          "finite_values": 344
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 343,
+        "nonfinite": 1,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 344,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_loss_g1.1_M0.2",
+    "group": "conversion_loss_g1.1_M0.2",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct conversion at Mach=0.2, gamma=1.1. Negative loss and unit-loss boundaries are explicit domain stress tests.",
+    "base_points": 200,
+    "refined_points": 312,
+    "lo": -0.01,
+    "hi": 1.05,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_loss_g1.1_m0.2.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "delta_phi2",
+    "function_seconds_by_version": {
+      "baseline": 0.02781709999180748,
+      "candidate": 0.08369139998649189
+    },
+    "elapsed_seconds": 0.1412958000000799,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Mach_effective": {
+          "retained": 253,
+          "finite_values": 263
+        },
+        "Y_flag_false": {
+          "retained": 245,
+          "finite_values": 254
+        },
+        "Y_flag_true": {
+          "retained": 245,
+          "finite_values": 254
+        },
+        "Y_formula_unrestricted": {
+          "retained": 261,
+          "finite_values": 269
+        },
+        "Y_guarded_before_cap": {
+          "retained": 245,
+          "finite_values": 253
+        },
+        "raw_domain_margin": {
+          "retained": 297,
+          "finite_values": 312
+        }
+      },
+      "candidate": {
+        "Mach_effective": {
+          "retained": 297,
+          "finite_values": 312
+        },
+        "Y_flag_false": {
+          "retained": 261,
+          "finite_values": 269
+        },
+        "Y_flag_true": {
+          "retained": 269,
+          "finite_values": 278
+        },
+        "Y_formula_unrestricted": {
+          "retained": 261,
+          "finite_values": 269
+        },
+        "Y_guarded_before_cap": {
+          "retained": 269,
+          "finite_values": 278
+        },
+        "raw_domain_margin": {
+          "retained": 297,
+          "finite_values": 312
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 253,
+        "nonfinite": 59,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 269,
+        "nonfinite": 43,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_loss_g1.1_M0.7",
+    "group": "conversion_loss_g1.1_M0.7",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct conversion at Mach=0.7, gamma=1.1. Negative loss and unit-loss boundaries are explicit domain stress tests.",
+    "base_points": 200,
+    "refined_points": 348,
+    "lo": -0.01,
+    "hi": 1.05,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_loss_g1.1_m0.7.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "delta_phi2",
+    "function_seconds_by_version": {
+      "baseline": 0.031238400004440336,
+      "candidate": 0.07843579999826034
+    },
+    "elapsed_seconds": 0.13623050000023795,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Mach_effective": {
+          "retained": 278,
+          "finite_values": 298
+        },
+        "Y_flag_false": {
+          "retained": 276,
+          "finite_values": 296
+        },
+        "Y_flag_true": {
+          "retained": 276,
+          "finite_values": 296
+        },
+        "Y_formula_unrestricted": {
+          "retained": 263,
+          "finite_values": 278
+        },
+        "Y_guarded_before_cap": {
+          "retained": 276,
+          "finite_values": 295
+        },
+        "raw_domain_margin": {
+          "retained": 322,
+          "finite_values": 348
+        }
+      },
+      "candidate": {
+        "Mach_effective": {
+          "retained": 322,
+          "finite_values": 348
+        },
+        "Y_flag_false": {
+          "retained": 263,
+          "finite_values": 278
+        },
+        "Y_flag_true": {
+          "retained": 298,
+          "finite_values": 320
+        },
+        "Y_formula_unrestricted": {
+          "retained": 263,
+          "finite_values": 278
+        },
+        "Y_guarded_before_cap": {
+          "retained": 298,
+          "finite_values": 320
+        },
+        "raw_domain_margin": {
+          "retained": 322,
+          "finite_values": 348
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 255,
+        "nonfinite": 93,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 278,
+        "nonfinite": 70,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_loss_g1.1_M1.2",
+    "group": "conversion_loss_g1.1_M1.2",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct conversion at Mach=1.2, gamma=1.1. Negative loss and unit-loss boundaries are explicit domain stress tests.",
+    "base_points": 200,
+    "refined_points": 339,
+    "lo": -0.01,
+    "hi": 1.05,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_loss_g1.1_m1.2.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "delta_phi2",
+    "function_seconds_by_version": {
+      "baseline": 0.027258699981757673,
+      "candidate": 0.06801580000137619
+    },
+    "elapsed_seconds": 0.11821819999931904,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Mach_effective": {
+          "retained": 278,
+          "finite_values": 288
+        },
+        "Y_flag_false": {
+          "retained": 278,
+          "finite_values": 288
+        },
+        "Y_flag_true": {
+          "retained": 278,
+          "finite_values": 288
+        },
+        "Y_formula_unrestricted": {
+          "retained": 242,
+          "finite_values": 244
+        },
+        "Y_guarded_before_cap": {
+          "retained": 278,
+          "finite_values": 287
+        },
+        "raw_domain_margin": {
+          "retained": 326,
+          "finite_values": 339
+        }
+      },
+      "candidate": {
+        "Mach_effective": {
+          "retained": 326,
+          "finite_values": 339
+        },
+        "Y_flag_false": {
+          "retained": 242,
+          "finite_values": 244
+        },
+        "Y_flag_true": {
+          "retained": 294,
+          "finite_values": 303
+        },
+        "Y_formula_unrestricted": {
+          "retained": 242,
+          "finite_values": 244
+        },
+        "Y_guarded_before_cap": {
+          "retained": 294,
+          "finite_values": 303
+        },
+        "raw_domain_margin": {
+          "retained": 326,
+          "finite_values": 339
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 228,
+        "nonfinite": 111,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 244,
+        "nonfinite": 95,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_loss_g1.1_M2.0",
+    "group": "conversion_loss_g1.1_M2.0",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct conversion at Mach=2.0, gamma=1.1. Negative loss and unit-loss boundaries are explicit domain stress tests.",
+    "base_points": 200,
+    "refined_points": 348,
+    "lo": -0.01,
+    "hi": 1.05,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_loss_g1.1_m2.0.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "delta_phi2",
+    "function_seconds_by_version": {
+      "baseline": 0.02653469999859226,
+      "candidate": 0.06736220001221227
+    },
+    "elapsed_seconds": 0.11725639999895066,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Mach_effective": {
+          "retained": 282,
+          "finite_values": 297
+        },
+        "Y_flag_false": {
+          "retained": 282,
+          "finite_values": 296
+        },
+        "Y_flag_true": {
+          "retained": 282,
+          "finite_values": 296
+        },
+        "Y_formula_unrestricted": {
+          "retained": 234,
+          "finite_values": 241
+        },
+        "Y_guarded_before_cap": {
+          "retained": 282,
+          "finite_values": 296
+        },
+        "raw_domain_margin": {
+          "retained": 330,
+          "finite_values": 348
+        }
+      },
+      "candidate": {
+        "Mach_effective": {
+          "retained": 330,
+          "finite_values": 348
+        },
+        "Y_flag_false": {
+          "retained": 234,
+          "finite_values": 241
+        },
+        "Y_flag_true": {
+          "retained": 298,
+          "finite_values": 312
+        },
+        "Y_formula_unrestricted": {
+          "retained": 234,
+          "finite_values": 241
+        },
+        "Y_guarded_before_cap": {
+          "retained": 298,
+          "finite_values": 312
+        },
+        "raw_domain_margin": {
+          "retained": 330,
+          "finite_values": 348
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 225,
+        "nonfinite": 123,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 241,
+        "nonfinite": 107,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_loss_g1.33_M0.2",
+    "group": "conversion_loss_g1.33_M0.2",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct conversion at Mach=0.2, gamma=1.33. Negative loss and unit-loss boundaries are explicit domain stress tests.",
+    "base_points": 200,
+    "refined_points": 326,
+    "lo": -0.01,
+    "hi": 1.05,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_loss_g1.33_m0.2.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "delta_phi2",
+    "function_seconds_by_version": {
+      "baseline": 0.02430419999473088,
+      "candidate": 0.06374289999439497
+    },
+    "elapsed_seconds": 0.11099339999964286,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Mach_effective": {
+          "retained": 266,
+          "finite_values": 276
+        },
+        "Y_flag_false": {
+          "retained": 251,
+          "finite_values": 256
+        },
+        "Y_flag_true": {
+          "retained": 251,
+          "finite_values": 256
+        },
+        "Y_formula_unrestricted": {
+          "retained": 269,
+          "finite_values": 275
+        },
+        "Y_guarded_before_cap": {
+          "retained": 251,
+          "finite_values": 255
+        },
+        "raw_domain_margin": {
+          "retained": 310,
+          "finite_values": 326
+        }
+      },
+      "candidate": {
+        "Mach_effective": {
+          "retained": 310,
+          "finite_values": 326
+        },
+        "Y_flag_false": {
+          "retained": 269,
+          "finite_values": 275
+        },
+        "Y_flag_true": {
+          "retained": 286,
+          "finite_values": 298
+        },
+        "Y_formula_unrestricted": {
+          "retained": 269,
+          "finite_values": 275
+        },
+        "Y_guarded_before_cap": {
+          "retained": 286,
+          "finite_values": 298
+        },
+        "raw_domain_margin": {
+          "retained": 310,
+          "finite_values": 326
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 252,
+        "nonfinite": 74,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 275,
+        "nonfinite": 51,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_loss_g1.33_M0.7",
+    "group": "conversion_loss_g1.33_M0.7",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct conversion at Mach=0.7, gamma=1.33. Negative loss and unit-loss boundaries are explicit domain stress tests.",
+    "base_points": 200,
+    "refined_points": 362,
+    "lo": -0.01,
+    "hi": 1.05,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_loss_g1.33_m0.7.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "delta_phi2",
+    "function_seconds_by_version": {
+      "baseline": 0.027922400024181115,
+      "candidate": 0.06961720001527283
+    },
+    "elapsed_seconds": 0.12300209999921208,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Mach_effective": {
+          "retained": 302,
+          "finite_values": 312
+        },
+        "Y_flag_false": {
+          "retained": 300,
+          "finite_values": 310
+        },
+        "Y_flag_true": {
+          "retained": 300,
+          "finite_values": 310
+        },
+        "Y_formula_unrestricted": {
+          "retained": 249,
+          "finite_values": 254
+        },
+        "Y_guarded_before_cap": {
+          "retained": 300,
+          "finite_values": 309
+        },
+        "raw_domain_margin": {
+          "retained": 346,
+          "finite_values": 362
+        }
+      },
+      "candidate": {
+        "Mach_effective": {
+          "retained": 346,
+          "finite_values": 362
+        },
+        "Y_flag_false": {
+          "retained": 249,
+          "finite_values": 254
+        },
+        "Y_flag_true": {
+          "retained": 322,
+          "finite_values": 334
+        },
+        "Y_formula_unrestricted": {
+          "retained": 249,
+          "finite_values": 254
+        },
+        "Y_guarded_before_cap": {
+          "retained": 322,
+          "finite_values": 334
+        },
+        "raw_domain_margin": {
+          "retained": 346,
+          "finite_values": 362
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 231,
+        "nonfinite": 131,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 254,
+        "nonfinite": 108,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_loss_g1.33_M1.2",
+    "group": "conversion_loss_g1.33_M1.2",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct conversion at Mach=1.2, gamma=1.33. Negative loss and unit-loss boundaries are explicit domain stress tests.",
+    "base_points": 200,
+    "refined_points": 340,
+    "lo": -0.01,
+    "hi": 1.05,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_loss_g1.33_m1.2.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "delta_phi2",
+    "function_seconds_by_version": {
+      "baseline": 0.026655099989511655,
+      "candidate": 0.07024950000050012
+    },
+    "elapsed_seconds": 0.12225559999933466,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Mach_effective": {
+          "retained": 270,
+          "finite_values": 289
+        },
+        "Y_flag_false": {
+          "retained": 270,
+          "finite_values": 289
+        },
+        "Y_flag_true": {
+          "retained": 270,
+          "finite_values": 289
+        },
+        "Y_formula_unrestricted": {
+          "retained": 223,
+          "finite_values": 234
+        },
+        "Y_guarded_before_cap": {
+          "retained": 270,
+          "finite_values": 288
+        },
+        "raw_domain_margin": {
+          "retained": 318,
+          "finite_values": 340
+        }
+      },
+      "candidate": {
+        "Mach_effective": {
+          "retained": 318,
+          "finite_values": 340
+        },
+        "Y_flag_false": {
+          "retained": 223,
+          "finite_values": 234
+        },
+        "Y_flag_true": {
+          "retained": 286,
+          "finite_values": 304
+        },
+        "Y_formula_unrestricted": {
+          "retained": 223,
+          "finite_values": 234
+        },
+        "Y_guarded_before_cap": {
+          "retained": 286,
+          "finite_values": 304
+        },
+        "raw_domain_margin": {
+          "retained": 318,
+          "finite_values": 340
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 218,
+        "nonfinite": 122,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 234,
+        "nonfinite": 106,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_loss_g1.33_M2.0",
+    "group": "conversion_loss_g1.33_M2.0",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct conversion at Mach=2.0, gamma=1.33. Negative loss and unit-loss boundaries are explicit domain stress tests.",
+    "base_points": 200,
+    "refined_points": 341,
+    "lo": -0.01,
+    "hi": 1.05,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_loss_g1.33_m2.0.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "delta_phi2",
+    "function_seconds_by_version": {
+      "baseline": 0.026021299994681613,
+      "candidate": 0.0650827999907051
+    },
+    "elapsed_seconds": 0.11287959999935993,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Mach_effective": {
+          "retained": 278,
+          "finite_values": 290
+        },
+        "Y_flag_false": {
+          "retained": 278,
+          "finite_values": 289
+        },
+        "Y_flag_true": {
+          "retained": 278,
+          "finite_values": 289
+        },
+        "Y_formula_unrestricted": {
+          "retained": 188,
+          "finite_values": 192
+        },
+        "Y_guarded_before_cap": {
+          "retained": 278,
+          "finite_values": 289
+        },
+        "raw_domain_margin": {
+          "retained": 326,
+          "finite_values": 341
+        }
+      },
+      "candidate": {
+        "Mach_effective": {
+          "retained": 326,
+          "finite_values": 341
+        },
+        "Y_flag_false": {
+          "retained": 188,
+          "finite_values": 192
+        },
+        "Y_flag_true": {
+          "retained": 294,
+          "finite_values": 305
+        },
+        "Y_formula_unrestricted": {
+          "retained": 188,
+          "finite_values": 192
+        },
+        "Y_guarded_before_cap": {
+          "retained": 294,
+          "finite_values": 305
+        },
+        "raw_domain_margin": {
+          "retained": 326,
+          "finite_values": 341
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 176,
+        "nonfinite": 165,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 192,
+        "nonfinite": 149,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_loss_g1.4_M0.2",
+    "group": "conversion_loss_g1.4_M0.2",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct conversion at Mach=0.2, gamma=1.4. Negative loss and unit-loss boundaries are explicit domain stress tests.",
+    "base_points": 200,
+    "refined_points": 326,
+    "lo": -0.01,
+    "hi": 1.05,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_loss_g1.4_m0.2.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "delta_phi2",
+    "function_seconds_by_version": {
+      "baseline": 0.02470109998830594,
+      "candidate": 0.06576440000389994
+    },
+    "elapsed_seconds": 0.11462799999935669,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Mach_effective": {
+          "retained": 258,
+          "finite_values": 268
+        },
+        "Y_flag_false": {
+          "retained": 240,
+          "finite_values": 244
+        },
+        "Y_flag_true": {
+          "retained": 240,
+          "finite_values": 244
+        },
+        "Y_formula_unrestricted": {
+          "retained": 259,
+          "finite_values": 264
+        },
+        "Y_guarded_before_cap": {
+          "retained": 240,
+          "finite_values": 243
+        },
+        "raw_domain_margin": {
+          "retained": 310,
+          "finite_values": 326
+        }
+      },
+      "candidate": {
+        "Mach_effective": {
+          "retained": 310,
+          "finite_values": 326
+        },
+        "Y_flag_false": {
+          "retained": 259,
+          "finite_values": 264
+        },
+        "Y_flag_true": {
+          "retained": 278,
+          "finite_values": 290
+        },
+        "Y_formula_unrestricted": {
+          "retained": 259,
+          "finite_values": 264
+        },
+        "Y_guarded_before_cap": {
+          "retained": 278,
+          "finite_values": 290
+        },
+        "raw_domain_margin": {
+          "retained": 310,
+          "finite_values": 326
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 241,
+        "nonfinite": 85,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 264,
+        "nonfinite": 62,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_loss_g1.4_M0.7",
+    "group": "conversion_loss_g1.4_M0.7",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct conversion at Mach=0.7, gamma=1.4. Negative loss and unit-loss boundaries are explicit domain stress tests.",
+    "base_points": 200,
+    "refined_points": 354,
+    "lo": -0.01,
+    "hi": 1.05,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_loss_g1.4_m0.7.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "delta_phi2",
+    "function_seconds_by_version": {
+      "baseline": 0.027261799970801803,
+      "candidate": 0.07215929998528736
+    },
+    "elapsed_seconds": 0.12530809999952908,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Mach_effective": {
+          "retained": 294,
+          "finite_values": 304
+        },
+        "Y_flag_false": {
+          "retained": 292,
+          "finite_values": 302
+        },
+        "Y_flag_true": {
+          "retained": 292,
+          "finite_values": 302
+        },
+        "Y_formula_unrestricted": {
+          "retained": 249,
+          "finite_values": 254
+        },
+        "Y_guarded_before_cap": {
+          "retained": 292,
+          "finite_values": 301
+        },
+        "raw_domain_margin": {
+          "retained": 338,
+          "finite_values": 354
+        }
+      },
+      "candidate": {
+        "Mach_effective": {
+          "retained": 338,
+          "finite_values": 354
+        },
+        "Y_flag_false": {
+          "retained": 249,
+          "finite_values": 254
+        },
+        "Y_flag_true": {
+          "retained": 314,
+          "finite_values": 326
+        },
+        "Y_formula_unrestricted": {
+          "retained": 249,
+          "finite_values": 254
+        },
+        "Y_guarded_before_cap": {
+          "retained": 314,
+          "finite_values": 326
+        },
+        "raw_domain_margin": {
+          "retained": 338,
+          "finite_values": 354
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 231,
+        "nonfinite": 123,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 254,
+        "nonfinite": 100,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_loss_g1.4_M1.2",
+    "group": "conversion_loss_g1.4_M1.2",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct conversion at Mach=1.2, gamma=1.4. Negative loss and unit-loss boundaries are explicit domain stress tests.",
+    "base_points": 200,
+    "refined_points": 331,
+    "lo": -0.01,
+    "hi": 1.05,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_loss_g1.4_m1.2.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "delta_phi2",
+    "function_seconds_by_version": {
+      "baseline": 0.026518299999224837,
+      "candidate": 0.06815890001053049
+    },
+    "elapsed_seconds": 0.11836279999988619,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Mach_effective": {
+          "retained": 270,
+          "finite_values": 281
+        },
+        "Y_flag_false": {
+          "retained": 270,
+          "finite_values": 281
+        },
+        "Y_flag_true": {
+          "retained": 270,
+          "finite_values": 281
+        },
+        "Y_formula_unrestricted": {
+          "retained": 222,
+          "finite_values": 228
+        },
+        "Y_guarded_before_cap": {
+          "retained": 270,
+          "finite_values": 280
+        },
+        "raw_domain_margin": {
+          "retained": 314,
+          "finite_values": 331
+        }
+      },
+      "candidate": {
+        "Mach_effective": {
+          "retained": 314,
+          "finite_values": 331
+        },
+        "Y_flag_false": {
+          "retained": 222,
+          "finite_values": 228
+        },
+        "Y_flag_true": {
+          "retained": 290,
+          "finite_values": 303
+        },
+        "Y_formula_unrestricted": {
+          "retained": 222,
+          "finite_values": 228
+        },
+        "Y_guarded_before_cap": {
+          "retained": 290,
+          "finite_values": 303
+        },
+        "raw_domain_margin": {
+          "retained": 314,
+          "finite_values": 331
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 205,
+        "nonfinite": 126,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 228,
+        "nonfinite": 103,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_loss_g1.4_M2.0",
+    "group": "conversion_loss_g1.4_M2.0",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct conversion at Mach=2.0, gamma=1.4. Negative loss and unit-loss boundaries are explicit domain stress tests.",
+    "base_points": 200,
+    "refined_points": 339,
+    "lo": -0.01,
+    "hi": 1.05,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_loss_g1.4_m2.0.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "delta_phi2",
+    "function_seconds_by_version": {
+      "baseline": 0.02663319997554936,
+      "candidate": 0.06686489999810874
+    },
+    "elapsed_seconds": 0.11500730000079784,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Mach_effective": {
+          "retained": 270,
+          "finite_values": 289
+        },
+        "Y_flag_false": {
+          "retained": 270,
+          "finite_values": 288
+        },
+        "Y_flag_true": {
+          "retained": 270,
+          "finite_values": 288
+        },
+        "Y_formula_unrestricted": {
+          "retained": 176,
+          "finite_values": 190
+        },
+        "Y_guarded_before_cap": {
+          "retained": 270,
+          "finite_values": 288
+        },
+        "raw_domain_margin": {
+          "retained": 314,
+          "finite_values": 339
+        }
+      },
+      "candidate": {
+        "Mach_effective": {
+          "retained": 314,
+          "finite_values": 339
+        },
+        "Y_flag_false": {
+          "retained": 176,
+          "finite_values": 190
+        },
+        "Y_flag_true": {
+          "retained": 290,
+          "finite_values": 311
+        },
+        "Y_formula_unrestricted": {
+          "retained": 176,
+          "finite_values": 190
+        },
+        "Y_guarded_before_cap": {
+          "retained": 290,
+          "finite_values": 311
+        },
+        "raw_domain_margin": {
+          "retained": 314,
+          "finite_values": 339
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 167,
+        "nonfinite": 172,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 190,
+        "nonfinite": 149,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_mach_d0.001",
+    "group": "conversion_mach_d0.001",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Flow probe: only outlet Mach changes; prescribed pressures and Re fixed. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 349,
+    "lo": 0,
+    "hi": 3,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_mach_d0.001.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "Ma_rel_out",
+    "function_seconds_by_version": {
+      "baseline": 0.0199734000270837,
+      "candidate": 0.04857219998484652
+    },
+    "elapsed_seconds": 0.0988575999999739,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y": {
+          "retained": 325,
+          "finite_values": 348
+        },
+        "Y_flag_false": {
+          "retained": 325,
+          "finite_values": 348
+        },
+        "Y_formula_unrestricted": {
+          "retained": 326,
+          "finite_values": 349
+        },
+        "input_delta_phi2": {
+          "retained": 326,
+          "finite_values": 349
+        },
+        "raw_roundtrip": {
+          "retained": 325,
+          "finite_values": 348
+        },
+        "roundtrip_delta_phi2": {
+          "retained": 325,
+          "finite_values": 348
+        }
+      },
+      "candidate": {
+        "Y": {
+          "retained": 326,
+          "finite_values": 349
+        },
+        "Y_flag_false": {
+          "retained": 326,
+          "finite_values": 349
+        },
+        "Y_formula_unrestricted": {
+          "retained": 326,
+          "finite_values": 349
+        },
+        "input_delta_phi2": {
+          "retained": 326,
+          "finite_values": 349
+        },
+        "raw_roundtrip": {
+          "retained": 326,
+          "finite_values": 349
+        },
+        "roundtrip_delta_phi2": {
+          "retained": 326,
+          "finite_values": 349
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 348,
+        "nonfinite": 1,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 349,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_mach_d0.05",
+    "group": "conversion_mach_d0.05",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Flow probe: only outlet Mach changes; prescribed pressures and Re fixed. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 320,
+    "lo": 0,
+    "hi": 3,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_mach_d0.05.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "Ma_rel_out",
+    "function_seconds_by_version": {
+      "baseline": 0.01662200000100711,
+      "candidate": 0.0441685999812762
+    },
+    "elapsed_seconds": 0.08782419999988633,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y": {
+          "retained": 300,
+          "finite_values": 319
+        },
+        "Y_flag_false": {
+          "retained": 300,
+          "finite_values": 319
+        },
+        "Y_formula_unrestricted": {
+          "retained": 301,
+          "finite_values": 320
+        },
+        "input_delta_phi2": {
+          "retained": 301,
+          "finite_values": 320
+        },
+        "raw_roundtrip": {
+          "retained": 300,
+          "finite_values": 319
+        },
+        "roundtrip_delta_phi2": {
+          "retained": 300,
+          "finite_values": 319
+        }
+      },
+      "candidate": {
+        "Y": {
+          "retained": 301,
+          "finite_values": 320
+        },
+        "Y_flag_false": {
+          "retained": 301,
+          "finite_values": 320
+        },
+        "Y_formula_unrestricted": {
+          "retained": 301,
+          "finite_values": 320
+        },
+        "input_delta_phi2": {
+          "retained": 301,
+          "finite_values": 320
+        },
+        "raw_roundtrip": {
+          "retained": 301,
+          "finite_values": 320
+        },
+        "roundtrip_delta_phi2": {
+          "retained": 301,
+          "finite_values": 320
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 319,
+        "nonfinite": 1,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 320,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_mach_d0.3",
+    "group": "conversion_mach_d0.3",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Flow probe: only outlet Mach changes; prescribed pressures and Re fixed. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 323,
+    "lo": 0,
+    "hi": 3,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_mach_d0.3.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "Ma_rel_out",
+    "function_seconds_by_version": {
+      "baseline": 0.017681399995126412,
+      "candidate": 0.044375700015734765
+    },
+    "elapsed_seconds": 0.08641200000056415,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y": {
+          "retained": 305,
+          "finite_values": 322
+        },
+        "Y_flag_false": {
+          "retained": 305,
+          "finite_values": 322
+        },
+        "Y_formula_unrestricted": {
+          "retained": 306,
+          "finite_values": 323
+        },
+        "input_delta_phi2": {
+          "retained": 306,
+          "finite_values": 323
+        },
+        "raw_roundtrip": {
+          "retained": 305,
+          "finite_values": 322
+        },
+        "roundtrip_delta_phi2": {
+          "retained": 305,
+          "finite_values": 322
+        }
+      },
+      "candidate": {
+        "Y": {
+          "retained": 306,
+          "finite_values": 323
+        },
+        "Y_flag_false": {
+          "retained": 306,
+          "finite_values": 323
+        },
+        "Y_formula_unrestricted": {
+          "retained": 306,
+          "finite_values": 323
+        },
+        "input_delta_phi2": {
+          "retained": 306,
+          "finite_values": 323
+        },
+        "raw_roundtrip": {
+          "retained": 306,
+          "finite_values": 323
+        },
+        "roundtrip_delta_phi2": {
+          "retained": 306,
+          "finite_values": 323
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 322,
+        "nonfinite": 1,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 323,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_mach_d0.8",
+    "group": "conversion_mach_d0.8",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Flow probe: only outlet Mach changes; prescribed pressures and Re fixed. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 333,
+    "lo": 0,
+    "hi": 3,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_mach_d0.8.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "Ma_rel_out",
+    "function_seconds_by_version": {
+      "baseline": 0.018111400002453593,
+      "candidate": 0.046240099996794015
+    },
+    "elapsed_seconds": 0.08763329999965208,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y": {
+          "retained": 311,
+          "finite_values": 333
+        },
+        "Y_flag_false": {
+          "retained": 311,
+          "finite_values": 333
+        },
+        "Y_formula_unrestricted": {
+          "retained": 178,
+          "finite_values": 196
+        },
+        "input_delta_phi2": {
+          "retained": 311,
+          "finite_values": 333
+        },
+        "raw_roundtrip": {
+          "retained": 310,
+          "finite_values": 332
+        },
+        "roundtrip_delta_phi2": {
+          "retained": 310,
+          "finite_values": 332
+        }
+      },
+      "candidate": {
+        "Y": {
+          "retained": 311,
+          "finite_values": 333
+        },
+        "Y_flag_false": {
+          "retained": 178,
+          "finite_values": 196
+        },
+        "Y_formula_unrestricted": {
+          "retained": 178,
+          "finite_values": 196
+        },
+        "input_delta_phi2": {
+          "retained": 311,
+          "finite_values": 333
+        },
+        "raw_roundtrip": {
+          "retained": 178,
+          "finite_values": 196
+        },
+        "roundtrip_delta_phi2": {
+          "retained": 311,
+          "finite_values": 333
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 195,
+        "nonfinite": 138,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 196,
+        "nonfinite": 137,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_conversion_gamma",
+    "group": "conversion_gamma",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Conversion domain stress test; gamma<=1 is not a physical perfect-gas case.",
+    "base_points": 200,
+    "refined_points": 259,
+    "lo": 0.98,
+    "hi": 1.8,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_conversion_gamma.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "conversions",
+    "variable": "gamma",
+    "function_seconds_by_version": {
+      "baseline": 0.007119999989299686,
+      "candidate": 0.019529100005456712
+    },
+    "elapsed_seconds": 0.03390980000040145,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "Y": {
+          "retained": 231,
+          "finite_values": 240
+        }
+      },
+      "candidate": {
+        "Y": {
+          "retained": 231,
+          "finite_values": 240
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 240,
+        "nonfinite": 19,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 240,
+        "nonfinite": 19,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_smooth_bounds",
+    "group": "smooth_bounds",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct scalar helper input; all other arguments fixed. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 237,
+    "lo": -0.5,
+    "hi": 0.8,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_smooth_bounds.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "shared_math",
+    "variable": "scalar",
+    "function_seconds_by_version": {
+      "baseline": 0.01365070000065316,
+      "candidate": 0.014160400003675022
+    },
+    "elapsed_seconds": 0.04586530000051425,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "boltzmann_max": {
+          "retained": 227,
+          "finite_values": 237
+        },
+        "boltzmann_min": {
+          "retained": 227,
+          "finite_values": 237
+        },
+        "hard_max": {
+          "retained": 227,
+          "finite_values": 237
+        },
+        "hard_min": {
+          "retained": 227,
+          "finite_values": 237
+        },
+        "logsumexp_max": {
+          "retained": 227,
+          "finite_values": 237
+        }
+      },
+      "candidate": {
+        "boltzmann_max": {
+          "retained": 227,
+          "finite_values": 237
+        },
+        "boltzmann_min": {
+          "retained": 227,
+          "finite_values": 237
+        },
+        "hard_max": {
+          "retained": 227,
+          "finite_values": 237
+        },
+        "hard_min": {
+          "retained": 227,
+          "finite_values": 237
+        },
+        "logsumexp_max": {
+          "retained": 227,
+          "finite_values": 237
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 237,
+        "nonfinite": 0,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 237,
+        "nonfinite": 0,
+        "exception": 0
+      }
+    }
+  },
+  {
+    "id": "fundamental_smooth_absolute",
+    "group": "smooth_absolute",
+    "family": "prescribed reference",
+    "kind": "fundamental",
+    "rule": "Direct scalar helper input; all other arguments fixed. Individual function only; no complete-row sum or penetration weighting.",
+    "base_points": 200,
+    "refined_points": 250,
+    "lo": -0.02,
+    "hi": 0.02,
+    "log": false,
+    "data_path": "data/sweeps/fundamental_smooth_absolute.csv.gz",
+    "level": "fundamental",
+    "category": "fundamental",
+    "mechanism": "shared_math",
+    "variable": "scalar",
+    "function_seconds_by_version": {
+      "baseline": 0.0017953999958990607,
+      "candidate": 0.001657200007684878
+    },
+    "elapsed_seconds": 0.014707100001032813,
+    "found_branches": [],
+    "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
+    "derivative_coordinate": "x (including logarithmic display axes)",
+    "derivative_sample_counts": {
+      "baseline": {
+        "hyperbolic": {
+          "retained": 245,
+          "finite_values": 250
+        },
+        "logcosh": {
+          "retained": 111,
+          "finite_values": 116
+        },
+        "quadratic": {
+          "retained": 245,
+          "finite_values": 250
+        }
+      },
+      "candidate": {
+        "hyperbolic": {
+          "retained": 245,
+          "finite_values": 250
+        },
+        "logcosh": {
+          "retained": 111,
+          "finite_values": 116
+        },
+        "quadratic": {
+          "retained": 245,
+          "finite_values": 250
+        }
+      }
+    },
+    "status_counts": {
+      "baseline": {
+        "ok": 116,
+        "nonfinite": 134,
+        "exception": 0
+      },
+      "candidate": {
+        "ok": 116,
+        "nonfinite": 134,
+        "exception": 0
+      }
+    }
+  }
+]

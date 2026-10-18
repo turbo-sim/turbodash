@@ -1,0 +1,49 @@
+{
+  "reference_files": 88,
+  "numeric_reference_differences": [
+    "data/sweeps/fundamental_ko_profile_exit_angle__stator.csv.gz",
+    "data/sweeps/fundamental_ko_profile_hub_tip__stator.csv.gz",
+    "data/sweeps/fundamental_ko_profile_ma_rel_in__stator.csv.gz",
+    "data/sweeps/fundamental_ko_profile_ma_rel_out__stator.csv.gz",
+    "data/sweeps/fundamental_ko_profile_pitch_chord__stator.csv.gz",
+    "data/sweeps/fundamental_ko_profile_re_out__stator.csv.gz",
+    "data/sweeps/fundamental_ko_profile_thickness_chord__stator.csv.gz",
+    "data/sweeps/fundamental_nozzle_angle.csv.gz",
+    "data/provenance/fundamental_join_intervals.csv",
+    "data/provenance/fundamental_curvature_intervals.csv",
+    "data/validation/nozzle_directional_probes.csv",
+    "data/reynolds_review/samples.csv",
+    "data/profile_review/pitch_families.csv",
+    "data/profile_review/angle_transitions.csv",
+    "data/profile_review/transition_probes.csv",
+    "data/profile_review/profile_floor.csv"
+  ],
+  "paired_sweeps": 78,
+  "supplemental": [
+    {
+      "file": "data/reynolds_review/samples.csv",
+      "paired_sweeps": 1,
+      "rows": 1052
+    },
+    {
+      "file": "data/profile_review/pitch_families.csv",
+      "paired_sweeps": 13,
+      "rows": 15574
+    },
+    {
+      "file": "data/profile_review/angle_transitions.csv",
+      "paired_sweeps": 10,
+      "rows": 53540
+    },
+    {
+      "file": "data/profile_review/profile_floor.csv",
+      "paired_sweeps": 1,
+      "rows": 1990
+    }
+  ],
+  "base_points": 200,
+  "checked_markdown_links": 356,
+  "broken_links": [],
+  "figures_checked": false,
+  "note": "Digests use parsed float.hex values and text/status fields, independent of compressed-file timestamps. References represent the reviewed angle/floor refinement; previous results are preserved in data/history/before_angle_refinement.zip."
+}

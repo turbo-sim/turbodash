@@ -1,0 +1,328 @@
+{
+  "passed": true,
+  "families": {
+    "nozzle": {
+      "mesh_shape": [
+        703,
+        801
+      ],
+      "angle_range": [
+        40.0,
+        80.0
+      ],
+      "spacing_range": [
+        0.0,
+        3.0
+      ],
+      "max_value_error": 0.0,
+      "max_derivative_error": {
+        "spacing": 0.0,
+        "angle": 5.204170427930421e-18
+      },
+      "bounded_range": [
+        0.0184963609129567,
+        0.5
+      ],
+      "low_spacing_min_angle_derivative": -6.83467564183138e-19,
+      "c2_joins": [
+        {
+          "angle_deg": 40.0,
+          "pitch_chord": 0.0456523508685869,
+          "value": 0.24999999999999967,
+          "first_derivative_jump": 8.203215884350357e-12,
+          "second_derivative_relative_jump": 7.501018996416863e-06
+        },
+        {
+          "angle_deg": 40.0,
+          "pitch_chord": 2.815799402057555,
+          "value": 0.24999999999992678,
+          "first_derivative_jump": 7.216449660063518e-15,
+          "second_derivative_relative_jump": 9.770097834807136e-08
+        },
+        {
+          "angle_deg": 45.0,
+          "pitch_chord": 0.04755278820949042,
+          "value": 0.25,
+          "first_derivative_jump": 7.177369809596712e-12,
+          "second_derivative_relative_jump": 7.572236936312603e-06
+        },
+        {
+          "angle_deg": 45.0,
+          "pitch_chord": 2.661113983383099,
+          "value": 0.2500000000000001,
+          "first_derivative_jump": 8.93729534823251e-15,
+          "second_derivative_relative_jump": 1.198930654423021e-07
+        },
+        {
+          "angle_deg": 50.0,
+          "pitch_chord": 0.04929633594919623,
+          "value": 0.25000000000000067,
+          "first_derivative_jump": 6.532996366104271e-12,
+          "second_derivative_relative_jump": 7.60957326742076e-06
+        },
+        {
+          "angle_deg": 50.0,
+          "pitch_chord": 2.5177497426245874,
+          "value": 0.24999999999999986,
+          "first_derivative_jump": 1.099120794378905e-14,
+          "second_derivative_relative_jump": 1.4265519796251655e-07
+        },
+        {
+          "angle_deg": 55.0,
+          "pitch_chord": 0.05073943636012451,
+          "value": 0.25,
+          "first_derivative_jump": 6.229683435776678e-12,
+          "second_derivative_relative_jump": 7.6160770104389385e-06
+        },
+        {
+          "angle_deg": 55.0,
+          "pitch_chord": 2.382072597187667,
+          "value": 0.24999999999999836,
+          "first_derivative_jump": 1.304512053934559e-14,
+          "second_derivative_relative_jump": 1.6562298454159291e-07
+        },
+        {
+          "angle_deg": 60.0,
+          "pitch_chord": 0.05191144267503495,
+          "value": 0.2500000000002129,
+          "first_derivative_jump": 6.1661786787681194e-12,
+          "second_derivative_relative_jump": 7.597673842227477e-06
+        },
+        {
+          "angle_deg": 60.0,
+          "pitch_chord": 2.2509270709486837,
+          "value": 0.24999999999998684,
+          "first_derivative_jump": 1.4488410471358293e-14,
+          "second_derivative_relative_jump": 1.8397609030000574e-07
+        },
+        {
+          "angle_deg": 65.0,
+          "pitch_chord": 0.05299562582881164,
+          "value": 0.24999999999973108,
+          "first_derivative_jump": 6.265210572564683e-12,
+          "second_derivative_relative_jump": 7.563373097752078e-06
+        },
+        {
+          "angle_deg": 65.0,
+          "pitch_chord": 2.121895390857501,
+          "value": 0.24999999999993286,
+          "first_derivative_jump": 1.5987211554602254e-14,
+          "second_derivative_relative_jump": 1.9728055813540797e-07
+        },
+        {
+          "angle_deg": 70.0,
+          "pitch_chord": 0.0542016573153521,
+          "value": 0.25000000000000006,
+          "first_derivative_jump": 6.409983654975804e-12,
+          "second_derivative_relative_jump": 7.523436862081945e-06
+        },
+        {
+          "angle_deg": 70.0,
+          "pitch_chord": 1.9938241114697206,
+          "value": 0.250000000000114,
+          "first_derivative_jump": 1.6819878823071122e-14,
+          "second_derivative_relative_jump": 2.019652854989422e-07
+        },
+        {
+          "angle_deg": 75.0,
+          "pitch_chord": 0.05566729742346601,
+          "value": 0.2499999999999987,
+          "first_derivative_jump": 6.554312648177074e-12,
+          "second_derivative_relative_jump": 7.481065395634831e-06
+        },
+        {
+          "angle_deg": 75.0,
+          "pitch_chord": 1.8666119321952241,
+          "value": 0.25,
+          "first_derivative_jump": 1.6708856520608606e-14,
+          "second_derivative_relative_jump": 1.9888315371555035e-07
+        },
+        {
+          "angle_deg": 80.0,
+          "pitch_chord": 0.05746740043648228,
+          "value": 0.25000000000000006,
+          "first_derivative_jump": 6.675549002466141e-12,
+          "second_derivative_relative_jump": 7.439705777196073e-06
+        },
+        {
+          "angle_deg": 80.0,
+          "pitch_chord": 1.7398121701613625,
+          "value": 0.2500000000000077,
+          "first_derivative_jump": 1.5654144647214707e-14,
+          "second_derivative_relative_jump": 1.8953204563109295e-07
+        }
+      ],
+      "zero_spacing_value": 0.5,
+      "zero_spacing_slope": 0.0
+    },
+    "impulse": {
+      "mesh_shape": [
+        703,
+        801
+      ],
+      "angle_range": [
+        40.0,
+        70.0
+      ],
+      "spacing_range": [
+        0.0,
+        3.0
+      ],
+      "max_value_error": 0.0,
+      "max_derivative_error": {
+        "spacing": 0.0,
+        "angle": 6.938893903907228e-18
+      },
+      "bounded_range": [
+        0.0662966683947059,
+        0.5
+      ],
+      "low_spacing_min_angle_derivative": -2.14232829815342e-18,
+      "c2_joins": [
+        {
+          "angle_deg": 40.0,
+          "pitch_chord": 0.14977845504104434,
+          "value": 0.24999999999999994,
+          "first_derivative_jump": 1.1610712391529887e-12,
+          "second_derivative_relative_jump": 4.500992517499844e-06
+        },
+        {
+          "angle_deg": 40.0,
+          "pitch_chord": 1.7501268471612454,
+          "value": 0.25000000000000006,
+          "first_derivative_jump": 2.398081733190338e-14,
+          "second_derivative_relative_jump": 2.687963941532148e-07
+        },
+        {
+          "angle_deg": 43.75,
+          "pitch_chord": 0.16035446002678688,
+          "value": 0.2500000000000026,
+          "first_derivative_jump": 1.0802470029602773e-12,
+          "second_derivative_relative_jump": 4.090746299282261e-06
+        },
+        {
+          "angle_deg": 43.75,
+          "pitch_chord": 1.7252062271565916,
+          "value": 0.24999999999999994,
+          "first_derivative_jump": 2.4091839634365897e-14,
+          "second_derivative_relative_jump": 2.721991132963707e-07
+        },
+        {
+          "angle_deg": 47.5,
+          "pitch_chord": 0.16591452112151328,
+          "value": 0.24999999999999994,
+          "first_derivative_jump": 1.1239897901305085e-12,
+          "second_derivative_relative_jump": 3.889471482314722e-06
+        },
+        {
+          "angle_deg": 47.5,
+          "pitch_chord": 1.7126294463304845,
+          "value": 0.25000000000000006,
+          "first_derivative_jump": 2.1926904736346842e-14,
+          "second_derivative_relative_jump": 2.5087191559401466e-07
+        },
+        {
+          "angle_deg": 51.25,
+          "pitch_chord": 0.16863375735844285,
+          "value": 0.24999999999999997,
+          "first_derivative_jump": 1.2159162565694714e-12,
+          "second_derivative_relative_jump": 3.798847464654187e-06
+        },
+        {
+          "angle_deg": 51.25,
+          "pitch_chord": 1.7064567313634538,
+          "value": 0.25000000000000006,
+          "first_derivative_jump": 1.7708057242771247e-14,
+          "second_derivative_relative_jump": 2.1033789938382048e-07
+        },
+        {
+          "angle_deg": 55.0,
+          "pitch_chord": 0.17076533200816688,
+          "value": 0.25,
+          "first_derivative_jump": 1.2942980021080075e-12,
+          "second_derivative_relative_jump": 3.749035759817466e-06
+        },
+        {
+          "angle_deg": 55.0,
+          "pitch_chord": 1.6987208800383111,
+          "value": 0.24999999999999728,
+          "first_derivative_jump": 1.304512053934559e-14,
+          "second_derivative_relative_jump": 1.6222855721506566e-07
+        },
+        {
+          "angle_deg": 58.75,
+          "pitch_chord": 0.17350404723750829,
+          "value": 0.2499999999999416,
+          "first_derivative_jump": 1.3158363287857355e-12,
+          "second_derivative_relative_jump": 3.7088819532876484e-06
+        },
+        {
+          "angle_deg": 58.75,
+          "pitch_chord": 1.67627461675098,
+          "value": 0.2499999999998938,
+          "first_derivative_jump": 8.881784197001252e-15,
+          "second_derivative_relative_jump": 1.17620543201512e-07
+        },
+        {
+          "angle_deg": 62.5,
+          "pitch_chord": 0.17691926729964347,
+          "value": 0.25,
+          "first_derivative_jump": 1.2740919430598296e-12,
+          "second_derivative_relative_jump": 3.6737130971636362e-06
+        },
+        {
+          "angle_deg": 62.5,
+          "pitch_chord": 1.6164070316623578,
+          "value": 0.25,
+          "first_derivative_jump": 6.022959908591474e-15,
+          "second_derivative_relative_jump": 8.846371275826387e-08
+        },
+        {
+          "angle_deg": 66.25,
+          "pitch_chord": 0.18033540697536887,
+          "value": 0.2500000000000024,
+          "first_derivative_jump": 1.2003731342247193e-12,
+          "second_derivative_relative_jump": 3.6558515421762157e-06
+        },
+        {
+          "angle_deg": 66.25,
+          "pitch_chord": 1.4910066158054034,
+          "value": 0.24999999999999947,
+          "first_derivative_jump": 4.579669976578771e-15,
+          "second_derivative_relative_jump": 7.552352367261117e-08
+        },
+        {
+          "angle_deg": 70.0,
+          "pitch_chord": 0.18272059754169281,
+          "value": 0.24999999999966804,
+          "first_derivative_jump": 1.1308731728831845e-12,
+          "second_derivative_relative_jump": 3.672436972777808e-06
+        },
+        {
+          "angle_deg": 70.0,
+          "pitch_chord": 1.2931285159364374,
+          "value": 0.25000000000000794,
+          "first_derivative_jump": 4.801714581503802e-15,
+          "second_derivative_relative_jump": 9.06692032009579e-08
+        }
+      ],
+      "zero_spacing_value": 0.5,
+      "zero_spacing_slope": -1.6467264167036452e-16
+    }
+  },
+  "propagation_comparison": "Current production versus independent analytical-reference substitution; all current corrections retained.",
+  "propagation_csv": "data/profile_review/model_propagation.csv",
+  "corrected_ko_at_zero_spacing_re1000": 2.407098222298436,
+  "corrected_ko_not_capped": true,
+  "retained_corrections": [
+    "Reynolds",
+    "thickness",
+    "Mach",
+    "shock"
+  ],
+  "source_hashes": {
+    "improving_turbodash/ainley_mathieson_fitting/analytic_fits.py": "26f88bc58493938e84d34bfb2d239d224bfdec51ace10bd651de22ea8785245b",
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "4295e119d25fc43579ec79059484913ed0af83822088eaf2bd50af41f3fa5395"
+  },
+  "limits": "Outside chart coverage remains unvalidated. Ordering checked numerically for 0<x<=.5; large-spacing impulse crossings remain possible. Current backend is NumPy; no JAX/JIT guarantee."
+}

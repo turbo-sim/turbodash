@@ -1,0 +1,812 @@
+{
+  "protected_sources": {
+    "turbodash/loss_models/__init__.py": true,
+    "turbodash/loss_models/loss_coefficient_conversion.py": true,
+    "turbodash/loss_models/loss_model.py": true,
+    "turbodash/loss_models/loss_model_benner.py": true,
+    "turbodash/loss_models/loss_model_kacker_okapuu.py": true,
+    "turbodash/loss_models/loss_model_moustapha.py": true,
+    "turbodash/math.py": true
+  },
+  "docstring_preservation": [
+    {
+      "module": "loss_coefficient_conversion.py",
+      "function": "convert_stagnation_pressure_to_kinetic_energy_loss",
+      "original_characters": 1532,
+      "current_characters": 2145,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_coefficient_conversion.py",
+      "function": "convert_kinetic_energy_to_stagnation_pressure_loss",
+      "original_characters": 2184,
+      "current_characters": 3456,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_coefficient_conversion.py",
+      "function": "convert_enthalpy_to_stagnation_pressure_loss",
+      "original_characters": 1282,
+      "current_characters": 1559,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_coefficient_conversion.py",
+      "function": "convert_stagnation_pressure_to_enthalpy_loss",
+      "original_characters": 1300,
+      "current_characters": 1432,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model.py",
+      "function": "_normalize_loss_options",
+      "original_characters": 51,
+      "current_characters": 51,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model.py",
+      "function": "evaluate_loss_model",
+      "original_characters": 1450,
+      "current_characters": 1450,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model.py",
+      "function": "apply_tuning_factors",
+      "original_characters": 79,
+      "current_characters": 79,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_benner.py",
+      "function": "compute_losses",
+      "original_characters": 2085,
+      "current_characters": 2085,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_benner.py",
+      "function": "_compute_losses_benner_jit",
+      "original_characters": 333,
+      "current_characters": 333,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_benner.py",
+      "function": "get_secondary_loss",
+      "original_characters": 1922,
+      "current_characters": 2668,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_benner.py",
+      "function": "get_incidence_loss",
+      "original_characters": 1383,
+      "current_characters": 1483,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_benner.py",
+      "function": "get_incidence_profile_loss_increment",
+      "original_characters": 3212,
+      "current_characters": 4259,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_benner.py",
+      "function": "get_incidence_parameter",
+      "original_characters": 1674,
+      "current_characters": 1674,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_benner.py",
+      "function": "_require_positive_finite",
+      "original_characters": 144,
+      "current_characters": 144,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_benner.py",
+      "function": "_require_nonnegative_finite",
+      "original_characters": 138,
+      "current_characters": 138,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_benner.py",
+      "function": "limit_penetration_depth",
+      "original_characters": 1465,
+      "current_characters": 1465,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_benner.py",
+      "function": "get_penetration_diagnostics",
+      "original_characters": 1205,
+      "current_characters": 1205,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_benner.py",
+      "function": "get_penetration_depth",
+      "original_characters": 1056,
+      "current_characters": 1056,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_benner.py",
+      "function": "get_penetration_depth_raw",
+      "original_characters": 1511,
+      "current_characters": 1511,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_benner.py",
+      "function": "_get_raw_penetration_diagnostics",
+      "original_characters": 328,
+      "current_characters": 328,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_benner.py",
+      "function": "F_t",
+      "original_characters": 1022,
+      "current_characters": 1022,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_kacker_okapuu.py",
+      "function": "compute_losses",
+      "original_characters": 813,
+      "current_characters": 813,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_kacker_okapuu.py",
+      "function": "_compute_losses_jit",
+      "original_characters": 132,
+      "current_characters": 132,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_kacker_okapuu.py",
+      "function": "get_profile_loss",
+      "original_characters": 3511,
+      "current_characters": 4167,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_kacker_okapuu.py",
+      "function": "get_secondary_loss",
+      "original_characters": 2464,
+      "current_characters": 2850,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_kacker_okapuu.py",
+      "function": "get_trailing_edge_loss",
+      "original_characters": 1910,
+      "current_characters": 2430,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_kacker_okapuu.py",
+      "function": "get_tip_clearance_loss",
+      "original_characters": 1421,
+      "current_characters": 1820,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_kacker_okapuu.py",
+      "function": "nozzle_blades",
+      "original_characters": 1926,
+      "current_characters": 3034,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_kacker_okapuu.py",
+      "function": "impulse_blades",
+      "original_characters": 1557,
+      "current_characters": 2006,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_kacker_okapuu.py",
+      "function": "get_compressible_correction_factors",
+      "original_characters": 1344,
+      "current_characters": 1737,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_kacker_okapuu.py",
+      "function": "get_hub_to_mean_mach_ratio",
+      "original_characters": 949,
+      "current_characters": 1354,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_moustapha.py",
+      "function": "compute_losses",
+      "original_characters": 1192,
+      "current_characters": 1192,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_moustapha.py",
+      "function": "_compute_losses_moustapha_jit",
+      "original_characters": 209,
+      "current_characters": 209,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_moustapha.py",
+      "function": "get_incidence_loss",
+      "original_characters": 1400,
+      "current_characters": 1400,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_moustapha.py",
+      "function": "get_secondary_loss_correction_factor",
+      "original_characters": 1458,
+      "current_characters": 1458,
+      "original_citations_preserved": true
+    },
+    {
+      "module": "loss_model_moustapha.py",
+      "function": "get_incidence_parameter",
+      "original_characters": 1260,
+      "current_characters": 1260,
+      "original_citations_preserved": true
+    }
+  ],
+  "sweeps": [
+    {
+      "study": "fundamental_ko_profile_pitch_chord__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 377
+    },
+    {
+      "study": "fundamental_ko_profile_exit_angle__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 352
+    },
+    {
+      "study": "fundamental_ko_profile_Re_out__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 302
+    },
+    {
+      "study": "fundamental_ko_profile_Ma_rel_in__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 271
+    },
+    {
+      "study": "fundamental_ko_profile_Ma_rel_out__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 311
+    },
+    {
+      "study": "fundamental_ko_profile_thickness_chord__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 264
+    },
+    {
+      "study": "fundamental_ko_profile_hub_tip__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 274
+    },
+    {
+      "study": "fundamental_ko_secondary_aspect_ratio__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 282
+    },
+    {
+      "study": "fundamental_ko_secondary_incidence__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 229
+    },
+    {
+      "study": "fundamental_ko_secondary_exit_angle__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 323
+    },
+    {
+      "study": "fundamental_ko_secondary_Ma_rel_out__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 295
+    },
+    {
+      "study": "fundamental_ko_secondary_stagger__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 228
+    },
+    {
+      "study": "fundamental_ko_clearance_clearance__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 223
+    },
+    {
+      "study": "fundamental_ko_clearance_clearance__rotor",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 247
+    },
+    {
+      "study": "fundamental_ko_clearance_aspect_ratio__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 273
+    },
+    {
+      "study": "fundamental_ko_clearance_aspect_ratio__rotor",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 291
+    },
+    {
+      "study": "fundamental_ko_clearance_incidence__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 229
+    },
+    {
+      "study": "fundamental_ko_clearance_incidence__rotor",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 229
+    },
+    {
+      "study": "fundamental_ko_clearance_exit_angle__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 322
+    },
+    {
+      "study": "fundamental_ko_clearance_exit_angle__rotor",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 322
+    },
+    {
+      "study": "fundamental_ko_clearance_pitch_chord__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 236
+    },
+    {
+      "study": "fundamental_ko_clearance_pitch_chord__rotor",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 236
+    },
+    {
+      "study": "fundamental_ko_trailing_trailing_ratio__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 379
+    },
+    {
+      "study": "fundamental_ko_trailing_exit_angle__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 335
+    },
+    {
+      "study": "fundamental_ko_trailing_Ma_rel_out__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 280
+    },
+    {
+      "study": "fundamental_benner_secondary_aspect_ratio__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 273
+    },
+    {
+      "study": "fundamental_benner_secondary_incidence__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 229
+    },
+    {
+      "study": "fundamental_benner_secondary_exit_angle__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 322
+    },
+    {
+      "study": "fundamental_benner_secondary_delta_ref__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 235
+    },
+    {
+      "study": "fundamental_benner_secondary_stagger__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 220
+    },
+    {
+      "study": "fundamental_benner_penetration_aspect_ratio__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 413
+    },
+    {
+      "study": "fundamental_benner_penetration_pitch_chord__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 351
+    },
+    {
+      "study": "fundamental_benner_penetration_incidence__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 310
+    },
+    {
+      "study": "fundamental_benner_penetration_exit_angle__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 328
+    },
+    {
+      "study": "fundamental_benner_penetration_delta_ref__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 377
+    },
+    {
+      "study": "fundamental_benner_penetration_Re_in__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 251
+    },
+    {
+      "study": "fundamental_benner_incidence_incidence__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 393
+    },
+    {
+      "study": "fundamental_benner_incidence_incidence__rotor",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 408
+    },
+    {
+      "study": "fundamental_benner_incidence_leading_edge_ratio__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 218
+    },
+    {
+      "study": "fundamental_benner_incidence_leading_edge_ratio__rotor",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 218
+    },
+    {
+      "study": "fundamental_benner_incidence_wedge__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 246
+    },
+    {
+      "study": "fundamental_benner_incidence_wedge__rotor",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 305
+    },
+    {
+      "study": "fundamental_benner_incidence_pitch_chord__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 238
+    },
+    {
+      "study": "fundamental_benner_incidence_pitch_chord__rotor",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 238
+    },
+    {
+      "study": "fundamental_benner_incidence_Ma_rel_out__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 308
+    },
+    {
+      "study": "fundamental_benner_incidence_Ma_rel_out__rotor",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 289
+    },
+    {
+      "study": "fundamental_moustapha_incidence_incidence__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 415
+    },
+    {
+      "study": "fundamental_moustapha_incidence_leading_edge_ratio__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 281
+    },
+    {
+      "study": "fundamental_moustapha_incidence_pitch_chord__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 296
+    },
+    {
+      "study": "fundamental_moustapha_incidence_Ma_rel_out__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 306
+    },
+    {
+      "study": "fundamental_moustapha_secondary_incidence__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 229
+    },
+    {
+      "study": "fundamental_moustapha_secondary_leading_edge_ratio__stator",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 218
+    },
+    {
+      "study": "fundamental_nozzle_angle",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 347
+    },
+    {
+      "study": "fundamental_penetration_cap",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 253
+    },
+    {
+      "study": "fundamental_incidence_chi",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 281
+    },
+    {
+      "study": "fundamental_loading_inlet",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 229
+    },
+    {
+      "study": "fundamental_incidence_chi_detail",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 265
+    },
+    {
+      "study": "fundamental_hub_interpolation",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 307
+    },
+    {
+      "study": "fundamental_compressibility_mach",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 323
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.1_M0.2",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 312
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.1_M0.7",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 348
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.1_M1.2",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 339
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.1_M2.0",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 348
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.33_M0.2",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 326
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.33_M0.7",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 362
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.33_M1.2",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 340
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.33_M2.0",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 341
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.4_M0.2",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 326
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.4_M0.7",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 354
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.4_M1.2",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 331
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.4_M2.0",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 339
+    },
+    {
+      "study": "fundamental_conversion_mach_d0.001",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 349
+    },
+    {
+      "study": "fundamental_conversion_mach_d0.05",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 320
+    },
+    {
+      "study": "fundamental_conversion_mach_d0.3",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 323
+    },
+    {
+      "study": "fundamental_conversion_mach_d0.8",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 333
+    },
+    {
+      "study": "fundamental_conversion_gamma",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 259
+    },
+    {
+      "study": "fundamental_smooth_bounds",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 237
+    },
+    {
+      "study": "fundamental_smooth_absolute",
+      "common_grid": true,
+      "base_points": 200,
+      "value_points_per_version": 250
+    }
+  ],
+  "sensitivity_scope": "Fundamental helpers/components only; no complete-row/stage sensitivity.",
+  "derivative_method": "See DERIVATIVE_METHOD.md and tests/test_differentiation.py.",
+  "numerical_checks": {
+    "baseline": {
+      "zero_trailing": 0.0008769014059373248,
+      "zero_rotor_clearance": 2.679175660326057e-09,
+      "incidence_at_chi0": -1.490658491239597e-07
+    },
+    "candidate": {
+      "zero_trailing": 0.0,
+      "zero_rotor_clearance": 0.0,
+      "incidence_at_chi0": 0.0
+    },
+    "unrestricted_roundtrip_max_absolute_error": 5.551115123125783e-17,
+    "zero_Mach_Y_at_loss_0.05": 0.052631578947368425
+  },
+  "regression_tests": {
+    "tests": "277",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "8",
+    "time": "15.298"
+  },
+  "sphinx": {
+    "exit_status": 0,
+    "warnings": "",
+    "modules": [
+      "loss_model_benner",
+      "loss_model_kacker_okapuu",
+      "loss_model_moustapha",
+      "loss_coefficient_conversion",
+      "loss_model"
+    ],
+    "math_nodes": 50,
+    "scope": "Sphinx autodoc, NumPy sections and math markup. Citation keys rendered literally; not bibliography verification."
+  },
+  "final_source_sha256": {
+    "turbodash/loss_models_new/__init__.py": "5b9d3bc6706ab907bf8314428b244132feb46cf2754de33ba2e0d8f7676593a3",
+    "turbodash/loss_models_new/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
+    "turbodash/loss_models_new/_numerics.py": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff",
+    "turbodash/loss_models_new/loss_coefficient_conversion.py": "eab232ff2304b104726b2b3af4a87c96c65f302903e807ea9dd3dc2db827ae98",
+    "turbodash/loss_models_new/loss_model.py": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11",
+    "turbodash/loss_models_new/loss_model_benner.py": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba",
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "eb7caea42df7f722416dd3a7196ff36ec924a0c15cbd4a0fe9a72bae09bddf72",
+    "turbodash/loss_models_new/loss_model_moustapha.py": "923339d879bb7edf952112296b605073d9c5f466e541ea04b3ce10f3f8e1f489",
+    "improving_turbodash/loss_model_audit/scripts/capture_baseline.py": "909030096696416de6664a75ca784a801aa8ebd4df4cb5b931650ccc826f0ef9",
+    "improving_turbodash/loss_model_audit/scripts/capture_refinement_start.py": "0c6d11023e98aae510faee3ad9244d8668cca0991f2cd85909d8e72350f069dc",
+    "improving_turbodash/loss_model_audit/scripts/cases.py": "a03293cdca16b1a665c21f39105a1945e48f5d745fd65ff6324ce273ecb747a0",
+    "improving_turbodash/loss_model_audit/scripts/check_sphinx_docstrings.py": "1ed7be43abae7835628ffa0321123d962e25e21fe1e2a5150fcad170b3d75199",
+    "improving_turbodash/loss_model_audit/scripts/check_stage_branch.py": "4f88fa67ccc11a3b6fbf0eb49a2a60fc52b7da3ca5647c402f2c4fcf3f7cae8d",
+    "improving_turbodash/loss_model_audit/scripts/common.py": "ffd54a47032491ac03c2884a4b81d0017ed04e923c9557e06143da4726f92004",
+    "improving_turbodash/loss_model_audit/scripts/differentiation.py": "c836e42d293f1ab04c67cc12ebb65030735088a1eb6d9e740f53b8cbf4ce5959",
+    "improving_turbodash/loss_model_audit/scripts/engine.py": "6bbd90d1239a668df565d6c05ae926077c5c8a6381571e79c9069504a6608308",
+    "improving_turbodash/loss_model_audit/scripts/fundamental.py": "c074dd75955908ac2e19292eb480a59836329af9450f553b1f71ee918e06c94a",
+    "improving_turbodash/loss_model_audit/scripts/fundamental_probes.py": "4043fcffd1bffe2da0433eeee23e16df38f4350a70b09c718ab5f67384b518c5",
+    "improving_turbodash/loss_model_audit/scripts/inventory.py": "4bb0d479753e1a0453c0f98adc5133d3cbbaf9b6283b17f997b1e35231691427",
+    "improving_turbodash/loss_model_audit/scripts/joins.py": "b91498358c248104c887bcbbc2a92e6ca7ad206f429cea96830b83086b7afd98",
+    "improving_turbodash/loss_model_audit/scripts/mechanisms.py": "ee10535b615be9f1912577e22fecf2ea8173921b6acc1d999cca586e4df91306",
+    "improving_turbodash/loss_model_audit/scripts/plotting.py": "6d917ced2058ed98ff0b480c90e6e3fe0bf75c21d6fdccda46361b7b0ffa0448",
+    "improving_turbodash/loss_model_audit/scripts/prepare_candidate.py": "23512e37144936896a079ddf4b23e08fdf1d06e76b5718834f2873e8d034ee96",
+    "improving_turbodash/loss_model_audit/scripts/render_refinement.py": "f0342493a7d85d8a7d857e55ea6b303691abb4a4bee4872753eddea07ebca1ca",
+    "improving_turbodash/loss_model_audit/scripts/render_saved.py": "8484a4ed3645fbe852fa8ea149aa358fc42120218cbda7980ab54ac0b7f0f3ff",
+    "improving_turbodash/loss_model_audit/scripts/repair_study_links.py": "f6d052c239e03d7194644c8ae7efffd83571761c19bb244e243771c371731955",
+    "improving_turbodash/loss_model_audit/scripts/report.py": "7ebfcef31e28876a5005b1b0c27576b716886da18e10d17665e6a0c5aaa339af",
+    "improving_turbodash/loss_model_audit/scripts/report_refinement.py": "3a312f6ba0a35c86eff7697d8a88c8f5c65f00d5db15bb1a8fffb1a00c6ac5f4",
+    "improving_turbodash/loss_model_audit/scripts/restore_sphinx_docstrings.py": "0436d30cb4e1c5b86714c8b6ddf9ac9f7ade8ce956301f0ea0b9c268e396ac53",
+    "improving_turbodash/loss_model_audit/scripts/review_nozzle_patch.py": "a7e89dfe73c7ec97bb4e7f5decb52913dc5548743933c87096c3d09a48b534ab",
+    "improving_turbodash/loss_model_audit/scripts/run_audit.py": "fda5a4837e7a574e0daa34eb53ef0f4d6615b2c9bcba15b8772813719f9672c6",
+    "improving_turbodash/loss_model_audit/scripts/run_refinement.py": "103f0634014f80fbdbc126e71abb6b805a64e4044c403b4fec5991ff678743cd",
+    "improving_turbodash/loss_model_audit/scripts/smoke.py": "233261d9061e690c361d4a05b8a0120b9e8a9ffccd1ffaf1d2ed05ab70443d66",
+    "improving_turbodash/loss_model_audit/scripts/stage_context.py": "3ab9c11ebf977d5473da3e28e95a585c050a36664f0843af4b9382f2698e8939",
+    "improving_turbodash/loss_model_audit/scripts/studies.py": "f7359cb1a84b635d9fea20a617ddaa5e0380f7165b3e05fbfd725b3fbe7e705d",
+    "improving_turbodash/loss_model_audit/scripts/validate_derivatives.py": "5ec7138febe197eefe9a8668640260222c701d9c07a8cffa9406fb30882e4561",
+    "improving_turbodash/loss_model_audit/scripts/verify_refinement.py": "cc17cbc17a1e06126d57de96b468a5fb83f5153e1cff418fec36a6f4d16241e0",
+    "improving_turbodash/loss_model_audit/scripts/verify_results.py": "67fab682bb9b1f17ff756e4da10134fce4efbe9631dae0b7a040297c984caa94"
+  },
+  "provenance_note": "Calculation and render manifests preserve their own source hashes. The final manifest additionally includes later report/display tooling and module-header clarifications; numerical equations and saved values were unchanged after the verified calculation."
+}

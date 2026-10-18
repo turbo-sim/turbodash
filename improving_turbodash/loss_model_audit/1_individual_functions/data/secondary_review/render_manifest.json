@@ -1,0 +1,28 @@
+{
+  "figures": 6,
+  "model_calls": 0,
+  "derivative_recalculations": 0,
+  "files": {
+    "ko_secondary_factor.png": "2c68b7a9f89ccc698da46d1da3f18570cf3702a689c7a197ec4accf8c46148a2",
+    "ko_secondary_factor.pdf": "7be96be07e47b8bba5729736c451fbaf2cd16a3594302aea7ca7b8533c854671",
+    "ko_secondary_geometry_ar.png": "477b8cedaedb59866faef69dd4236235139a41bcf23de469d463bbe8082cd971",
+    "ko_secondary_geometry_ar.pdf": "361656e095d502d61b3b5332d3a52e27313ff55c588837c42e08518c208300fb",
+    "ko_secondary_geometry_angle.png": "6c59706bffd67c4f0dcccc67157f8c2c6567e5937a1a2d3e25a2632847f893ed",
+    "ko_secondary_geometry_angle.pdf": "c6dfeaf40aee84af80af30897cb2b4e8a7490e0e28957c427e278000102b1cb0",
+    "ko_secondary_compressibility_ar.png": "fb3bad96cd9edd6627d6e539d519989454c8c86e84b21560521bc25e96d8948b",
+    "ko_secondary_compressibility_ar.pdf": "a79e9799d5bc04166ed2877e693a31fcd24fe7fb22465d2c300ee09929989513",
+    "ko_secondary_mach_out.png": "01626f005f408a0dc01dc8a81443228646af97d0e75c4104baeddbf1238752a0",
+    "ko_secondary_mach_out.pdf": "5d41ce86738275e7cbdce2a60394c017737544a2b653065e5f70389c7b8d6824",
+    "ko_secondary_mach_in.png": "89474173fc4532369bf1e81d6b8c4068229b234a690797d1a252993c5232e73d",
+    "ko_secondary_mach_in.pdf": "21547eadd77da8d094eac16649fdb782cdf39ed6e35f96da1cce750dbf296ae7"
+  },
+  "script_sha256": "f6d6e3ac4a062cf94bed1371ef5d30f01c8bdd507d813c9f266756bce9aa70ca",
+  "data_sha256": {
+    "factor": "48e57bea48dbd24f229b2ad68a1125997073e30d69a0c7f47a2e54f5b3c7d370",
+    "geometry_ar": "a68006ce9a52d127165fc64f8efa9162d2bc064f3ddefe2fec00da58f82f1f9f",
+    "geometry_angle": "778ff96131d624e44cab6740d142b12cb0df415fb3044ff4b2b52bbea0da6895",
+    "compressibility_ar": "8d8ff5477bc36d75ef2ec4c74ccb7b80f9e3e7cbb07b1fd249bad00830763273",
+    "mach_out": "5de528e042490098987ea2f362eaea835bb5f5b2fb3c3166c8e2eb036adbff19",
+    "mach_in": "ab991a7f5c05dccadcf38b278e5f0bb42d7dae1d1b95af557c7536c8c012f14e"
+  }
+}

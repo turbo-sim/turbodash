@@ -1,0 +1,211 @@
+{
+  "passed": true,
+  "completed_at_utc": "2026-10-18T12:40:14.398745+00:00",
+  "fresh_full_api_grid_evaluations": 10504,
+  "direct_ko_evaluations": 132,
+  "figures_regenerated": 56,
+  "numerical_results_identical_excluding_timing": true,
+  "saved_design_outputs_identical": true,
+  "production_sources_unchanged": true,
+  "calculation_source_manifest_current": true,
+  "pre_recheck_archive": "data/history/before_profile_figure_recheck_20261018T123240Z.zip",
+  "pre_recheck_archive_sha256": "fdd92fae5a2809f6cd8d8d0a350731a60d9b51008dc2e65bb80139d9e579f316",
+  "tables": [
+    {
+      "file": "direct_ko_samples.csv",
+      "rows": 132,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "009ddc77bffeb54875c1b82e303eaed2d824b47212784a38b08672b806587bdb"
+    },
+    {
+      "file": "eps0_exit_angle.csv",
+      "rows": 400,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "88900c3886b12ba5b518d4f02b94f747622a34eb6a4c171e5b81727763a71c38"
+    },
+    {
+      "file": "eps0_meridional_ratio.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "2462be1fcdb2883a53721ee2cdd8ca98c37f76113acb8749b015c4e3149e108d"
+    },
+    {
+      "file": "eps0_reaction.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "be6f8f5af0ae2f2fc77dac50b9bc10d75e0c646a7c7f4f1e8cb1ce2f00140eb6"
+    },
+    {
+      "file": "eps0_rotor_aspect_ratio.csv",
+      "rows": 412,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "354fa8d117ad4c5e8050886840dae47222dc64dec148da3e832d57e7847d36dd"
+    },
+    {
+      "file": "eps0_rotor_maximum_thickness_ratio.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "05d26c4605d4b48270d205c6a296c76e09fee2e2594d23e3c7ab8408b320ebb4"
+    },
+    {
+      "file": "eps0_rotor_trailing_edge_ratio.csv",
+      "rows": 406,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "fd91175e958d50be9e22407f06d2d4cb1dd2c7c82bc8b6549ef03c99eae6178f"
+    },
+    {
+      "file": "eps0_solidity.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "99b5d6f565ae876f8c4ce1c2baf9af45217f877461d00b989f40fafee5a2fc64"
+    },
+    {
+      "file": "eps0_speed_r025.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "28c339ccf3fc2c86e2c5cd0b83c4a162ca97fa73589a9b301396630d88664bd6"
+    },
+    {
+      "file": "eps0_speed_r050.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "20ebfe303d19bbd947109f64e638fe82714fc2ed1823c40e71e8aebc9509a8c4"
+    },
+    {
+      "file": "eps0_speed_r075.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "6a874352f2cd9cc1994fd44eb5e63c481ce9de97d43b4abba990aff3b4305a08"
+    },
+    {
+      "file": "eps0_stator_aspect_ratio.csv",
+      "rows": 412,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "82ee0a8e979f051c2b9d87d4e55ef415a7c13de33540596b5ac7d29815c14c66"
+    },
+    {
+      "file": "eps0_stator_maximum_thickness_ratio.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "22c31f55a38c4fc4b2f2c8e0d0f86740e6512954d15ab2892e896bca3074456c"
+    },
+    {
+      "file": "eps0_stator_trailing_edge_ratio.csv",
+      "rows": 406,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "5d4f08a84ebd51c438e6a76071f59081ab6dce8c79cd792a98f117c517cf2658"
+    },
+    {
+      "file": "eps80_exit_angle.csv",
+      "rows": 400,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "94e49048b2f62487359068be47af641cee2759d97fa607ae137feba87882b827"
+    },
+    {
+      "file": "eps80_meridional_ratio.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "e736ef848de93f4a8133db7438c0770e09a516becdab2399908a06be7956893e"
+    },
+    {
+      "file": "eps80_reaction.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "10f4bcf6120f694b9dc179ab4e25faa1ef0a5dd2dd942e8916bc24ccf7eb1cbf"
+    },
+    {
+      "file": "eps80_rotor_aspect_ratio.csv",
+      "rows": 412,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "eb2f51e91dea0ee8fd924ee41384d0222d0045e4e251deeaf5f43b00a5a4cb1a"
+    },
+    {
+      "file": "eps80_rotor_maximum_thickness_ratio.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "7497c81a1cc377dfe1e7a1d203cd14c98841cb216192770d917bb0eebc2a4769"
+    },
+    {
+      "file": "eps80_rotor_trailing_edge_ratio.csv",
+      "rows": 406,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "3446888dd77b817a1201a7a6a00680ab0b47e445f0ad8524af2a20d2bad1ce4f"
+    },
+    {
+      "file": "eps80_solidity.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "40db0d0a5eb0638074fcb63aad14d926b9200b81a547e860b26b736d2562dc38"
+    },
+    {
+      "file": "eps80_speed_r025.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "b4b546d6fab80fe15b337ca6e86cf1fc4d7340aee59b07e1126638a26f343a63"
+    },
+    {
+      "file": "eps80_speed_r050.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "c30e819908cf9f90e91567925688182ee11af3185908edfceea31c4548c62d75"
+    },
+    {
+      "file": "eps80_speed_r075.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "a43ac4cb10e63ca464ab15467230a0da0d3bd6b82012eae5a3c6dd838ee406e8"
+    },
+    {
+      "file": "eps80_stator_aspect_ratio.csv",
+      "rows": 412,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "19e61804578a23f13caa3c5ffe3ca4a42ba419541dea3a43d0f169bb8537ed38"
+    },
+    {
+      "file": "eps80_stator_maximum_thickness_ratio.csv",
+      "rows": 402,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "697f9ca5d22d1f4237fc89b3ed7c39faebf6632f773488791ca539727e9e31c8"
+    },
+    {
+      "file": "eps80_stator_trailing_edge_ratio.csv",
+      "rows": 406,
+      "changed_rows_excluding_timing": 0,
+      "sha256": "0b808715871c8793423eb9d8b5ca6c20a1f14edf3f249b6a9673b0b9cf1b71ee"
+    }
+  ],
+  "checked_images": [
+    {
+      "file": "plots/eps0_speed_r025.png",
+      "pixels_identical": true,
+      "sha256": "a30805928148c2d71d545ca419564007905a2ac6e0149af0fd65bbf32c71cfa8"
+    },
+    {
+      "file": "plots/eps0_speed_r025_components.png",
+      "pixels_identical": true,
+      "sha256": "ed8bf009fe9450cbffe153dae95d22cc9f22d083ade385d1067505f9d9c6b28b"
+    }
+  ],
+  "fresh_profile_samples": {
+    "file": "data/profile_figure_recheck_samples.csv",
+    "sha256": "c4e1989c523dcd12e956f3fd70bc9a5434d6a5d3e964eaa54ec6c4149e3e3299",
+    "full_api_calls": 10,
+    "row_records": 20,
+    "points_coincident_with_saved_grid": 12,
+    "method": "Captured actual production function return-frame locals during full API evaluation; no model implementation changed",
+    "sample_speeds": [
+      0.3,
+      0.4,
+      0.5,
+      0.7,
+      1.0
+    ],
+    "component_assembly_verified": true
+  },
+  "profile_plot_definition": "Benner primary_loss_weight * 0.914*f_Re*((2/3)*AM_reference_blend*thickness*Kp + Y_shock)",
+  "selected_models": {
+    "previous": "benner",
+    "revised": "benner_new"
+  },
+  "old_and_new_include_all_accumulated_model_revisions": true
+}

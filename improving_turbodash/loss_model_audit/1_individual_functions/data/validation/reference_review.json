@@ -1,0 +1,116 @@
+{
+  "accepted": true,
+  "revision": "Widen K1 low join to 0.15-0.25, high tail to 0.9 and K2 saturation to 0.8",
+  "archive": "data/history/before_wider_compressibility_blends.zip",
+  "archive_sha256": "5d27dbdf220e932fe4c937d51660673f694d11c6b237370b789c4d30482ae7b3",
+  "protected_sources": 40,
+  "baseline_values_and_statuses_unchanged": true,
+  "changed_tables": [
+    {
+      "path": "data/provenance/fundamental_curvature_intervals.csv",
+      "before": {
+        "rows": 588,
+        "sha256": "b8a733fc23668d7704d2551629b9617b92a70c7eb1607c4c178963dbe4187944"
+      },
+      "after": {
+        "rows": 588,
+        "sha256": "66e97bbee91c9618e6a90e577355644c9901c187949fa4f45c7e0b41298b6870"
+      }
+    },
+    {
+      "path": "data/provenance/fundamental_join_intervals.csv",
+      "before": {
+        "rows": 686,
+        "sha256": "5f93a48fd10ee97cde15baa94c8cc568074dd4bbec68c49bf93606568de97148"
+      },
+      "after": {
+        "rows": 686,
+        "sha256": "e7e1ddcedba02d3c6e1c3723c02fae7b17c02937d903585604a2485d55848f0f"
+      }
+    },
+    {
+      "path": "data/sweeps/fundamental_compressibility_mach.csv.gz",
+      "before": {
+        "rows": 692,
+        "sha256": "59de5d4f680a7228007f42c5a03e232bd8737dcff11a03edf3d2efacab2b8c91"
+      },
+      "after": {
+        "rows": 688,
+        "sha256": "60ce70c293dfb48e9a9882bcfd600eddc0437af8c540646232f4a4768c76a27f"
+      }
+    },
+    {
+      "path": "data/sweeps/fundamental_hub_interpolation.csv.gz",
+      "before": {
+        "rows": 614,
+        "sha256": "7b21865cca4e8508ecb75134203e187c7158676da69849e94331219094e813ff"
+      },
+      "after": {
+        "rows": 624,
+        "sha256": "14d32737c4bad2fb128c2ba25181317f59988e7aaa312a30c3f406272c81971d"
+      }
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_profile_hub_tip__stator.csv.gz",
+      "before": {
+        "rows": 548,
+        "sha256": "5487007e595d3f20daac43f2879697d6b94f314fc85baf485dfc81991bb939d5"
+      },
+      "after": {
+        "rows": 584,
+        "sha256": "55ac7c8d1d4ee3ef5fd6797cbcb240715289cab675198a99661257ffad89c81c"
+      }
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_profile_ma_rel_in__stator.csv.gz",
+      "before": {
+        "rows": 582,
+        "sha256": "d88a7a1b9354037d8d96b2ded2a432a01e5b19d3d943a60a0ab4593217f74fa7"
+      },
+      "after": {
+        "rows": 588,
+        "sha256": "1e7a40d13a0ee52edc43f7c6f8d2e8ba9c1e5c981ecd2ab543812a6ea2cbc2ec"
+      }
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_profile_ma_rel_out__stator.csv.gz",
+      "before": {
+        "rows": 638,
+        "sha256": "1757cd3823b34b700f019c245269ee8e8845da28b4c97da7d42ffd390d43468f"
+      },
+      "after": {
+        "rows": 638,
+        "sha256": "59a0ebe9351ad5008e2eacaafe6065e91ca14ad901607ad823f670b0d123fd61"
+      }
+    },
+    {
+      "path": "data/sweeps/fundamental_ko_secondary_ma_rel_out__stator.csv.gz",
+      "before": {
+        "rows": 606,
+        "sha256": "04c81795e811bfee4c2cea11a46c8f64a9623707f7d07e75391c475fb6b187bd"
+      },
+      "after": {
+        "rows": 606,
+        "sha256": "0505e51d15e97ebcc150be29963d93db5f8133377e9bdfdad820a6b39544844b"
+      }
+    }
+  ],
+  "existing_shock_refresh_tables": [
+    "data/sweeps/fundamental_hub_interpolation.csv.gz",
+    "data/sweeps/fundamental_ko_profile_hub_tip__stator.csv.gz"
+  ],
+  "retired_tables": [],
+  "added_tables": [],
+  "tests": {
+    "analytical_integration_tests.xml": {
+      "tests": 78,
+      "sha256": "3c5fbe59a44c9077cd149f93f3da56439635a59ca60e3be4003ee4cfa102e786"
+    },
+    "repository_model_tests.xml": {
+      "tests": 85,
+      "sha256": "72f117ba131fba81c812a4833dd86771920593b271ad466251e892c57ce75e4d"
+    }
+  },
+  "physical_validation": false,
+  "notes": "Only the new KO module changes. AST comparison with the archived source identifies get_compressible_correction_factors as the only changed function. Six reference-table changes concern compressibility and its join probes; two hub-related tables refresh older data against the shock helpers already present in the archived source. Tests verify the wider K1/K2 joins, endpoint values/slopes/curvatures, monotonicity and absence of slope overshoot in the K1 low join, plus the unchanged rational Kp continuation. All baseline sweep values and interpolation/thickness reference tables are unchanged. Focused compressibility and continuation tables are checked by current-source hashes and independent real differences. The raw comparison includes unsmoothed K1 with linear high-Mach extrapolation, unbounded K2 and no Kp limiting; it is diagnostic, not additional calibration."
+}

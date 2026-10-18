@@ -1,0 +1,44 @@
+{
+  "domain": "Tangential angle phi 29..31 deg; pitch/chord 0.4..1.6 for positivity/optima.",
+  "directional_gradient_max_mismatch": 7.517134918005874e-12,
+  "smallest_probe_h": 3e-06,
+  "all_directional_gradients_finite": true,
+  "optima": [
+    {
+      "phi": 29.0,
+      "interior_minima": 1,
+      "minimum": 0.025729901361545716,
+      "minimizing_pitch": 0.82894,
+      "positive": true
+    },
+    {
+      "phi": 29.5,
+      "interior_minima": 1,
+      "minimum": 0.025285509162188316,
+      "minimizing_pitch": 0.8344,
+      "positive": true
+    },
+    {
+      "phi": 30.0,
+      "interior_minima": 1,
+      "minimum": 0.024861725761590868,
+      "minimizing_pitch": 0.8398000000000001,
+      "positive": true
+    },
+    {
+      "phi": 30.5,
+      "interior_minima": 1,
+      "minimum": 0.024458119326156647,
+      "minimizing_pitch": 0.84508,
+      "positive": true
+    },
+    {
+      "phi": 31.0,
+      "interior_minima": 1,
+      "minimum": 0.024074216680000246,
+      "minimizing_pitch": 0.8503000000000001,
+      "positive": true
+    }
+  ],
+  "interpretation": "Supports C1 across pitch and angle including both branch optima; one interior minimum in the tested neighborhood. Does not assert global positivity for extrapolated cubic fits."
+}

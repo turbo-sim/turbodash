@@ -1,0 +1,45 @@
+{
+  "policy": "Production get_profile_loss_blend; no runtime overrides",
+  "z_range": [
+    -1.2,
+    1.2
+  ],
+  "thickness_values": [
+    0.05,
+    0.15,
+    0.2,
+    0.25,
+    0.4
+  ],
+  "settings": {
+    "Re_out": 500000.0,
+    "Ma_rel_in": 0.2,
+    "Ma_rel_out": 0.5,
+    "thickness_chord": 0.2,
+    "hub_tip_ratio": 0.8,
+    "chord": 0.05
+  },
+  "zero_turning_fraction": 0.9,
+  "asymptotic_fraction": 0.8,
+  "first_two_ordinates": "blended_reference_before_all_KO_corrections",
+  "third_ordinate": "final_KO_profile_loss",
+  "third_coordinate": "z",
+  "third_curve_parameter": "thickness_chord",
+  "zero_zoom_range": [
+    -0.1,
+    0.1
+  ],
+  "zero_zoom_derivatives": "Complex step including zero; matching one-sided limits at z=0 and z=0.05",
+  "thickness_transition": [
+    0.0,
+    0.05
+  ],
+  "thickness_transition_center": 0.025,
+  "rows": {
+    "vary_alpha2": 4808,
+    "vary_pitch_chord": 4808,
+    "vary_thickness": 6010,
+    "thickness_z_zero_zoom": 5015,
+    "thickness_z_zero_limits": 10
+  }
+}

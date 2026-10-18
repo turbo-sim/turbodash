@@ -1,0 +1,417 @@
+{
+  "passed": true,
+  "archive": "data/history/before_wider_compressibility_blends.zip",
+  "archive_sha256": "5d27dbdf220e932fe4c937d51660673f694d11c6b237370b789c4d30482ae7b3",
+  "protected_source_files": 40,
+  "changed_candidate_sources": [
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py"
+  ],
+  "changed_executable_functions": [
+    "get_compressible_correction_factors"
+  ],
+  "standard_sweeps": 78,
+  "all_baseline_values_and_statuses_unchanged": true,
+  "studies": [
+    {
+      "study": "fundamental_ko_profile_pitch_chord__stator",
+      "unchanged_baseline_fields": 2324,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_profile_exit_angle__stator",
+      "unchanged_baseline_fields": 2534,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_profile_Re_out__stator",
+      "unchanged_baseline_fields": 2114,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_profile_Ma_rel_in__stator",
+      "unchanged_baseline_fields": 1918,
+      "candidate_changed_common_rows": 233
+    },
+    {
+      "study": "fundamental_ko_profile_Ma_rel_out__stator",
+      "unchanged_baseline_fields": 2205,
+      "candidate_changed_common_rows": 268
+    },
+    {
+      "study": "fundamental_ko_profile_thickness_chord__stator",
+      "unchanged_baseline_fields": 1848,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_profile_hub_tip__stator",
+      "unchanged_baseline_fields": 1918,
+      "candidate_changed_common_rows": 59
+    },
+    {
+      "study": "fundamental_ko_secondary_aspect_ratio__stator",
+      "unchanged_baseline_fields": 1128,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_secondary_incidence__stator",
+      "unchanged_baseline_fields": 916,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_secondary_exit_angle__stator",
+      "unchanged_baseline_fields": 1248,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_secondary_Ma_rel_out__stator",
+      "unchanged_baseline_fields": 1196,
+      "candidate_changed_common_rows": 252
+    },
+    {
+      "study": "fundamental_ko_secondary_stagger__stator",
+      "unchanged_baseline_fields": 912,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_clearance_clearance__stator",
+      "unchanged_baseline_fields": 892,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_clearance_clearance__rotor",
+      "unchanged_baseline_fields": 988,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_clearance_aspect_ratio__stator",
+      "unchanged_baseline_fields": 1092,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_clearance_aspect_ratio__rotor",
+      "unchanged_baseline_fields": 1164,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_clearance_incidence__stator",
+      "unchanged_baseline_fields": 916,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_clearance_incidence__rotor",
+      "unchanged_baseline_fields": 916,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_clearance_exit_angle__stator",
+      "unchanged_baseline_fields": 1244,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_clearance_exit_angle__rotor",
+      "unchanged_baseline_fields": 1244,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_clearance_pitch_chord__stator",
+      "unchanged_baseline_fields": 944,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_clearance_pitch_chord__rotor",
+      "unchanged_baseline_fields": 944,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_trailing_trailing_ratio__stator",
+      "unchanged_baseline_fields": 2653,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_trailing_exit_angle__stator",
+      "unchanged_baseline_fields": 2268,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_ko_trailing_Ma_rel_out__stator",
+      "unchanged_baseline_fields": 1960,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_secondary_aspect_ratio__stator",
+      "unchanged_baseline_fields": 1092,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_secondary_incidence__stator",
+      "unchanged_baseline_fields": 916,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_secondary_exit_angle__stator",
+      "unchanged_baseline_fields": 1244,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_secondary_delta_ref__stator",
+      "unchanged_baseline_fields": 940,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_secondary_stagger__stator",
+      "unchanged_baseline_fields": 880,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_penetration_aspect_ratio__stator",
+      "unchanged_baseline_fields": 2478,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_penetration_pitch_chord__stator",
+      "unchanged_baseline_fields": 2106,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_penetration_incidence__stator",
+      "unchanged_baseline_fields": 1860,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_penetration_exit_angle__stator",
+      "unchanged_baseline_fields": 1902,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_penetration_delta_ref__stator",
+      "unchanged_baseline_fields": 2262,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_penetration_Re_in__stator",
+      "unchanged_baseline_fields": 1506,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_incidence_incidence__stator",
+      "unchanged_baseline_fields": 3144,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_incidence_incidence__rotor",
+      "unchanged_baseline_fields": 3264,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_incidence_leading_edge_ratio__stator",
+      "unchanged_baseline_fields": 1744,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_incidence_leading_edge_ratio__rotor",
+      "unchanged_baseline_fields": 1744,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_incidence_wedge__stator",
+      "unchanged_baseline_fields": 1968,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_incidence_wedge__rotor",
+      "unchanged_baseline_fields": 2440,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_incidence_pitch_chord__stator",
+      "unchanged_baseline_fields": 1904,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_incidence_pitch_chord__rotor",
+      "unchanged_baseline_fields": 1904,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_incidence_Ma_rel_out__stator",
+      "unchanged_baseline_fields": 2464,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_benner_incidence_Ma_rel_out__rotor",
+      "unchanged_baseline_fields": 2312,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_moustapha_incidence_incidence__stator",
+      "unchanged_baseline_fields": 3320,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_moustapha_incidence_leading_edge_ratio__stator",
+      "unchanged_baseline_fields": 2248,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_moustapha_incidence_pitch_chord__stator",
+      "unchanged_baseline_fields": 2368,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_moustapha_incidence_Ma_rel_out__stator",
+      "unchanged_baseline_fields": 2448,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_moustapha_secondary_incidence__stator",
+      "unchanged_baseline_fields": 916,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_moustapha_secondary_leading_edge_ratio__stator",
+      "unchanged_baseline_fields": 872,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_nozzle_angle",
+      "unchanged_baseline_fields": 1870,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_penetration_cap",
+      "unchanged_baseline_fields": 1265,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_incidence_chi",
+      "unchanged_baseline_fields": 1405,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_loading_inlet",
+      "unchanged_baseline_fields": 916,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_incidence_chi_detail",
+      "unchanged_baseline_fields": 1325,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_hub_interpolation",
+      "unchanged_baseline_fields": 1764,
+      "candidate_changed_common_rows": 279
+    },
+    {
+      "study": "fundamental_compressibility_mach",
+      "unchanged_baseline_fields": 2016,
+      "candidate_changed_common_rows": 317
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.1_M0.2",
+      "unchanged_baseline_fields": 2808,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.1_M0.7",
+      "unchanged_baseline_fields": 3132,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.1_M1.2",
+      "unchanged_baseline_fields": 3051,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.1_M2.0",
+      "unchanged_baseline_fields": 3132,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.33_M0.2",
+      "unchanged_baseline_fields": 2934,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.33_M0.7",
+      "unchanged_baseline_fields": 3258,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.33_M1.2",
+      "unchanged_baseline_fields": 3060,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.33_M2.0",
+      "unchanged_baseline_fields": 3069,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.4_M0.2",
+      "unchanged_baseline_fields": 2934,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.4_M0.7",
+      "unchanged_baseline_fields": 3186,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.4_M1.2",
+      "unchanged_baseline_fields": 2979,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_loss_g1.4_M2.0",
+      "unchanged_baseline_fields": 3051,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_mach_d0.001",
+      "unchanged_baseline_fields": 3141,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_mach_d0.05",
+      "unchanged_baseline_fields": 2880,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_mach_d0.3",
+      "unchanged_baseline_fields": 2907,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_mach_d0.8",
+      "unchanged_baseline_fields": 2997,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_conversion_gamma",
+      "unchanged_baseline_fields": 1036,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_smooth_bounds",
+      "unchanged_baseline_fields": 1896,
+      "candidate_changed_common_rows": 0
+    },
+    {
+      "study": "fundamental_smooth_absolute",
+      "unchanged_baseline_fields": 1500,
+      "candidate_changed_common_rows": 0
+    }
+  ],
+  "changed_reference_tables": [
+    "data/provenance/fundamental_curvature_intervals.csv",
+    "data/provenance/fundamental_join_intervals.csv",
+    "data/sweeps/fundamental_compressibility_mach.csv.gz",
+    "data/sweeps/fundamental_hub_interpolation.csv.gz",
+    "data/sweeps/fundamental_ko_profile_hub_tip__stator.csv.gz",
+    "data/sweeps/fundamental_ko_profile_ma_rel_in__stator.csv.gz",
+    "data/sweeps/fundamental_ko_profile_ma_rel_out__stator.csv.gz",
+    "data/sweeps/fundamental_ko_secondary_ma_rel_out__stator.csv.gz"
+  ],
+  "note": "Baseline comparisons include all 200 original base points per sweep. K1 uses a wider low-Mach join from 0.15 to 0.25 and a rational tail starting at 0.9; K2 saturation starts at ratio 0.8. Join probes follow the new boundaries. The Kp rational continuation, reference fits, reaction/impulse interpolation and thickness treatment are unchanged. Profile and KO-secondary corrections inherit the updated component factors."
+}

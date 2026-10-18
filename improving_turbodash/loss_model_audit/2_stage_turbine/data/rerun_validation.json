@@ -1,0 +1,209 @@
+{
+  "passed": true,
+  "completed_at_utc": "2026-10-18T13:05:52.679891+00:00",
+  "revision": "Reaction sweep extended to -0.1..0.9; focused acoustic-switch, stator-plateau and near-zero velocity-triangle diagnoses",
+  "pre_rerun_archive": "data/history/before_reaction_range_extension.zip",
+  "pre_rerun_archive_sha256": "1edf89d657475bd9618db84d863f6ccfbbbbf565fc1a11654fe59f05ba592cab",
+  "production_physics_modified_for_this_investigation": false,
+  "concurrent_production_changes_observed_since_snapshot": {
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": {
+      "before": "c03be22271d6d95f39da2df2ed68de7284ad12cf33b83c2fe47e3c27bf765f1f",
+      "current": "3551d08bf9b66a0ae003855db71b3910e3c7110e7543766f9236299c40629737"
+    }
+  },
+  "provenance_note": "The complete sweep was run with the source hashes in calculation_provenance.json. A concurrent KO secondary-loss edit followed. Both complete reaction sweeps, direct KO checks and focused diagnostics were then freshly evaluated with the current source hashes in reaction_calculation_provenance.json. Every preceding main-sweep output and every refreshed reaction output remained unchanged; direct KO data was refreshed as it calls KO secondary losses.",
+  "current_source_and_input_hashes_match_latest_reaction_refresh": true,
+  "sources_unchanged_during_latest_reaction_refresh": true,
+  "calculation_provenance": "data/calculation_provenance.json",
+  "latest_reaction_calculation_provenance": "data/reaction_calculation_provenance.json",
+  "render_only_revision": "data/reaction_render_revision.json",
+  "all_numerical_calculations_completed": true,
+  "all_figures_and_reports_regenerated": true,
+  "grid_evaluations": 11972,
+  "reference_evaluations": 4,
+  "direct_ko_evaluations": 132,
+  "focused_jump_evaluations": 376,
+  "focused_zero_evaluations": 452,
+  "latest_refresh_reaction_evaluations": 2272,
+  "preceding_main_outputs_unchanged": true,
+  "preceding_rows_compared": 10504,
+  "added_reaction_rows": 1468,
+  "reaction_grid": {
+    "0": {
+      "previous": {
+        "points": 568,
+        "range": [
+          -0.1,
+          0.9
+        ],
+        "finite_points": 532,
+        "failed_points": 36,
+        "all_requested_negative_reactions_infeasible": true,
+        "zero_reaction_status": "exception"
+      },
+      "revised": {
+        "points": 568,
+        "range": [
+          -0.1,
+          0.9
+        ],
+        "finite_points": 532,
+        "failed_points": 36,
+        "all_requested_negative_reactions_infeasible": true,
+        "zero_reaction_status": "exception"
+      }
+    },
+    "80": {
+      "previous": {
+        "points": 568,
+        "range": [
+          -0.1,
+          0.9
+        ],
+        "finite_points": 500,
+        "failed_points": 68,
+        "all_requested_negative_reactions_infeasible": true,
+        "zero_reaction_status": "exception"
+      },
+      "revised": {
+        "points": 568,
+        "range": [
+          -0.1,
+          0.9
+        ],
+        "finite_points": 500,
+        "failed_points": 68,
+        "all_requested_negative_reactions_infeasible": true,
+        "zero_reaction_status": "exception"
+      }
+    }
+  },
+  "triangle_feasibility_boundaries": {
+    "0": 0.00578372336053684,
+    "80": 0.017517787314425125
+  },
+  "acoustic_switch_reaction_eps80": 0.774982301837849,
+  "geometry_tests_passed": 5,
+  "stage_checks": {
+    "input_immutability": true,
+    "equal_grids": true,
+    "unchanged_flow_and_geometry": true,
+    "energy_balance": true,
+    "component_sums": true,
+    "stage_matches_turbine": true,
+    "saved_reference_matches_sweep": true,
+    "geometry_coordinates_match_requested_ratios": true,
+    "independent_row_geometry_and_losses_unchanged": true,
+    "geometry_sweep_flow_controls_unchanged": true,
+    "geometry_saved_anchors_match_reference": true,
+    "revised_zero_thickness_has_zero_trailing_loss": true
+  },
+  "figure_count_png": 62,
+  "markdown_equations_and_links_passed": true,
+  "markdown_files_checked": 10,
+  "navigation_and_script_layout_passed": true,
+  "visually_reviewed_figures": [
+    "plots/eps80_reaction_efficiency_detail.png",
+    "plots/eps80_reaction_components_detail.png",
+    "plots/eps80_reaction_jump_diagnostics.png",
+    "plots/eps80_reaction_zero_diagnostics.png"
+  ],
+  "source_and_input_sha256": {
+    "turbodash/__init__.py": "4c7737a35da6c41e775164eabe7db6fe91180dd5cdc9b0449c548a99a29454aa",
+    "turbodash/app.py": "f22a099a5fc3b38f2d15c420322f79a603e3bc62cbb72941a1611d321aeb8605",
+    "turbodash/app_experimental.py": "da7eed86b47ebfcd67306aec84c10457d37c87aacadd075fcdec8d57a933793f",
+    "turbodash/app_lite.py": "3577ca78a96d79d75d34de6c54f14f34da40df07ce097468048658e89c40ad80",
+    "turbodash/app_meshing.py": "edd160c2a7e7106303fb75b3381c87265587a92d873d92f8e88ce8ead7f4ad89",
+    "turbodash/app_turbine.py": "0a0880c27f13adcca2515246a674adfc2c7d6ee976aebb0e4f25f7b5a89fe6fd",
+    "turbodash/app_turbogrid.py": "7856d4d4cc65415b9ab62ac7405a52a7f66e5a46d391143714038be5121d7f7f",
+    "turbodash/core_stage.py": "e0126d1fbd61f41fd13ce23f42189daf3f9e0772f7c8c2518a038c97b8d134ba",
+    "turbodash/core_turbine.py": "7bfb9ca303ddba914c126519ede33c6603c40970a6d9c52e3f49abd6fd24054d",
+    "turbodash/excel_interface_stage.py": "18089b9b1b6d3089fc4b12c4d33587db25a81f35dd5b9a85875a7ef636affe83",
+    "turbodash/excel_interface_turbine.py": "6d14d5361590f9945da41ed033702ba7e2988e492373a01706af161e33488a15",
+    "turbodash/export_turbogrid.py": "4dff7818d5742b561a6a991c2178781b3acf772d1db31c14bb5bfbaecb52c7df",
+    "turbodash/export_turbogrid_assembly.py": "86f9bcb58b0d946555667cec04a5d1dd9a5e4f123ef06f6e58754c4913b92ee0",
+    "turbodash/geom_blade.py": "b386a1fa3b4d848cdcf3a2f994927c7eb99cb4ce4db697fcb99e986c2a1b20d8",
+    "turbodash/graphics.py": "2e8e2a8afca76df900d272d03bca44754e98eef6a69a5e89072253fc7732de4a",
+    "turbodash/loss_model_dispatch.py": "39acd5c8b4961e5239b32c95edc33a2447bb558ed4158b1de4becd8efe447dbd",
+    "turbodash/loss_models/__init__.py": "225e50f404dd5fcc97a95c6d3ff9d8a94844c73c4f0bfaa4fd65d0ff88747b18",
+    "turbodash/loss_models/loss_coefficient_conversion.py": "21ffa896097129972ec2130ba6cf54377fc6726ba5960d73c8fd40cd90454309",
+    "turbodash/loss_models/loss_model.py": "156fbe3b0a9510b760f32e73b39c09533edf8e3e4798df9cdb08cd32f905a3e4",
+    "turbodash/loss_models/loss_model_benner.py": "ce5e2aae37a04718c0ad8b6801b67be2e7824fdacd407affcb00e279ff46d649",
+    "turbodash/loss_models/loss_model_kacker_okapuu.py": "197794ed5736c997b865e43860ffeccdaf4dfd21dbc2f99b2191f4a28abab28d",
+    "turbodash/loss_models/loss_model_moustapha.py": "9918fc36bf9e3ed59d65256332d21780f0baff6ade302e8ee49c342e31b1d762",
+    "turbodash/loss_models_new/__init__.py": "5b9d3bc6706ab907bf8314428b244132feb46cf2754de33ba2e0d8f7676593a3",
+    "turbodash/loss_models_new/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
+    "turbodash/loss_models_new/_numerics.py": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff",
+    "turbodash/loss_models_new/loss_coefficient_conversion.py": "eab232ff2304b104726b2b3af4a87c96c65f302903e807ea9dd3dc2db827ae98",
+    "turbodash/loss_models_new/loss_model.py": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11",
+    "turbodash/loss_models_new/loss_model_benner.py": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba",
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "3551d08bf9b66a0ae003855db71b3910e3c7110e7543766f9236299c40629737",
+    "turbodash/loss_models_new/loss_model_moustapha.py": "923339d879bb7edf952112296b605073d9c5f466e541ea04b3ce10f3f8e1f489",
+    "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
+    "turbodash/mesh_jobs.py": "7c25d0d21557ecf7cec876846bbc09d1a1486db97808076ba5ee1f95f219bf85",
+    "turbodash/meshing.py": "6b059111bfef2221a67ef1ebc6d00ef24096f30844c110a1df9f38f00634c070",
+    "turbodash/plotting_mesh.py": "5f42be0552677596f4b1c2e70839c322eeaec65948b429501bbc1519dabd82fe",
+    "turbodash/plotting_mpl.py": "af77f23594d8111f6ce4333e28f7ec7de190bd7513d5b51ebff0680de79ce937",
+    "turbodash/plotting_plotly_stage.py": "c9e160298bf696a6d4befb015f5d71ec27d4dabf4bc3d107f0fcc5898cabd738",
+    "turbodash/plotting_plotly_turbine.py": "d7b7c56ae4f626934642e09a56f104472ac6f010139cd75d102b4d272084a3b8",
+    "turbodash/reporting_utils.py": "cccc32cff5e44396ec0ded04815470e37d680c0a4d43af339d65b329f47d0db8",
+    "turbodash/turbogrid_assembly.py": "74a983c0f9c9754fe718807ed658da3da4dbab7168170709571d1a7da493344d",
+    "turbodash/visualization_vtk.py": "0afa55e95720e9fe6ff652222b154c8e5d9f80bdad916e15cd0f6daed3a4191d",
+    "turbodash/vtk_assets.py": "af1c3d7e9a0e1b3f9e2f1749c7daf743cb0f0f4eacfdf7064ac7699d1c8cbeb1",
+    "improving_turbodash/loss_model_audit/2_stage_turbine/scripts/compare_profile_revision.py": "aff9a0e770ed1df07021626374c03bcd726b0ac75986e292692e583bc1f3982b",
+    "improving_turbodash/loss_model_audit/2_stage_turbine/scripts/compare_reynolds_revision.py": "4f2f157fce2dd2c0ec0ffd823ec4ff28d32257cb67d9232fc5cd3b19b634a077",
+    "improving_turbodash/loss_model_audit/2_stage_turbine/scripts/direct_ko_check.py": "fac50ee88706aadde3fee2895916a775f35ac002efc30ee8c2e1bbdc8020c618",
+    "improving_turbodash/loss_model_audit/2_stage_turbine/scripts/reaction_jump_diagnostics.py": "b965179dea3eaae3d1369547096a32818549ebdd1033d8edb2ca8cb4fd2acaaa",
+    "improving_turbodash/loss_model_audit/2_stage_turbine/scripts/reaction_zero_diagnostics.py": "20d15531ee264af3cf90bf0aad0ec50bbd57723f489091ba61c2179bf5faded1",
+    "improving_turbodash/loss_model_audit/2_stage_turbine/scripts/run_sweeps.py": "f46c5ab0b136aaca45fe4c0c2a77e60e1a8fb2191d7ed827afe028123c21782b",
+    "improving_turbodash/loss_model_audit/2_stage_turbine/scripts/test_geometry_sweeps.py": "325156a0a6eec2dbb34fa973b165830aa4033c9ce20f143a03b62b7ce69b0863",
+    "improving_turbodash/loss_model_audit/2_stage_turbine/inputs/R245fa_turbine_0_final.yaml": "874f8f2d4010d66ad50529f45aa8c67d4ed532dec5393277eb5eb61a8cabda31",
+    "improving_turbodash/loss_model_audit/2_stage_turbine/inputs/R245fa_turbine_80_final.yaml": "28d205e8c932521be8e4a8b6e4907dcd2b4d716d3a13551e29e93bdccc0729dc"
+  },
+  "csv_sha256": {
+    "data/eps0_exit_angle.csv": "f9811798a1b947d24245e8d109c60a941e8c6c0ba5282f60341856cde5195ab3",
+    "data/eps0_meridional_ratio.csv": "7f70601866c6bf00f04d5d5b352950b54ba461897a9cc17fca57cc8501631da7",
+    "data/eps0_reaction.csv": "423b359899736e031960ca777b541f0271a40e2dba0117de13fe3e338fcd4066",
+    "data/eps0_rotor_aspect_ratio.csv": "adb336a93f96453e0666a468cf241d9cbd99f80a3710fb4985a734a972542b1b",
+    "data/eps0_rotor_maximum_thickness_ratio.csv": "907aea93f0433c3b0491abdd1323322948f42afc24e8be22673b8e2934e58c78",
+    "data/eps0_rotor_trailing_edge_ratio.csv": "da8d251e0acfad0eb4e7028c253937a7f476b04d8fedf687fcb5b0ab14710b36",
+    "data/eps0_solidity.csv": "6b4a1a4f14cfae5e6f864867d6939af3122759310a9fade406a103168b86d296",
+    "data/eps0_speed_r025.csv": "4cd0e84a654740c53a2750d23dc32b2fd25fce5781326508a5d8e857454418cb",
+    "data/eps0_speed_r050.csv": "9bbf6b9d2fcd345deefd694619b2591eaceacdd9b354060ec0bbd1bab22bdf6d",
+    "data/eps0_speed_r075.csv": "f2e107bfa183385e421fa7a45978a1e82ce347fc2502f81c4be80ad61cad9801",
+    "data/eps0_stator_aspect_ratio.csv": "fe61921e21be5ec74f38a59865da5447b20218890295a6f3f51f78fdea335105",
+    "data/eps0_stator_maximum_thickness_ratio.csv": "e9074c5f8af435e3da34bee43fd3e4ba2d086d78c411830cb27b734c82fadfcc",
+    "data/eps0_stator_trailing_edge_ratio.csv": "dc663c8eea580bf5f4cba70e58b13ebad56f47dfbbfc457ca7ae2de01af2f429",
+    "data/eps80_exit_angle.csv": "2706bdad44f203079c0d37e1f634217b8bffd215c726f73cc780517ab39b466a",
+    "data/eps80_meridional_ratio.csv": "35c5e6eac6e9c049a9e8dd73899fb906bc39106d3d4c60e6bfc7ca97e90f3365",
+    "data/eps80_reaction.csv": "07787c9408888b33c893f7177f5a9e8f191a084176af9d2da18031b0fe4f0879",
+    "data/eps80_rotor_aspect_ratio.csv": "63682494a9f442ce81e7bd9ff4c032bbf89db7b7d5d152b5e2e5b141ac86a47a",
+    "data/eps80_rotor_maximum_thickness_ratio.csv": "478a9c3e7aa1123660dc28d08f43d7f93c305e2f3fcddcbfdc5f97810367f97e",
+    "data/eps80_rotor_trailing_edge_ratio.csv": "881aa778f3c8740cde3974f914b1c9a2210cf79677cc5e322700c572a67c402d",
+    "data/eps80_solidity.csv": "cebc6c67cb785e941b8832101d814188e600a1331ab229a2db000a74e212c179",
+    "data/eps80_speed_r025.csv": "9a624c7772ed0cc048fe8713b7dc9f947abd31b28e6f3b0e2128a47404c8d0b2",
+    "data/eps80_speed_r050.csv": "8862385a216b3dd1115b9df07fc3dd38766150ff7e4e1257f75584675f57535e",
+    "data/eps80_speed_r075.csv": "6fed153a9280eb25a02005a94aaad234fbe3cb96c4feda8d5c7268c7398e456d",
+    "data/eps80_stator_aspect_ratio.csv": "73dd18d0088698af9ca805ad4cf992586e394c3d89a61efc3931afbb68f967ea",
+    "data/eps80_stator_maximum_thickness_ratio.csv": "eae4a7b8dd422c5907d4e882c7b9d933c4423213157a2b7b443d1985c6605121",
+    "data/eps80_stator_trailing_edge_ratio.csv": "8e9b98a8391c911a5bc698d3abeb229a72abcc6fe76f226fdc41bc0659152b6e",
+    "data/direct_ko_samples.csv": "5bb566445dd47259e28b1c48ab3c0b0744f9fe1995f422631c98fdaa6478dd0c",
+    "data/reaction_jump_diagnostics.csv": "3469d9d4d2fb46da6d4c48d8770d7335c4becfe84e61595213d0e18645f6b153",
+    "data/reaction_zero_diagnostics.csv": "4342f451720337be0cdb715e62ef42002adf2d8c7cb99912df341adb80d44808"
+  },
+  "report_and_validation_sha256": {
+    "report/01_blade_velocity_ratio.md": "53e1e2ff1636f0eaf0e5b5784182d23376d071af3ea89b5f504e2e69763b9bb3",
+    "report/02_reaction.md": "49b9305a44268a535cfc986bdab162be10278e35e05fcc2d14b387f78e0d0e21",
+    "report/03_stator_exit_angle.md": "05cb37297367db12636d8992d442aba23575a788b5328d7fa5d947d0cfad655f",
+    "report/04_solidity.md": "1672dc27081db45dd818da55a2b7b0f6e138c8d18970492c57773f9d5c58ff4f",
+    "report/05_meridional_ratio.md": "eb645793c555c6d68f2f466746cf404f235bb821c7727a17ec9391dc79d05b93",
+    "report/06_aspect_ratio.md": "3268a939aed8fd5fa7192cdfd3b55acae251894e5a1a689bd43b46b9ff23659a",
+    "report/07_trailing_edge_ratio.md": "1cae468ef2dbcc80e7d386e439a58723a66a6f2c55c9d1dbce2a93ac80614597",
+    "report/08_maximum_thickness_ratio.md": "6ab8384b3fb11e2f60c4d5eaa71a95801acae63d8533836893b5f54b51123516",
+    "report/09_method.md": "f878115f8d6783e3f8007481f3da5335d807f3ddeb777caa104f46d3c88f794f",
+    "readme.md": "9af528348450ab6edee80009d43f41cc902930b5405a8443c44313e1f0a9e10b",
+    "data/profile_revision_comparison.json": "5ea0f9aef280ebec61308173c2daf5bc51e83edd1f427f072f54a7d610c6e681",
+    "data/direct_ko_checks.json": "68edf764617b7741ebc0e0eb7a9eef28e9413351ca3b948f94616ff562e9feed",
+    "data/markdown_validation.json": "618f128b0ce6fe402b08b12c7d16bdb51ef7a6ac4f0a5f4685eb655325c36761"
+  }
+}

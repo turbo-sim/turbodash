@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "compared_rows": 6010,
+  "changed_rows": 96,
+  "all_changes_inside_transition": true,
+  "original_outer_values_exact": true,
+  "transition": [
+    0.0,
+    0.05
+  ],
+  "center": 0.025,
+  "production_sha256": "3c4fc1e50a7b51a21fd5383c583a1d3e587e05e90fe231efa4a1a8b8098cf243"
+}

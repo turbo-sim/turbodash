@@ -1,0 +1,133 @@
+{
+  "passed": true,
+  "production_sources": {
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "c03be22271d6d95f39da2df2ed68de7284ad12cf33b83c2fe47e3c27bf765f1f",
+    "turbodash/loss_models_new/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff"
+  },
+  "script_sha256": "d2bb8557cb34ab2ce6e4d2cc7ffcab99bfa8819a739026bba9e63f63886d905a",
+  "data_sha256": {
+    "hub_factor": "a1cd5a23f369e4d646ebd6c3814f09e92098629cde1149ac11b285384a86707b",
+    "hub_tip": "8ee016b464ff69551717e9bd05010ec58c336f1652a4408675d68319e45ab835",
+    "exit_mach": "f2f79d31b41457be1c12637b5a3746b74da527e145fd613c5a45734125bf6805",
+    "onset": "b28ffa95fc104464464079bbdfeeba5012ec375df7b9bf8b58029eeed2934fa0"
+  },
+  "curves": 18,
+  "derivative_checks": [
+    {
+      "family": "stator",
+      "sweep": "hub_tip",
+      "inlet_mach": 0.2,
+      "max_slope_error": 6.504727312339753e-13
+    },
+    {
+      "family": "stator",
+      "sweep": "exit_mach",
+      "inlet_mach": 0.2,
+      "max_slope_error": 0.0
+    },
+    {
+      "family": "stator",
+      "sweep": "hub_tip",
+      "inlet_mach": 0.4,
+      "max_slope_error": 1.731118026704337e-11
+    },
+    {
+      "family": "stator",
+      "sweep": "exit_mach",
+      "inlet_mach": 0.4,
+      "max_slope_error": 2.8012334674087924e-09
+    },
+    {
+      "family": "stator",
+      "sweep": "hub_tip",
+      "inlet_mach": 0.6,
+      "max_slope_error": 6.57616738841682e-11
+    },
+    {
+      "family": "stator",
+      "sweep": "exit_mach",
+      "inlet_mach": 0.6,
+      "max_slope_error": 2.0351054175193894e-10
+    },
+    {
+      "family": "stator",
+      "sweep": "hub_tip",
+      "inlet_mach": 0.8,
+      "max_slope_error": 9.327227878941358e-11
+    },
+    {
+      "family": "stator",
+      "sweep": "exit_mach",
+      "inlet_mach": 0.8,
+      "max_slope_error": 1.569225860365009e-10
+    },
+    {
+      "family": "stator",
+      "sweep": "onset",
+      "inlet_mach": 0.0,
+      "max_slope_error": 6.3546529149860476e-12
+    },
+    {
+      "family": "rotor",
+      "sweep": "hub_tip",
+      "inlet_mach": 0.2,
+      "max_slope_error": 3.9048035638256096e-12
+    },
+    {
+      "family": "rotor",
+      "sweep": "exit_mach",
+      "inlet_mach": 0.2,
+      "max_slope_error": 5.142140491187774e-09
+    },
+    {
+      "family": "rotor",
+      "sweep": "hub_tip",
+      "inlet_mach": 0.4,
+      "max_slope_error": 9.425496494408492e-11
+    },
+    {
+      "family": "rotor",
+      "sweep": "exit_mach",
+      "inlet_mach": 0.4,
+      "max_slope_error": 6.736484703395718e-10
+    },
+    {
+      "family": "rotor",
+      "sweep": "hub_tip",
+      "inlet_mach": 0.6,
+      "max_slope_error": 1.0604961353521958e-10
+    },
+    {
+      "family": "rotor",
+      "sweep": "exit_mach",
+      "inlet_mach": 0.6,
+      "max_slope_error": 1.7138834795815683e-10
+    },
+    {
+      "family": "rotor",
+      "sweep": "hub_tip",
+      "inlet_mach": 0.8,
+      "max_slope_error": 1.767392898699427e-10
+    },
+    {
+      "family": "rotor",
+      "sweep": "exit_mach",
+      "inlet_mach": 0.8,
+      "max_slope_error": 8.656231287318406e-11
+    },
+    {
+      "family": "rotor",
+      "sweep": "onset",
+      "inlet_mach": 0.0,
+      "max_slope_error": 7.732349482925116e-12
+    }
+  ],
+  "component_assembly_verified": true,
+  "full_profile_isolation_verified": true,
+  "pressure_prescription": "gamma=1.4, equal inlet/outlet relative p0=200 kPa; static pressures follow Mach",
+  "derivative_method": "One complex-step source-helper call gives all values and slopes; checked against real differences",
+  "outer_KO_scaling_in_figures": false,
+  "continuation_start": 0.25,
+  "shock_asymptote": 0.5,
+  "maximum_plotted_loss": 0.4999999742385013
+}

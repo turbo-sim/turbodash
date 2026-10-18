@@ -1,0 +1,195 @@
+{
+  "passed": true,
+  "renderer": "Installed VS Code Markdown+Math, dollar delimiters",
+  "katex_version": "0.13.11",
+  "modules": "C:\\Users\\roagr\\.vscode\\extensions\\goessner.mdmath-2.7.4\\node_modules",
+  "markdown_files": 26,
+  "inline_equations": 840,
+  "display_equations": 100,
+  "local_links": 664,
+  "files": [
+    {
+      "file": "improving_turbodash/loss_model_audit/1_individual_functions/methodology.md",
+      "inline_equations": 33,
+      "display_equations": 1,
+      "local_links": 49,
+      "sha256": "6b9240b7b34e0c2632020ce18519fe2e5a5a89d96ed2291f0d5d1e455c849d53"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/1_individual_functions/readme.md",
+      "inline_equations": 12,
+      "display_equations": 0,
+      "local_links": 34,
+      "sha256": "c85a3bdd7582a6c15344650b2024e5c94696e40cee94d679e8996aa657736c54"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/1_individual_functions/report/01_ko_profile.md",
+      "inline_equations": 327,
+      "display_equations": 49,
+      "local_links": 110,
+      "sha256": "822dde257a7cbc6cc9107d6487082d7078cba6906233afd9b8676ce287d2a482"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/1_individual_functions/report/02_ko_secondary.md",
+      "inline_equations": 216,
+      "display_equations": 21,
+      "local_links": 41,
+      "sha256": "5a5bf18c7ea444e5fc3cfbdd3327b54c2430a1329c0b326be06f3afc63d52e28"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/1_individual_functions/report/03_ko_trailing.md",
+      "inline_equations": 1,
+      "display_equations": 0,
+      "local_links": 18,
+      "sha256": "11f4d80742974f738de97ae61ea3eecc9256fefd1ca269abdc052ea5f9d9ca73"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/1_individual_functions/report/04_ko_clearance.md",
+      "inline_equations": 63,
+      "display_equations": 13,
+      "local_links": 22,
+      "sha256": "a322e0150bc3711a34115dc5fb35dc72fb9e71a61a9c3742e07f7a08b3323db2"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/1_individual_functions/report/05_conversions.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 48,
+      "sha256": "87837eb658c0fc19e8e919352b0af873530a97dfefb4a3482c7696069a2c4f08"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/1_individual_functions/report/06_shared_math.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 15,
+      "sha256": "9e09d1dd1d30d22a453dfd73b22e28953a52f6d1a663340e10a5d0aaa13c7f46"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/1_individual_functions/report/07_moustapha_incidence.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 21,
+      "sha256": "0ed8c255f7007dcbc477fd8506db618b4e4c5f5188b09dbb4f4c51827c9088a6"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/1_individual_functions/report/08_moustapha_secondary.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 16,
+      "sha256": "91873310f8f900164a2f3b1009a9f7893bd653ab9c9b86c00395c2f46afeefe1"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/1_individual_functions/report/09_benner_secondary.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 21,
+      "sha256": "bb56d1104810ffd6e1d795ec9309a098f5c465d52625356e415136daf9d42896"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/1_individual_functions/report/10_benner_incidence.md",
+      "inline_equations": 1,
+      "display_equations": 0,
+      "local_links": 32,
+      "sha256": "a80226b138a51f7cb347790bd996847981445a719782d8677709193ae925bd06"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/1_individual_functions/report/11_benner_penetration.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 29,
+      "sha256": "ea56ac81436f920fc41159959d26393b8d85f78f56ea16ff7923ac78d66d15b8"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/readme.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 14,
+      "sha256": "9af528348450ab6edee80009d43f41cc902930b5405a8443c44313e1f0a9e10b"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/01_blade_velocity_ratio.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 20,
+      "sha256": "53e1e2ff1636f0eaf0e5b5784182d23376d071af3ea89b5f504e2e69763b9bb3"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/02_reaction.md",
+      "inline_equations": 46,
+      "display_equations": 4,
+      "local_links": 28,
+      "sha256": "49b9305a44268a535cfc986bdab162be10278e35e05fcc2d14b387f78e0d0e21"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/03_stator_exit_angle.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 10,
+      "sha256": "05cb37297367db12636d8992d442aba23575a788b5328d7fa5d947d0cfad655f"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/04_solidity.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 8,
+      "sha256": "1672dc27081db45dd818da55a2b7b0f6e138c8d18970492c57773f9d5c58ff4f"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/05_meridional_ratio.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 8,
+      "sha256": "eb645793c555c6d68f2f466746cf404f235bb821c7727a17ec9391dc79d05b93"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/06_aspect_ratio.md",
+      "inline_equations": 5,
+      "display_equations": 0,
+      "local_links": 14,
+      "sha256": "3268a939aed8fd5fa7192cdfd3b55acae251894e5a1a689bd43b46b9ff23659a"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/07_trailing_edge_ratio.md",
+      "inline_equations": 2,
+      "display_equations": 0,
+      "local_links": 14,
+      "sha256": "1cae468ef2dbcc80e7d386e439a58723a66a6f2c55c9d1dbce2a93ac80614597"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/08_maximum_thickness_ratio.md",
+      "inline_equations": 2,
+      "display_equations": 0,
+      "local_links": 14,
+      "sha256": "6ab8384b3fb11e2f60c4d5eaa71a95801acae63d8533836893b5f54b51123516"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/2_stage_turbine/report/09_method.md",
+      "inline_equations": 14,
+      "display_equations": 0,
+      "local_links": 17,
+      "sha256": "f878115f8d6783e3f8007481f3da5335d807f3ddeb777caa104f46d3c88f794f"
+    },
+    {
+      "file": "improving_turbodash/loss_model_audit/readme.md",
+      "inline_equations": 5,
+      "display_equations": 0,
+      "local_links": 7,
+      "sha256": "e9b9b559b9ce730e93efbcebdb5e9f65fa515775c27f4912670cc54398518013"
+    },
+    {
+      "file": "improving_turbodash/ainley_mathieson_fitting/readme.md",
+      "inline_equations": 48,
+      "display_equations": 5,
+      "local_links": 32,
+      "sha256": "c251d445b6e5c2a67abe8dfc243b15193f33bf464a51f387fcd2a2c345533bd3"
+    },
+    {
+      "file": "improving_turbodash/ainley_mathieson_interpolation/readme.md",
+      "inline_equations": 65,
+      "display_equations": 7,
+      "local_links": 22,
+      "sha256": "5d440712907c12e3118704bef460f7f600dd803f29413c2796e1214839dc367d"
+    }
+  ],
+  "errors": []
+}

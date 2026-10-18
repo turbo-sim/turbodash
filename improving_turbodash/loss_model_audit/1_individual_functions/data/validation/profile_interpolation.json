@@ -1,0 +1,424 @@
+{
+  "passed": true,
+  "plotted_curves": 18,
+  "main_curves": 13,
+  "positive_grid_points": 605151,
+  "maximum_blend_formula_error": 5.551115123125783e-17,
+  "negative_side_gradients_verified": true,
+  "exact_reference_endpoints": true,
+  "zero_turning_fraction": 0.9,
+  "first_two_figures_reference_blend_only": true,
+  "third_figure_full_profile": true,
+  "zero_zoom": {
+    "passed": true,
+    "curves": 5,
+    "z_range": [
+      -0.1,
+      0.1
+    ],
+    "maximum_derivative_formula_error": 1.8735013540549517e-16,
+    "joins": [
+      {
+        "thickness_chord": 0.05,
+        "join_z": 0.0,
+        "value_at_join": 0.015651549432088845,
+        "left_slope": 0.0,
+        "right_slope": 0.0,
+        "slope_jump": 0.0,
+        "continuous": true,
+        "first_derivative_continuous": true,
+        "one_sided_probes": [
+          {
+            "h": 0.001,
+            "left_value": 0.015651546301782088,
+            "right_value": 0.015651590368219014,
+            "left_slope_fd": 1.8785320521352844e-11,
+            "right_slope_fd": 9.68270004973737e-06
+          },
+          {
+            "h": 0.0001,
+            "left_value": 0.015651549400785746,
+            "right_value": 0.01565154985810702,
+            "left_slope_fd": 3.469446951953614e-14,
+            "right_slope_fd": 1.034040908454159e-08
+          },
+          {
+            "h": 1e-05,
+            "left_value": 0.015651549431775814,
+            "right_value": 0.015651549436350738,
+            "left_slope_fd": 0.0,
+            "right_slope_fd": 9.887923813067799e-12
+          },
+          {
+            "h": 1e-06,
+            "left_value": 0.015651549432085715,
+            "right_value": 0.015651549432131463,
+            "left_slope_fd": -1.734723475976807e-12,
+            "right_slope_fd": -1.734723475976807e-12
+          }
+        ]
+      },
+      {
+        "thickness_chord": 0.05,
+        "join_z": 0.05,
+        "value_at_join": 0.014702824607277168,
+        "left_slope": -0.016405938106839466,
+        "right_slope": -0.016405938106839466,
+        "slope_jump": 0.0,
+        "continuous": true,
+        "first_derivative_continuous": true,
+        "one_sided_probes": [
+          {
+            "h": 0.001,
+            "left_value": 0.014719359288474083,
+            "right_value": 0.014686466991849547,
+            "left_slope_fd": -0.016261135063228016,
+            "right_slope_fd": -0.016405822671736008
+          },
+          {
+            "h": 0.0001,
+            "left_value": 0.014704465768954319,
+            "right_value": 0.014701184497213393,
+            "left_slope_fd": -0.016404273533061897,
+            "right_slope_fd": -0.016405936950417144
+          },
+          {
+            "h": 1e-05,
+            "left_value": 0.01470298867158072,
+            "right_value": 0.014702660552734085,
+            "left_slope_fd": -0.016405921235852078,
+            "right_slope_fd": -0.01640593809562954
+          },
+          {
+            "h": 1e-06,
+            "left_value": 0.014702841013263735,
+            "right_value": 0.014702808201387437,
+            "left_slope_fd": -0.01640593793109102,
+            "right_slope_fd": -0.016405938112369622
+          }
+        ]
+      },
+      {
+        "thickness_chord": 0.15,
+        "join_z": 0.0,
+        "value_at_join": 0.015651549432088845,
+        "left_slope": 0.0,
+        "right_slope": 0.0,
+        "slope_jump": 0.0,
+        "continuous": true,
+        "first_derivative_continuous": true,
+        "one_sided_probes": [
+          {
+            "h": 0.001,
+            "left_value": 0.015651546301782088,
+            "right_value": 0.01565159170176703,
+            "left_slope_fd": 1.8785320521352844e-11,
+            "right_slope_fd": 2.0119337394014503e-06
+          },
+          {
+            "h": 0.0001,
+            "left_value": 0.015651549400785746,
+            "right_value": 0.015651549858244154,
+            "left_slope_fd": 3.469446951953614e-14,
+            "right_slope_fd": 2.146043759365668e-09
+          },
+          {
+            "h": 1e-05,
+            "left_value": 0.015651549431775814,
+            "right_value": 0.01565154943635075,
+            "left_slope_fd": 0.0,
+            "right_slope_fd": 1.7347234759768069e-12
+          },
+          {
+            "h": 1e-06,
+            "left_value": 0.015651549432085715,
+            "right_value": 0.015651549432131463,
+            "left_slope_fd": -1.734723475976807e-12,
+            "right_slope_fd": -1.734723475976807e-12
+          }
+        ]
+      },
+      {
+        "thickness_chord": 0.15,
+        "join_z": 0.05,
+        "value_at_join": 0.015533053540926024,
+        "left_slope": -0.0002675337753619731,
+        "right_slope": -0.0002675337753619731,
+        "slope_jump": 0.0,
+        "continuous": true,
+        "first_derivative_continuous": true,
+        "one_sided_probes": [
+          {
+            "h": 0.001,
+            "left_value": 0.015533379647578517,
+            "right_value": 0.015532827439850865,
+            "left_slope_fd": -0.000236706312428496,
+            "right_slope_fd": -0.00026750983880483026
+          },
+          {
+            "h": 0.0001,
+            "left_value": 0.015533080726675653,
+            "right_value": 0.015533027201983232,
+            "left_slope_fd": -0.0002671788593231611,
+            "right_slope_fd": -0.00026753353594977103
+          },
+          {
+            "h": 1e-05,
+            "left_value": 0.015533056220426247,
+            "right_value": 0.015533050869732723,
+            "left_slope_fd": -0.000267530176744496,
+            "right_slope_fd": -0.00026753377325994254
+          },
+          {
+            "h": 1e-06,
+            "left_value": 0.015533053808501264,
+            "right_value": 0.015533053273433694,
+            "left_slope_fd": -0.00026753374342269876,
+            "right_slope_fd": -0.0002675337737803596
+          }
+        ]
+      },
+      {
+        "thickness_chord": 0.2,
+        "join_z": 0.0,
+        "value_at_join": 0.015651549432088845,
+        "left_slope": 0.0,
+        "right_slope": 0.0,
+        "slope_jump": 0.0,
+        "continuous": true,
+        "first_derivative_continuous": true,
+        "one_sided_probes": [
+          {
+            "h": 0.001,
+            "left_value": 0.015651546301782088,
+            "right_value": 0.015651592051211374,
+            "left_slope_fd": 1.8785320521352844e-11,
+            "right_slope_fd": 6.938893903907228e-15
+          },
+          {
+            "h": 0.0001,
+            "left_value": 0.015651549400785746,
+            "right_value": 0.01565154985828007,
+            "left_slope_fd": 3.469446951953614e-14,
+            "right_slope_fd": -1.734723475976807e-14
+          },
+          {
+            "h": 1e-05,
+            "left_value": 0.015651549431775814,
+            "right_value": 0.015651549436350755,
+            "left_slope_fd": 0.0,
+            "right_slope_fd": -3.4694469519536137e-13
+          },
+          {
+            "h": 1e-06,
+            "left_value": 0.015651549432085715,
+            "right_value": 0.015651549432131463,
+            "left_slope_fd": -1.734723475976807e-12,
+            "right_slope_fd": -1.734723475976807e-12
+          }
+        ]
+      },
+      {
+        "thickness_chord": 0.2,
+        "join_z": 0.05,
+        "value_at_join": 0.015758097238405263,
+        "left_slope": 0.004261912252656679,
+        "right_slope": 0.004261912252656679,
+        "slope_jump": 0.0,
+        "continuous": true,
+        "first_derivative_continuous": true,
+        "one_sided_probes": [
+          {
+            "h": 0.001,
+            "left_value": 0.015753877945275132,
+            "right_value": 0.015762401769780447,
+            "left_slope_fd": 0.004261912252655556,
+            "right_slope_fd": 0.004261912252659025
+          },
+          {
+            "h": 0.0001,
+            "left_value": 0.01575767147337122,
+            "right_value": 0.015758523855821754,
+            "left_slope_fd": 0.004261912252643413,
+            "right_slope_fd": 0.00426191225266076
+          },
+          {
+            "h": 1e-05,
+            "left_value": 0.015758054623544647,
+            "right_value": 0.0157581398617897,
+            "left_slope_fd": 0.00426191225297301,
+            "right_slope_fd": 0.004261912252279121
+          },
+          {
+            "h": 1e-06,
+            "left_value": 0.01575809297653563,
+            "right_value": 0.015758101500360135,
+            "left_slope_fd": 0.004261912246728006,
+            "right_slope_fd": 0.004261912255401623
+          }
+        ]
+      },
+      {
+        "thickness_chord": 0.25,
+        "join_z": 0.0,
+        "value_at_join": 0.015651549432088845,
+        "left_slope": 0.0,
+        "right_slope": 0.0,
+        "slope_jump": 0.0,
+        "continuous": true,
+        "first_derivative_continuous": true,
+        "one_sided_probes": [
+          {
+            "h": 0.001,
+            "left_value": 0.015651546301782088,
+            "right_value": 0.0156515923223307,
+            "left_slope_fd": 1.8785320521352844e-11,
+            "right_slope_fd": -1.5615129345808443e-06
+          },
+          {
+            "h": 0.0001,
+            "left_value": 0.015651549400785746,
+            "right_value": 0.01565154985830793,
+            "left_slope_fd": 3.469446951953614e-14,
+            "right_slope_fd": -1.6646926892516234e-09
+          },
+          {
+            "h": 1e-05,
+            "left_value": 0.015651549431775814,
+            "right_value": 0.01565154943635076,
+            "left_slope_fd": 0.0,
+            "right_slope_fd": -1.908195823574488e-12
+          },
+          {
+            "h": 1e-06,
+            "left_value": 0.015651549432085715,
+            "right_value": 0.015651549432131463,
+            "left_slope_fd": -1.734723475976807e-12,
+            "right_slope_fd": -1.734723475976807e-12
+          }
+        ]
+      },
+      {
+        "thickness_chord": 0.25,
+        "join_z": 0.05,
+        "value_at_join": 0.015934897589805364,
+        "left_slope": 0.007865499058731008,
+        "right_slope": 0.007865499058731008,
+        "slope_jump": 0.0,
+        "continuous": true,
+        "first_derivative_continuous": true,
+        "one_sided_probes": [
+          {
+            "h": 0.001,
+            "left_value": 0.01592706309316399,
+            "right_value": 0.01594280755432493,
+            "left_slope_fd": 0.007841298714611825,
+            "right_slope_fd": 0.007865479544845802
+          },
+          {
+            "h": 0.0001,
+            "left_value": 0.015934111470373904,
+            "right_value": 0.015935684584278045,
+            "left_slope_fd": 0.007865220241799753,
+            "right_slope_fd": 0.007865498863491444
+          },
+          {
+            "h": 1e-05,
+            "left_value": 0.015934818939246198,
+            "right_value": 0.015934976249241527,
+            "left_slope_fd": 0.007865496232974112,
+            "right_slope_fd": 0.00786549905554268
+          },
+          {
+            "h": 1e-06,
+            "left_value": 0.015934889724350743,
+            "right_value": 0.015934905455348876,
+            "left_slope_fd": 0.00786549903854239,
+            "right_slope_fd": 0.007865499052420177
+          }
+        ]
+      },
+      {
+        "thickness_chord": 0.4,
+        "join_z": 0.0,
+        "value_at_join": 0.015651549432088845,
+        "left_slope": 0.0,
+        "right_slope": 0.0,
+        "slope_jump": 0.0,
+        "continuous": true,
+        "first_derivative_continuous": true,
+        "one_sided_probes": [
+          {
+            "h": 0.001,
+            "left_value": 0.015651546301782088,
+            "right_value": 0.015651592893582873,
+            "left_slope_fd": 1.8785320521352844e-11,
+            "right_slope_fd": -4.8531789090949795e-06
+          },
+          {
+            "h": 0.0001,
+            "left_value": 0.015651549400785746,
+            "right_value": 0.0156515498583666,
+            "left_slope_fd": 3.469446951953614e-14,
+            "right_slope_fd": -5.171522932112538e-09
+          },
+          {
+            "h": 1e-05,
+            "left_value": 0.015651549431775814,
+            "right_value": 0.015651549436350762,
+            "left_slope_fd": 0.0,
+            "right_slope_fd": -5.898059818321143e-12
+          },
+          {
+            "h": 1e-06,
+            "left_value": 0.015651549432085715,
+            "right_value": 0.015651549432131463,
+            "left_slope_fd": -1.734723475976807e-12,
+            "right_slope_fd": -1.734723475976807e-12
+          }
+        ]
+      },
+      {
+        "thickness_chord": 0.4,
+        "join_z": 0.05,
+        "value_at_join": 0.016313805337402648,
+        "left_slope": 0.01572007643748968,
+        "right_slope": 0.01572007643748968,
+        "slope_jump": 0.0,
+        "continuous": true,
+        "first_derivative_continuous": true,
+        "one_sided_probes": [
+          {
+            "h": 0.001,
+            "left_value": 0.016298094082928222,
+            "right_value": 0.016329576545800476,
+            "left_slope_fd": 0.01564406363316513,
+            "right_slope_fd": 0.015720011274429624
+          },
+          {
+            "h": 0.0001,
+            "left_value": 0.016312233796488353,
+            "right_value": 0.01631537785607295,
+            "left_slope_fd": 0.01571920010151953,
+            "right_slope_fd": 0.01572007578639137
+          },
+          {
+            "h": 1e-05,
+            "left_value": 0.016313648141703746,
+            "right_value": 0.016313962543276994,
+            "left_slope_fd": 0.015720067553064154,
+            "right_slope_fd": 0.01572007643103196
+          },
+          {
+            "h": 1e-06,
+            "left_value": 0.01631378961737727,
+            "right_value": 0.016313821057530185,
+            "left_slope_fd": 0.01572007633787731,
+            "right_slope_fd": 0.01572007643849127
+          }
+        ]
+      }
+    ]
+  },
+  "production_sources_unchanged": true
+}

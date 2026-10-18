@@ -1,0 +1,20 @@
+{
+  "level": "fundamental",
+  "initial_points": 200,
+  "studies": 78,
+  "comparison_figures": 66,
+  "status_counts": {
+    "baseline": {
+      "ok": 20721,
+      "nonfinite": 2455,
+      "exception": 0
+    },
+    "candidate": {
+      "ok": 20971,
+      "nonfinite": 2205,
+      "exception": 0
+    }
+  },
+  "all_nonfinite_masks_and_statuses_equal": false,
+  "max_absolute_difference": 2.126893347711278e+38
+}

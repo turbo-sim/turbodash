@@ -16,9 +16,9 @@
     "mechanism": "ko_profile",
     "variable": "pitch_chord",
     "function_seconds_by_version": {
-      "candidate": 0.11063049995573238
+      "candidate": 0.13894360008271178
     },
-    "elapsed_seconds": 0.12014930000441382,
+    "elapsed_seconds": 0.14875559999927646,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -67,9 +67,9 @@
     "mechanism": "ko_profile",
     "variable": "exit_angle",
     "function_seconds_by_version": {
-      "candidate": 0.17126009982894175
+      "candidate": 0.18799819995183498
     },
-    "elapsed_seconds": 0.18513309999980265,
+    "elapsed_seconds": 0.20338980000087759,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -118,9 +118,9 @@
     "mechanism": "ko_profile",
     "variable": "Re_out",
     "function_seconds_by_version": {
-      "candidate": 0.14902210003492655
+      "candidate": 0.16352340006415034
     },
-    "elapsed_seconds": 0.1569208000000799,
+    "elapsed_seconds": 0.17280759999994189,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -169,9 +169,9 @@
     "mechanism": "ko_profile",
     "variable": "Ma_rel_in",
     "function_seconds_by_version": {
-      "candidate": 0.12017689998901915
+      "candidate": 0.13622610005404567
     },
-    "elapsed_seconds": 0.1279186000028858,
+    "elapsed_seconds": 0.14438649999647168,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -220,9 +220,9 @@
     "mechanism": "ko_profile",
     "variable": "Ma_rel_out",
     "function_seconds_by_version": {
-      "candidate": 0.134971800056519
+      "candidate": 0.14760380004008766
     },
-    "elapsed_seconds": 0.1434238000001642,
+    "elapsed_seconds": 0.1560109999991255,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -271,9 +271,9 @@
     "mechanism": "ko_profile",
     "variable": "thickness_chord",
     "function_seconds_by_version": {
-      "candidate": 0.12009479997504968
+      "candidate": 0.13209920004737796
     },
-    "elapsed_seconds": 0.12744669999665348,
+    "elapsed_seconds": 0.1401932000007946,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -322,9 +322,9 @@
     "mechanism": "ko_profile",
     "variable": "hub_tip",
     "function_seconds_by_version": {
-      "candidate": 0.1482485999513301
+      "candidate": 0.1636050999368308
     },
-    "elapsed_seconds": 0.15559780000330647,
+    "elapsed_seconds": 0.17166269999870565,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -373,9 +373,9 @@
     "mechanism": "ko_secondary",
     "variable": "aspect_ratio",
     "function_seconds_by_version": {
-      "candidate": 0.05036900004779454
+      "candidate": 0.056789299931551795
     },
-    "elapsed_seconds": 0.05458360000193352,
+    "elapsed_seconds": 0.06151629999658326,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -412,9 +412,9 @@
     "mechanism": "ko_secondary",
     "variable": "incidence",
     "function_seconds_by_version": {
-      "candidate": 0.03795900000113761
+      "candidate": 0.04325860004610149
     },
-    "elapsed_seconds": 0.041732899997441564,
+    "elapsed_seconds": 0.047227199996996205,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -451,9 +451,9 @@
     "mechanism": "ko_secondary",
     "variable": "exit_angle",
     "function_seconds_by_version": {
-      "candidate": 0.05794559994683368
+      "candidate": 0.07801260000269394
     },
-    "elapsed_seconds": 0.06254199999966659,
+    "elapsed_seconds": 0.0846116999964579,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -490,9 +490,9 @@
     "mechanism": "ko_secondary",
     "variable": "Ma_rel_out",
     "function_seconds_by_version": {
-      "candidate": 0.048138699916307814
+      "candidate": 0.057564099959563464
     },
-    "elapsed_seconds": 0.05237150000175461,
+    "elapsed_seconds": 0.062080499999865424,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -529,9 +529,9 @@
     "mechanism": "ko_secondary",
     "variable": "stagger",
     "function_seconds_by_version": {
-      "candidate": 0.03963400004431605
+      "candidate": 0.0432383000079426
     },
-    "elapsed_seconds": 0.04278770000382792,
+    "elapsed_seconds": 0.046871799997461494,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -568,9 +568,9 @@
     "mechanism": "ko_clearance",
     "variable": "clearance",
     "function_seconds_by_version": {
-      "candidate": 0.019688900021719746
+      "candidate": 0.022443699985160492
     },
-    "elapsed_seconds": 0.022432400000980124,
+    "elapsed_seconds": 0.025601000001188368,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -607,9 +607,9 @@
     "mechanism": "ko_clearance",
     "variable": "clearance",
     "function_seconds_by_version": {
-      "candidate": 0.020384200048283674
+      "candidate": 0.024373199936235324
     },
-    "elapsed_seconds": 0.023980099998880178,
+    "elapsed_seconds": 0.028108899998187553,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -646,9 +646,9 @@
     "mechanism": "ko_clearance",
     "variable": "aspect_ratio",
     "function_seconds_by_version": {
-      "candidate": 0.027306200048769824
+      "candidate": 0.030848099988361355
     },
-    "elapsed_seconds": 0.030677100003231317,
+    "elapsed_seconds": 0.034643099999811966,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -685,9 +685,9 @@
     "mechanism": "ko_clearance",
     "variable": "aspect_ratio",
     "function_seconds_by_version": {
-      "candidate": 0.02781920002598781
+      "candidate": 0.02837769997131545
     },
-    "elapsed_seconds": 0.031188000000838656,
+    "elapsed_seconds": 0.03194700000312878,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -724,9 +724,9 @@
     "mechanism": "ko_clearance",
     "variable": "incidence",
     "function_seconds_by_version": {
-      "candidate": 0.021273199970892165
+      "candidate": 0.022503400010464247
     },
-    "elapsed_seconds": 0.024110999998811167,
+    "elapsed_seconds": 0.025410700000065845,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -763,9 +763,9 @@
     "mechanism": "ko_clearance",
     "variable": "incidence",
     "function_seconds_by_version": {
-      "candidate": 0.021359400103392545
+      "candidate": 0.023639100014406722
     },
-    "elapsed_seconds": 0.024333500005013775,
+    "elapsed_seconds": 0.026666799996746704,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -802,9 +802,9 @@
     "mechanism": "ko_clearance",
     "variable": "exit_angle",
     "function_seconds_by_version": {
-      "candidate": 0.03070229995500995
+      "candidate": 0.03378250010428019
     },
-    "elapsed_seconds": 0.03454240000428399,
+    "elapsed_seconds": 0.03778940000483999,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -841,9 +841,9 @@
     "mechanism": "ko_clearance",
     "variable": "exit_angle",
     "function_seconds_by_version": {
-      "candidate": 0.03115339996293187
+      "candidate": 0.03489380003884435
     },
-    "elapsed_seconds": 0.035308699996676296,
+    "elapsed_seconds": 0.03874050000013085,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -880,9 +880,9 @@
     "mechanism": "ko_clearance",
     "variable": "pitch_chord",
     "function_seconds_by_version": {
-      "candidate": 0.02273330002935836
+      "candidate": 0.024885699967853725
     },
-    "elapsed_seconds": 0.025676099998236168,
+    "elapsed_seconds": 0.028594799994607456,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -919,9 +919,9 @@
     "mechanism": "ko_clearance",
     "variable": "pitch_chord",
     "function_seconds_by_version": {
-      "candidate": 0.02230130007956177
+      "candidate": 0.025112399955105502
     },
-    "elapsed_seconds": 0.025379400001838803,
+    "elapsed_seconds": 0.028504899994004518,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -958,9 +958,9 @@
     "mechanism": "ko_trailing",
     "variable": "trailing_ratio",
     "function_seconds_by_version": {
-      "candidate": 0.10386560009646928
+      "candidate": 0.11752529995283112
     },
-    "elapsed_seconds": 0.11358319999999367,
+    "elapsed_seconds": 0.1287254999988363,
     "found_branches": [
       {
         "field": "trailing_ratio_preprocessed",
@@ -1016,9 +1016,9 @@
     "mechanism": "ko_trailing",
     "variable": "exit_angle",
     "function_seconds_by_version": {
-      "candidate": 0.10973880004166858
+      "candidate": 0.12170770001102937
     },
-    "elapsed_seconds": 0.11962159999529831,
+    "elapsed_seconds": 0.13203010000142967,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -1067,9 +1067,9 @@
     "mechanism": "ko_trailing",
     "variable": "Ma_rel_out",
     "function_seconds_by_version": {
-      "candidate": 0.090740899919183
+      "candidate": 0.10563469998305663
     },
-    "elapsed_seconds": 0.09833269999944605,
+    "elapsed_seconds": 0.11393919999682112,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -1118,9 +1118,9 @@
     "mechanism": "benner_secondary",
     "variable": "aspect_ratio",
     "function_seconds_by_version": {
-      "candidate": 0.01668039996729931
+      "candidate": 0.01935410002624849
     },
-    "elapsed_seconds": 0.020607899998140056,
+    "elapsed_seconds": 0.024120100002619438,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -1157,9 +1157,9 @@
     "mechanism": "benner_secondary",
     "variable": "incidence",
     "function_seconds_by_version": {
-      "candidate": 0.013273899894556962
+      "candidate": 0.014179399950080551
     },
-    "elapsed_seconds": 0.016342300004907884,
+    "elapsed_seconds": 0.018008799997915048,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -1196,9 +1196,9 @@
     "mechanism": "benner_secondary",
     "variable": "exit_angle",
     "function_seconds_by_version": {
-      "candidate": 0.01894790001824731
+      "candidate": 0.020381199930852745
     },
-    "elapsed_seconds": 0.02326540000649402,
+    "elapsed_seconds": 0.02526930000021821,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -1235,9 +1235,9 @@
     "mechanism": "benner_secondary",
     "variable": "delta_ref",
     "function_seconds_by_version": {
-      "candidate": 0.014152399911836255
+      "candidate": 0.014565700046659913
     },
-    "elapsed_seconds": 0.017113200003223028,
+    "elapsed_seconds": 0.01824990000022808,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -1274,9 +1274,9 @@
     "mechanism": "benner_secondary",
     "variable": "stagger",
     "function_seconds_by_version": {
-      "candidate": 0.012568799982545897
+      "candidate": 0.013257800026622135
     },
-    "elapsed_seconds": 0.015454899999895133,
+    "elapsed_seconds": 0.01693599999998696,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -1313,9 +1313,9 @@
     "mechanism": "benner_penetration",
     "variable": "aspect_ratio",
     "function_seconds_by_version": {
-      "candidate": 0.04702300008648308
+      "candidate": 0.054609900020295754
     },
-    "elapsed_seconds": 0.05667220000032103,
+    "elapsed_seconds": 0.06544790000043577,
     "found_branches": [
       {
         "field": "penetration_raw_ratio",
@@ -1373,9 +1373,9 @@
     "mechanism": "benner_penetration",
     "variable": "pitch_chord",
     "function_seconds_by_version": {
-      "candidate": 0.038593799974478316
+      "candidate": 0.042824900010600686
     },
-    "elapsed_seconds": 0.04759020000346936,
+    "elapsed_seconds": 0.052242700003262144,
     "found_branches": [
       {
         "field": "penetration_raw_ratio",
@@ -1433,9 +1433,9 @@
     "mechanism": "benner_penetration",
     "variable": "incidence",
     "function_seconds_by_version": {
-      "candidate": 0.035023100004764274
+      "candidate": 0.040229200036264956
     },
-    "elapsed_seconds": 0.04269380000187084,
+    "elapsed_seconds": 0.049610200003371574,
     "found_branches": [
       {
         "field": "penetration_raw_ratio",
@@ -1487,9 +1487,9 @@
     "mechanism": "benner_penetration",
     "variable": "exit_angle",
     "function_seconds_by_version": {
-      "candidate": 0.03710719993978273
+      "candidate": 0.04241489992273273
     },
-    "elapsed_seconds": 0.04610889999457868,
+    "elapsed_seconds": 0.05247300000337418,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -1534,9 +1534,9 @@
     "mechanism": "benner_penetration",
     "variable": "delta_ref",
     "function_seconds_by_version": {
-      "candidate": 0.04169959996215766
+      "candidate": 0.04526480002095923
     },
-    "elapsed_seconds": 0.050062800000887364,
+    "elapsed_seconds": 0.05422710000129882,
     "found_branches": [
       {
         "field": "penetration_raw_ratio",
@@ -1594,9 +1594,9 @@
     "mechanism": "benner_penetration",
     "variable": "Re_in",
     "function_seconds_by_version": {
-      "candidate": 0.027825900062453002
+      "candidate": 0.030524500019964762
     },
-    "elapsed_seconds": 0.034662300000491086,
+    "elapsed_seconds": 0.037556299997959286,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -1641,9 +1641,9 @@
     "mechanism": "benner_incidence",
     "variable": "incidence",
     "function_seconds_by_version": {
-      "candidate": 0.08715410009608604
+      "candidate": 0.09661389990651514
     },
-    "elapsed_seconds": 0.100206100003561,
+    "elapsed_seconds": 0.11115110000537243,
     "found_branches": [
       {
         "field": "incidence_chi",
@@ -1709,9 +1709,9 @@
     "mechanism": "benner_incidence",
     "variable": "incidence",
     "function_seconds_by_version": {
-      "candidate": 0.08993099996587262
+      "candidate": 0.09812240004248451
     },
-    "elapsed_seconds": 0.10469810000358848,
+    "elapsed_seconds": 0.11255099999834783,
     "found_branches": [
       {
         "field": "incidence_chi",
@@ -1777,9 +1777,9 @@
     "mechanism": "benner_incidence",
     "variable": "leading_edge_ratio",
     "function_seconds_by_version": {
-      "candidate": 0.04967820001184009
+      "candidate": 0.055035900018992834
     },
-    "elapsed_seconds": 0.05885290000151144,
+    "elapsed_seconds": 0.06577680000191322,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -1832,9 +1832,9 @@
     "mechanism": "benner_incidence",
     "variable": "leading_edge_ratio",
     "function_seconds_by_version": {
-      "candidate": 0.04877839995606337
+      "candidate": 0.05883370003721211
     },
-    "elapsed_seconds": 0.05774779999774182,
+    "elapsed_seconds": 0.07512619999761228,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -1887,9 +1887,9 @@
     "mechanism": "benner_incidence",
     "variable": "wedge",
     "function_seconds_by_version": {
-      "candidate": 0.05727909998677205
+      "candidate": 0.06303310005023377
     },
-    "elapsed_seconds": 0.06744669999898179,
+    "elapsed_seconds": 0.0749262000026647,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -1942,9 +1942,9 @@
     "mechanism": "benner_incidence",
     "variable": "wedge",
     "function_seconds_by_version": {
-      "candidate": 0.0725731001002714
+      "candidate": 0.07819629996811273
     },
-    "elapsed_seconds": 0.08459600000060163,
+    "elapsed_seconds": 0.09203870000055758,
     "found_branches": [
       {
         "field": "incidence_chi",
@@ -2004,9 +2004,9 @@
     "mechanism": "benner_incidence",
     "variable": "pitch_chord",
     "function_seconds_by_version": {
-      "candidate": 0.05717620001087198
+      "candidate": 0.06303179996757535
     },
-    "elapsed_seconds": 0.06811929999821587,
+    "elapsed_seconds": 0.07578009999997448,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2059,9 +2059,9 @@
     "mechanism": "benner_incidence",
     "variable": "pitch_chord",
     "function_seconds_by_version": {
-      "candidate": 0.054384899987780955
+      "candidate": 0.059022200061008334
     },
-    "elapsed_seconds": 0.06502689999615541,
+    "elapsed_seconds": 0.07070190000376897,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2114,9 +2114,9 @@
     "mechanism": "benner_incidence",
     "variable": "Ma_rel_out",
     "function_seconds_by_version": {
-      "candidate": 0.06937099996866891
+      "candidate": 0.07930060003127437
     },
-    "elapsed_seconds": 0.0790091000017128,
+    "elapsed_seconds": 0.09101650000229711,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2169,9 +2169,9 @@
     "mechanism": "benner_incidence",
     "variable": "Ma_rel_out",
     "function_seconds_by_version": {
-      "candidate": 0.0644485000448185
+      "candidate": 0.07442509992688429
     },
-    "elapsed_seconds": 0.08275130000401987,
+    "elapsed_seconds": 0.08668179999949643,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2224,9 +2224,9 @@
     "mechanism": "moustapha_incidence",
     "variable": "incidence",
     "function_seconds_by_version": {
-      "candidate": 0.04223629996704403
+      "candidate": 0.05521500006580027
     },
-    "elapsed_seconds": 0.05463639999652514,
+    "elapsed_seconds": 0.06944460000522668,
     "found_branches": [
       {
         "field": "incidence_chi",
@@ -2292,9 +2292,9 @@
     "mechanism": "moustapha_incidence",
     "variable": "leading_edge_ratio",
     "function_seconds_by_version": {
-      "candidate": 0.029311199999938253
+      "candidate": 0.03303770000638906
     },
-    "elapsed_seconds": 0.03830960000050254,
+    "elapsed_seconds": 0.04289319999952568,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2347,9 +2347,9 @@
     "mechanism": "moustapha_incidence",
     "variable": "pitch_chord",
     "function_seconds_by_version": {
-      "candidate": 0.030560799918021075
+      "candidate": 0.03232689995638793
     },
-    "elapsed_seconds": 0.03874260000156937,
+    "elapsed_seconds": 0.041531399998348206,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2402,9 +2402,9 @@
     "mechanism": "moustapha_incidence",
     "variable": "Ma_rel_out",
     "function_seconds_by_version": {
-      "candidate": 0.03176159998838557
+      "candidate": 0.034499499983212445
     },
-    "elapsed_seconds": 0.03881330000149319,
+    "elapsed_seconds": 0.04234839999844553,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2457,9 +2457,9 @@
     "mechanism": "moustapha_secondary",
     "variable": "incidence",
     "function_seconds_by_version": {
-      "candidate": 0.00628510006936267
+      "candidate": 0.006616799997573253
     },
-    "elapsed_seconds": 0.009807800000999123,
+    "elapsed_seconds": 0.009991599996283185,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2496,9 +2496,9 @@
     "mechanism": "moustapha_secondary",
     "variable": "leading_edge_ratio",
     "function_seconds_by_version": {
-      "candidate": 0.005713099999411497
+      "candidate": 0.005944900010945275
     },
-    "elapsed_seconds": 0.008780499993008561,
+    "elapsed_seconds": 0.009241599997039884,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2535,9 +2535,9 @@
     "mechanism": "ko_profile",
     "variable": "exit_angle",
     "function_seconds_by_version": {
-      "candidate": 0.02229059996898286
+      "candidate": 0.023870899953180924
     },
-    "elapsed_seconds": 0.029465799998433795,
+    "elapsed_seconds": 0.031168900000920985,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2578,9 +2578,9 @@
     "mechanism": "benner_penetration",
     "variable": "raw_penetration",
     "function_seconds_by_version": {
-      "candidate": 0.008300200090161525
+      "candidate": 0.008405800006585196
     },
-    "elapsed_seconds": 0.012818700000934768,
+    "elapsed_seconds": 0.012707599998975638,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2621,9 +2621,9 @@
     "mechanism": "benner_incidence",
     "variable": "chi",
     "function_seconds_by_version": {
-      "candidate": 0.022803999978350475
+      "candidate": 0.02320039999904111
     },
-    "elapsed_seconds": 0.028894499999296386,
+    "elapsed_seconds": 0.0289587000006577,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2664,9 +2664,9 @@
     "mechanism": "benner_penetration",
     "variable": "incidence",
     "function_seconds_by_version": {
-      "candidate": 0.007260899983521085
+      "candidate": 0.007699899921135511
     },
-    "elapsed_seconds": 0.010673499993572477,
+    "elapsed_seconds": 0.011211400000320282,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2703,9 +2703,9 @@
     "mechanism": "benner_incidence",
     "variable": "chi",
     "function_seconds_by_version": {
-      "candidate": 0.020392800084664486
+      "candidate": 0.020319899973401334
     },
-    "elapsed_seconds": 0.025691099996038247,
+    "elapsed_seconds": 0.025899400003254414,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2746,9 +2746,9 @@
     "mechanism": "ko_profile",
     "variable": "hub_tip",
     "function_seconds_by_version": {
-      "candidate": 0.015598400066664908
+      "candidate": 0.0173787000021548
     },
-    "elapsed_seconds": 0.02264580000337446,
+    "elapsed_seconds": 0.025380899998708628,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2793,9 +2793,9 @@
     "mechanism": "ko_profile",
     "variable": "Ma_rel_out",
     "function_seconds_by_version": {
-      "candidate": 0.016284600053040776
+      "candidate": 0.01672300000063842
     },
-    "elapsed_seconds": 0.024708000004466157,
+    "elapsed_seconds": 0.025279999994381797,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2840,9 +2840,9 @@
     "mechanism": "conversions",
     "variable": "delta_phi2",
     "function_seconds_by_version": {
-      "candidate": 0.055943999970622826
+      "candidate": 0.057310300013341475
     },
-    "elapsed_seconds": 0.0671204000027501,
+    "elapsed_seconds": 0.06814000000304077,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2899,9 +2899,9 @@
     "mechanism": "conversions",
     "variable": "delta_phi2",
     "function_seconds_by_version": {
-      "candidate": 0.06245180005498696
+      "candidate": 0.06678720007039374
     },
-    "elapsed_seconds": 0.0740834000025643,
+    "elapsed_seconds": 0.07934869999735383,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -2958,9 +2958,9 @@
     "mechanism": "conversions",
     "variable": "delta_phi2",
     "function_seconds_by_version": {
-      "candidate": 0.057665099964651745
+      "candidate": 0.06177699995896546
     },
-    "elapsed_seconds": 0.06843579999986105,
+    "elapsed_seconds": 0.0732951999962097,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3017,9 +3017,9 @@
     "mechanism": "conversions",
     "variable": "delta_phi2",
     "function_seconds_by_version": {
-      "candidate": 0.05969680004636757
+      "candidate": 0.06405109996558167
     },
-    "elapsed_seconds": 0.0712130999963847,
+    "elapsed_seconds": 0.07512000000133412,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3076,9 +3076,9 @@
     "mechanism": "conversions",
     "variable": "delta_phi2",
     "function_seconds_by_version": {
-      "candidate": 0.0563769999644137
+      "candidate": 0.062156299987691455
     },
-    "elapsed_seconds": 0.06803600000421284,
+    "elapsed_seconds": 0.07443680000142194,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3135,9 +3135,9 @@
     "mechanism": "conversions",
     "variable": "delta_phi2",
     "function_seconds_by_version": {
-      "candidate": 0.058562099940900225
+      "candidate": 0.06713769998168573
     },
-    "elapsed_seconds": 0.07115899999917019,
+    "elapsed_seconds": 0.079560300000594,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3194,9 +3194,9 @@
     "mechanism": "conversions",
     "variable": "delta_phi2",
     "function_seconds_by_version": {
-      "candidate": 0.057875099999364465
+      "candidate": 0.06393260007462231
     },
-    "elapsed_seconds": 0.06855689999792958,
+    "elapsed_seconds": 0.0758685000037076,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3253,9 +3253,9 @@
     "mechanism": "conversions",
     "variable": "delta_phi2",
     "function_seconds_by_version": {
-      "candidate": 0.05873359995166538
+      "candidate": 0.06593500003509689
     },
-    "elapsed_seconds": 0.06988690000434872,
+    "elapsed_seconds": 0.07742460000008577,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3312,9 +3312,9 @@
     "mechanism": "conversions",
     "variable": "delta_phi2",
     "function_seconds_by_version": {
-      "candidate": 0.06291360001341673
+      "candidate": 0.07191460004833061
     },
-    "elapsed_seconds": 0.07557879999512807,
+    "elapsed_seconds": 0.08488329999818234,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3371,9 +3371,9 @@
     "mechanism": "conversions",
     "variable": "delta_phi2",
     "function_seconds_by_version": {
-      "candidate": 0.06045570009155199
+      "candidate": 0.06258289986726595
     },
-    "elapsed_seconds": 0.07199360000231536,
+    "elapsed_seconds": 0.07540259999950649,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3430,9 +3430,9 @@
     "mechanism": "conversions",
     "variable": "delta_phi2",
     "function_seconds_by_version": {
-      "candidate": 0.05907620002835756
+      "candidate": 0.06500740002957173
     },
-    "elapsed_seconds": 0.06999879999784753,
+    "elapsed_seconds": 0.0774636999994982,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3489,9 +3489,9 @@
     "mechanism": "conversions",
     "variable": "delta_phi2",
     "function_seconds_by_version": {
-      "candidate": 0.05933940009708749
+      "candidate": 0.06420060001255479
     },
-    "elapsed_seconds": 0.07020270000066375,
+    "elapsed_seconds": 0.07538799999747425,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3548,9 +3548,9 @@
     "mechanism": "conversions",
     "variable": "Ma_rel_out",
     "function_seconds_by_version": {
-      "candidate": 0.04113230004440993
+      "candidate": 0.045551899951533414
     },
-    "elapsed_seconds": 0.05404580000322312,
+    "elapsed_seconds": 0.06041959999856772,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3607,9 +3607,9 @@
     "mechanism": "conversions",
     "variable": "Ma_rel_out",
     "function_seconds_by_version": {
-      "candidate": 0.038552000041818246
+      "candidate": 0.041272900023614056
     },
-    "elapsed_seconds": 0.05012759999954142,
+    "elapsed_seconds": 0.05405320000136271,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3666,9 +3666,9 @@
     "mechanism": "conversions",
     "variable": "Ma_rel_out",
     "function_seconds_by_version": {
-      "candidate": 0.04171040008077398
+      "candidate": 0.046353100035048556
     },
-    "elapsed_seconds": 0.05352600000333041,
+    "elapsed_seconds": 0.05935309999767924,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3725,9 +3725,9 @@
     "mechanism": "conversions",
     "variable": "Ma_rel_out",
     "function_seconds_by_version": {
-      "candidate": 0.04279359991051024
+      "candidate": 0.044688700028928
     },
-    "elapsed_seconds": 0.0519477000052575,
+    "elapsed_seconds": 0.055247399999643676,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3784,9 +3784,9 @@
     "mechanism": "conversions",
     "variable": "gamma",
     "function_seconds_by_version": {
-      "candidate": 0.018509299989091232
+      "candidate": 0.01907210009812843
     },
-    "elapsed_seconds": 0.022125099996628705,
+    "elapsed_seconds": 0.023061100000631995,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3823,9 +3823,9 @@
     "mechanism": "shared_math",
     "variable": "scalar",
     "function_seconds_by_version": {
-      "candidate": 0.014721300081873778
+      "candidate": 0.014656699968327302
     },
-    "elapsed_seconds": 0.024386900004174095,
+    "elapsed_seconds": 0.024314800000865944,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",
@@ -3878,9 +3878,9 @@
     "mechanism": "shared_math",
     "variable": "scalar",
     "function_seconds_by_version": {
-      "candidate": 0.0016758000710979104
+      "candidate": 0.002090799913275987
     },
-    "elapsed_seconds": 0.006871799996588379,
+    "elapsed_seconds": 0.008573899998737033,
     "found_branches": [],
     "derivative_policy": "d/dx; quadratic divided differences on finite contiguous runs; preselect spacing >= eps(float64)^(1/3)*max(abs(x_i),abs(x_j),span/200); all original value samples retained, excluded derivatives recorded as NaN",
     "derivative_coordinate": "x (including logarithmic display axes)",

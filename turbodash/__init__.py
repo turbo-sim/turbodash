@@ -55,3 +55,16 @@ def launch_app_turbine():
         Timer(1, lambda: webbrowser.open("http://127.0.0.1:8050/")).start()
 
     app.run(debug=True)
+
+
+def launch_app_experimental():
+    """Launch the experimental meanline, geometry and meshing workspace."""
+    import os
+    import webbrowser
+    from threading import Timer
+    from turbodash.app_experimental import app
+
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        Timer(1, lambda: webbrowser.open("http://127.0.0.1:8050/")).start()
+
+    app.run(debug=True)

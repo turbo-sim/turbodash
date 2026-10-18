@@ -173,7 +173,7 @@ def test_mesh_summary_explains_counts_and_quality():
 
 
 def test_three_tab_layout_keeps_controls_and_stores_mounted():
-    from turbodash.app_turbine import app, switch_tab
+    from turbodash.app_experimental import app, switch_tab
 
     def components(component):
         yield component
@@ -247,7 +247,7 @@ def _components(component):
 
 @pytest.mark.parametrize("turbine_type", ["axial", "radial"])
 def test_geometry_editors_match_every_mounted_meanline_parameter(turbine_type):
-    from turbodash.app_turbine import geometry_stage_panel, make_stage_accordion_item, stage_defaults_for
+    from turbodash.app_experimental import geometry_stage_panel, make_stage_accordion_item, stage_defaults_for
 
     values = stage_defaults_for(turbine_type)
     meanline = make_stage_accordion_item(1, values, turbine_type)
@@ -263,12 +263,12 @@ def test_geometry_editors_match_every_mounted_meanline_parameter(turbine_type):
 
 @pytest.mark.parametrize("element,value", [("geometry", 0.45), ("slider", 0.25), ("input", 0.35)])
 def test_geometry_meanline_and_slider_use_one_value(monkeypatch, element, value):
-    from turbodash import app_turbine
+    from turbodash import app_experimental
 
-    monkeypatch.setattr(app_turbine, "ctx", SimpleNamespace(triggered_id={"elem": element}))
-    assert app_turbine.sync_stage_slider_input(.25, .35, .45) == (value, value, value)
-    monkeypatch.setattr(app_turbine, "ctx", SimpleNamespace(triggered_id={"elem": "geometry"}))
-    assert app_turbine.sync_stage_slider_input(.25, .35, None) == (no_update, None, None)
+    monkeypatch.setattr(app_experimental, "ctx", SimpleNamespace(triggered_id={"elem": element}))
+    assert app_experimental.sync_stage_slider_input(.25, .35, .45) == (value, value, value)
+    monkeypatch.setattr(app_experimental, "ctx", SimpleNamespace(triggered_id={"elem": "geometry"}))
+    assert app_experimental.sync_stage_slider_input(.25, .35, None) == (no_update, None, None)
 
 
 def test_row_mesh_settings_persist_independently_and_ignore_inactive_edits(callbacks):

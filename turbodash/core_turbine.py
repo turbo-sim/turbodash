@@ -320,7 +320,7 @@ def compute_loss_coefficient(
     Under isentropic reconstruction the isentropic exit relative stagnation
     pressure equals the actual one, so p0_rel_is defaults to p0_rel_out.
     """
-    from .loss_models.loss_model import evaluate_loss_model
+    from .loss_model_dispatch import evaluate_loss_model
  
     if p0_rel_is is None:
         p0_rel_is = p0_rel_out

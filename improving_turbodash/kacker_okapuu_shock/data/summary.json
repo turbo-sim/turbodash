@@ -20,7 +20,7 @@
     "stator": 2.8851335712978265,
     "rotor": 4.775730229953466
   },
-  "calculation_seconds": 1.27029340000081,
+  "calculation_seconds": 1.0708106999991287,
   "formula": "Single get_shock_loss call returns all components; JVP returns values and derivatives together.",
   "output_floor": false,
   "onset": "Quintic smoothstep over hub Mach 0.4 to 0.5",

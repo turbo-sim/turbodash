@@ -229,7 +229,7 @@ This view fixes $r_h/r_t=0.5$ and $M_2=0.6$ and spans $0.35\le M_{1,\mathrm{hub}
 
 The curves leave zero with zero slope at hub Mach 0.4 and join the original power law smoothly at 0.5. The quintic weight and upper continuation make the complete shock term $C^2$ across the onset and limiting joins for valid, smoothly varying pressure states. The plots expose the loss and slope; numerical checks also verify curvature at the joins.
 
-The shock curves use linear axes. For the main Mach sweeps, the loss axis spans 0?0.5 with a small margin; the onset close-up retains its tighter scale. The [audit outlet-Mach sweep](../loss_model_audit/1_individual_functions/report/01_ko_profile.md#64-shock-loss-versus-outlet-mach-number) additionally varies $M_2$ directly at fixed inlet Mach values.
+The shock curves use linear axes. For the main Mach sweeps, the loss axis spans 0–0.5 with a small margin; the onset close-up retains its tighter scale. The [audit outlet-Mach sweep](../loss_model_audit/1_individual_functions/report/01_ko_profile.md#64-shock-loss-versus-outlet-mach-number) additionally varies $M_2$ directly at fixed inlet Mach values.
 
 ## Reproduction and validation
 

@@ -1,0 +1,116 @@
+{
+  "parameters": {
+    "nozzle": {
+      "coefficients": [
+        0.02564380076855907,
+        1.2332771855078724,
+        -1.0332647877407999
+      ],
+      "ceiling": 0.25,
+      "minimum_digitized_ratio": 0.05410729906701107,
+      "maximum_digitized_ratio": 0.3989271661536283
+    },
+    "impulse": {
+      "coefficients": [
+        0.015128580684873045,
+        0.6394153340696378,
+        -0.5515740653135338
+      ],
+      "ceiling": 0.13,
+      "minimum_digitized_ratio": 0.05413622363459901,
+      "maximum_digitized_ratio": 0.3997089236262483
+    }
+  },
+  "ratio_join": 0.4,
+  "selection": "Cubic is the lowest tested degree resolving both traces within digitization uncertainty. Quartic improvement does not justify an extra parameter for this scan.",
+  "weighting": "Iteratively weighted least squares: sigma_eff^2=sigma_energy^2+(sigma_ratio*fit_slope)^2.",
+  "zero_endpoint": "Enforced F(0)=0; origin is not an extra digitized datum.",
+  "candidate_fits": [
+    {
+      "family": "nozzle",
+      "degree": 2,
+      "coefficients": [
+        0.08705445861593293,
+        0.6948395926691141
+      ],
+      "rmse": 0.0019321676977000313,
+      "maximum_error": 0.004583335737712246,
+      "holdout_points": 5,
+      "holdout_rmse": 0.0016058412637672604,
+      "holdout_maximum_error": 0.0023641851726866614
+    },
+    {
+      "family": "nozzle",
+      "degree": 3,
+      "coefficients": [
+        0.02564380076855907,
+        1.2332771855078724,
+        -1.0332647877407999
+      ],
+      "rmse": 0.00023726381587986663,
+      "maximum_error": 0.0004665138094100407,
+      "holdout_points": 5,
+      "holdout_rmse": 0.00021222076124738628,
+      "holdout_maximum_error": 0.0003144650958828536
+    },
+    {
+      "family": "nozzle",
+      "degree": 4,
+      "coefficients": [
+        0.03246981189086878,
+        1.1298372928701688,
+        -0.5804887399311214,
+        -0.6001253591203659
+      ],
+      "rmse": 0.00021055957359215647,
+      "maximum_error": 0.00035795972275749766,
+      "holdout_points": 5,
+      "holdout_rmse": 0.00022039883530954296,
+      "holdout_maximum_error": 0.0003456725679238104
+    },
+    {
+      "family": "impulse",
+      "degree": 2,
+      "coefficients": [
+        0.05010357854524256,
+        0.3432036632500754
+      ],
+      "rmse": 0.000997242817303186,
+      "maximum_error": 0.0015762173885909697,
+      "holdout_points": 5,
+      "holdout_rmse": 0.000955267952477292,
+      "holdout_maximum_error": 0.0012894502938781693
+    },
+    {
+      "family": "impulse",
+      "degree": 3,
+      "coefficients": [
+        0.015128580684873045,
+        0.6394153340696378,
+        -0.5515740653135338
+      ],
+      "rmse": 0.0002512495358847194,
+      "maximum_error": 0.0004980910257027585,
+      "holdout_points": 5,
+      "holdout_rmse": 0.00019978580595770797,
+      "holdout_maximum_error": 0.00035934122355836887
+    },
+    {
+      "family": "impulse",
+      "degree": 4,
+      "coefficients": [
+        0.000875888374005445,
+        0.848156075025426,
+        -1.4471979522545744,
+        1.1708339364668598
+      ],
+      "rmse": 0.00015014060865779883,
+      "maximum_error": 0.000271112508753682,
+      "holdout_points": 5,
+      "holdout_rmse": 0.00010577777562799956,
+      "holdout_maximum_error": 0.00020099003130712167
+    }
+  ],
+  "fit_script_sha256": "681899a896268a5e084829ae3c99c454b9882d21edc43b003ffc47dae2351bf3",
+  "data_sha256": "f1bbfb09fc02a0bf2f63225111f99ccb0607c8b87848e3ae163704123954f19e"
+}

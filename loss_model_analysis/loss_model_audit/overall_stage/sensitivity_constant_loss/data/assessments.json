@@ -1,0 +1,191 @@
+{
+  "speed_r0/stator_exit_angle": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 405,
+    "negative_eta_tt": 74,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": false,
+    "maximum_parameter_efficiency_spread": 28.42817773345685
+  },
+  "speed_r05/stator_exit_angle": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 471,
+    "negative_eta_tt": 41,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": false,
+    "maximum_parameter_efficiency_spread": 1.3348365362592052
+  },
+  "reaction/stator_exit_angle": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.5,
+    "negative_hub": 94,
+    "negative_eta_tt": 0,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": false,
+    "maximum_parameter_efficiency_spread": 0.6918649423965805
+  },
+  "speed_r0/pitch_chord": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 420,
+    "negative_eta_tt": 63,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": true,
+    "maximum_parameter_efficiency_spread": 0.0
+  },
+  "speed_r05/pitch_chord": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 490,
+    "negative_eta_tt": 42,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": true,
+    "maximum_parameter_efficiency_spread": 0.0
+  },
+  "reaction/pitch_chord": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.5,
+    "negative_hub": 77,
+    "negative_eta_tt": 0,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": true,
+    "maximum_parameter_efficiency_spread": 0.0
+  },
+  "speed_r0/aspect_ratio": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 300,
+    "negative_eta_tt": 45,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": true,
+    "maximum_parameter_efficiency_spread": 0.0
+  },
+  "speed_r05/aspect_ratio": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 350,
+    "negative_eta_tt": 30,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": true,
+    "maximum_parameter_efficiency_spread": 0.0
+  },
+  "reaction/aspect_ratio": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.5,
+    "negative_hub": 55,
+    "negative_eta_tt": 0,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": true,
+    "maximum_parameter_efficiency_spread": 0.0
+  },
+  "speed_r0/trailing_ratio": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 300,
+    "negative_eta_tt": 45,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": true,
+    "maximum_parameter_efficiency_spread": 0.0
+  },
+  "speed_r05/trailing_ratio": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 350,
+    "negative_eta_tt": 30,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": true,
+    "maximum_parameter_efficiency_spread": 0.0
+  },
+  "reaction/trailing_ratio": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.5,
+    "negative_hub": 55,
+    "negative_eta_tt": 0,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": true,
+    "maximum_parameter_efficiency_spread": 0.0
+  },
+  "speed_r0/specific_speed": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 293,
+    "negative_eta_tt": 45,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": true,
+    "maximum_parameter_efficiency_spread": 0.0
+  },
+  "speed_r05/specific_speed": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 343,
+    "negative_eta_tt": 30,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": true,
+    "maximum_parameter_efficiency_spread": 0.0
+  },
+  "reaction/specific_speed": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.5,
+    "negative_hub": 222,
+    "negative_eta_tt": 0,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": true,
+    "maximum_parameter_efficiency_spread": 0.0
+  },
+  "speed_r0/mass_flow": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 300,
+    "negative_eta_tt": 45,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": true,
+    "maximum_parameter_efficiency_spread": 0.0
+  },
+  "speed_r05/mass_flow": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 350,
+    "negative_eta_tt": 30,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": true,
+    "maximum_parameter_efficiency_spread": 0.0
+  },
+  "reaction/mass_flow": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.5,
+    "negative_hub": 55,
+    "negative_eta_tt": 0,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": true,
+    "maximum_parameter_efficiency_spread": 0.0
+  },
+  "speed_r0/isentropic_mach": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 360,
+    "negative_eta_tt": 61,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": false,
+    "maximum_parameter_efficiency_spread": 6.997422998554947
+  },
+  "speed_r05/isentropic_mach": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 420,
+    "negative_eta_tt": 37,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": false,
+    "maximum_parameter_efficiency_spread": 5.345335620865194
+  },
+  "reaction/isentropic_mach": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.5,
+    "negative_hub": 66,
+    "negative_eta_tt": 0,
+    "maximum_row_coefficient_error": 0.0,
+    "inactive_parameter": false,
+    "maximum_parameter_efficiency_spread": 0.12376482675775402
+  }
+}

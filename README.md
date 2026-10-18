@@ -119,7 +119,7 @@ All analyses and turbine solvers use the production models in
 `turbodash/loss_models/`, selected by `benner`, `kacker_okapuu`, `moustapha`,
 or `isentropic` (zero losses). The shared KO components include the bounded
 shock, finite high-Reynolds correction and physical-turning loading formulation.
-The stage reports compare isentropic, Kacker–Okapuu and Benner predictions using
+The stage reports compare isentropic, constant-loss, Kacker–Okapuu and Benner predictions using
 the same continuous geometry, true-chord solidity and Benner half-height cap.
 Each section includes the scripts and inputs needed to regenerate its figures,
 using the existing model functions in this repository.

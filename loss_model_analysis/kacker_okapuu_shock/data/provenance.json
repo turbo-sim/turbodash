@@ -1,5 +1,5 @@
 {
-  "created_utc": "2026-10-18T21:17:32.200210+00:00",
+  "created_utc": "2026-10-18T22:05:21.253143+00:00",
   "source_sha256": {
     "turbodash/core/turbine.py": "2590995df2b3842e36051cc524ca59e35a7ece5e043474e9c78c2bc4eeecd1ea",
     "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
@@ -13,7 +13,7 @@
     "turbodash/loss_models/loss_model_benner.py": "6a95683659c639508bf93d5a743d09a5a5998d4cbf5e4ce750fc484f9490bbcd",
     "turbodash/loss_models/loss_model_kacker_okapuu.py": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51",
     "turbodash/loss_models/loss_model_moustapha.py": "0748aa6c29528f98e0e6a12e61b9ed34f263f9f576f3664b9ebf322ef3098d23",
-    "loss_model_analysis/loss_model_audit/overall_stage/study.py": "40b89adfeb76c50e0234260a99e8cc4a9ed2ed27b9a7d80cf49613f29fabcd79"
+    "loss_model_analysis/loss_model_audit/overall_stage/study.py": "01b3d263d88821d0da09710b8e5f26699e9bee23f7e09c21f7cb402921c8930c"
   },
   "study_sha256": "7c78eebf9e34665795373b9ffb8e6fda1bd81ca8c7f273ae18c5b2452732c23b",
   "baseline": {
@@ -73,7 +73,7 @@
   },
   "samples": 2215,
   "speeds_per_curve": 443,
-  "elapsed_seconds": 10.292613300000085,
+  "elapsed_seconds": 9.161749200000486,
   "speed_range": [
     1e-05,
     0.9

@@ -4,13 +4,14 @@
 
 [Side-by-side model comparison](comparison.md)
 
-Air expands through one axial stage from **50 bar and 600 K total inlet conditions**. Kacker-Okapuu, Benner and the isentropic zero-loss model each have a separate full study with 21 figures on the same reference designs and baseline parameters. Both efficiencies use solid lines and separate blue/orange color scales.
+Air expands through one axial stage from **50 bar and 600 K total inlet conditions**. Kacker-Okapuu, Benner, the isentropic zero-loss model and a constant-loss reference each have a separate full study with 21 figures on the same reference designs and baseline parameters. The constant-loss reference prescribes $Y_{\mathrm{stator}}=Y_{\mathrm{rotor}}=0.1$ using the production `custom` option. Both efficiencies use solid lines and separate blue/orange color scales.
 
 | Model | Report | Samples |
 |---|---|---|
 | Kacker–Okapuu | [Report](sensitivity_kacker_okapuu/readme.md) | 28,920 |
 | Benner | [Report](sensitivity_benner/readme.md) | 28,920 |
 | Isentropic (zero losses) | [Report](sensitivity_isentropic/readme.md) | 28,920 |
+| Constant loss (Y = 0.1 per row) | [Report](sensitivity_constant_loss/readme.md) | 28,920 |
 
 ## Baseline and parameter ranges
 
@@ -24,7 +25,7 @@ Air expands through one axial stage from **50 bar and 600 K total inlet conditio
 | Mass flow $\dot{m}$ | 0.1 to 1000 kg/s | 10 kg/s |
 | Isentropic expansion Mach number $M_{\mathrm{is}}$ | 0.3 to 2  | 1.15  |
 
-Seven parameters are varied one at a time in all three models. Each sweeps blade velocity ratio from 0 to 1.2 at $R=0$ and $R=0.5$, then reaction from -0.1 to 1.1 at $U/c_0=0.6$. Both rows share true-chord pitch ratio, aspect ratio and dimensionless trailing thickness. The specified stator angle baseline is 70 degrees; mass-flow levels use logarithmic color normalization.
+Seven parameters are varied one at a time in all four models. Each sweeps blade velocity ratio from 0 to 1.2 at $R=0$ and $R=0.5$, then reaction from -0.1 to 1.1 at $U/c_0=0.6$. Both rows share true-chord pitch ratio, aspect ratio and dimensionless trailing thickness. The specified stator angle baseline is 70 degrees; mass-flow levels use logarithmic color normalization.
 
 Axial inlet flow, constant mean radius and equal meridional velocities define the reference triangles. Metal inlet angles follow inlet flow, giving zero incidence. Maximum thickness/chord is 0.30; rotor tip clearance/height is 0.01 and stator clearance is zero. Benner uses inlet displacement thickness/height 0.011. These are resized design families with continuous blade counts.
 
@@ -46,6 +47,8 @@ $$
 Signed hub radii remain in geometry. Their loss-only hub/tip coordinate is identity at and above 0.5 and approaches **0.3** below that join. The same positive coordinate enters the hub-Mach fit and shock span weighting. Shock onset blends over hub Mach 0.4-0.5; the exit-normalized coefficient is exact through 0.25 and approaches **0.7** above it. The Reynolds coordinate equals the supplied value on $10^4\le\mathrm{Re}\le10^7$, tends to 1000 for large negative trial values, and to $5\times10^7$ at large positive values. Consequently its high-Re correction tends to $50^{-0.2}=0.457305052$.
 
 The isentropic option sets every row-loss component to zero, so $\eta_{tt}=1$ and $\eta_{ts}=1-v_4^2/[2(h_{01}-h_{4s})]$. The latter can be below one because of exit kinetic energy. Geometry-only parameter curves overlap in this model; the expansion-Mach curves also overlap for the prescribed dimensionless triangles. No shock, Reynolds or mean-secant correction is applied to isentropic losses.
+
+The constant-loss reference sets each complete row pressure-loss coefficient to 0.1, using `custom_value=0.1` in the production `custom` model. The prescribed totals have no empirical component decomposition. Geometry-only parameter curves overlap; stator exit angle and expansion Mach can affect the velocity triangles and the exact pressure-to-enthalpy-loss conversion. No empirical shock, Reynolds or loading correction is active in this reference.
 
 At zero blade speed, finite-specific-speed sizing is singular. At $R\ge1$ the chosen reference triangles lose real throughflow. Such failures remain gaps with explicit statuses. Negative hub radii and negative loss-corrected efficiencies are retained, without markers at their boundaries. All efficiency axes show 0-100%.
 
@@ -92,6 +95,6 @@ python -B loss_model_analysis/loss_model_audit/overall_stage/study.py --render-o
 python -B loss_model_analysis/loss_model_audit/overall_stage/study.py --check
 ```
 
-The saved run contains 86,760 samples in 63 SVG figures. Each model retains all seven sensitivity families and all three sweeps.
+The saved run contains 115,680 samples in 84 SVG figures. Each model retains all seven sensitivity families and all three sweeps.
 
 Checks cover the Mach boundary, Euler/reaction identities, geometry ratios, size similarity, EOS pressure/enthalpy round trips and the signed efficiency identity. Source files are hashed before and after calculation. [Provenance](data/provenance.json) | [Validation](data/validation.json) | [Assessments](data/assessments.json) | [Render hashes](data/render_manifest.json)

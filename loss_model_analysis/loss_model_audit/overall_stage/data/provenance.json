@@ -1,5 +1,5 @@
 {
-  "created_utc": "2026-10-18T21:18:03.253707+00:00",
+  "created_utc": "2026-10-18T22:05:09.825599+00:00",
   "python": "3.13.2",
   "executable": "C:\\Users\\roagr\\AppData\\Local\\pypoetry\\Cache\\virtualenvs\\turbomachinery-special-course-fbPpiFVa-py3.13\\Scripts\\python.exe",
   "numpy": "2.5.2",
@@ -18,7 +18,7 @@
     "turbodash/loss_models/loss_model_kacker_okapuu.py": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51",
     "turbodash/loss_models/loss_model_moustapha.py": "0748aa6c29528f98e0e6a12e61b9ed34f263f9f576f3664b9ebf322ef3098d23"
   },
-  "study_sha256": "40b89adfeb76c50e0234260a99e8cc4a9ed2ed27b9a7d80cf49613f29fabcd79",
+  "study_sha256": "01b3d263d88821d0da09710b8e5f26699e9bee23f7e09c21f7cb402921c8930c",
   "fixed": {
     "inlet_total_pressure": 5000000.0,
     "inlet_total_temperature": 600.0,
@@ -172,15 +172,61 @@
   "models": [
     "kacker_okapuu",
     "benner",
-    "isentropic"
+    "isentropic",
+    "constant_loss"
   ],
   "points": 241,
   "unique_designs": 24514,
-  "elapsed_seconds": 41.75990589999856,
+  "loss_model_options": {
+    "kacker_okapuu": {
+      "stator": {
+        "model": "kacker_okapuu",
+        "inlet_displacement_thickness_height_ratio": 0.011
+      },
+      "rotor": {
+        "model": "kacker_okapuu",
+        "inlet_displacement_thickness_height_ratio": 0.011
+      }
+    },
+    "benner": {
+      "stator": {
+        "model": "benner",
+        "inlet_displacement_thickness_height_ratio": 0.011
+      },
+      "rotor": {
+        "model": "benner",
+        "inlet_displacement_thickness_height_ratio": 0.011
+      }
+    },
+    "isentropic": {
+      "stator": {
+        "model": "isentropic",
+        "inlet_displacement_thickness_height_ratio": 0.011
+      },
+      "rotor": {
+        "model": "isentropic",
+        "inlet_displacement_thickness_height_ratio": 0.011
+      }
+    },
+    "constant_loss": {
+      "stator": {
+        "model": "custom",
+        "inlet_displacement_thickness_height_ratio": 0.011,
+        "custom_value": 0.1
+      },
+      "rotor": {
+        "model": "custom",
+        "inlet_displacement_thickness_height_ratio": 0.011,
+        "custom_value": 0.1
+      }
+    }
+  },
+  "elapsed_seconds": 44.496818699997675,
   "sample_counts": {
     "kacker_okapuu": 28920,
     "benner": 28920,
-    "isentropic": 28920
+    "isentropic": 28920,
+    "constant_loss": 28920
   },
   "model_cases": "All seven sensitivities and all three sweeps per model",
   "expansion_boundaries": {
@@ -266,7 +312,8 @@
   "data_sha256": {
     "../sensitivity_kacker_okapuu/data/kacker_okapuu.csv.gz": "dc45229f4b251ac4fc5084dd6fdb34d046b4d8bd178439ce0ebd7c712b6dfd0a",
     "../sensitivity_benner/data/benner.csv.gz": "8a7b5512c4296b9417dcd29f387b3bf2ce6aea2744bbebe307dd049adcf8841a",
-    "../sensitivity_isentropic/data/isentropic.csv.gz": "f65d5f0d6f6abe53caf86fe7759ff79c9113c7780d6ff0d60c7537197cff286c"
+    "../sensitivity_isentropic/data/isentropic.csv.gz": "f65d5f0d6f6abe53caf86fe7759ff79c9113c7780d6ff0d60c7537197cff286c",
+    "../sensitivity_constant_loss/data/constant_loss.csv.gz": "27f541b2f5f686c359b7d536c833e6729bc193ea5f2e9c7fe24799c5205cb0e0"
   },
   "source_unchanged": true
 }

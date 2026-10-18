@@ -1,7 +1,8 @@
 """One-stage air-turbine design sensitivities using the repository loss models.
 
-Calculate full KO, Benner and zero-loss studies: python -B study.py
+Calculate KO, Benner, zero-loss and constant-loss studies: python -B study.py
 Calculate only the zero-loss study: python -B study.py --models isentropic
+Calculate only fixed Y=0.1 in both rows: python -B study.py --models constant_loss
 Redraw saved results: python -B study.py --render-only
 Verify saved results: python -B study.py --check
 The second script, report.py, owns all plotting and report text.
@@ -46,7 +47,9 @@ MODELS = {
     "kacker_okapuu": "Kacker–Okapuu",
     "benner": "Benner",
     "isentropic": "Isentropic (zero losses)",
+    "constant_loss": "Constant loss (Y = 0.1 per row)",
 }
+CONSTANT_ROW_LOSSES = {"stator": .1, "rotor": .1}
 PARAMETERS = {
     "stator_exit_angle": dict(name="Stator exit angle", symbol=r"$\alpha_2$", unit="deg",
                               baseline=70., values=[50., 55., 60., 65., 70., 75., 80.]),
@@ -87,6 +90,20 @@ def sha256(path):
 def model_directory(model):
     """Keep model identifiers separate from the sensitivity folder names."""
     return BASE / f"sensitivity_{model}"
+
+
+def loss_options(model, row):
+    """Use production custom totals for the prescribed row pressure losses.
+
+    ``constant_loss`` is this study's label for the existing ``custom`` model.
+    The prescribed total has no empirical component decomposition; its profile,
+    secondary, trailing-edge, clearance and incidence outputs remain zero.
+    """
+    options = dict(model=model,
+                   inlet_displacement_thickness_height_ratio=FIXED["inlet_displacement_thickness_height"])
+    if model == "constant_loss":
+        options.update(model="custom", custom_value=CONSTANT_ROW_LOSSES[row])
+    return options
 
 
 def source_hashes():
@@ -397,7 +414,7 @@ def calculate(models, points):
     if not valid_indices:
         raise RuntimeError("No admissible designs: inspect the chosen baseline and ranges")
     common_inputs = {row: stack_rows(prepared, valid_indices, row) for row in ("stator", "rotor")}
-    if any(model != "isentropic" for model in models):
+    if any(model in ("kacker_okapuu", "benner") for model in models):
         for row, row_id in (("stator", 0), ("rotor", 1)):
             inputs = common_inputs[row]
             shock = ko.get_shock_loss(inputs["flow"], inputs["geometry"], row_id)
@@ -417,18 +434,18 @@ def calculate(models, points):
         model_inputs = {row:stack_rows(prepared,model_indices,row) for row in ("stator","rotor")}
         print(f"Evaluating {MODELS[model]} on {len(model_indices):,} finite reference designs", flush=True)
         outputs = [{**item["metrics"], "status": item["status"]} for item in prepared]
-        if model == "isentropic":
-            # Empirical shock/Reynolds diagnostics are not active in this model.
+        if model in ("isentropic", "constant_loss"):
+            # Empirical shock/Reynolds diagnostics are inactive in these references.
             for result in outputs:
                 for key in list(result):
                     if "_shock_" in key or key.endswith(("_profile_compressibility", "_reynolds_factor")):
                         del result[key]
-        losses = {row: evaluate_loss_model({"model": model,
-                    "inlet_displacement_thickness_height_ratio": FIXED["inlet_displacement_thickness_height"]},
+        losses = {row: evaluate_loss_model(loss_options(model, row),
                     model_inputs[row]) for row in ("stator", "rotor")}
         for row in ("stator", "rotor"):
+            prescribed = CONSTANT_ROW_LOSSES[row] if model == "constant_loss" else 0.
             np.testing.assert_allclose(losses[row]["loss_total"],
-                                       sum(losses[row][f"loss_{part}"] for part in PARTS),
+                                       prescribed + sum(losses[row][f"loss_{part}"] for part in PARTS),
                                        atol=2e-13, rtol=2e-13)
         for offset, index in enumerate(model_indices):
             result = outputs[index]
@@ -480,6 +497,29 @@ def calculate(models, points):
             checks["isentropic"] = dict(all_row_components_zero=True, eta_tt_exactly_one=True,
                                         eta_ts_equals_one_minus_exit_kinetic_energy=True,
                                         maximum_inactive_parameter_eta_ts_spread=float(invariant_spread))
+        if model == "constant_loss":
+            good = [row for row in rows if row["status"] == "ok"]
+            for row in good:
+                for blade, coefficient in CONSTANT_ROW_LOSSES.items():
+                    assert row[f"{blade}_Y_total"] == coefficient
+                    assert all(row[f"{blade}_Y_{part}"] == 0. for part in PARTS)
+            invariant_spread = 0.
+            inactive_parameters = ("pitch_chord", "aspect_ratio", "trailing_ratio", "specific_speed", "mass_flow")
+            for parameter in inactive_parameters:
+                curves = {}
+                for row in good:
+                    if row["parameter"] == parameter:
+                        curves.setdefault((row["sweep"], row["coordinate"]), []).append(row)
+                for curve in curves.values():
+                    for efficiency in ("eta_tt", "eta_ts"):
+                        invariant_spread = max(invariant_spread, np.ptp([row[efficiency] for row in curve]))
+            assert invariant_spread < 3e-14
+            assert any(row.get("negative_hub", 0) for row in good)
+            checks["constant_loss"] = dict(production_model="custom",
+                row_pressure_loss_coefficients=CONSTANT_ROW_LOSSES,
+                empirical_components_zero=True, negative_hub_designs_retained=True,
+                inactive_parameters=list(inactive_parameters),
+                maximum_inactive_parameter_efficiency_spread=float(invariant_spread))
         model_data = model_directory(model) / "data"
         model_data.mkdir(parents=True, exist_ok=True)
         write_samples(model_data / f"{model}.csv.gz", rows)
@@ -490,6 +530,7 @@ def calculate(models, points):
                       executable=sys.executable, numpy=np.__version__, coolprop=CP.get_global_param_string("version"),
                       source_sha256=sources, study_sha256=runner_hash, fixed=FIXED, parameters=PARAMETERS,
                       sweeps=SWEEPS, models=list(models), points=points, unique_designs=len(designs),
+                      loss_model_options={model:{row:loss_options(model,row) for row in ("stator","rotor")} for model in models},
                       elapsed_seconds=perf_counter()-started,
                       sample_counts={model:summary["samples"] for model,summary in summaries.items()},
                       model_cases="All seven sensitivities and all three sweeps per model",

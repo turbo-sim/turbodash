@@ -7,6 +7,7 @@ The scripts import the current repository loss functions. Shock uses a shared hu
 - [Full Kacker-Okapuu turbine sensitivities](overall_stage/sensitivity_kacker_okapuu/readme.md)
 - [Full Benner turbine sensitivities](overall_stage/sensitivity_benner/readme.md)
 - [Isentropic zero-loss turbine sensitivities](overall_stage/sensitivity_isentropic/readme.md)
+- [Constant-loss turbine sensitivities: stator and rotor Y = 0.1](overall_stage/sensitivity_constant_loss/readme.md)
 - [Shock and Reynolds analysis](../kacker_okapuu_shock/readme.md)
 
 Run `python -B loss_model_analysis/loss_model_audit/run.py` to calculate both audit sections. Use `--render-only` to render saved data or `--check` to verify navigation.

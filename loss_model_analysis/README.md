@@ -1,7 +1,7 @@
 # Loss model analysis
 
 Figures are exported as SVG only and embedded directly in the Markdown reports,
-including the three-column stage comparison, whose previews link to full-size
+including the two-by-two stage comparison, whose previews link to full-size
 figures. The original paper PDFs remain the source
 for digitization: Poppler renders their scanned charts in memory at the recorded
 resolution, so no raster image files are needed. Scanned backgrounds embedded
@@ -24,3 +24,8 @@ function docstrings. The analyses contain reproduction scripts, data and reports
 [Full KO turbine sensitivities](loss_model_audit/overall_stage/sensitivity_kacker_okapuu/readme.md) and [full Benner turbine sensitivities](loss_model_audit/overall_stage/sensitivity_benner/readme.md) use the same current helpers.
 
 [Isentropic zero-loss sensitivities](loss_model_audit/overall_stage/sensitivity_isentropic/readme.md) provide the corresponding ideal-flow reference.
+
+[Constant-loss sensitivities](loss_model_audit/overall_stage/sensitivity_constant_loss/readme.md)
+prescribe stator and rotor pressure-loss coefficients of 0.1 each. The
+[stage comparison](loss_model_audit/overall_stage/comparison.md) places isentropic
+and constant loss above Kacker-Okapuu and Benner in every section.

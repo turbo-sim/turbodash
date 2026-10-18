@@ -15,7 +15,7 @@ from matplotlib.colors import LinearSegmentedColormap, Normalize, LogNorm
 from matplotlib.cm import ScalarMappable
 from matplotlib.lines import Line2D
 from matplotlib.ticker import MultipleLocator
-from study import (BASE,DATA,MODELS,PARAMETERS,SWEEPS,FIXED,
+from study import (BASE,DATA,MODELS,PARAMETERS,SWEEPS,FIXED,CONSTANT_ROW_LOSSES,
                    read_samples,write_json,sha256,source_hashes,model_directory,CONFIG_KEYS)
 
 INK="#172c43"; MUTED="#596d7f"
@@ -36,6 +36,15 @@ ISENTROPIC_PURPOSES={
  "specific_speed":"Check that rotational speed and annulus sizing leave the prescribed dimensionless triangles and zero-loss efficiencies unchanged.",
  "mass_flow":"Check size invariance: mass flow changes dimensions and Reynolds numbers, but neither row losses nor normalized velocity triangles.",
  "isentropic_mach":"Vary dimensional expansion and thermodynamic states while checking that the prescribed normalized exit kinetic energy, and hence ideal efficiency, is unchanged."
+}
+CONSTANT_LOSS_PURPOSES={
+ "stator_exit_angle":"Isolate the effect of turning and exit kinetic energy while both row pressure-loss coefficients stay fixed at 0.1.",
+ "pitch_chord":"Check that spacing does not change efficiency when both row pressure-loss coefficients are prescribed, with no spacing correlation active.",
+ "aspect_ratio":"Check that changing blade aspect ratio only resizes geometry when secondary, clearance and Reynolds loss corrections are inactive.",
+ "trailing_ratio":"Check that changing both trailing-edge thicknesses does not change the prescribed row losses; compare the overlap with empirical thickness penalties.",
+ "specific_speed":"Check that rotational speed and annulus sizing leave efficiency unchanged at fixed dimensionless triangles and fixed row pressure-loss coefficients.",
+ "mass_flow":"Check size invariance with fixed row pressure-loss coefficients: dimensions and Reynolds numbers change, but no Reynolds correction is applied.",
+ "isentropic_mach":"Isolate compressibility in the pressure-to-enthalpy-loss conversion at fixed row pressure-loss coefficients, without empirical Mach or shock corrections."
 }
 
 def style():
@@ -94,6 +103,8 @@ def plot_group(model,sweep,parameter,rows,ko_rows=None):
   note=r"All $\eta_{tt}$ levels coincide at 100%."
   if parameter!="stator_exit_angle":note+="\n"+r"All $\eta_{ts}$ parameter levels also coincide."
   fig.text(.085,.855,note,va="top",fontsize=8.5,color=MUTED)
+ if model=="constant_loss" and parameter not in ("stator_exit_angle","isentropic_mach"):
+  fig.text(.085,.855,"All parameter levels coincide for both efficiencies.",va="top",fontsize=8.5,color=MUTED)
  for left,cmap,label in ((.085,blue,r"Total-total $\eta_{tt}$"),(.55,orange,r"Total-static $\eta_{ts}$")):
   cb=fig.colorbar(ScalarMappable(norm=norm,cmap=cmap),cax=fig.add_axes([left,.145,.405,.017]),orientation="horizontal")
   cb.set_ticks(levels,labels=[f"{v:g}" for v in levels]);cb.ax.minorticks_off();cb.outline.set_visible(False)
@@ -135,6 +146,28 @@ def assessment(sweep,parameter,rows):
   return text,dict(verdict=verdict,comparison_coordinate=x,negative_hub=negative,
                    eta_tt_exactly_one=all(r['eta_tt']==1. for r in good),
                    maximum_parameter_eta_ts_spread=spread,maximum_exit_energy_identity_error=identity_error)
+ if good[0]['model']=='constant_loss':
+  inactive=parameter not in ('stator_exit_angle','isentropic_mach')
+  spread=max(np.ptp([r[key] for r in curve]) for curve in by_x.values() for key in ('eta_tt','eta_ts'))
+  error=max(abs(r[f'{blade}_Y_total']-coefficient) for r in good for blade,coefficient in CONSTANT_ROW_LOSSES.items())
+  okay=error==0. and (not inactive or spread<3e-14)
+  verdict='Consistent' if okay else 'Problematic'
+  if inactive:
+   comment='All parameter levels coincide as expected: this parameter changes geometry or inactive loss corrections while the row states and prescribed coefficients stay the same.'
+  elif parameter=='isentropic_mach':
+   comment='Different Mach curves are possible even with fixed Y: the exact Air EOS converts the same pressure-loss coefficient into different enthalpy defects. This response contains no empirical shock or Reynolds correction.'
+  else:
+   comment='Turning changes the row velocities, the enthalpy defects associated with fixed Y, and the unrecovered exit kinetic energy.'
+  negative=sum(r.get('negative_hub',0)>0 for r in good)
+  negative_eta=sum(r['eta_tt']<0 for r in good)
+  text=(f'**{verdict}.** Both row total pressure-loss coefficients remain exactly 0.1. {comment} '
+        f'At {axis}={x:g}, total-total efficiency ranges from {100*min(r["eta_tt"] for r in section):.2f}% to {100*max(r["eta_tt"] for r in section):.2f}%, '
+        f'and total-static efficiency from {100*min(r["eta_ts"] for r in section):.2f}% to {100*max(r["eta_ts"] for r in section):.2f}%. '
+        f'Retained samples include {negative:,} negative-hub designs and {negative_eta:,} negative total-total efficiencies. '
+        'This is a controlled reference; it does not predict the loss penalties of the empirical correlations.')
+  return text,dict(verdict=verdict,comparison_coordinate=x,negative_hub=negative,
+                   negative_eta_tt=negative_eta,maximum_row_coefficient_error=error,
+                   inactive_parameter=inactive,maximum_parameter_efficiency_spread=float(spread))
  sentence=(f"At {axis}={x:g}, increasing {PARAMETERS[parameter]['symbol']} from {first['parameter_value']:g} to {last['parameter_value']:g} "
   f"changes total-total efficiency from {100*first['eta_tt']:.1f}% to {100*last['eta_tt']:.1f}% and total-static efficiency from {100*first['eta_ts']:.1f}% to {100*last['eta_ts']:.1f}%.")
  verdict="Review"
@@ -186,11 +219,20 @@ def model_report(model,rows,ko_rows=None):
    "$$",r"\eta_{tt}=1,\qquad\eta_{ts}=1-\frac{v_4^2/2}{h_{01}-h_{4s}}.","$$","",
    r"Total-static efficiency can therefore be below 100% despite zero irreversible loss: it includes unrecovered absolute exit kinetic energy. Curves for pitch/chord, aspect ratio, trailing-edge thickness, specific speed and mass flow coincide because these inputs only change geometry or inactive loss corrections. Expansion Mach changes dimensional states and work, while the prescribed normalized triangles leave this ideal efficiency unchanged. Overlap is expected and is checked numerically.","",
    r"The blue total-total curves lie exactly on the upper 100% boundary. Both efficiencies use solid lines and their existing colormaps; no visual offsets are introduced to separate identical solutions. Zero blade speed and nonreal reference triangles remain explicit gaps, as in the other studies.",""]
+ if model=="constant_loss":
+  content += [r"This study uses the existing production `custom` option with a total pressure-loss coefficient of 0.1 in each row:","",
+   "$$",r"Y_{\mathrm{stator}}=0.1,\qquad Y_{\mathrm{rotor}}=0.1.","$$","",
+   r"These are complete row coefficients under the same stagnation-pressure definition as the empirical studies. They are not kinetic-energy coefficients or prescribed enthalpy defects. The exact Air EOS converts each coefficient into an enthalpy defect before applying the common signed efficiency definitions.","",
+   r"The prescribed totals are unpartitioned. The production custom model returns zero profile, incidence, secondary, trailing-edge and clearance components; those zero components do not sum to the nonzero prescribed total. No empirical shock, Reynolds, loading or penetration correction is applied.","",
+   r"Pitch/chord, aspect ratio, trailing-edge thickness, specific speed and mass-flow curves should coincide wherever the common reference design is finite. Stator-angle curves can separate through turning and exit kinetic energy; expansion-Mach curves can separate through the pressure-to-enthalpy conversion. A fixed pressure-loss coefficient does not imply fixed efficiency.","",
+   "Reproduce all 21 constant-loss figures with the shared scripts:","",'```powershell',
+   'python -B loss_model_analysis/loss_model_audit/overall_stage/study.py --models constant_loss','```',""]
  results={}
  for sweep,parameter in pairs:
   selected=group_rows(rows,sweep,parameter);text,metrics=assessment(sweep,parameter,selected)
   key=f"{sweep}/{parameter}";results[key]=metrics
-  purpose=(ISENTROPIC_PURPOSES if model=="isentropic" else PURPOSES)[parameter]
+  purposes=ISENTROPIC_PURPOSES if model=="isentropic" else (CONSTANT_LOSS_PURPOSES if model=="constant_loss" else PURPOSES)
+  purpose=purposes[parameter]
   content += [f"## {PARAMETERS[parameter]['name']}: {title(sweep)}","",f"**Purpose.** {purpose}","",
    f"![{MODELS[model]} {parameter} {sweep} (SVG)](figures/{filename(sweep,parameter)}.svg)","",
    f"[Vector SVG](figures/{filename(sweep,parameter)}.svg) | [Samples](data/{model}.csv.gz)","",text,""]
@@ -207,7 +249,7 @@ METHOD=r"""# Single-stage air turbine: current loss-model trends
 
 __COMPARISON__
 
-Air expands through one axial stage from **50 bar and 600 K total inlet conditions**. Kacker-Okapuu, Benner and the isentropic zero-loss model each have a separate full study with 21 figures on the same reference designs and baseline parameters. Both efficiencies use solid lines and separate blue/orange color scales.
+Air expands through one axial stage from **50 bar and 600 K total inlet conditions**. Kacker-Okapuu, Benner, the isentropic zero-loss model and a constant-loss reference each have a separate full study with 21 figures on the same reference designs and baseline parameters. The constant-loss reference prescribes $Y_{\mathrm{stator}}=Y_{\mathrm{rotor}}=0.1$ using the production `custom` option. Both efficiencies use solid lines and separate blue/orange color scales.
 
 __REPORTS__
 
@@ -215,7 +257,7 @@ __REPORTS__
 
 __BASELINE__
 
-Seven parameters are varied one at a time in all three models. Each sweeps blade velocity ratio from 0 to 1.2 at $R=0$ and $R=0.5$, then reaction from -0.1 to 1.1 at $U/c_0=0.6$. Both rows share true-chord pitch ratio, aspect ratio and dimensionless trailing thickness. The specified stator angle baseline is 70 degrees; mass-flow levels use logarithmic color normalization.
+Seven parameters are varied one at a time in all four models. Each sweeps blade velocity ratio from 0 to 1.2 at $R=0$ and $R=0.5$, then reaction from -0.1 to 1.1 at $U/c_0=0.6$. Both rows share true-chord pitch ratio, aspect ratio and dimensionless trailing thickness. The specified stator angle baseline is 70 degrees; mass-flow levels use logarithmic color normalization.
 
 Axial inlet flow, constant mean radius and equal meridional velocities define the reference triangles. Metal inlet angles follow inlet flow, giving zero incidence. Maximum thickness/chord is 0.30; rotor tip clearance/height is 0.01 and stator clearance is zero. Benner uses inlet displacement thickness/height 0.011. These are resized design families with continuous blade counts.
 
@@ -237,6 +279,8 @@ $$
 Signed hub radii remain in geometry. Their loss-only hub/tip coordinate is identity at and above 0.5 and approaches **0.3** below that join. The same positive coordinate enters the hub-Mach fit and shock span weighting. Shock onset blends over hub Mach 0.4-0.5; the exit-normalized coefficient is exact through 0.25 and approaches **0.7** above it. The Reynolds coordinate equals the supplied value on $10^4\le\mathrm{Re}\le10^7$, tends to 1000 for large negative trial values, and to $5\times10^7$ at large positive values. Consequently its high-Re correction tends to $50^{-0.2}=0.457305052$.
 
 The isentropic option sets every row-loss component to zero, so $\eta_{tt}=1$ and $\eta_{ts}=1-v_4^2/[2(h_{01}-h_{4s})]$. The latter can be below one because of exit kinetic energy. Geometry-only parameter curves overlap in this model; the expansion-Mach curves also overlap for the prescribed dimensionless triangles. No shock, Reynolds or mean-secant correction is applied to isentropic losses.
+
+The constant-loss reference sets each complete row pressure-loss coefficient to 0.1, using `custom_value=0.1` in the production `custom` model. The prescribed totals have no empirical component decomposition. Geometry-only parameter curves overlap; stator exit angle and expansion Mach can affect the velocity triangles and the exact pressure-to-enthalpy-loss conversion. No empirical shock, Reynolds or loading correction is active in this reference.
 
 At zero blade speed, finite-specific-speed sizing is singular. At $R\ge1$ the chosen reference triangles lose real throughflow. Such failures remain gaps with explicit statuses. Negative hub radii and negative loss-corrected efficiencies are retained, without markers at their boundaries. All efficiency axes show 0-100%.
 
@@ -305,17 +349,18 @@ def check_links(paths):
    count+=1
  return count
 
-COMPARISON_MODELS=("isentropic","kacker_okapuu","benner")
+COMPARISON_MODELS=("isentropic","constant_loss","kacker_okapuu","benner")
+COMPARISON_GRID=(COMPARISON_MODELS[:2],COMPARISON_MODELS[2:])
 
 
 def comparison_report(provenance,model_rows=None):
- """Write the matching sections in three columns using existing figures.
+ """Write matching sections in a two-by-two grid using existing figures.
 
  Check matching configuration grids and section headings before comparing
  saved results. Existing SVG figures are embedded without regeneration.
  """
  if not set(COMPARISON_MODELS).issubset(provenance['models']):
-  raise ValueError("The overall report requires saved isentropic, KO and Benner studies")
+  raise ValueError("The overall report requires saved isentropic, constant-loss, KO and Benner studies")
  rows=model_rows or {model:read_samples(model) for model in COMPARISON_MODELS}
  case_key=lambda row:(row['sweep'],row['parameter'],row['coordinate'],row['parameter_value'])
  signatures={model:{case_key(row):tuple(row[key] for key in CONFIG_KEYS)
@@ -326,42 +371,47 @@ def comparison_report(provenance,model_rows=None):
  for model in COMPARISON_MODELS:
   document=model_directory(model)/'readme.md'
   assert re.findall(r'^## (.+)$',document.read_text(encoding='utf-8'),re.M)==headings,document
- names={'isentropic':'Isentropic (zero losses)','kacker_okapuu':'Kacker–Okapuu','benner':'Benner'}
+ names={model:MODELS[model] for model in COMPARISON_MODELS}
  content=['# Overall stage: side-by-side model sensitivities','',
   '[Common method and baseline](readme.md) | '+ ' | '.join(
    f'[{names[model]}]({model_directory(model).name}/readme.md)' for model in COMPARISON_MODELS),'',
-  'Each section uses the same saved designs and parameter levels, with **isentropic, Kacker–Okapuu and Benner** in fixed left-to-right columns. '
+  'Each section uses the same saved designs and parameter levels in a **2 × 2 grid**: '
+  '**isentropic at top left, constant loss at top right, Kacker–Okapuu at bottom left and Benner at bottom right**. '
   'Air enters at 50 bar and 600 K. All plots retain the same axes, 0–100% efficiency limits, blue total-total and orange total-static colormaps, and solid lines. '
   'Negative hub ratios remain in the data without boundary markers.','',
-  'SVG figures are embedded in each column; click an image to inspect it at full size. The three models stay in one table row; a narrow preview may need horizontal scrolling. '
-  'Isentropic total-total efficiency is exactly 100%; its total-static efficiency includes unrecovered exit kinetic energy. Coincident ideal curves are expected for parameters that only affect sizing or loss corrections.','']
+  'SVG figures are embedded in each cell; click an image to inspect it at full size. '
+  'The constant-loss reference uses the production `custom` model with total pressure-loss coefficients of 0.1 for both stator and rotor. '
+  'Isentropic total-total efficiency is exactly 100%; its total-static efficiency includes unrecovered exit kinetic energy. '
+  'Coincident curves are expected for geometry-only parameters in both reference models. Fixed pressure-loss coefficients can still give a Mach-dependent efficiency through their thermodynamic conversion.','']
  figure_hashes={};sections=[]
  for parameter in PARAMETERS:
   for sweep in SWEEPS:
    heading=f"{PARAMETERS[parameter]['name']}: {title(sweep)}"
-   content += [f'## {heading}','',f'**Purpose.** {PURPOSES[parameter]}','',
-    '<table width="100%" style="width:100%;table-layout:fixed">','<thead><tr>']
-   content += [f'<th width="33.333%" align="center">{escape(names[model])}</th>' for model in COMPARISON_MODELS]
-   content += ['</tr></thead>','<tbody><tr>']
+   content += [f'## {heading}','',f'**Purpose.** {PURPOSES[parameter]} Compare the empirical trends with the zero-loss and fixed-row-loss references.','',
+    '<table width="100%" style="width:100%;table-layout:fixed">','<tbody>']
    section_files=[]
-   for model in COMPARISON_MODELS:
-    stem=f'{model_directory(model).name}/figures/{filename(sweep,parameter)}'
-    svg=stem+'.svg'
-    path=BASE/svg
-    assert path.is_file(),path
-    figure_hashes[svg]=sha256(path)
-    alt=escape(f'{names[model]}: {PARAMETERS[parameter]["name"]}, {sweep}',quote=True)
-    content += ['<td width="33.333%" align="center" valign="top">',
-     f'<a href="{svg}" title="{alt}"><img src="{svg}" alt="{alt}" width="100%" style="width:100%;height:auto" /></a>','</td>']
-    section_files.append(dict(model=model,svg=svg))
-   content += ['</tr></tbody>','</table>','']
+   for row_index,model_pair in enumerate(COMPARISON_GRID):
+    content += ['<tr>']
+    for column_index,model in enumerate(model_pair):
+     stem=f'{model_directory(model).name}/figures/{filename(sweep,parameter)}'
+     svg=stem+'.svg'
+     path=BASE/svg
+     assert path.is_file(),path
+     figure_hashes[svg]=sha256(path)
+     alt=escape(f'{names[model]}: {PARAMETERS[parameter]["name"]}, {sweep}',quote=True)
+     content += ['<td width="50%" align="center" valign="top">',
+      f'<p><strong>{escape(names[model])}</strong></p>',
+      f'<a href="{svg}" title="{alt}"><img src="{svg}" alt="{alt}" width="100%" style="width:100%;height:auto" /></a>','</td>']
+     section_files.append(dict(model=model,row=row_index+1,column=column_index+1,svg=svg))
+    content += ['</tr>']
+   content += ['</tbody>','</table>','']
    groups={model:group_rows(rows[model],sweep,parameter) for model in COMPARISON_MODELS}
    common_keys=set.intersection(*[{case_key(row) for row in groups[model] if row['status']=='ok'} for model in COMPARISON_MODELS])
    anchor=.5 if sweep=='reaction' else .6
    coordinates=Counter(key[2] for key in common_keys)
    if coordinates:
     coordinate=min(coordinates,key=lambda value:(-coordinates[value],abs(value-anchor)))
-    by_key={model:{case_key(row):row for row in groups[model]} for model in ('kacker_okapuu','benner')}
+    by_key={model:{case_key(row):row for row in groups[model]} for model in COMPARISON_MODELS}
     common=[key for key in common_keys if key[2]==coordinate]
     differences={name:[100*(by_key['benner'][key][name]-by_key['kacker_okapuu'][key][name]) for key in common]
                  for name in ('eta_tt','eta_ts')}
@@ -369,15 +419,20 @@ def comparison_report(provenance,model_rows=None):
     comment=(f"**Comparison.** At {axis}={coordinate:g}, Benner minus KO spans "
              f"{min(differences['eta_tt']):.2f} to {max(differences['eta_tt']):.2f} percentage points in total-total efficiency and "
              f"{min(differences['eta_ts']):.2f} to {max(differences['eta_ts']):.2f} points in total-static efficiency across the common finite parameter levels.")
+    constant=[by_key['constant_loss'][key] for key in common]
+    comment+=(f" The fixed-loss total-total efficiency spans {100*min(row['eta_tt'] for row in constant):.2f}% to "
+              f"{100*max(row['eta_tt'] for row in constant):.2f}%, against 100% for the isentropic reference. "
+              "The fixed-loss panel isolates the velocity-triangle and thermodynamic response; the empirical panels also include geometry-dependent correlations.")
    else:comment='**Comparison.** No common finite samples exist in this family; retain the gaps shown in the individual reports.'
    content += [comment,'']
-   sections.append(dict(heading=heading,sweep=sweep,parameter=parameter,columns=section_files))
+   sections.append(dict(heading=heading,sweep=sweep,parameter=parameter,panels=section_files))
  content += ['---','', '**Reproduce from saved figures.** No cases or plots are rerun:','',
   '```powershell','python -B loss_model_analysis/loss_model_audit/overall_stage/report.py --comparison-only','```','',
   '[Report and source-figure hashes](data/comparison_manifest.json)','']
  document=BASE/'comparison.md'
  document.write_text('\n'.join(content),encoding='utf-8')
- record=dict(passed=True,sections=len(sections),columns=3,model_order=list(COMPARISON_MODELS),
+ record=dict(passed=True,sections=len(sections),rows=2,columns=2,model_order=list(COMPARISON_MODELS),
+  model_grid=[list(pair) for pair in COMPARISON_GRID],
   matching_section_headings=True,matching_input_grids=True,figures_reused=len(figure_hashes),
   model_calculations=0,plots_regenerated=0,figure_sha256=figure_hashes,
   data_sha256=provenance['data_sha256'],report_sha256=sha256(document),
@@ -390,9 +445,9 @@ def comparison_report(provenance,model_rows=None):
 
 
 def link_comparison():
- """Link the three-column report from an existing common-method index."""
+ """Link the two-by-two comparison from an existing common-method index."""
  path=BASE/'readme.md';text=path.read_text(encoding='utf-8')
- link='[Side-by-side comparison: isentropic, Kacker–Okapuu and Benner](comparison.md)'
+ link='[Two-by-two comparison: isentropic, constant loss, Kacker–Okapuu and Benner](comparison.md)'
  if '(comparison.md)' not in text:
   lines=text.splitlines();lines[2:2]=[link,''];path.write_text('\n'.join(lines)+'\n',encoding='utf-8')
 
@@ -445,9 +500,9 @@ def write_render_manifest(provenance,outputs=None):
   write_json(model_data/'render_manifest.json',dict(figures=len(model_hashes),
    figure_sha256=model_hashes,report_sha256=sha256(model_directory(model)/'readme.md'),
    report_script_sha256=sha256(__file__),hub_ratio_markers=False,
-   physical_turning=model!="isentropic",physical_secondary_projection=model=='kacker_okapuu',
-   mean_secant_onset_degrees=None if model=="isentropic" else 80.,
-   mean_secant_limit_degrees=None if model=="isentropic" else 87.5,
+   physical_turning=model in ("kacker_okapuu","benner"),physical_secondary_projection=model=='kacker_okapuu',
+   mean_secant_onset_degrees=80. if model in ("kacker_okapuu","benner") else None,
+   mean_secant_limit_degrees=87.5 if model in ("kacker_okapuu","benner") else None,
    data_sha256={f'{model}.csv.gz':sha256(model_data/f'{model}.csv.gz')}))
   write_json(model_data/'provenance.json',dict(provenance,model=model,
    data_sha256={f'{model}.csv.gz':sha256(model_data/f'{model}.csv.gz')},
@@ -462,10 +517,10 @@ if __name__=='__main__':
  from study import verify_saved
  parser=argparse.ArgumentParser(description=__doc__)
  parser.add_argument('--comparison-only',action='store_true',required=True,
-                     help='Build the three-column report from existing SVG figures and samples')
+                     help='Build the two-by-two comparison from existing SVG figures and samples')
  parser.parse_args()
  provenance=verify_saved()
  result=comparison_report(provenance)
  link_comparison()
  write_render_manifest(provenance)
- print(f"Wrote comparison.md: {result['sections']} sections, three columns; no cases or plots rerun.")
+ print(f"Wrote comparison.md: {result['sections']} sections, two-by-two layout; no cases or plots rerun.")

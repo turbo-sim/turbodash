@@ -1,7 +1,7 @@
 """Compatibility entry point for the complete stage sensitivity studies.
 
 The common study.py writes samples into each model folder and report.py
-writes separate complete reports. Includes KO, Benner and isentropic models; supports --models, --render-only and --check.
+writes separate complete reports. Includes KO, Benner, isentropic and constant-loss studies; supports --models, --render-only and --check.
 """
 from pathlib import Path
 import sys

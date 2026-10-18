@@ -29,7 +29,7 @@ def check_bundle():
             if not {f"{i:02d}_" for i in range(1, 12)}.issubset(prefixes):
                 failures.append(f"Missing numbered individual-function reports in {directory.name}")
         else:
-            for name in ("readme.md", "comparison.md", "sensitivity_kacker_okapuu/readme.md", "sensitivity_benner/readme.md", "sensitivity_isentropic/readme.md"):
+            for name in ("readme.md", "comparison.md", "sensitivity_kacker_okapuu/readme.md", "sensitivity_benner/readme.md", "sensitivity_isentropic/readme.md", "sensitivity_constant_loss/readme.md"):
                 if not (directory / name).is_file():
                     failures.append(f"Missing air-turbine report: {name}")
     for page in HERE.rglob("*.md"):

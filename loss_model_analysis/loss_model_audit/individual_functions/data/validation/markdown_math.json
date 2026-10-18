@@ -4,10 +4,10 @@
   "katex_version": "0.13.11",
   "modules": "C:\\Users\\roagr\\.vscode\\extensions\\goessner.mdmath-2.7.4\\node_modules",
   "excluded_directories": [],
-  "markdown_files": 27,
-  "inline_equations": 1325,
-  "display_equations": 166,
-  "local_links": 775,
+  "markdown_files": 28,
+  "inline_equations": 1368,
+  "display_equations": 167,
+  "local_links": 844,
   "files": [
     {
       "file": "loss_model_analysis/ainley_mathieson_fitting/readme.md",
@@ -153,15 +153,15 @@
       "file": "loss_model_analysis/loss_model_audit/overall_stage/comparison.md",
       "inline_equations": 42,
       "display_equations": 0,
-      "local_links": 5,
-      "sha256": "ab9a585b2b464acdcdbde08f238541118906978dd87d5358f61b2481a5ded815"
+      "local_links": 6,
+      "sha256": "924211c1f0d13b67d2def62105d1bb51a3c1e2e3f6c0bc08f8bc1ec9a2862ba8"
     },
     {
       "file": "loss_model_analysis/loss_model_audit/overall_stage/readme.md",
-      "inline_equations": 22,
+      "inline_equations": 23,
       "display_equations": 5,
-      "local_links": 16,
-      "sha256": "5ae643c2869d03e2cad1ab5a8c6c62cb0b7431b95869d703547afca52a925eac"
+      "local_links": 17,
+      "sha256": "8cf279273d6143c210659f4361351ab28ce048a9afb3b288eed7fd79401a8fd1"
     },
     {
       "file": "loss_model_analysis/loss_model_audit/overall_stage/sensitivity_benner/readme.md",
@@ -169,6 +169,13 @@
       "display_equations": 0,
       "local_links": 64,
       "sha256": "6c5596a5953ae504de5151ac754e5efae8a6b2fac18059a57ca39324ff15f459"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/overall_stage/sensitivity_constant_loss/readme.md",
+      "inline_equations": 42,
+      "display_equations": 1,
+      "local_links": 64,
+      "sha256": "4ca1f91e83e48e7a6382c56ab3e6fb2b581349390f823e93a56cc47988215bb3"
     },
     {
       "file": "loss_model_analysis/loss_model_audit/overall_stage/sensitivity_isentropic/readme.md",
@@ -188,15 +195,15 @@
       "file": "loss_model_analysis/loss_model_audit/readme.md",
       "inline_equations": 0,
       "display_equations": 0,
-      "local_links": 6,
-      "sha256": "ff526ad0c843558f765a7bae7b9b27098f3e10a29c16a5c5b16fea3d1882ebf5"
+      "local_links": 7,
+      "sha256": "9330db1b3e60f0dd7900890b6c20382d2c3b104ecfeaa1a7ac60574a5bc3d5d9"
     },
     {
       "file": "loss_model_analysis/README.md",
       "inline_equations": 0,
       "display_equations": 0,
-      "local_links": 9,
-      "sha256": "a0a085128baad3b5f5dac37b6893376eaeb2fbe18daa4316a40fb59073fcbc23"
+      "local_links": 11,
+      "sha256": "5d60df210a51af28814464cce35faa78f35660331df144c8b3d6f2984269d84f"
     }
   ],
   "errors": []

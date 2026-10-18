@@ -1,105 +1,151 @@
 {
   "passed": true,
   "sections": 21,
-  "columns": 3,
+  "rows": 2,
+  "columns": 2,
   "model_order": [
     "isentropic",
+    "constant_loss",
     "kacker_okapuu",
     "benner"
   ],
+  "model_grid": [
+    [
+      "isentropic",
+      "constant_loss"
+    ],
+    [
+      "kacker_okapuu",
+      "benner"
+    ]
+  ],
   "matching_section_headings": true,
   "matching_input_grids": true,
-  "figures_reused": 63,
+  "figures_reused": 84,
   "model_calculations": 0,
   "plots_regenerated": 0,
   "figure_sha256": {
-    "sensitivity_isentropic/figures/speed_r0_stator_exit_angle.svg": "1946b52812c34f9bfe8af7d1242ddfc78a20909f62168c24170ce12ed5064f1f",
-    "sensitivity_kacker_okapuu/figures/speed_r0_stator_exit_angle.svg": "4ebab7693b39d28c6206e7a469ab8f727a8c8ac03e0356a2de7b143abc2f83bf",
-    "sensitivity_benner/figures/speed_r0_stator_exit_angle.svg": "12254f8c7751369783f384c7610bce8e5a24e4962e21230c7367f1b4523922aa",
-    "sensitivity_isentropic/figures/speed_r05_stator_exit_angle.svg": "84544bfa87b645c7a00a6aab7eae148d0cf6f79b08982204a42c3b2685f72838",
-    "sensitivity_kacker_okapuu/figures/speed_r05_stator_exit_angle.svg": "18781f7e7f7d215d40849e997c6774b635cc2154d84325c71e7c5fc7bb4d2def",
-    "sensitivity_benner/figures/speed_r05_stator_exit_angle.svg": "8fa9a20cf9d71833b7a6e1a4b15025d977b45bb5b037bef3de6e67132128a804",
-    "sensitivity_isentropic/figures/reaction_stator_exit_angle.svg": "11ab7e596bb7db4b03f48065dfb002299d0ad46ef12ac377a7e05c777b41e6df",
-    "sensitivity_kacker_okapuu/figures/reaction_stator_exit_angle.svg": "e7812db3e56f9757d8167525677b07b4108efdbd58567895bbaccf62ee02d53a",
-    "sensitivity_benner/figures/reaction_stator_exit_angle.svg": "f94625656b5f221f8ae50a2511a24fabea558e1476826ef7a39687a852d0234f",
-    "sensitivity_isentropic/figures/speed_r0_pitch_chord.svg": "176c46f7d57df55471e46b23f78864a8f3cdd01d6e43f06967886f11e5ac3b73",
-    "sensitivity_kacker_okapuu/figures/speed_r0_pitch_chord.svg": "efe70aec39ccade79f47b52f82421be8c980f1baf320bbbe62a24276b56ab3a9",
-    "sensitivity_benner/figures/speed_r0_pitch_chord.svg": "ffc98e19aeeb91df2354170c2aa8ff225edc0f0fade6425b580081bf54e0e117",
-    "sensitivity_isentropic/figures/speed_r05_pitch_chord.svg": "9385844696db797298e80ee89908f0e7ac1234df73d6ba68a93f3e5efb0000c2",
-    "sensitivity_kacker_okapuu/figures/speed_r05_pitch_chord.svg": "b0f0ccbfdc81b979b434a780825972adfa9add9492fae1af047220a45bf29a41",
-    "sensitivity_benner/figures/speed_r05_pitch_chord.svg": "23463b171e0975d59a307c660ebac88e062f43997b1e271254fad3bf2a925aeb",
-    "sensitivity_isentropic/figures/reaction_pitch_chord.svg": "ee577d201b03c9382230c7e6f057e2a6bb7f43bb07c89862c5430926d18c60e8",
-    "sensitivity_kacker_okapuu/figures/reaction_pitch_chord.svg": "1292b7b7b2ebdce002b43d6490c27176fcd622692089753fb78748c5ba128cdf",
-    "sensitivity_benner/figures/reaction_pitch_chord.svg": "73c7a23ae40d6e5881a2d4baa01c857e004a27ed26e3fa39365745278bd3d6cd",
-    "sensitivity_isentropic/figures/speed_r0_aspect_ratio.svg": "13b9009bac5ed73e88a3f4982f2c64dae927de32f18ed4dffca6264b1ca4e73f",
-    "sensitivity_kacker_okapuu/figures/speed_r0_aspect_ratio.svg": "afa4008be0278c82765bf369afcfd8ba47ec9a89ca961b2c9af8816a0df9438a",
-    "sensitivity_benner/figures/speed_r0_aspect_ratio.svg": "857f05287ae5dbf8461cb5ec6b0179123c5ff33cbd2c336a3ee4e222ae06a89b",
-    "sensitivity_isentropic/figures/speed_r05_aspect_ratio.svg": "85976132cb0a05a08ec7d6312e9339f78a966fc8170dfc63d21d359db10ffe03",
-    "sensitivity_kacker_okapuu/figures/speed_r05_aspect_ratio.svg": "fee138947a3ab41a84addbd6361c01ecf126274ca5b6702bd94b69e865e1ced2",
-    "sensitivity_benner/figures/speed_r05_aspect_ratio.svg": "c6cce7e9cdd79b8cf5cd7e9cffbf96e5cc011feafcaa749d744959fcea42d121",
-    "sensitivity_isentropic/figures/reaction_aspect_ratio.svg": "2647c2af5f3625538c3c0d2f4fd0871fb79077c39a12be0a9bf5d65e494bbe55",
-    "sensitivity_kacker_okapuu/figures/reaction_aspect_ratio.svg": "a052cdf2ecc5df28094feb8aa5684be3e34bca42ba36ab4ae71d9e908a04cae1",
-    "sensitivity_benner/figures/reaction_aspect_ratio.svg": "1e076d4204fa66f0c62e8b9077ad0fcb5d9e9a959d0c604d26625ac00032c307",
-    "sensitivity_isentropic/figures/speed_r0_trailing_ratio.svg": "eb73f351185e1b43be720aca0150a53d8f95f4e456f140d7a51c5abecdcd24a4",
-    "sensitivity_kacker_okapuu/figures/speed_r0_trailing_ratio.svg": "3207f48a4c226f6493a90c426583aef5c2f53324b7d81a69d3cba5d39400d82d",
-    "sensitivity_benner/figures/speed_r0_trailing_ratio.svg": "1b0565618a2a9efde5f10073e649789be0542129dcc0f997ec2015cae1b8e66f",
-    "sensitivity_isentropic/figures/speed_r05_trailing_ratio.svg": "673abdea2b2b4c44f2122ee5d22f9c4b2dc5d8e05245acf38416e47508b49e87",
-    "sensitivity_kacker_okapuu/figures/speed_r05_trailing_ratio.svg": "f67e3c653857986baac8105f64bce4927ba9d97b5b3a9c4d7080cd2a3c521872",
-    "sensitivity_benner/figures/speed_r05_trailing_ratio.svg": "75bdc9d5e50c4f0235ca3e9c57e6a861d8ce3acf5aed264f5195bf02ffb35e41",
-    "sensitivity_isentropic/figures/reaction_trailing_ratio.svg": "279c7ced9c7e13e1f741aac53ad76af7cf80b8e3edaaa03278ff2030f1467406",
-    "sensitivity_kacker_okapuu/figures/reaction_trailing_ratio.svg": "360774c01cb90e0d118da57e1595c88bb762557689a870b959e0050d556fc0b7",
-    "sensitivity_benner/figures/reaction_trailing_ratio.svg": "346b63743bbb2f81bcb644d5269a741e236d348112c9fef4f25bde974e775f01",
-    "sensitivity_isentropic/figures/speed_r0_specific_speed.svg": "41e873f0fb06015a8835f3e2a4e6d1ded8b1579e87fce207cd4bbdb416c346a4",
-    "sensitivity_kacker_okapuu/figures/speed_r0_specific_speed.svg": "a0f40d30aaa8781dbaacc335defe8bd6e2ca296977d564a16b475c54022ed608",
-    "sensitivity_benner/figures/speed_r0_specific_speed.svg": "ea9aec73ca83d7786f50a71c45f0f7162daf83724dcbac24bbe214f97f8836a6",
-    "sensitivity_isentropic/figures/speed_r05_specific_speed.svg": "af027586bc5df02ae0418823e4d3fef73d9144d46513a7f63ab4acf360ba7843",
-    "sensitivity_kacker_okapuu/figures/speed_r05_specific_speed.svg": "385ddd06c9b369ad1a91e8ab51b8fbd3d85b999257242ed894c200715fa53f08",
-    "sensitivity_benner/figures/speed_r05_specific_speed.svg": "d124005c7e866fc84de39f79ab39df33708e5da81a48695c32da5c0fd6a675d8",
-    "sensitivity_isentropic/figures/reaction_specific_speed.svg": "6dd6e47af674609fe5f24b2c25e805db1c4c3b3087082c6443adec4fed16254e",
-    "sensitivity_kacker_okapuu/figures/reaction_specific_speed.svg": "8146f1f11a4d4915153e10fa6457c4ecf6458601990b7e259b01776cf9755010",
-    "sensitivity_benner/figures/reaction_specific_speed.svg": "7e94b4475dcc59c8d4f8fcf78fef03e2253c6dce57b4a7133f197644bf07a01f",
-    "sensitivity_isentropic/figures/speed_r0_mass_flow.svg": "60b690a01e9d24b17d1282da7922d3023a562a9fc0700aa4af68cc48ab0c6b4c",
-    "sensitivity_kacker_okapuu/figures/speed_r0_mass_flow.svg": "387a37bdce44d42862eb832ae7fdb0111f68a8fc15a119b829ab59bbb9e8b3a6",
-    "sensitivity_benner/figures/speed_r0_mass_flow.svg": "2cec2ebd4cfd23a7d5615b1384c8f23842dfb79afc4132881cb01d6b910e6b1b",
-    "sensitivity_isentropic/figures/speed_r05_mass_flow.svg": "20eb20e2541dc1e0b65376fe0f4af2b04fe15541feacca089056553d9c8def5e",
-    "sensitivity_kacker_okapuu/figures/speed_r05_mass_flow.svg": "466ab9ab276cd5a912be890d01e9f61231abc3b2a50c6d73fbd951c2d5a17754",
-    "sensitivity_benner/figures/speed_r05_mass_flow.svg": "1bd490773699a95d3f85c7d89830983b82f378c469fbfffab1360646a40e0821",
-    "sensitivity_isentropic/figures/reaction_mass_flow.svg": "876f840dd47dc73b6558f47bc7759c07ef68bc37e15b84b52e4c5a4c102aad48",
-    "sensitivity_kacker_okapuu/figures/reaction_mass_flow.svg": "4bab326a2219f1d6a9459a692c5998767eae16d756182ae7ea4ef5fdd88d4d2b",
-    "sensitivity_benner/figures/reaction_mass_flow.svg": "bf2a00f89b582ce94a58917667c33968424be42d8ff2e9931fe9f1d980786801",
-    "sensitivity_isentropic/figures/speed_r0_isentropic_mach.svg": "a081de10164d428cac477c9401e4699089f0923667c612043322177e127f4811",
-    "sensitivity_kacker_okapuu/figures/speed_r0_isentropic_mach.svg": "ad9817f34bdec0287b2d7f6b264a5a4e78b6ff4fdeddb62130bfaf27c1b4a394",
-    "sensitivity_benner/figures/speed_r0_isentropic_mach.svg": "60b9ab3a903f2e4ac911c7398f459813144e2f586940083ceff0ef7540610ba3",
-    "sensitivity_isentropic/figures/speed_r05_isentropic_mach.svg": "cad53e4fee8f23071dc0537a8cade12520dc79919ab1ef5a74151aab4b806391",
-    "sensitivity_kacker_okapuu/figures/speed_r05_isentropic_mach.svg": "e963254c81b149c39ab83e1dad7327634f8db82dc55fafe5d8f240046da77fb0",
-    "sensitivity_benner/figures/speed_r05_isentropic_mach.svg": "5ac8c5c66264417012ffc09be6ee0b3362ad5be1c0e6fc861386fea062d570e3",
-    "sensitivity_isentropic/figures/reaction_isentropic_mach.svg": "ab5f7826714302d9674746b2ea4e623fc4938d948a6925be44e99128a166cbbb",
-    "sensitivity_kacker_okapuu/figures/reaction_isentropic_mach.svg": "56242c99dc7d91a4cde0ba76768019813f2b1d3a09dd03651f83cf737070d052",
-    "sensitivity_benner/figures/reaction_isentropic_mach.svg": "efe34fb35968e46d9fe3d013065c005ef244a549ec8ff3c7efcb6b27867d18c4"
+    "sensitivity_isentropic/figures/speed_r0_stator_exit_angle.svg": "9f1d471182dabbe5a286647af8c7564398ea19dd98911cf5a0b4183f6c88fe0a",
+    "sensitivity_constant_loss/figures/speed_r0_stator_exit_angle.svg": "88bd028f64bb65509b88fc126e248f2148b3df25f854a853fc3dc02ac14d332a",
+    "sensitivity_kacker_okapuu/figures/speed_r0_stator_exit_angle.svg": "fa5642a1337d08188fa81cc7ab4974c94ec22f6ce3120a9a6644e6f0557e5d12",
+    "sensitivity_benner/figures/speed_r0_stator_exit_angle.svg": "5ffd1951f8c84c30b3671484c6b03e548b79892f204fabc8d35815cfbd735a4b",
+    "sensitivity_isentropic/figures/speed_r05_stator_exit_angle.svg": "ae1a35b06a07254a7c1ed9d4de3cd702fc2750f8a35ae502bbbbc59fea1714bf",
+    "sensitivity_constant_loss/figures/speed_r05_stator_exit_angle.svg": "9785f1ca0d7809eff4efa7efce03289fea64814935d9d413863fcb9935318663",
+    "sensitivity_kacker_okapuu/figures/speed_r05_stator_exit_angle.svg": "092dcaa22156e420da844c4f122ec2a5e9d5c0ffad39ea32f9b1ef35c11acaaa",
+    "sensitivity_benner/figures/speed_r05_stator_exit_angle.svg": "a681c5c45d3b4e76064f709c69b6a1e857dc07226b282364c8ceaee3fedb65a1",
+    "sensitivity_isentropic/figures/reaction_stator_exit_angle.svg": "3230ee5c330cc2b36bd0c5a2125bf20acd88bf7aed0f4835a1e420fa8b68b294",
+    "sensitivity_constant_loss/figures/reaction_stator_exit_angle.svg": "747852ed2c75bc26fe091b4c6630ccb5da18d7947b003e4454fdd4d43a649834",
+    "sensitivity_kacker_okapuu/figures/reaction_stator_exit_angle.svg": "42803fdb88709959b886e0cfbbd537bbe2f26bdead07638fa35a2b86606b925d",
+    "sensitivity_benner/figures/reaction_stator_exit_angle.svg": "a86281097ecd8d33059fefc07409f6f2cd18800d91d91c4d65227d936de11c8d",
+    "sensitivity_isentropic/figures/speed_r0_pitch_chord.svg": "a7d098c8e69d18bce69bde86c55e3bd5eb09cbed49344a7b869b6de594045c3b",
+    "sensitivity_constant_loss/figures/speed_r0_pitch_chord.svg": "5dda7d55dee6e6fc79fa095c90afb51befbf482ea89a6b8341c7dde521758547",
+    "sensitivity_kacker_okapuu/figures/speed_r0_pitch_chord.svg": "d74ae41ba90b3b66978cf747bd3f77b6348abea2a839dbdb23690b4557c705ca",
+    "sensitivity_benner/figures/speed_r0_pitch_chord.svg": "0335ab6291cf195771e880ffd8e2f53b742c9825c4667273f1f8d4abcecc3be8",
+    "sensitivity_isentropic/figures/speed_r05_pitch_chord.svg": "12c33b9441f9327d3c07cbd1c044629d8d0d2cc7cbec387cdf6ba7a57af80b2c",
+    "sensitivity_constant_loss/figures/speed_r05_pitch_chord.svg": "c39d977f8b754f2f105ce1752935d757d4d50c4eec8d0660176ec6252cebfc54",
+    "sensitivity_kacker_okapuu/figures/speed_r05_pitch_chord.svg": "2b4623020718c9eca11367fcffde4cb022284ad25b596e19c64d055c2ee36c7c",
+    "sensitivity_benner/figures/speed_r05_pitch_chord.svg": "0090b974f328eee2a11cea2a66d226f59fdc1274eb3faac9a4054095825d3d41",
+    "sensitivity_isentropic/figures/reaction_pitch_chord.svg": "204cc5267b2e3034d2a91d8164a638e79ee5006e27dc68153f9c3feaec45925d",
+    "sensitivity_constant_loss/figures/reaction_pitch_chord.svg": "fed1256a1f34c4233813bfb27c6ff4ac9bec43c0b3cee9943307c7d76cc531c3",
+    "sensitivity_kacker_okapuu/figures/reaction_pitch_chord.svg": "4e0ebe090982b6ee14c2b609cb40d36e94c2050a2f99972d00d5fe7f2a5314b9",
+    "sensitivity_benner/figures/reaction_pitch_chord.svg": "b9d6e7a4066e61e9ed6f06b523b4c15f92d6b9451ef8879805df67321ff4a1a0",
+    "sensitivity_isentropic/figures/speed_r0_aspect_ratio.svg": "9fb8f038527b76f0131530e99d44fabec53f2eeeaac6a8f9221d8f273aeaf2f1",
+    "sensitivity_constant_loss/figures/speed_r0_aspect_ratio.svg": "327bdcec71837db8872ba373c09d7973989767692814950f3fe14479bdfc2908",
+    "sensitivity_kacker_okapuu/figures/speed_r0_aspect_ratio.svg": "a7492a9bdff2ff1adacb12ac285d6397f5937ece5240f141355bba6b0863c30b",
+    "sensitivity_benner/figures/speed_r0_aspect_ratio.svg": "19ff3c60e72de9c86f56ed76cbec76d514d9c1a7dfd30791c202469a71267fac",
+    "sensitivity_isentropic/figures/speed_r05_aspect_ratio.svg": "d81066cf71a00b877116caf320c8fc9de3b499891ad015a33645ef7c857d622c",
+    "sensitivity_constant_loss/figures/speed_r05_aspect_ratio.svg": "ed97689363d12d9b89ed15f276d87b4a36afb3adb8b7b28dc6e8c6cc055fadef",
+    "sensitivity_kacker_okapuu/figures/speed_r05_aspect_ratio.svg": "c59946c7f97849ebbb0b48c37c5e5d86451e74c731261329ccf980fedf73a2a8",
+    "sensitivity_benner/figures/speed_r05_aspect_ratio.svg": "07d305e17a2b76af3bd5633f04ca6972e3afdee9985068a65f1e2dcd04621f4e",
+    "sensitivity_isentropic/figures/reaction_aspect_ratio.svg": "621d5532e183a830a00839562fc8898dc8f0d9e3c2bb4cb69c94786c2786d3b1",
+    "sensitivity_constant_loss/figures/reaction_aspect_ratio.svg": "6628de5fdde7b727d6f0580f6c187f274bac383d81318b2ae4092f8b1dd8d0d6",
+    "sensitivity_kacker_okapuu/figures/reaction_aspect_ratio.svg": "7a6718082dc2c47509eaf0245011d6ad8e25dcccff079178d5cee4f23b91c9fe",
+    "sensitivity_benner/figures/reaction_aspect_ratio.svg": "ce6cf8028d3107bfff68e8ab6216afb2032f3304ec246d16b9b8722460692a62",
+    "sensitivity_isentropic/figures/speed_r0_trailing_ratio.svg": "0841479e64a8df6086d6ad46197279875da7d4086ff61f35d42ad1c3dcf1c3c4",
+    "sensitivity_constant_loss/figures/speed_r0_trailing_ratio.svg": "0869907cd87a0710a9d38c72672c958ea51767b7e70dd8e28518b4c04db7b0c6",
+    "sensitivity_kacker_okapuu/figures/speed_r0_trailing_ratio.svg": "3013e70378a79fd6a9e51d3b49a33dfc33dcf7cddd2568848d9fb4df73cbb423",
+    "sensitivity_benner/figures/speed_r0_trailing_ratio.svg": "3b0f29e55b240476bc8ab2420a1fe843ef2cffc30e3e3f04dfef207fa93b5c23",
+    "sensitivity_isentropic/figures/speed_r05_trailing_ratio.svg": "f62d738d31f00345e842bddb0002cc43d4c4d7577bf3f01c075abb72f6c30ef6",
+    "sensitivity_constant_loss/figures/speed_r05_trailing_ratio.svg": "cfa4d0b6b81f3a0a464b82010806c6fd4c18b9a341e5fc671033f4301b7eb645",
+    "sensitivity_kacker_okapuu/figures/speed_r05_trailing_ratio.svg": "bc2be095ab7ca2207bc4d74190d3e288320518737f07256509531b803c5710fc",
+    "sensitivity_benner/figures/speed_r05_trailing_ratio.svg": "a130b780273fbb64235b377e439178cc91585be9b5533304123cfd1a33ee3c27",
+    "sensitivity_isentropic/figures/reaction_trailing_ratio.svg": "d5f69d9f22a73d12aa81d1f1230690acf37ccd7e482bcfd685e68d2af47b5f0c",
+    "sensitivity_constant_loss/figures/reaction_trailing_ratio.svg": "a1a6d881535ea41a94c879a7b5de6dce05bb99f6563fa4b866054bb4e191567d",
+    "sensitivity_kacker_okapuu/figures/reaction_trailing_ratio.svg": "87dec05230c7566ae14513677d2e284296d79868ad9aede51bb613d690503fe4",
+    "sensitivity_benner/figures/reaction_trailing_ratio.svg": "608ffa898987a35f2170f4d5bd02a359d59e3f232fc0b8c9e487b7b65af965c9",
+    "sensitivity_isentropic/figures/speed_r0_specific_speed.svg": "66da1a9e7bd550d20711323336ea3f8fc14ed3a5f06adfe6f5559cbf941f9a36",
+    "sensitivity_constant_loss/figures/speed_r0_specific_speed.svg": "341a6f4b3bffe97f70be5cb0d39193b4b07fa721c78b6e8a836028c629dc4529",
+    "sensitivity_kacker_okapuu/figures/speed_r0_specific_speed.svg": "4298fdedd3c688ab7a1cf5cff79d13cf260487e5f5ea0f024b1887edb14962de",
+    "sensitivity_benner/figures/speed_r0_specific_speed.svg": "e64d8cf918f5619df1147058187e564d56ee2d3934b0ffc6b130f7af83d781ad",
+    "sensitivity_isentropic/figures/speed_r05_specific_speed.svg": "e0e2ca89cfced62b17dd0869490239cd5cbcfe1010c51048f98a16abaac5304a",
+    "sensitivity_constant_loss/figures/speed_r05_specific_speed.svg": "badad3ee92581ee45f47a50a709d8e0e8d6a4090e087efb5ebdf4a2e09243926",
+    "sensitivity_kacker_okapuu/figures/speed_r05_specific_speed.svg": "5c3be96a38de00238b03e09761e6d9419522a5c6b28fcc8985df182bcdcb270b",
+    "sensitivity_benner/figures/speed_r05_specific_speed.svg": "0f8632b0216fb248f80010ecf546b492f91f68d12f73a16d766981f961bdec10",
+    "sensitivity_isentropic/figures/reaction_specific_speed.svg": "3ff78c1970c0600caab71a6f7968040a14e703d6a2493ecf8b4779b9cb108350",
+    "sensitivity_constant_loss/figures/reaction_specific_speed.svg": "16843648f8efc7fda46c30a7df0552c4841e01266e9753fe8d3bd126565f051d",
+    "sensitivity_kacker_okapuu/figures/reaction_specific_speed.svg": "3cccd8132702ac0b78b1dc3154c74bc9aa4f4f1be05f42f778293089b0741383",
+    "sensitivity_benner/figures/reaction_specific_speed.svg": "0f78c9bfe70778a8e1cd4a49faed34b16c358a90d3cf2b6cf656a3adee2b93e0",
+    "sensitivity_isentropic/figures/speed_r0_mass_flow.svg": "b48f17cd827e52bbcc1ac00d64f80d66da3601fc25aef5e4f4e7b0c99e5d2897",
+    "sensitivity_constant_loss/figures/speed_r0_mass_flow.svg": "0b354127c4aafd9eb9bd8543ba66da9893b4e1f80c3c8c5f798fdec7a9ea716b",
+    "sensitivity_kacker_okapuu/figures/speed_r0_mass_flow.svg": "5726bd1562012582741fadfb698ded655f2346177be5d4229879b8a135709ea5",
+    "sensitivity_benner/figures/speed_r0_mass_flow.svg": "18e5a49c64d267e5894d82eeecc0537934b4b4293a9ae997a7ec97e2cf5ef1c3",
+    "sensitivity_isentropic/figures/speed_r05_mass_flow.svg": "1dbbc879cfecb0e115418bd030758e8554fb641cd47e5f37f127cac3750a404b",
+    "sensitivity_constant_loss/figures/speed_r05_mass_flow.svg": "a94e6eb41df351a49c25e692c961c97a2806d9257aa4eba77fe0a68e8e5cc50d",
+    "sensitivity_kacker_okapuu/figures/speed_r05_mass_flow.svg": "0eb1590b0b26067668c4dbae6bb6db1d7cf325b7cd6104fa8b3f1fddc614533c",
+    "sensitivity_benner/figures/speed_r05_mass_flow.svg": "d8a4148762f6cb02fe4c5b9012bcdcee168d0dd9fd7977a93b568ca1628efdf6",
+    "sensitivity_isentropic/figures/reaction_mass_flow.svg": "67c6f2689f92c66db1c9172417dbc673f2df4f785632f9cd0d5f2325dc8956b4",
+    "sensitivity_constant_loss/figures/reaction_mass_flow.svg": "6a1ef16b4568d94714a236de0a556a1344eafeb30ce732f2c54c22bbe6fec88b",
+    "sensitivity_kacker_okapuu/figures/reaction_mass_flow.svg": "6932bd65e00db63ff50e353e760afcab200005a9b898274e00dfc75201b4f544",
+    "sensitivity_benner/figures/reaction_mass_flow.svg": "a9e61ec7f5387231daa0cd197a090e7264736bd35897bc0c9633636f07074101",
+    "sensitivity_isentropic/figures/speed_r0_isentropic_mach.svg": "477744d432b6bb5da2a6f71c7579f7d84499cafa2b409f60e71e813861dd93b1",
+    "sensitivity_constant_loss/figures/speed_r0_isentropic_mach.svg": "15b11c89db32c1ab9a575c8650ca842711285155b77b7ad4d4e25567452474d3",
+    "sensitivity_kacker_okapuu/figures/speed_r0_isentropic_mach.svg": "ec57acf5de4b00f07c25e37b1ed2fafdd0ddefd02e892013da755f0c40e46fa3",
+    "sensitivity_benner/figures/speed_r0_isentropic_mach.svg": "7ff0fef959e9615f49827cbecd146564067b66e557cba111f96df685a13de3b8",
+    "sensitivity_isentropic/figures/speed_r05_isentropic_mach.svg": "3292d8ebe5302639a4645a7a952a67641e599fa96b3e0eacb7d22effa28413de",
+    "sensitivity_constant_loss/figures/speed_r05_isentropic_mach.svg": "7b084cbd610b312246f22ea1a9cb1013aa43ca42026658ca6d7275366a09751f",
+    "sensitivity_kacker_okapuu/figures/speed_r05_isentropic_mach.svg": "49269e5b782cee17fd21921132d58ec101281a647cbe6fd2491ed11adc1808a0",
+    "sensitivity_benner/figures/speed_r05_isentropic_mach.svg": "8e8770cf268be17a513b5151d39c2acfb61287e5c0c6b097abc7aaddaa284861",
+    "sensitivity_isentropic/figures/reaction_isentropic_mach.svg": "a3898a092ee41f52c77ad1aadc574c671dc0cd7867082751caf96d3d8ec58ecd",
+    "sensitivity_constant_loss/figures/reaction_isentropic_mach.svg": "5bb7c1a970b970d1b115ab26e78add06b0cfe29b78a4d474e0e3dc0cf119d859",
+    "sensitivity_kacker_okapuu/figures/reaction_isentropic_mach.svg": "32b1cc16b771cbe2030ca4b0433fba11437a6ca55dd951633f4fe0b8f7524653",
+    "sensitivity_benner/figures/reaction_isentropic_mach.svg": "334a75a8f394796941a44631deba0e2e660b0d8401dfac4b19d96938c1797c10"
   },
   "data_sha256": {
     "../sensitivity_kacker_okapuu/data/kacker_okapuu.csv.gz": "dc45229f4b251ac4fc5084dd6fdb34d046b4d8bd178439ce0ebd7c712b6dfd0a",
     "../sensitivity_benner/data/benner.csv.gz": "8a7b5512c4296b9417dcd29f387b3bf2ce6aea2744bbebe307dd049adcf8841a",
-    "../sensitivity_isentropic/data/isentropic.csv.gz": "f65d5f0d6f6abe53caf86fe7759ff79c9113c7780d6ff0d60c7537197cff286c"
+    "../sensitivity_isentropic/data/isentropic.csv.gz": "f65d5f0d6f6abe53caf86fe7759ff79c9113c7780d6ff0d60c7537197cff286c",
+    "../sensitivity_constant_loss/data/constant_loss.csv.gz": "27f541b2f5f686c359b7d536c833e6729bc193ea5f2e9c7fe24799c5205cb0e0"
   },
-  "report_sha256": "ab9a585b2b464acdcdbde08f238541118906978dd87d5358f61b2481a5ded815",
-  "report_script_sha256": "f51bb54056776ca61c06c55dc18e038db64b974b406f7aa083d48e2aac0edfcc",
+  "report_sha256": "924211c1f0d13b67d2def62105d1bb51a3c1e2e3f6c0bc08f8bc1ec9a2862ba8",
+  "report_script_sha256": "9f382e1bbe36ed5c0c409ac03d76168334189017391739e48037490689eeb2b6",
   "section_inventory": [
     {
       "heading": "Stator exit angle: Blade velocity ratio at $R=0$",
       "sweep": "speed_r0",
       "parameter": "stator_exit_angle",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/speed_r0_stator_exit_angle.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/speed_r0_stator_exit_angle.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/speed_r0_stator_exit_angle.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/speed_r0_stator_exit_angle.svg"
         }
       ]
@@ -108,17 +154,29 @@
       "heading": "Stator exit angle: Blade velocity ratio at $R=0.5$",
       "sweep": "speed_r05",
       "parameter": "stator_exit_angle",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/speed_r05_stator_exit_angle.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/speed_r05_stator_exit_angle.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/speed_r05_stator_exit_angle.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/speed_r05_stator_exit_angle.svg"
         }
       ]
@@ -127,17 +185,29 @@
       "heading": "Stator exit angle: Reaction at $U/c_0=0.6$",
       "sweep": "reaction",
       "parameter": "stator_exit_angle",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/reaction_stator_exit_angle.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/reaction_stator_exit_angle.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/reaction_stator_exit_angle.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/reaction_stator_exit_angle.svg"
         }
       ]
@@ -146,17 +216,29 @@
       "heading": "Pitch / true chord: Blade velocity ratio at $R=0$",
       "sweep": "speed_r0",
       "parameter": "pitch_chord",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/speed_r0_pitch_chord.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/speed_r0_pitch_chord.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/speed_r0_pitch_chord.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/speed_r0_pitch_chord.svg"
         }
       ]
@@ -165,17 +247,29 @@
       "heading": "Pitch / true chord: Blade velocity ratio at $R=0.5$",
       "sweep": "speed_r05",
       "parameter": "pitch_chord",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/speed_r05_pitch_chord.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/speed_r05_pitch_chord.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/speed_r05_pitch_chord.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/speed_r05_pitch_chord.svg"
         }
       ]
@@ -184,17 +278,29 @@
       "heading": "Pitch / true chord: Reaction at $U/c_0=0.6$",
       "sweep": "reaction",
       "parameter": "pitch_chord",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/reaction_pitch_chord.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/reaction_pitch_chord.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/reaction_pitch_chord.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/reaction_pitch_chord.svg"
         }
       ]
@@ -203,17 +309,29 @@
       "heading": "Blade aspect ratio: Blade velocity ratio at $R=0$",
       "sweep": "speed_r0",
       "parameter": "aspect_ratio",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/speed_r0_aspect_ratio.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/speed_r0_aspect_ratio.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/speed_r0_aspect_ratio.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/speed_r0_aspect_ratio.svg"
         }
       ]
@@ -222,17 +340,29 @@
       "heading": "Blade aspect ratio: Blade velocity ratio at $R=0.5$",
       "sweep": "speed_r05",
       "parameter": "aspect_ratio",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/speed_r05_aspect_ratio.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/speed_r05_aspect_ratio.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/speed_r05_aspect_ratio.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/speed_r05_aspect_ratio.svg"
         }
       ]
@@ -241,17 +371,29 @@
       "heading": "Blade aspect ratio: Reaction at $U/c_0=0.6$",
       "sweep": "reaction",
       "parameter": "aspect_ratio",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/reaction_aspect_ratio.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/reaction_aspect_ratio.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/reaction_aspect_ratio.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/reaction_aspect_ratio.svg"
         }
       ]
@@ -260,17 +402,29 @@
       "heading": "Trailing-edge thickness / opening: Blade velocity ratio at $R=0$",
       "sweep": "speed_r0",
       "parameter": "trailing_ratio",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/speed_r0_trailing_ratio.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/speed_r0_trailing_ratio.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/speed_r0_trailing_ratio.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/speed_r0_trailing_ratio.svg"
         }
       ]
@@ -279,17 +433,29 @@
       "heading": "Trailing-edge thickness / opening: Blade velocity ratio at $R=0.5$",
       "sweep": "speed_r05",
       "parameter": "trailing_ratio",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/speed_r05_trailing_ratio.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/speed_r05_trailing_ratio.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/speed_r05_trailing_ratio.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/speed_r05_trailing_ratio.svg"
         }
       ]
@@ -298,17 +464,29 @@
       "heading": "Trailing-edge thickness / opening: Reaction at $U/c_0=0.6$",
       "sweep": "reaction",
       "parameter": "trailing_ratio",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/reaction_trailing_ratio.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/reaction_trailing_ratio.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/reaction_trailing_ratio.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/reaction_trailing_ratio.svg"
         }
       ]
@@ -317,17 +495,29 @@
       "heading": "Specific speed: Blade velocity ratio at $R=0$",
       "sweep": "speed_r0",
       "parameter": "specific_speed",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/speed_r0_specific_speed.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/speed_r0_specific_speed.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/speed_r0_specific_speed.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/speed_r0_specific_speed.svg"
         }
       ]
@@ -336,17 +526,29 @@
       "heading": "Specific speed: Blade velocity ratio at $R=0.5$",
       "sweep": "speed_r05",
       "parameter": "specific_speed",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/speed_r05_specific_speed.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/speed_r05_specific_speed.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/speed_r05_specific_speed.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/speed_r05_specific_speed.svg"
         }
       ]
@@ -355,17 +557,29 @@
       "heading": "Specific speed: Reaction at $U/c_0=0.6$",
       "sweep": "reaction",
       "parameter": "specific_speed",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/reaction_specific_speed.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/reaction_specific_speed.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/reaction_specific_speed.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/reaction_specific_speed.svg"
         }
       ]
@@ -374,17 +588,29 @@
       "heading": "Mass flow: Blade velocity ratio at $R=0$",
       "sweep": "speed_r0",
       "parameter": "mass_flow",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/speed_r0_mass_flow.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/speed_r0_mass_flow.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/speed_r0_mass_flow.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/speed_r0_mass_flow.svg"
         }
       ]
@@ -393,17 +619,29 @@
       "heading": "Mass flow: Blade velocity ratio at $R=0.5$",
       "sweep": "speed_r05",
       "parameter": "mass_flow",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/speed_r05_mass_flow.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/speed_r05_mass_flow.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/speed_r05_mass_flow.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/speed_r05_mass_flow.svg"
         }
       ]
@@ -412,17 +650,29 @@
       "heading": "Mass flow: Reaction at $U/c_0=0.6$",
       "sweep": "reaction",
       "parameter": "mass_flow",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/reaction_mass_flow.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/reaction_mass_flow.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/reaction_mass_flow.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/reaction_mass_flow.svg"
         }
       ]
@@ -431,17 +681,29 @@
       "heading": "Isentropic expansion Mach number: Blade velocity ratio at $R=0$",
       "sweep": "speed_r0",
       "parameter": "isentropic_mach",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/speed_r0_isentropic_mach.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/speed_r0_isentropic_mach.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/speed_r0_isentropic_mach.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/speed_r0_isentropic_mach.svg"
         }
       ]
@@ -450,17 +712,29 @@
       "heading": "Isentropic expansion Mach number: Blade velocity ratio at $R=0.5$",
       "sweep": "speed_r05",
       "parameter": "isentropic_mach",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/speed_r05_isentropic_mach.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/speed_r05_isentropic_mach.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/speed_r05_isentropic_mach.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/speed_r05_isentropic_mach.svg"
         }
       ]
@@ -469,21 +743,33 @@
       "heading": "Isentropic expansion Mach number: Reaction at $U/c_0=0.6$",
       "sweep": "reaction",
       "parameter": "isentropic_mach",
-      "columns": [
+      "panels": [
         {
           "model": "isentropic",
+          "row": 1,
+          "column": 1,
           "svg": "sensitivity_isentropic/figures/reaction_isentropic_mach.svg"
         },
         {
+          "model": "constant_loss",
+          "row": 1,
+          "column": 2,
+          "svg": "sensitivity_constant_loss/figures/reaction_isentropic_mach.svg"
+        },
+        {
           "model": "kacker_okapuu",
+          "row": 2,
+          "column": 1,
           "svg": "sensitivity_kacker_okapuu/figures/reaction_isentropic_mach.svg"
         },
         {
           "model": "benner",
+          "row": 2,
+          "column": 2,
           "svg": "sensitivity_benner/figures/reaction_isentropic_mach.svg"
         }
       ]
     }
   ],
-  "checked_links": 131
+  "checked_links": 174
 }

@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "scientific_checks": {
+    "mass_flow_similarity": "radius, chord and Reynolds scale as sqrt(mass flow); rpm scales inversely",
+    "negative_hub_retained": "signed hub radii are evaluated with the shared continued loss coordinate",
+    "zero_loss": "zero Y gives exactly zero row enthalpy defect and eta_tt=1",
+    "pressure_enthalpy_roundtrip": "EOS pressure-loss coefficient recovered from the calculated enthalpy defect",
+    "mach_boundary": "isentropic expansion Mach reproduced by the Air EOS",
+    "per_design": "Euler work, prescribed reaction, exit enthalpy, and all three physical geometry ratios checked",
+    "isentropic": {
+      "all_row_components_zero": true,
+      "eta_tt_exactly_one": true,
+      "eta_ts_equals_one_minus_exit_kinetic_energy": true,
+      "maximum_inactive_parameter_eta_ts_spread": 7.771561172376096e-16
+    },
+    "constant_loss": {
+      "production_model": "custom",
+      "row_pressure_loss_coefficients": {
+        "stator": 0.1,
+        "rotor": 0.1
+      },
+      "empirical_components_zero": true,
+      "negative_hub_designs_retained": true,
+      "inactive_parameters": [
+        "pitch_chord",
+        "aspect_ratio",
+        "trailing_ratio",
+        "specific_speed",
+        "mass_flow"
+      ],
+      "maximum_inactive_parameter_efficiency_spread": 0.0
+    }
+  },
+  "signed_efficiency_identity": true,
+  "negative_efficiencies_retained": true,
+  "negative_hub_radii_retained": true,
+  "raw_failed_samples_retained": true,
+  "unexpected_failures": 0,
+  "source_unchanged": true
+}

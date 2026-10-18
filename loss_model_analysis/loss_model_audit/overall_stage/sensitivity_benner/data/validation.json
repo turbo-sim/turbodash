@@ -12,6 +12,23 @@
       "eta_tt_exactly_one": true,
       "eta_ts_equals_one_minus_exit_kinetic_energy": true,
       "maximum_inactive_parameter_eta_ts_spread": 7.771561172376096e-16
+    },
+    "constant_loss": {
+      "production_model": "custom",
+      "row_pressure_loss_coefficients": {
+        "stator": 0.1,
+        "rotor": 0.1
+      },
+      "empirical_components_zero": true,
+      "negative_hub_designs_retained": true,
+      "inactive_parameters": [
+        "pitch_chord",
+        "aspect_ratio",
+        "trailing_ratio",
+        "specific_speed",
+        "mass_flow"
+      ],
+      "maximum_inactive_parameter_efficiency_spread": 0.0
     }
   },
   "signed_efficiency_identity": true,

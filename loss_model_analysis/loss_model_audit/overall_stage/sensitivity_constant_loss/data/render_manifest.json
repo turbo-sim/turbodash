@@ -1,0 +1,36 @@
+{
+  "figures": 21,
+  "figure_sha256": {
+    "figures/speed_r0_stator_exit_angle.svg": "88bd028f64bb65509b88fc126e248f2148b3df25f854a853fc3dc02ac14d332a",
+    "figures/speed_r05_stator_exit_angle.svg": "9785f1ca0d7809eff4efa7efce03289fea64814935d9d413863fcb9935318663",
+    "figures/reaction_stator_exit_angle.svg": "747852ed2c75bc26fe091b4c6630ccb5da18d7947b003e4454fdd4d43a649834",
+    "figures/speed_r0_pitch_chord.svg": "5dda7d55dee6e6fc79fa095c90afb51befbf482ea89a6b8341c7dde521758547",
+    "figures/speed_r05_pitch_chord.svg": "c39d977f8b754f2f105ce1752935d757d4d50c4eec8d0660176ec6252cebfc54",
+    "figures/reaction_pitch_chord.svg": "fed1256a1f34c4233813bfb27c6ff4ac9bec43c0b3cee9943307c7d76cc531c3",
+    "figures/speed_r0_aspect_ratio.svg": "327bdcec71837db8872ba373c09d7973989767692814950f3fe14479bdfc2908",
+    "figures/speed_r05_aspect_ratio.svg": "ed97689363d12d9b89ed15f276d87b4a36afb3adb8b7b28dc6e8c6cc055fadef",
+    "figures/reaction_aspect_ratio.svg": "6628de5fdde7b727d6f0580f6c187f274bac383d81318b2ae4092f8b1dd8d0d6",
+    "figures/speed_r0_trailing_ratio.svg": "0869907cd87a0710a9d38c72672c958ea51767b7e70dd8e28518b4c04db7b0c6",
+    "figures/speed_r05_trailing_ratio.svg": "cfa4d0b6b81f3a0a464b82010806c6fd4c18b9a341e5fc671033f4301b7eb645",
+    "figures/reaction_trailing_ratio.svg": "a1a6d881535ea41a94c879a7b5de6dce05bb99f6563fa4b866054bb4e191567d",
+    "figures/speed_r0_specific_speed.svg": "341a6f4b3bffe97f70be5cb0d39193b4b07fa721c78b6e8a836028c629dc4529",
+    "figures/speed_r05_specific_speed.svg": "badad3ee92581ee45f47a50a709d8e0e8d6a4090e087efb5ebdf4a2e09243926",
+    "figures/reaction_specific_speed.svg": "16843648f8efc7fda46c30a7df0552c4841e01266e9753fe8d3bd126565f051d",
+    "figures/speed_r0_mass_flow.svg": "0b354127c4aafd9eb9bd8543ba66da9893b4e1f80c3c8c5f798fdec7a9ea716b",
+    "figures/speed_r05_mass_flow.svg": "a94e6eb41df351a49c25e692c961c97a2806d9257aa4eba77fe0a68e8e5cc50d",
+    "figures/reaction_mass_flow.svg": "6a1ef16b4568d94714a236de0a556a1344eafeb30ce732f2c54c22bbe6fec88b",
+    "figures/speed_r0_isentropic_mach.svg": "15b11c89db32c1ab9a575c8650ca842711285155b77b7ad4d4e25567452474d3",
+    "figures/speed_r05_isentropic_mach.svg": "7b084cbd610b312246f22ea1a9cb1013aa43ca42026658ca6d7275366a09751f",
+    "figures/reaction_isentropic_mach.svg": "5bb7c1a970b970d1b115ab26e78add06b0cfe29b78a4d474e0e3dc0cf119d859"
+  },
+  "report_sha256": "4ca1f91e83e48e7a6382c56ab3e6fb2b581349390f823e93a56cc47988215bb3",
+  "report_script_sha256": "9f382e1bbe36ed5c0c409ac03d76168334189017391739e48037490689eeb2b6",
+  "hub_ratio_markers": false,
+  "physical_turning": false,
+  "physical_secondary_projection": false,
+  "mean_secant_onset_degrees": null,
+  "mean_secant_limit_degrees": null,
+  "data_sha256": {
+    "constant_loss.csv.gz": "27f541b2f5f686c359b7d536c833e6729bc193ea5f2e9c7fe24799c5205cb0e0"
+  }
+}

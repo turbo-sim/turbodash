@@ -1,0 +1,73 @@
+{
+  "cap_start": 0.25,
+  "ceiling": 0.5,
+  "method": "C2 identity-preserving saturation, stable algebra at zero spacing",
+  "families": {
+    "nozzle": {
+      "angle_range": [
+        40.0,
+        80.0
+      ],
+      "spacing_range": [
+        0.0,
+        3.0
+      ],
+      "bounded_range": [
+        0.01849627719883325,
+        0.5
+      ],
+      "raw_at_three_range": [
+        0.2977873184146797,
+        0.8555808623160691
+      ],
+      "raw_at_zero": "unbounded positive limit",
+      "bounded_at_zero": 0.5,
+      "aungier_range": [
+        -0.05436246170276782,
+        0.8306005457829099
+      ],
+      "saturation_effect_on_digitized_points": 1.3877787807814457e-17,
+      "maximum_raw_loss_at_digitized_points": 0.07012060444026672,
+      "bounded_fit_metrics": {
+        "rmse": 0.0008868396708574761,
+        "mae": 0.000645134922045591,
+        "max_abs": 0.004053763184640985,
+        "relative_rmse_percent": 2.1732269375566755,
+        "tolerance_scaled_rmse": 1.1294959603511983
+      }
+    },
+    "impulse": {
+      "angle_range": [
+        40.0,
+        70.0
+      ],
+      "spacing_range": [
+        0.0,
+        3.0
+      ],
+      "bounded_range": [
+        0.06629577527207169,
+        0.5
+      ],
+      "raw_at_three_range": [
+        0.6762840661560214,
+        1.0096118149593936
+      ],
+      "raw_at_zero": "unbounded positive limit",
+      "bounded_at_zero": 0.5,
+      "aungier_range": [
+        -4.139781537837457,
+        0.341812261685697
+      ],
+      "saturation_effect_on_digitized_points": 2.7755575615628914e-17,
+      "maximum_raw_loss_at_digitized_points": 0.1911027437881523,
+      "bounded_fit_metrics": {
+        "rmse": 0.0010438811449270662,
+        "mae": 0.0008182775397381168,
+        "max_abs": 0.003472431293855466,
+        "relative_rmse_percent": 0.9026260304464198,
+        "tolerance_scaled_rmse": 2.375024593558956
+      }
+    }
+  }
+}

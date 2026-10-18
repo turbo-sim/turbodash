@@ -1,0 +1,1512 @@
+{
+  "all_checks_passed": true,
+  "check_count": 68,
+  "checks": [
+    {
+      "name": "runtime_uses_only_numpy_and_literal_coefficients",
+      "passed": true,
+      "imports": [
+        "numpy"
+      ],
+      "calls": [
+        "ValueError",
+        "_softplus",
+        "_terms",
+        "np.any",
+        "np.asarray",
+        "np.exp",
+        "np.log",
+        "np.maximum",
+        "np.polynomial.polynomial.polyval",
+        "np.real",
+        "np.sqrt",
+        "np.where",
+        "profile_loss"
+      ],
+      "unsupported_calls": [],
+      "literal_coefficients": true
+    },
+    {
+      "name": "protected_production_sources_unchanged",
+      "passed": true,
+      "files": {
+        "turbodash/loss_models/loss_coefficient_conversion.py": {
+          "original_sha256": "21ffa896097129972ec2130ba6cf54377fc6726ba5960d73c8fd40cd90454309",
+          "current_sha256": "21ffa896097129972ec2130ba6cf54377fc6726ba5960d73c8fd40cd90454309",
+          "authorized_candidate_change": false,
+          "original_unchanged": true,
+          "expected_hash_matches": true
+        },
+        "turbodash/loss_models/loss_model.py": {
+          "original_sha256": "156fbe3b0a9510b760f32e73b39c09533edf8e3e4798df9cdb08cd32f905a3e4",
+          "current_sha256": "156fbe3b0a9510b760f32e73b39c09533edf8e3e4798df9cdb08cd32f905a3e4",
+          "authorized_candidate_change": false,
+          "original_unchanged": true,
+          "expected_hash_matches": true
+        },
+        "turbodash/loss_models/loss_model_benner.py": {
+          "original_sha256": "ce5e2aae37a04718c0ad8b6801b67be2e7824fdacd407affcb00e279ff46d649",
+          "current_sha256": "ce5e2aae37a04718c0ad8b6801b67be2e7824fdacd407affcb00e279ff46d649",
+          "authorized_candidate_change": false,
+          "original_unchanged": true,
+          "expected_hash_matches": true
+        },
+        "turbodash/loss_models/loss_model_kacker_okapuu.py": {
+          "original_sha256": "197794ed5736c997b865e43860ffeccdaf4dfd21dbc2f99b2191f4a28abab28d",
+          "current_sha256": "197794ed5736c997b865e43860ffeccdaf4dfd21dbc2f99b2191f4a28abab28d",
+          "authorized_candidate_change": false,
+          "original_unchanged": true,
+          "expected_hash_matches": true
+        },
+        "turbodash/loss_models/loss_model_moustapha.py": {
+          "original_sha256": "9918fc36bf9e3ed59d65256332d21780f0baff6ade302e8ee49c342e31b1d762",
+          "current_sha256": "9918fc36bf9e3ed59d65256332d21780f0baff6ade302e8ee49c342e31b1d762",
+          "authorized_candidate_change": false,
+          "original_unchanged": true,
+          "expected_hash_matches": true
+        },
+        "turbodash/loss_models/__init__.py": {
+          "original_sha256": "225e50f404dd5fcc97a95c6d3ff9d8a94844c73c4f0bfaa4fd65d0ff88747b18",
+          "current_sha256": "225e50f404dd5fcc97a95c6d3ff9d8a94844c73c4f0bfaa4fd65d0ff88747b18",
+          "authorized_candidate_change": false,
+          "original_unchanged": true,
+          "expected_hash_matches": true
+        },
+        "turbodash/loss_models_new/loss_coefficient_conversion.py": {
+          "original_sha256": "eab232ff2304b104726b2b3af4a87c96c65f302903e807ea9dd3dc2db827ae98",
+          "current_sha256": "eab232ff2304b104726b2b3af4a87c96c65f302903e807ea9dd3dc2db827ae98",
+          "authorized_candidate_change": false,
+          "original_unchanged": true,
+          "expected_hash_matches": true
+        },
+        "turbodash/loss_models_new/loss_model.py": {
+          "original_sha256": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11",
+          "current_sha256": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11",
+          "authorized_candidate_change": false,
+          "original_unchanged": true,
+          "expected_hash_matches": true
+        },
+        "turbodash/loss_models_new/loss_model_benner.py": {
+          "original_sha256": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba",
+          "current_sha256": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba",
+          "authorized_candidate_change": false,
+          "original_unchanged": true,
+          "expected_hash_matches": true
+        },
+        "turbodash/loss_models_new/loss_model_moustapha.py": {
+          "original_sha256": "923339d879bb7edf952112296b605073d9c5f466e541ea04b3ce10f3f8e1f489",
+          "current_sha256": "923339d879bb7edf952112296b605073d9c5f466e541ea04b3ce10f3f8e1f489",
+          "authorized_candidate_change": false,
+          "original_unchanged": true,
+          "expected_hash_matches": true
+        },
+        "turbodash/loss_models_new/_backend.py": {
+          "original_sha256": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
+          "current_sha256": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
+          "authorized_candidate_change": false,
+          "original_unchanged": true,
+          "expected_hash_matches": true
+        },
+        "turbodash/loss_models_new/_numerics.py": {
+          "original_sha256": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff",
+          "current_sha256": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff",
+          "authorized_candidate_change": false,
+          "original_unchanged": true,
+          "expected_hash_matches": true
+        },
+        "turbodash/loss_models_new/__init__.py": {
+          "original_sha256": "5b9d3bc6706ab907bf8314428b244132feb46cf2754de33ba2e0d8f7676593a3",
+          "current_sha256": "5b9d3bc6706ab907bf8314428b244132feb46cf2754de33ba2e0d8f7676593a3",
+          "authorized_candidate_change": false,
+          "original_unchanged": true,
+          "expected_hash_matches": true
+        },
+        "turbodash/math.py": {
+          "original_sha256": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
+          "current_sha256": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
+          "authorized_candidate_change": false,
+          "original_unchanged": true,
+          "expected_hash_matches": true
+        }
+      }
+    },
+    {
+      "name": "authorized_candidate_integration_hashes",
+      "passed": true,
+      "files": {
+        "turbodash/loss_models_new/loss_model_kacker_okapuu.py": {
+          "original_sha256": "f75083e50008952dac5ffc7c9867dde4fbe620d9866c043ce2ea4c22a80894bc",
+          "current_sha256": "3b6876f0be6cb53388288a53a58089c413b1032512407fd8353339ea0f286f66",
+          "authorized_candidate_change": true,
+          "original_unchanged": false,
+          "expected_hash_matches": true
+        }
+      },
+      "original_provenance": "data/provenance.json retains all original production_before hashes"
+    },
+    {
+      "name": "original_pdf_hash",
+      "passed": true
+    },
+    {
+      "name": "nozzle_digitization_source_hash",
+      "passed": true
+    },
+    {
+      "name": "impulse_digitization_source_hash",
+      "passed": true
+    },
+    {
+      "name": "calculation_and_export_source_hashes_current",
+      "passed": true,
+      "files": {
+        "analytic_fits.py": true,
+        "digitize_impulse.py": true,
+        "digitize_nozzle.py": true,
+        "extrapolation_fit.py": true,
+        "fit_models.py": true,
+        "plot_comparisons.py": true,
+        "run.py": true,
+        "verify.py": true,
+        "data/impulse_points.csv": true,
+        "data/nozzle_points.csv": true
+      }
+    },
+    {
+      "name": "nozzle_digitized_points_valid",
+      "passed": true,
+      "point_count": 163,
+      "angle_limits": [
+        40.0,
+        80.0
+      ],
+      "pitch_chord_range": [
+        0.30023297954957284,
+        1.0896117523609654
+      ],
+      "minimum_chart_tolerance": 0.0005,
+      "retained_pixel_coordinates": true
+    },
+    {
+      "name": "nozzle_no_duplicate_measurements",
+      "passed": true
+    },
+    {
+      "name": "nozzle_digitization_reaches_low_spacing",
+      "passed": true,
+      "observed_curve_minima": {
+        "40.0": 0.30023297954957284,
+        "50.0": 0.3003018542475205,
+        "60.0": 0.3003620611624749,
+        "65.0": 0.3004823116508408,
+        "70.0": 0.3005852105251834,
+        "75.0": 0.42491828011063615,
+        "80.0": 0.4062039957939012
+      },
+      "note": "A curve is measured only where original ink is visible; the monotonicity constraint can extend farther left than an individual curve's visible data."
+    },
+    {
+      "name": "nozzle_aungier_metrics_reproduced",
+      "passed": true,
+      "recomputed": {
+        "rmse": 0.0009688624466328545,
+        "mae": 0.0007629621923929343,
+        "max_abs": 0.0037014671935899496,
+        "relative_rmse_percent": 2.4962572220039196,
+        "tolerance_scaled_rmse": 1.45449046872412
+      }
+    },
+    {
+      "name": "nozzle_quadratic_233_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "nozzle_rational_2222_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "nozzle_rational_3222_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "nozzle_rational_3322_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "nozzle_rational_3333_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "nozzle_rational_4222_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "nozzle_rational_softplus222_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "nozzle_rational_monotone222_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "nozzle_quartic_32222_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "nozzle_current_refined_fit_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "nozzle_selection_rule_reproduced",
+      "passed": true,
+      "selected": "rational_monotone222",
+      "angle_tolerance": 0.000125,
+      "spacing_tolerance": 0.000125
+    },
+    {
+      "name": "nozzle_exported_coefficients_match",
+      "passed": true,
+      "model": "rational_monotone222",
+      "parameter_count": 13
+    },
+    {
+      "name": "nozzle_raw_export_matches_fit_model",
+      "passed": true,
+      "mesh_shape": [
+        81,
+        67
+      ],
+      "maximum_absolute_error": 0.0
+    },
+    {
+      "name": "nozzle_cap_inactive_on_chart_and_measurements",
+      "passed": true,
+      "measured_point_count": 163,
+      "maximum_chart_mesh_loss": 0.10621175243630339,
+      "maximum_measured_prediction": 0.07012060444026672,
+      "threshold": 0.25
+    },
+    {
+      "name": "nozzle_scalar_vector_broadcasting",
+      "passed": true
+    },
+    {
+      "name": "nozzle_spacing_first_derivative",
+      "passed": true,
+      "maximum_absolute_error": 5.551115123125783e-17
+    },
+    {
+      "name": "nozzle_spacing_second_derivative",
+      "passed": true,
+      "complex_step_maximum_error": 2.220446049250313e-16,
+      "independent_finite_difference_maximum_error": 1.7599418589142601e-09
+    },
+    {
+      "name": "nozzle_angle_derivative",
+      "passed": true,
+      "maximum_absolute_error": 3.054579159056381e-13
+    },
+    {
+      "name": "nozzle_raw_positive_single_minimum_and_convexity",
+      "passed": true,
+      "minimum_fitted_loss": 0.018496276912352817,
+      "minimum_curvature": 0.14147673217184825,
+      "spacing_at_minimum_range": [
+        0.5853797183506595,
+        0.9739379832362446
+      ]
+    },
+    {
+      "name": "nozzle_exterior_bounded_and_numerically_finite",
+      "passed": true,
+      "accuracy_validated": false,
+      "dense_spacing_range": [
+        0.0,
+        3.0
+      ],
+      "angle_range": [
+        0.0,
+        85.0
+      ],
+      "extra_small_spacing": 1e-12,
+      "extra_large_spacings": [
+        10.0,
+        100.0,
+        1000.0
+      ],
+      "mesh_shape": [
+        704,
+        341
+      ],
+      "ceiling": 0.5,
+      "minimum_finite_loss": 0.018082530823734528,
+      "maximum_finite_loss": 0.5,
+      "nonfinite_value_count": 0
+    },
+    {
+      "name": "nozzle_cap_formula_and_slope_sign",
+      "passed": true,
+      "maximum_value_error": 1.6653345369377348e-16,
+      "maximum_slope_error": 8.881784197001252e-15,
+      "explanation": "The cap has positive derivative with respect to raw Y, so it preserves every raw ordering and the sign of the spacing slope; bounded tails need not be convex."
+    },
+    {
+      "name": "nozzle_invalid_spacing_rejected",
+      "passed": true,
+      "cases": {
+        "negative_scalar": true,
+        "negative_array": true,
+        "raw_zero": true
+      }
+    },
+    {
+      "name": "nozzle_zero_spacing_endpoint_C2",
+      "passed": true,
+      "endpoint_value": 0.5,
+      "maximum_first_derivative": 8.103174944234279e-16,
+      "maximum_relative_curvature_error": 3.1199857104535766e-06,
+      "curvature_formula": "-D^3/(B*q^2)^2; D=.5-.25",
+      "note": "Right-hand endpoint extension; negative spacing is outside the domain."
+    },
+    {
+      "name": "nozzle_cap_transition_C2",
+      "passed": true,
+      "joins": [
+        {
+          "alpha_deg": 0.0,
+          "pitch_chord": 0.042985597021323006,
+          "value_error": 1.3100631690576847e-14,
+          "normalized_derivative_errors": [
+            0.004469849000720967,
+            0.0004482366637947623,
+            4.483623245010641e-05,
+            4.483626632303764e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 0.0,
+          "pitch_chord": 4.8437285307710285,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            6.011956136572517e-06,
+            6.011456455257108e-07,
+            6.017186889565939e-08,
+            6.105997828842032e-09
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 5.0,
+          "pitch_chord": 0.04174340754131653,
+          "value_error": 8.326672684688674e-17,
+          "normalized_derivative_errors": [
+            0.0044702698703710094,
+            0.00044827886627077216,
+            4.4840416888790095e-05,
+            4.484235120173052e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 5.0,
+          "pitch_chord": 4.561184283951511,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            9.148546980200416e-06,
+            9.14769465772005e-07,
+            9.147019656648374e-08,
+            9.044876867489499e-09
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 10.0,
+          "pitch_chord": 0.04089046531899542,
+          "value_error": 8.326672684688674e-17,
+          "normalized_derivative_errors": [
+            0.004470363213328145,
+            0.0004482882295284089,
+            4.484137590200246e-05,
+            4.48418575971763e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 10.0,
+          "pitch_chord": 4.2375511823371825,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            1.3885574293994914e-05,
+            1.3883972025693895e-06,
+            1.3886428612454767e-07,
+            1.4217907289881835e-08
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 15.0,
+          "pitch_chord": 0.04048525480761742,
+          "value_error": 1.2490009027033011e-15,
+          "normalized_derivative_errors": [
+            0.004470036031986986,
+            0.00044825541729087286,
+            4.483808060666023e-05,
+            4.483866300616399e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 15.0,
+          "pitch_chord": 3.924535864925406,
+          "value_error": 2.7755575615628914e-16,
+          "normalized_derivative_errors": [
+            2.0661171801606162e-05,
+            2.065859321103492e-06,
+            2.066153955161744e-07,
+            1.9650981813287862e-08
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 20.0,
+          "pitch_chord": 0.0405728379266866,
+          "value_error": 3.1086244689504383e-15,
+          "normalized_derivative_errors": [
+            0.004469187950596013,
+            0.0004481703753028023,
+            4.482957376122644e-05,
+            4.483103434318961e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 20.0,
+          "pitch_chord": 3.641950320678763,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            2.992531969116964e-05,
+            2.9920982985587886e-06,
+            2.9920784436726587e-07,
+            2.9536030473124788e-08
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 25.0,
+          "pitch_chord": 0.04117682730559923,
+          "value_error": 3.4416913763379853e-15,
+          "normalized_derivative_errors": [
+            0.004467710047521197,
+            0.0004480221661147991,
+            4.4814771303005326e-05,
+            4.4815475210547074e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 25.0,
+          "pitch_chord": 3.393699852217265,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            4.2061493636339435e-05,
+            4.205457216711182e-06,
+            4.2055746130445377e-07,
+            4.176272027672909e-08
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 30.0,
+          "pitch_chord": 0.04228423106606201,
+          "value_error": 2.6645352591003757e-15,
+          "normalized_derivative_errors": [
+            0.004465501928417036,
+            0.00044780073631961464,
+            4.4792599594182716e-05,
+            4.479482621733572e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 30.0,
+          "pitch_chord": 3.1768284134318883,
+          "value_error": 1.3877787807814457e-16,
+          "normalized_derivative_errors": [
+            5.7293581600634855e-05,
+            5.728305519221964e-06,
+            5.727865290844755e-07,
+            5.732047314004652e-08
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 35.0,
+          "pitch_chord": 0.04382459958183141,
+          "value_error": 1.4155343563970746e-15,
+          "normalized_derivative_errors": [
+            0.004462521075933143,
+            0.0004475018181540784,
+            4.476269651785791e-05,
+            4.476158280730773e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 35.0,
+          "pitch_chord": 2.986044186430548,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            7.558803179151982e-05,
+            7.5572666012481806e-06,
+            7.557325356439056e-07,
+            7.580205299650104e-08
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 40.0,
+          "pitch_chord": 0.0456523508685869,
+          "value_error": 3.3306690738754696e-16,
+          "normalized_derivative_errors": [
+            0.004458869133113614,
+            0.0004471356022069506,
+            4.472604818086978e-05,
+            4.472710130928744e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 40.0,
+          "pitch_chord": 2.815799402057851,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            9.656321158946255e-05,
+            9.654186285793976e-06,
+            9.653780667515327e-07,
+            9.5790262865927e-08
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 45.0,
+          "pitch_chord": 0.04755278820949042,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.004454875820872804,
+            0.00044673515058146263,
+            4.468601988690331e-05,
+            4.4688382731397415e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 45.0,
+          "pitch_chord": 2.661113983383099,
+          "value_error": 1.1102230246251565e-16,
+          "normalized_derivative_errors": [
+            0.00011941135204384556,
+            1.1938273957433948e-05,
+            1.193890769219639e-06,
+            1.1880146473054123e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 50.0,
+          "pitch_chord": 0.04929633594919623,
+          "value_error": 6.661338147750939e-16,
+          "normalized_derivative_errors": [
+            0.004451071857082122,
+            0.00044635369095551814,
+            4.4647873468922545e-05,
+            4.4647662096409496e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 50.0,
+          "pitch_chord": 2.517749742624587,
+          "value_error": 3.0531133177191805e-16,
+          "normalized_derivative_errors": [
+            0.00014282742265583274,
+            1.4279074041318061e-05,
+            1.4279238408141268e-06,
+            1.4204311187905934e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 55.0,
+          "pitch_chord": 0.05073943636012451,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.004447955417018878,
+            0.0004460411737357899,
+            4.4616624005733974e-05,
+            4.461840167930858e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 55.0,
+          "pitch_chord": 2.382072597187672,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.00016495046066115478,
+            1.649053080868503e-05,
+            1.6490783520433552e-06,
+            1.64595365367716e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 60.0,
+          "pitch_chord": 0.05191144267509363,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.004445672767477239,
+            0.0004458122704670843,
+            4.459370456220787e-05,
+            4.459383145302796e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 60.0,
+          "pitch_chord": 2.2509270709487255,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            0.00018342012030449353,
+            1.8336728522917457e-05,
+            1.8336714672279762e-06,
+            1.8268007407295494e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 65.0,
+          "pitch_chord": 0.052995625828736834,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            0.004443950261871436,
+            0.0004456395373341458,
+            4.457644815431946e-05,
+            4.457425786002868e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 65.0,
+          "pitch_chord": 2.121895390857709,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            0.0001958200966151059,
+            1.957609477274178e-05,
+            1.957670748102476e-06,
+            1.9565808979168127e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 70.0,
+          "pitch_chord": 0.0542016573153521,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            0.004442380352908592,
+            0.0004454821057758456,
+            4.456067645707191e-05,
+            4.456313758214472e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 70.0,
+          "pitch_chord": 1.9938241114693702,
+          "value_error": 1.6653345369377348e-16,
+          "normalized_derivative_errors": [
+            0.0002005984442843399,
+            2.0053539829728586e-05,
+            2.0052754434705315e-06,
+            2.0069555405625967e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 75.0,
+          "pitch_chord": 0.05566729742346601,
+          "value_error": 1.304512053934559e-15,
+          "normalized_derivative_errors": [
+            0.004440691681893254,
+            0.0004453127666920922,
+            4.454373129195121e-05,
+            4.454533669651748e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 75.0,
+          "pitch_chord": 1.8666119321952241,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.0001977827057315663,
+            1.977183841649935e-05,
+            1.9771115164888015e-06,
+            1.9859116225330582e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 80.0,
+          "pitch_chord": 0.05746740043648228,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            0.0044387539418294306,
+            0.0004451184472438729,
+            4.452432039801465e-05,
+            4.45292941303277e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 80.0,
+          "pitch_chord": 1.7398121701613387,
+          "value_error": 1.1102230246251565e-16,
+          "normalized_derivative_errors": [
+            0.00018882574856293472,
+            1.887626153252007e-05,
+            1.8875278901463795e-06,
+            1.8818975263853938e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 85.0,
+          "pitch_chord": 0.059641139266367396,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.00443652241975217,
+            0.00044489467301807604,
+            4.450192409723148e-05,
+            4.450070092377172e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 85.0,
+          "pitch_chord": 1.6109458029012453,
+          "value_error": 2.7755575615628914e-17,
+          "normalized_derivative_errors": [
+            0.00017608091118253316,
+            1.760213308991113e-05,
+            1.7601929095251125e-06,
+            1.7764801159978005e-07
+          ],
+          "converged": true
+        }
+      ],
+      "method": "Locate raw Y=.25 on both sides of each minimum; first/second one-sided derivatives from complex-step slopes converge to the raw derivatives as h decreases."
+    },
+    {
+      "name": "nozzle_independent_angle_derivative_formula",
+      "passed": true,
+      "raw_maximum_absolute_error": 3.126388037344441e-13,
+      "bounded_maximum_absolute_error": 8.890457814381136e-18
+    },
+    {
+      "name": "nozzle_low_spacing_monotonicity",
+      "passed": true,
+      "spacing_range": [
+        0.0,
+        0.5
+      ],
+      "angle_range": [
+        40.0,
+        80.0
+      ],
+      "numerical_slope_tolerance_per_degree": 2e-10,
+      "dense_minimum_slope_per_degree": 4.174720865078917e-17,
+      "adaptive_minimum_x_times_raw_slope_per_degree": 5.000004408986861e-12,
+      "worst_pitch_chord": 0.0,
+      "worst_alpha_deg": 40.0,
+      "dense_angle_count": 825,
+      "dense_spacing_count": 600,
+      "adaptive_angle_evaluations": 18670,
+      "adaptive_searches_converged": true,
+      "scope": "Exact cubic stationary-point search of x*dYraw/dalpha on [0,.5] at each angle; dense and bounded adaptive searches in angle. The strictly increasing cap preserves ordering at x>0 and all curves meet at the common .5 endpoint. Numerical verification, not a continuous-angle proof."
+    },
+    {
+      "name": "impulse_digitized_points_valid",
+      "passed": true,
+      "point_count": 138,
+      "angle_limits": [
+        40.0,
+        70.0
+      ],
+      "pitch_chord_range": [
+        0.3,
+        0.9915615752287298
+      ],
+      "minimum_chart_tolerance": 0.0003456985097892301,
+      "retained_pixel_coordinates": true
+    },
+    {
+      "name": "impulse_no_duplicate_measurements",
+      "passed": true
+    },
+    {
+      "name": "impulse_digitization_reaches_low_spacing",
+      "passed": true,
+      "observed_curve_minima": {
+        "40.0": 0.3,
+        "50.0": 0.3,
+        "55.0": 0.3,
+        "60.0": 0.3,
+        "65.0": 0.3,
+        "70.0": 0.3
+      },
+      "note": "A curve is measured only where original ink is visible; the monotonicity constraint can extend farther left than an individual curve's visible data."
+    },
+    {
+      "name": "impulse_aungier_metrics_reproduced",
+      "passed": true,
+      "recomputed": {
+        "rmse": 0.0017720243453842744,
+        "mae": 0.0014918589180008138,
+        "max_abs": 0.0036826544708480347,
+        "relative_rmse_percent": 1.625626297256907,
+        "tolerance_scaled_rmse": 4.712634484494405
+      }
+    },
+    {
+      "name": "impulse_quadratic_233_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "impulse_rational_2222_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "impulse_rational_3222_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "impulse_rational_3322_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "impulse_rational_3333_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "impulse_rational_4222_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "impulse_rational_softplus222_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "impulse_rational_monotone222_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "impulse_quartic_32222_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "impulse_current_refined_fit_metrics_reproduced",
+      "passed": true
+    },
+    {
+      "name": "impulse_selection_rule_reproduced",
+      "passed": true,
+      "selected": "rational_monotone222",
+      "angle_tolerance": 0.00016930262112927697,
+      "spacing_tolerance": 8.965579863573665e-05
+    },
+    {
+      "name": "impulse_exported_coefficients_match",
+      "passed": true,
+      "model": "rational_monotone222",
+      "parameter_count": 13
+    },
+    {
+      "name": "impulse_raw_export_matches_fit_model",
+      "passed": true,
+      "mesh_shape": [
+        81,
+        67
+      ],
+      "maximum_absolute_error": 0.0
+    },
+    {
+      "name": "impulse_cap_inactive_on_chart_and_measurements",
+      "passed": true,
+      "measured_point_count": 138,
+      "maximum_chart_mesh_loss": 0.22078993788255424,
+      "maximum_measured_prediction": 0.1911027437881523,
+      "threshold": 0.25
+    },
+    {
+      "name": "impulse_scalar_vector_broadcasting",
+      "passed": true
+    },
+    {
+      "name": "impulse_spacing_first_derivative",
+      "passed": true,
+      "maximum_absolute_error": 1.6653345369377348e-16
+    },
+    {
+      "name": "impulse_spacing_second_derivative",
+      "passed": true,
+      "complex_step_maximum_error": 1.1102230246251565e-15,
+      "independent_finite_difference_maximum_error": 3.1063085437210702e-09
+    },
+    {
+      "name": "impulse_angle_derivative",
+      "passed": true,
+      "maximum_absolute_error": 9.827590130573327e-13
+    },
+    {
+      "name": "impulse_raw_positive_single_minimum_and_convexity",
+      "passed": true,
+      "minimum_fitted_loss": 0.06629577522192943,
+      "minimum_curvature": 0.11567205438656197,
+      "spacing_at_minimum_range": [
+        0.49988553912234684,
+        0.7840148693146034
+      ]
+    },
+    {
+      "name": "impulse_exterior_bounded_and_numerically_finite",
+      "passed": true,
+      "accuracy_validated": false,
+      "dense_spacing_range": [
+        0.0,
+        3.0
+      ],
+      "angle_range": [
+        0.0,
+        85.0
+      ],
+      "extra_small_spacing": 1e-12,
+      "extra_large_spacings": [
+        10.0,
+        100.0,
+        1000.0
+      ],
+      "mesh_shape": [
+        704,
+        341
+      ],
+      "ceiling": 0.5,
+      "minimum_finite_loss": 0.06479557214724727,
+      "maximum_finite_loss": 0.5,
+      "nonfinite_value_count": 0
+    },
+    {
+      "name": "impulse_cap_formula_and_slope_sign",
+      "passed": true,
+      "maximum_value_error": 1.1102230246251565e-16,
+      "maximum_slope_error": 1.2434497875801753e-14,
+      "explanation": "The cap has positive derivative with respect to raw Y, so it preserves every raw ordering and the sign of the spacing slope; bounded tails need not be convex."
+    },
+    {
+      "name": "impulse_invalid_spacing_rejected",
+      "passed": true,
+      "cases": {
+        "negative_scalar": true,
+        "negative_array": true,
+        "raw_zero": true
+      }
+    },
+    {
+      "name": "impulse_zero_spacing_endpoint_C2",
+      "passed": true,
+      "endpoint_value": 0.5,
+      "maximum_first_derivative": 3.926687566088836e-16,
+      "maximum_relative_curvature_error": 5.367242392528837e-06,
+      "curvature_formula": "-D^3/(B*q^2)^2; D=.5-.25",
+      "note": "Right-hand endpoint extension; negative spacing is outside the domain."
+    },
+    {
+      "name": "impulse_cap_transition_C2",
+      "passed": true,
+      "joins": [
+        {
+          "alpha_deg": 0.0,
+          "pitch_chord": 0.019840664389317482,
+          "value_error": 1.1102230246251565e-16,
+          "normalized_derivative_errors": [
+            0.0044817587210212164,
+            0.00044943096866154037,
+            4.4955669475093735e-05,
+            4.495796796992094e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 0.0,
+          "pitch_chord": 5.382154037441802,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            7.570485729264118e-07,
+            7.57016630187426e-08,
+            7.594918186201808e-09,
+            9.628058917050186e-10
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 5.0,
+          "pitch_chord": 0.026331401851849297,
+          "value_error": 2.9976021664879227e-15,
+          "normalized_derivative_errors": [
+            0.004478531323509139,
+            0.00044910732720061965,
+            4.4923318757092997e-05,
+            4.492236095204552e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 5.0,
+          "pitch_chord": 4.550543134000568,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            2.1237542311759453e-06,
+            2.123624227172515e-07,
+            2.124044099543535e-08,
+            2.322781255445137e-09
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 10.0,
+          "pitch_chord": 0.03447581958374023,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.0044730816992363245,
+            0.0004485608407350228,
+            4.4868637269053565e-05,
+            4.486872237614494e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 10.0,
+          "pitch_chord": 3.625370989993332,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            6.784314837199163e-06,
+            6.78364164061877e-07,
+            6.786713637018623e-08,
+            6.905993389315858e-09
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 15.0,
+          "pitch_chord": 0.044845790287681764,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.004463465804126538,
+            0.00044759655861763975,
+            4.47722066504669e-05,
+            4.477356836968925e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 15.0,
+          "pitch_chord": 2.9047688350653256,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            1.9778306477815683e-05,
+            1.977542022071235e-06,
+            1.977524177693591e-07,
+            2.043812176749576e-08
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 20.0,
+          "pitch_chord": 0.05850680041268923,
+          "value_error": 2.1094237467877974e-15,
+          "normalized_derivative_errors": [
+            0.004445090110028511,
+            0.0004457538420758796,
+            4.458785940603739e-05,
+            4.45897271112119e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 20.0,
+          "pitch_chord": 2.419065988860862,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            4.850304912485234e-05,
+            4.849299778981175e-06,
+            4.849684891067349e-07,
+            4.847589245041971e-08
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 25.0,
+          "pitch_chord": 0.07695600477981011,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.004407758131993525,
+            0.0004420101884970703,
+            4.421341553506607e-05,
+            4.421442030573704e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 25.0,
+          "pitch_chord": 2.1117466403209924,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            9.784627214862658e-05,
+            9.78198342615716e-06,
+            9.783087119045308e-07,
+            9.659235671893727e-08
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 30.0,
+          "pitch_chord": 0.1008983669280385,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.004297081446554555,
+            0.00043090080744290324,
+            4.3102026632031814e-05,
+            4.310118478580815e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 30.0,
+          "pitch_chord": 1.9237447509152645,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.00016274949110661535,
+            1.6269597663579397e-05,
+            1.6270005088918295e-06,
+            1.630134608764425e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 35.0,
+          "pitch_chord": 0.1274808048543121,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            0.0033181872260003966,
+            0.0003325476289306955,
+            3.326207088292797e-05,
+            3.3263077860674652e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 35.0,
+          "pitch_chord": 1.812326127204279,
+          "value_error": 1.1102230246251565e-16,
+          "normalized_derivative_errors": [
+            0.00022601641813748663,
+            2.259315880843726e-05,
+            2.2591721131542615e-06,
+            2.2594704978455016e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 40.0,
+          "pitch_chord": 0.14977845504104434,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            0.0027598554298940603,
+            0.0002765015386198503,
+            2.765534433216776e-05,
+            2.765344045661725e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 40.0,
+          "pitch_chord": 1.7501268471612448,
+          "value_error": 2.498001805406602e-16,
+          "normalized_derivative_errors": [
+            0.0002653756014778828,
+            2.652690752682975e-05,
+            2.652538769415715e-06,
+            2.654137138412497e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 45.0,
+          "pitch_chord": 0.1626786339259247,
+          "value_error": 1.6653345369377348e-16,
+          "normalized_derivative_errors": [
+            0.0025216726900486714,
+            0.00025260134102935436,
+            2.526445168797714e-05,
+            2.526663253160362e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 45.0,
+          "pitch_chord": 1.7199139436140114,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.00026462947606180234,
+            2.6452294300887276e-05,
+            2.6450689557040695e-06,
+            2.658798373215157e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 50.0,
+          "pitch_chord": 0.16788796978957998,
+          "value_error": 2.7755575615628914e-17,
+          "normalized_derivative_errors": [
+            0.002458682935017183,
+            0.00024627838928815976,
+            2.463191776069088e-05,
+            2.4630381400235884e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 50.0,
+          "pitch_chord": 1.7082292662000758,
+          "value_error": 4.996003610813204e-16,
+          "normalized_derivative_errors": [
+            0.00022292663459076917,
+            2.228418549861991e-05,
+            2.2282670842224524e-06,
+            2.2358201562560813e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 55.0,
+          "pitch_chord": 0.17076533200816688,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.002440120457106904,
+            0.0002444121850671856,
+            2.4445234678971535e-05,
+            2.444270507169e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 55.0,
+          "pitch_chord": 1.69872088003832,
+          "value_error": 2.7755575615628914e-17,
+          "normalized_derivative_errors": [
+            0.00015909227300072,
+            1.59038544625246e-05,
+            1.59012214157641e-06,
+            1.6037741750118911e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 60.0,
+          "pitch_chord": 0.1745891992669148,
+          "value_error": 2.7755575615628914e-17,
+          "normalized_derivative_errors": [
+            0.0024029932649554716,
+            0.00024068475135206565,
+            2.4072341850097257e-05,
+            2.40739390561303e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 60.0,
+          "pitch_chord": 1.6618998243671006,
+          "value_error": 2.7755575615628914e-17,
+          "normalized_derivative_errors": [
+            0.00010192787297547986,
+            1.0189982045460785e-05,
+            1.0189059831833453e-06,
+            1.0157334856137656e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 65.0,
+          "pitch_chord": 0.17925706797622287,
+          "value_error": 3.3306690738754696e-16,
+          "normalized_derivative_errors": [
+            0.0023498172129868314,
+            0.00023534879885498132,
+            2.353853509123838e-05,
+            2.353838759746428e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 65.0,
+          "pitch_chord": 1.5413740648649816,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            7.109868838110439e-05,
+            7.108489699604756e-06,
+            7.108147409032298e-07,
+            7.145228447084023e-08
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 70.0,
+          "pitch_chord": 0.1827205975414433,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            0.0023125424705630806,
+            0.00023160865252730192,
+            2.3164401774780072e-05,
+            2.3168183841388653e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 70.0,
+          "pitch_chord": 1.2931285159363999,
+          "value_error": 5.551115123125783e-17,
+          "normalized_derivative_errors": [
+            7.692718939633586e-05,
+            7.691855645604904e-06,
+            7.691555154539624e-07,
+            7.657449185904385e-08
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 75.0,
+          "pitch_chord": 0.18256636971854284,
+          "value_error": 3.885780586188048e-16,
+          "normalized_derivative_errors": [
+            0.0023248019572646764,
+            0.00023283678264800995,
+            2.328726996871523e-05,
+            2.328713389971298e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 75.0,
+          "pitch_chord": 0.9817453868604585,
+          "value_error": 1.6653345369377348e-16,
+          "normalized_derivative_errors": [
+            0.00014549747854987672,
+            1.4548790795779254e-05,
+            1.45501029061451e-06,
+            1.4538868507840243e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 80.0,
+          "pitch_chord": 0.17726099001957016,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.002410931439467399,
+            0.0002414740073093819,
+            2.4151214199091274e-05,
+            2.415137128146257e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 80.0,
+          "pitch_chord": 0.7061717850796704,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.00034878413729414674,
+            3.487631720635967e-05,
+            3.487662935642952e-06,
+            3.4766862471429105e-07
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 85.0,
+          "pitch_chord": 0.16664236319522838,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.002587692170323533,
+            0.0002592040581467284,
+            2.5924766651515513e-05,
+            2.5926650478200254e-06
+          ],
+          "converged": true
+        },
+        {
+          "alpha_deg": 85.0,
+          "pitch_chord": 0.4954609476989554,
+          "value_error": 0.0,
+          "normalized_derivative_errors": [
+            0.0007731390457349504,
+            7.730919643076947e-05,
+            7.730848260281297e-06,
+            7.735839879222558e-07
+          ],
+          "converged": true
+        }
+      ],
+      "method": "Locate raw Y=.25 on both sides of each minimum; first/second one-sided derivatives from complex-step slopes converge to the raw derivatives as h decreases."
+    },
+    {
+      "name": "impulse_independent_angle_derivative_formula",
+      "passed": true,
+      "raw_maximum_absolute_error": 1.8189894035458565e-12,
+      "bounded_maximum_absolute_error": 1.0516761073109393e-17
+    },
+    {
+      "name": "impulse_low_spacing_monotonicity",
+      "passed": true,
+      "spacing_range": [
+        0.0,
+        0.5
+      ],
+      "angle_range": [
+        40.0,
+        70.0
+      ],
+      "numerical_slope_tolerance_per_degree": 2e-10,
+      "dense_minimum_slope_per_degree": 7.074740369020161e-14,
+      "adaptive_minimum_x_times_raw_slope_per_degree": 5.885798543897707e-08,
+      "worst_pitch_chord": 0.29428927684897854,
+      "worst_alpha_deg": 49.74147495803183,
+      "dense_angle_count": 627,
+      "dense_spacing_count": 600,
+      "adaptive_angle_evaluations": 14302,
+      "adaptive_searches_converged": true,
+      "scope": "Exact cubic stationary-point search of x*dYraw/dalpha on [0,.5] at each angle; dense and bounded adaptive searches in angle. The strictly increasing cap preserves ordering at x>0 and all curves meet at the common .5 endpoint. Numerical verification, not a continuous-angle proof."
+    },
+    {
+      "name": "readme_local_links",
+      "passed": true,
+      "checked": 32,
+      "missing": []
+    }
+  ],
+  "warnings": [
+    "Predictions outside the digitized chart coverage remain unvalidated; finite values and smooth derivatives do not establish physical accuracy."
+  ],
+  "verifier_sha256": "964e37eff2903ffebc97d1ffec1ed6de227f36a40a731e33d7d2c7bcfae3781b",
+  "interpretation": "These checks verify implementation, provenance, saved fit metrics and mathematical properties; they do not validate turbine performance or extrapolation."
+}

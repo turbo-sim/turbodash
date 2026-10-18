@@ -1,0 +1,11 @@
+{
+  "description": "Authorized integration of current analytical fits into candidate KO only; original production_before record is retained intact.",
+  "authorized_changes": {
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": {
+      "before_sha256": "f75083e50008952dac5ffc7c9867dde4fbe620d9866c043ce2ea4c22a80894bc",
+      "after_sha256": "3b6876f0be6cb53388288a53a58089c413b1032512407fd8353339ea0f286f66",
+      "reason": "Replace nozzle/impulse Aungier references with fixed current_fit constants and stable bounded continuation; retain downstream corrections."
+    }
+  },
+  "historical_archive": "data/history/before_analytical_integration.zip"
+}

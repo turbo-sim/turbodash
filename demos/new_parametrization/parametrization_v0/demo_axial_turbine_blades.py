@@ -14,6 +14,7 @@ import yaml
 import numpy as np
 import matplotlib.pyplot as plt
 import turbodash as td
+from turbodash.geometry.blade import compute_blade_coordinates_cartesian
 
 from pathlib import Path
 
@@ -26,7 +27,7 @@ def build_blade(blade_cfg, x0, n_points):
     """
     Returns x and y coordinates of one blade profile.
     """
-    x, y, *_ = td.geometry.compute_blade_coordinates_cartesian(
+    x, y, *_ = compute_blade_coordinates_cartesian(
         camberline_type=blade_cfg["camberline_type"],
         x1=x0,
         y1=0.0,

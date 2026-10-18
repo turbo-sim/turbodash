@@ -1,11 +1,11 @@
 {
-  "created_utc": "2026-10-18T20:07:55.456217+00:00",
+  "created_utc": "2026-10-18T21:18:03.253707+00:00",
   "python": "3.13.2",
   "executable": "C:\\Users\\roagr\\AppData\\Local\\pypoetry\\Cache\\virtualenvs\\turbomachinery-special-course-fbPpiFVa-py3.13\\Scripts\\python.exe",
   "numpy": "2.5.2",
   "coolprop": "7.2.0",
   "source_sha256": {
-    "turbodash/core_turbine.py": "a9c3706955a1350c3d4d105a3779bed43201a440ffb1ebf2fd0a6641023857eb",
+    "turbodash/core/turbine.py": "2590995df2b3842e36051cc524ca59e35a7ece5e043474e9c78c2bc4eeecd1ea",
     "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
     "turbodash/loss_models/__init__.py": "fcc03d0e9ee610b36333efe8c19d8ad9f49f79c2d91e48654bd454103e3374b5",
     "turbodash/loss_models/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
@@ -18,7 +18,7 @@
     "turbodash/loss_models/loss_model_kacker_okapuu.py": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51",
     "turbodash/loss_models/loss_model_moustapha.py": "0748aa6c29528f98e0e6a12e61b9ed34f263f9f576f3664b9ebf322ef3098d23"
   },
-  "study_sha256": "05501d1cd7f37432b52caac7ec853296e200ca0b2e12da73742a97357189df17",
+  "study_sha256": "40b89adfeb76c50e0234260a99e8cc4a9ed2ed27b9a7d80cf49613f29fabcd79",
   "fixed": {
     "inlet_total_pressure": 5000000.0,
     "inlet_total_temperature": 600.0,
@@ -176,7 +176,7 @@
   ],
   "points": 241,
   "unique_designs": 24514,
-  "elapsed_seconds": 48.17212510000536,
+  "elapsed_seconds": 41.75990589999856,
   "sample_counts": {
     "kacker_okapuu": 28920,
     "benner": 28920,

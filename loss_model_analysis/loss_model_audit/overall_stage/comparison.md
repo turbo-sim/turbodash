@@ -4,7 +4,7 @@
 
 Each section uses the same saved designs and parameter levels, with **isentropic, Kacker–Okapuu and Benner** in fixed left-to-right columns. Air enters at 50 bar and 600 K. All plots retain the same axes, 0–100% efficiency limits, blue total-total and orange total-static colormaps, and solid lines. Negative hub ratios remain in the data without boundary markers.
 
-Open the vector PDF in each column to inspect the plot. The three models stay in one table row; a narrow preview may need horizontal scrolling. Isentropic total-total efficiency is exactly 100%; its total-static efficiency includes unrecovered exit kinetic energy. Coincident ideal curves are expected for parameters that only affect sizing or loss corrections.
+SVG figures are embedded in each column; click an image to inspect it at full size. The three models stay in one table row; a narrow preview may need horizontal scrolling. Isentropic total-total efficiency is exactly 100%; its total-static efficiency includes unrecovered exit kinetic energy. Coincident ideal curves are expected for parameters that only affect sizing or loss corrections.
 
 ## Stator exit angle: Blade velocity ratio at $R=0$
 
@@ -18,13 +18,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/speed_r0_stator_exit_angle.pdf" title="Isentropic (zero losses): Stator exit angle, speed_r0">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/speed_r0_stator_exit_angle.svg" title="Isentropic (zero losses): Stator exit angle, speed_r0"><img src="sensitivity_isentropic/figures/speed_r0_stator_exit_angle.svg" alt="Isentropic (zero losses): Stator exit angle, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/speed_r0_stator_exit_angle.pdf" title="Kacker–Okapuu: Stator exit angle, speed_r0">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/speed_r0_stator_exit_angle.svg" title="Kacker–Okapuu: Stator exit angle, speed_r0"><img src="sensitivity_kacker_okapuu/figures/speed_r0_stator_exit_angle.svg" alt="Kacker–Okapuu: Stator exit angle, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/speed_r0_stator_exit_angle.pdf" title="Benner: Stator exit angle, speed_r0">Open vector PDF</a>
+<a href="sensitivity_benner/figures/speed_r0_stator_exit_angle.svg" title="Benner: Stator exit angle, speed_r0"><img src="sensitivity_benner/figures/speed_r0_stator_exit_angle.svg" alt="Benner: Stator exit angle, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -43,13 +43,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/speed_r05_stator_exit_angle.pdf" title="Isentropic (zero losses): Stator exit angle, speed_r05">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/speed_r05_stator_exit_angle.svg" title="Isentropic (zero losses): Stator exit angle, speed_r05"><img src="sensitivity_isentropic/figures/speed_r05_stator_exit_angle.svg" alt="Isentropic (zero losses): Stator exit angle, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/speed_r05_stator_exit_angle.pdf" title="Kacker–Okapuu: Stator exit angle, speed_r05">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/speed_r05_stator_exit_angle.svg" title="Kacker–Okapuu: Stator exit angle, speed_r05"><img src="sensitivity_kacker_okapuu/figures/speed_r05_stator_exit_angle.svg" alt="Kacker–Okapuu: Stator exit angle, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/speed_r05_stator_exit_angle.pdf" title="Benner: Stator exit angle, speed_r05">Open vector PDF</a>
+<a href="sensitivity_benner/figures/speed_r05_stator_exit_angle.svg" title="Benner: Stator exit angle, speed_r05"><img src="sensitivity_benner/figures/speed_r05_stator_exit_angle.svg" alt="Benner: Stator exit angle, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -68,13 +68,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/reaction_stator_exit_angle.pdf" title="Isentropic (zero losses): Stator exit angle, reaction">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/reaction_stator_exit_angle.svg" title="Isentropic (zero losses): Stator exit angle, reaction"><img src="sensitivity_isentropic/figures/reaction_stator_exit_angle.svg" alt="Isentropic (zero losses): Stator exit angle, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/reaction_stator_exit_angle.pdf" title="Kacker–Okapuu: Stator exit angle, reaction">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/reaction_stator_exit_angle.svg" title="Kacker–Okapuu: Stator exit angle, reaction"><img src="sensitivity_kacker_okapuu/figures/reaction_stator_exit_angle.svg" alt="Kacker–Okapuu: Stator exit angle, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/reaction_stator_exit_angle.pdf" title="Benner: Stator exit angle, reaction">Open vector PDF</a>
+<a href="sensitivity_benner/figures/reaction_stator_exit_angle.svg" title="Benner: Stator exit angle, reaction"><img src="sensitivity_benner/figures/reaction_stator_exit_angle.svg" alt="Benner: Stator exit angle, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -93,13 +93,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/speed_r0_pitch_chord.pdf" title="Isentropic (zero losses): Pitch / true chord, speed_r0">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/speed_r0_pitch_chord.svg" title="Isentropic (zero losses): Pitch / true chord, speed_r0"><img src="sensitivity_isentropic/figures/speed_r0_pitch_chord.svg" alt="Isentropic (zero losses): Pitch / true chord, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/speed_r0_pitch_chord.pdf" title="Kacker–Okapuu: Pitch / true chord, speed_r0">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/speed_r0_pitch_chord.svg" title="Kacker–Okapuu: Pitch / true chord, speed_r0"><img src="sensitivity_kacker_okapuu/figures/speed_r0_pitch_chord.svg" alt="Kacker–Okapuu: Pitch / true chord, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/speed_r0_pitch_chord.pdf" title="Benner: Pitch / true chord, speed_r0">Open vector PDF</a>
+<a href="sensitivity_benner/figures/speed_r0_pitch_chord.svg" title="Benner: Pitch / true chord, speed_r0"><img src="sensitivity_benner/figures/speed_r0_pitch_chord.svg" alt="Benner: Pitch / true chord, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -118,13 +118,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/speed_r05_pitch_chord.pdf" title="Isentropic (zero losses): Pitch / true chord, speed_r05">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/speed_r05_pitch_chord.svg" title="Isentropic (zero losses): Pitch / true chord, speed_r05"><img src="sensitivity_isentropic/figures/speed_r05_pitch_chord.svg" alt="Isentropic (zero losses): Pitch / true chord, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/speed_r05_pitch_chord.pdf" title="Kacker–Okapuu: Pitch / true chord, speed_r05">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/speed_r05_pitch_chord.svg" title="Kacker–Okapuu: Pitch / true chord, speed_r05"><img src="sensitivity_kacker_okapuu/figures/speed_r05_pitch_chord.svg" alt="Kacker–Okapuu: Pitch / true chord, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/speed_r05_pitch_chord.pdf" title="Benner: Pitch / true chord, speed_r05">Open vector PDF</a>
+<a href="sensitivity_benner/figures/speed_r05_pitch_chord.svg" title="Benner: Pitch / true chord, speed_r05"><img src="sensitivity_benner/figures/speed_r05_pitch_chord.svg" alt="Benner: Pitch / true chord, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -143,13 +143,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/reaction_pitch_chord.pdf" title="Isentropic (zero losses): Pitch / true chord, reaction">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/reaction_pitch_chord.svg" title="Isentropic (zero losses): Pitch / true chord, reaction"><img src="sensitivity_isentropic/figures/reaction_pitch_chord.svg" alt="Isentropic (zero losses): Pitch / true chord, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/reaction_pitch_chord.pdf" title="Kacker–Okapuu: Pitch / true chord, reaction">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/reaction_pitch_chord.svg" title="Kacker–Okapuu: Pitch / true chord, reaction"><img src="sensitivity_kacker_okapuu/figures/reaction_pitch_chord.svg" alt="Kacker–Okapuu: Pitch / true chord, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/reaction_pitch_chord.pdf" title="Benner: Pitch / true chord, reaction">Open vector PDF</a>
+<a href="sensitivity_benner/figures/reaction_pitch_chord.svg" title="Benner: Pitch / true chord, reaction"><img src="sensitivity_benner/figures/reaction_pitch_chord.svg" alt="Benner: Pitch / true chord, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -168,13 +168,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/speed_r0_aspect_ratio.pdf" title="Isentropic (zero losses): Blade aspect ratio, speed_r0">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/speed_r0_aspect_ratio.svg" title="Isentropic (zero losses): Blade aspect ratio, speed_r0"><img src="sensitivity_isentropic/figures/speed_r0_aspect_ratio.svg" alt="Isentropic (zero losses): Blade aspect ratio, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/speed_r0_aspect_ratio.pdf" title="Kacker–Okapuu: Blade aspect ratio, speed_r0">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/speed_r0_aspect_ratio.svg" title="Kacker–Okapuu: Blade aspect ratio, speed_r0"><img src="sensitivity_kacker_okapuu/figures/speed_r0_aspect_ratio.svg" alt="Kacker–Okapuu: Blade aspect ratio, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/speed_r0_aspect_ratio.pdf" title="Benner: Blade aspect ratio, speed_r0">Open vector PDF</a>
+<a href="sensitivity_benner/figures/speed_r0_aspect_ratio.svg" title="Benner: Blade aspect ratio, speed_r0"><img src="sensitivity_benner/figures/speed_r0_aspect_ratio.svg" alt="Benner: Blade aspect ratio, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -193,13 +193,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/speed_r05_aspect_ratio.pdf" title="Isentropic (zero losses): Blade aspect ratio, speed_r05">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/speed_r05_aspect_ratio.svg" title="Isentropic (zero losses): Blade aspect ratio, speed_r05"><img src="sensitivity_isentropic/figures/speed_r05_aspect_ratio.svg" alt="Isentropic (zero losses): Blade aspect ratio, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/speed_r05_aspect_ratio.pdf" title="Kacker–Okapuu: Blade aspect ratio, speed_r05">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/speed_r05_aspect_ratio.svg" title="Kacker–Okapuu: Blade aspect ratio, speed_r05"><img src="sensitivity_kacker_okapuu/figures/speed_r05_aspect_ratio.svg" alt="Kacker–Okapuu: Blade aspect ratio, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/speed_r05_aspect_ratio.pdf" title="Benner: Blade aspect ratio, speed_r05">Open vector PDF</a>
+<a href="sensitivity_benner/figures/speed_r05_aspect_ratio.svg" title="Benner: Blade aspect ratio, speed_r05"><img src="sensitivity_benner/figures/speed_r05_aspect_ratio.svg" alt="Benner: Blade aspect ratio, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -218,13 +218,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/reaction_aspect_ratio.pdf" title="Isentropic (zero losses): Blade aspect ratio, reaction">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/reaction_aspect_ratio.svg" title="Isentropic (zero losses): Blade aspect ratio, reaction"><img src="sensitivity_isentropic/figures/reaction_aspect_ratio.svg" alt="Isentropic (zero losses): Blade aspect ratio, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/reaction_aspect_ratio.pdf" title="Kacker–Okapuu: Blade aspect ratio, reaction">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/reaction_aspect_ratio.svg" title="Kacker–Okapuu: Blade aspect ratio, reaction"><img src="sensitivity_kacker_okapuu/figures/reaction_aspect_ratio.svg" alt="Kacker–Okapuu: Blade aspect ratio, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/reaction_aspect_ratio.pdf" title="Benner: Blade aspect ratio, reaction">Open vector PDF</a>
+<a href="sensitivity_benner/figures/reaction_aspect_ratio.svg" title="Benner: Blade aspect ratio, reaction"><img src="sensitivity_benner/figures/reaction_aspect_ratio.svg" alt="Benner: Blade aspect ratio, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -243,13 +243,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/speed_r0_trailing_ratio.pdf" title="Isentropic (zero losses): Trailing-edge thickness / opening, speed_r0">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/speed_r0_trailing_ratio.svg" title="Isentropic (zero losses): Trailing-edge thickness / opening, speed_r0"><img src="sensitivity_isentropic/figures/speed_r0_trailing_ratio.svg" alt="Isentropic (zero losses): Trailing-edge thickness / opening, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/speed_r0_trailing_ratio.pdf" title="Kacker–Okapuu: Trailing-edge thickness / opening, speed_r0">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/speed_r0_trailing_ratio.svg" title="Kacker–Okapuu: Trailing-edge thickness / opening, speed_r0"><img src="sensitivity_kacker_okapuu/figures/speed_r0_trailing_ratio.svg" alt="Kacker–Okapuu: Trailing-edge thickness / opening, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/speed_r0_trailing_ratio.pdf" title="Benner: Trailing-edge thickness / opening, speed_r0">Open vector PDF</a>
+<a href="sensitivity_benner/figures/speed_r0_trailing_ratio.svg" title="Benner: Trailing-edge thickness / opening, speed_r0"><img src="sensitivity_benner/figures/speed_r0_trailing_ratio.svg" alt="Benner: Trailing-edge thickness / opening, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -268,13 +268,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/speed_r05_trailing_ratio.pdf" title="Isentropic (zero losses): Trailing-edge thickness / opening, speed_r05">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/speed_r05_trailing_ratio.svg" title="Isentropic (zero losses): Trailing-edge thickness / opening, speed_r05"><img src="sensitivity_isentropic/figures/speed_r05_trailing_ratio.svg" alt="Isentropic (zero losses): Trailing-edge thickness / opening, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/speed_r05_trailing_ratio.pdf" title="Kacker–Okapuu: Trailing-edge thickness / opening, speed_r05">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/speed_r05_trailing_ratio.svg" title="Kacker–Okapuu: Trailing-edge thickness / opening, speed_r05"><img src="sensitivity_kacker_okapuu/figures/speed_r05_trailing_ratio.svg" alt="Kacker–Okapuu: Trailing-edge thickness / opening, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/speed_r05_trailing_ratio.pdf" title="Benner: Trailing-edge thickness / opening, speed_r05">Open vector PDF</a>
+<a href="sensitivity_benner/figures/speed_r05_trailing_ratio.svg" title="Benner: Trailing-edge thickness / opening, speed_r05"><img src="sensitivity_benner/figures/speed_r05_trailing_ratio.svg" alt="Benner: Trailing-edge thickness / opening, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -293,13 +293,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/reaction_trailing_ratio.pdf" title="Isentropic (zero losses): Trailing-edge thickness / opening, reaction">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/reaction_trailing_ratio.svg" title="Isentropic (zero losses): Trailing-edge thickness / opening, reaction"><img src="sensitivity_isentropic/figures/reaction_trailing_ratio.svg" alt="Isentropic (zero losses): Trailing-edge thickness / opening, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/reaction_trailing_ratio.pdf" title="Kacker–Okapuu: Trailing-edge thickness / opening, reaction">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/reaction_trailing_ratio.svg" title="Kacker–Okapuu: Trailing-edge thickness / opening, reaction"><img src="sensitivity_kacker_okapuu/figures/reaction_trailing_ratio.svg" alt="Kacker–Okapuu: Trailing-edge thickness / opening, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/reaction_trailing_ratio.pdf" title="Benner: Trailing-edge thickness / opening, reaction">Open vector PDF</a>
+<a href="sensitivity_benner/figures/reaction_trailing_ratio.svg" title="Benner: Trailing-edge thickness / opening, reaction"><img src="sensitivity_benner/figures/reaction_trailing_ratio.svg" alt="Benner: Trailing-edge thickness / opening, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -318,13 +318,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/speed_r0_specific_speed.pdf" title="Isentropic (zero losses): Specific speed, speed_r0">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/speed_r0_specific_speed.svg" title="Isentropic (zero losses): Specific speed, speed_r0"><img src="sensitivity_isentropic/figures/speed_r0_specific_speed.svg" alt="Isentropic (zero losses): Specific speed, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/speed_r0_specific_speed.pdf" title="Kacker–Okapuu: Specific speed, speed_r0">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/speed_r0_specific_speed.svg" title="Kacker–Okapuu: Specific speed, speed_r0"><img src="sensitivity_kacker_okapuu/figures/speed_r0_specific_speed.svg" alt="Kacker–Okapuu: Specific speed, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/speed_r0_specific_speed.pdf" title="Benner: Specific speed, speed_r0">Open vector PDF</a>
+<a href="sensitivity_benner/figures/speed_r0_specific_speed.svg" title="Benner: Specific speed, speed_r0"><img src="sensitivity_benner/figures/speed_r0_specific_speed.svg" alt="Benner: Specific speed, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -343,13 +343,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/speed_r05_specific_speed.pdf" title="Isentropic (zero losses): Specific speed, speed_r05">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/speed_r05_specific_speed.svg" title="Isentropic (zero losses): Specific speed, speed_r05"><img src="sensitivity_isentropic/figures/speed_r05_specific_speed.svg" alt="Isentropic (zero losses): Specific speed, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/speed_r05_specific_speed.pdf" title="Kacker–Okapuu: Specific speed, speed_r05">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/speed_r05_specific_speed.svg" title="Kacker–Okapuu: Specific speed, speed_r05"><img src="sensitivity_kacker_okapuu/figures/speed_r05_specific_speed.svg" alt="Kacker–Okapuu: Specific speed, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/speed_r05_specific_speed.pdf" title="Benner: Specific speed, speed_r05">Open vector PDF</a>
+<a href="sensitivity_benner/figures/speed_r05_specific_speed.svg" title="Benner: Specific speed, speed_r05"><img src="sensitivity_benner/figures/speed_r05_specific_speed.svg" alt="Benner: Specific speed, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -368,13 +368,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/reaction_specific_speed.pdf" title="Isentropic (zero losses): Specific speed, reaction">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/reaction_specific_speed.svg" title="Isentropic (zero losses): Specific speed, reaction"><img src="sensitivity_isentropic/figures/reaction_specific_speed.svg" alt="Isentropic (zero losses): Specific speed, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/reaction_specific_speed.pdf" title="Kacker–Okapuu: Specific speed, reaction">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/reaction_specific_speed.svg" title="Kacker–Okapuu: Specific speed, reaction"><img src="sensitivity_kacker_okapuu/figures/reaction_specific_speed.svg" alt="Kacker–Okapuu: Specific speed, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/reaction_specific_speed.pdf" title="Benner: Specific speed, reaction">Open vector PDF</a>
+<a href="sensitivity_benner/figures/reaction_specific_speed.svg" title="Benner: Specific speed, reaction"><img src="sensitivity_benner/figures/reaction_specific_speed.svg" alt="Benner: Specific speed, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -393,13 +393,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/speed_r0_mass_flow.pdf" title="Isentropic (zero losses): Mass flow, speed_r0">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/speed_r0_mass_flow.svg" title="Isentropic (zero losses): Mass flow, speed_r0"><img src="sensitivity_isentropic/figures/speed_r0_mass_flow.svg" alt="Isentropic (zero losses): Mass flow, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/speed_r0_mass_flow.pdf" title="Kacker–Okapuu: Mass flow, speed_r0">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/speed_r0_mass_flow.svg" title="Kacker–Okapuu: Mass flow, speed_r0"><img src="sensitivity_kacker_okapuu/figures/speed_r0_mass_flow.svg" alt="Kacker–Okapuu: Mass flow, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/speed_r0_mass_flow.pdf" title="Benner: Mass flow, speed_r0">Open vector PDF</a>
+<a href="sensitivity_benner/figures/speed_r0_mass_flow.svg" title="Benner: Mass flow, speed_r0"><img src="sensitivity_benner/figures/speed_r0_mass_flow.svg" alt="Benner: Mass flow, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -418,13 +418,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/speed_r05_mass_flow.pdf" title="Isentropic (zero losses): Mass flow, speed_r05">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/speed_r05_mass_flow.svg" title="Isentropic (zero losses): Mass flow, speed_r05"><img src="sensitivity_isentropic/figures/speed_r05_mass_flow.svg" alt="Isentropic (zero losses): Mass flow, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/speed_r05_mass_flow.pdf" title="Kacker–Okapuu: Mass flow, speed_r05">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/speed_r05_mass_flow.svg" title="Kacker–Okapuu: Mass flow, speed_r05"><img src="sensitivity_kacker_okapuu/figures/speed_r05_mass_flow.svg" alt="Kacker–Okapuu: Mass flow, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/speed_r05_mass_flow.pdf" title="Benner: Mass flow, speed_r05">Open vector PDF</a>
+<a href="sensitivity_benner/figures/speed_r05_mass_flow.svg" title="Benner: Mass flow, speed_r05"><img src="sensitivity_benner/figures/speed_r05_mass_flow.svg" alt="Benner: Mass flow, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -443,13 +443,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/reaction_mass_flow.pdf" title="Isentropic (zero losses): Mass flow, reaction">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/reaction_mass_flow.svg" title="Isentropic (zero losses): Mass flow, reaction"><img src="sensitivity_isentropic/figures/reaction_mass_flow.svg" alt="Isentropic (zero losses): Mass flow, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/reaction_mass_flow.pdf" title="Kacker–Okapuu: Mass flow, reaction">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/reaction_mass_flow.svg" title="Kacker–Okapuu: Mass flow, reaction"><img src="sensitivity_kacker_okapuu/figures/reaction_mass_flow.svg" alt="Kacker–Okapuu: Mass flow, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/reaction_mass_flow.pdf" title="Benner: Mass flow, reaction">Open vector PDF</a>
+<a href="sensitivity_benner/figures/reaction_mass_flow.svg" title="Benner: Mass flow, reaction"><img src="sensitivity_benner/figures/reaction_mass_flow.svg" alt="Benner: Mass flow, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -468,13 +468,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/speed_r0_isentropic_mach.pdf" title="Isentropic (zero losses): Isentropic expansion Mach number, speed_r0">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/speed_r0_isentropic_mach.svg" title="Isentropic (zero losses): Isentropic expansion Mach number, speed_r0"><img src="sensitivity_isentropic/figures/speed_r0_isentropic_mach.svg" alt="Isentropic (zero losses): Isentropic expansion Mach number, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/speed_r0_isentropic_mach.pdf" title="Kacker–Okapuu: Isentropic expansion Mach number, speed_r0">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/speed_r0_isentropic_mach.svg" title="Kacker–Okapuu: Isentropic expansion Mach number, speed_r0"><img src="sensitivity_kacker_okapuu/figures/speed_r0_isentropic_mach.svg" alt="Kacker–Okapuu: Isentropic expansion Mach number, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/speed_r0_isentropic_mach.pdf" title="Benner: Isentropic expansion Mach number, speed_r0">Open vector PDF</a>
+<a href="sensitivity_benner/figures/speed_r0_isentropic_mach.svg" title="Benner: Isentropic expansion Mach number, speed_r0"><img src="sensitivity_benner/figures/speed_r0_isentropic_mach.svg" alt="Benner: Isentropic expansion Mach number, speed_r0" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -493,13 +493,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/speed_r05_isentropic_mach.pdf" title="Isentropic (zero losses): Isentropic expansion Mach number, speed_r05">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/speed_r05_isentropic_mach.svg" title="Isentropic (zero losses): Isentropic expansion Mach number, speed_r05"><img src="sensitivity_isentropic/figures/speed_r05_isentropic_mach.svg" alt="Isentropic (zero losses): Isentropic expansion Mach number, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/speed_r05_isentropic_mach.pdf" title="Kacker–Okapuu: Isentropic expansion Mach number, speed_r05">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/speed_r05_isentropic_mach.svg" title="Kacker–Okapuu: Isentropic expansion Mach number, speed_r05"><img src="sensitivity_kacker_okapuu/figures/speed_r05_isentropic_mach.svg" alt="Kacker–Okapuu: Isentropic expansion Mach number, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/speed_r05_isentropic_mach.pdf" title="Benner: Isentropic expansion Mach number, speed_r05">Open vector PDF</a>
+<a href="sensitivity_benner/figures/speed_r05_isentropic_mach.svg" title="Benner: Isentropic expansion Mach number, speed_r05"><img src="sensitivity_benner/figures/speed_r05_isentropic_mach.svg" alt="Benner: Isentropic expansion Mach number, speed_r05" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>
@@ -518,13 +518,13 @@ Open the vector PDF in each column to inspect the plot. The three models stay in
 </tr></thead>
 <tbody><tr>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_isentropic/figures/reaction_isentropic_mach.pdf" title="Isentropic (zero losses): Isentropic expansion Mach number, reaction">Open vector PDF</a>
+<a href="sensitivity_isentropic/figures/reaction_isentropic_mach.svg" title="Isentropic (zero losses): Isentropic expansion Mach number, reaction"><img src="sensitivity_isentropic/figures/reaction_isentropic_mach.svg" alt="Isentropic (zero losses): Isentropic expansion Mach number, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_kacker_okapuu/figures/reaction_isentropic_mach.pdf" title="Kacker–Okapuu: Isentropic expansion Mach number, reaction">Open vector PDF</a>
+<a href="sensitivity_kacker_okapuu/figures/reaction_isentropic_mach.svg" title="Kacker–Okapuu: Isentropic expansion Mach number, reaction"><img src="sensitivity_kacker_okapuu/figures/reaction_isentropic_mach.svg" alt="Kacker–Okapuu: Isentropic expansion Mach number, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 <td width="33.333%" align="center" valign="top">
-<a href="sensitivity_benner/figures/reaction_isentropic_mach.pdf" title="Benner: Isentropic expansion Mach number, reaction">Open vector PDF</a>
+<a href="sensitivity_benner/figures/reaction_isentropic_mach.svg" title="Benner: Isentropic expansion Mach number, reaction"><img src="sensitivity_benner/figures/reaction_isentropic_mach.svg" alt="Benner: Isentropic expansion Mach number, reaction" width="100%" style="width:100%;height:auto" /></a>
 </td>
 </tr></tbody>
 </table>

@@ -76,7 +76,7 @@ does not configure boundary conditions, fluid properties, or solver settings.
 Use the project's Python environment and a YAML containing `stages_performance`:
 
 ```text
-python -m turbodash.turbogrid_assembly demos/cyclopentane_case/cyclopentane_8.yaml --row-gaps 0.01 --output-dir demos/cyclopentane_case/output/assembly_preview
+python -m turbodash.apps.assembly_preview demos/cyclopentane_case/cyclopentane_8.yaml --row-gaps 0.01 --output-dir demos/cyclopentane_case/output/assembly_preview
 ```
 
 The 0.01 m clearance is an example, not a recommended aerodynamic spacing.
@@ -99,7 +99,8 @@ to apply to existing local blade coordinates.
 ## Python API
 
 ```python
-from turbodash.turbogrid_assembly import build_assembly_layout, plot_assembly_layout
+from turbodash.geometry.assembly import build_assembly_layout
+from turbodash.visualization.matplotlib_assembly import plot_assembly_layout
 
 layout = build_assembly_layout(results, row_gaps=[0.01])
 figure, axes = plot_assembly_layout(layout)
@@ -108,7 +109,7 @@ figure, axes = plot_assembly_layout(layout)
 To create a positioned ZIP directly, with gaps in **metres**:
 
 ```python
-from turbodash.export_turbogrid_assembly import export_turbogrid_assembly_zip
+from turbodash.io.turbogrid_assembly import export_turbogrid_assembly_zip
 
 zip_bytes = export_turbogrid_assembly_zip(results, row_gaps=[0.01])
 ```

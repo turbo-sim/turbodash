@@ -61,7 +61,7 @@ def render_zero_zoom(data, figures, prefix, inputs, outputs):
             "All slopes tend to zero at z = 0. Dashed curves: thickness outside the impulse range (0.15–0.25).")
     fig.text(.5, .02, note, ha="center", fontsize=9)
     fig.tight_layout(rect=(0, .16, 1, .83))
-    for ext in ("pdf",):
+    for ext in ("svg",):
         path = figures / f"{prefix}thickness_z_zero_zoom.{ext}"
         fig.savefig(path, dpi=180)
         outputs[path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -117,14 +117,14 @@ def render(data_dir=None, figure_dir=None, prefix=""):
         fig.suptitle(title, fontsize=14, y=.98)
         fig.text(.5, .025, note, ha="center", fontsize=9)
         fig.tight_layout(rect=(0, .14, 1, .91))
-        for ext in ("pdf",):
+        for ext in ("svg",):
             output = figures / f"{prefix}{name}.{ext}"
             fig.savefig(output, dpi=180)
             outputs[output.name] = hashlib.sha256(output.read_bytes()).hexdigest()
         plt.close(fig)
         assert hashlib.sha256(path.read_bytes()).hexdigest() == inputs[path.name]
     render_zero_zoom(data, figures, prefix, inputs, outputs)
-    result = dict(figures=4, formats=["pdf"], model_calls=0, derivative_recalculations=0,
+    result = dict(figures=4, formats=["svg"], model_calls=0, derivative_recalculations=0,
                   data_hashes=inputs, figure_hashes=outputs,
                   renderer_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
     (data / "render_manifest.json").write_text(json.dumps(result, indent=2)+"\n", encoding="utf-8")

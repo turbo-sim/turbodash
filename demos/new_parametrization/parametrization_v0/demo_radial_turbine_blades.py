@@ -14,6 +14,7 @@ import yaml
 import numpy as np
 import matplotlib.pyplot as plt
 import turbodash as td
+from turbodash.geometry.blade import compute_blade_coordinates_radial
 
 from pathlib import Path
 
@@ -29,7 +30,7 @@ def build_radial_blade(blade_cfg, n_points, theta0_rad=0.0):
 
     theta0_rad sets the reference angular position of the leading edge.
     """
-    x, y, *_ = td.geometry.compute_blade_coordinates_radial(
+    x, y, *_ = compute_blade_coordinates_radial(
         blade_cfg["camberline_type"],
         blade_cfg["radius_in"],
         blade_cfg["radius_out"],

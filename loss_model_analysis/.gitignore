@@ -11,7 +11,9 @@
 .pytest_cache/
 .pytest_tmp*/
 
-# Analysis plots are exported as vector PDF only.
+# Analysis plots are exported as vector SVG only.
+**/figures/*.pdf
+**/figures/*.PDF
 *.png
 *.PNG
 *.jpg

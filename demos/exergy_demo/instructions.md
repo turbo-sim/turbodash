@@ -51,7 +51,7 @@ Open `meanline_calculator.xlsm`. You should see an **xlwings** tab in the ribbon
 | Field | Value |
 |-------|-------|
 | **Interpreter** | Path to your venv Python (see below) |
-| **UDF Modules** | `turbodash.excel_interface` |
+| **UDF Modules** | `turbodash.io.excel_stage` |
 | **Add workbook to PYTHONPATH** | ✅ Checked |
 | **Advanced → Show console** | ✅ Checked |
 
@@ -84,7 +84,7 @@ Back in Excel, in the **xlwings** tab:
 2. A console window will open — wait until you see:
 ```
    xlwings server running...
-   Imported functions from the following modules: turbodash.excel_interface
+   Imported functions from the following modules: turbodash.io.excel_stage
 ```
 
 The workbook is now ready to run meanline calculations!

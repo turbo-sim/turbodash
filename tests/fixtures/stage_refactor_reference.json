@@ -1,0 +1,1047 @@
+{
+  "cases": {
+    "axial": {
+      "inputs": {
+        "fluid_name": "Air",
+        "inlet_property_pair_string": "PT_INPUTS",
+        "inlet_property_1": 100000.0,
+        "inlet_property_2": 300.0,
+        "exit_pressure": 50000.0,
+        "mass_flow_rate": 5.0,
+        "stator_inlet_angle": 0.0,
+        "stator_exit_angle": 70.0,
+        "blade_velocity_ratio": 0.7,
+        "degree_reaction": 0.5,
+        "meridional_velocity_ratio_12": 1.0,
+        "meridional_velocity_ratio_23": 1.0,
+        "meridional_velocity_ratio_34": 1.0,
+        "radius_ratio_12": 0.75,
+        "radius_ratio_23": 0.95,
+        "radius_ratio_34": 0.8,
+        "height_radius_ratio": 0.25,
+        "solidity_chord_stator": 1.1209982569657782,
+        "solidity_chord_rotor": 1.0478376504703781,
+        "loss_coeff_stator": 0.05,
+        "loss_coeff_rotor": 0.06,
+        "stage_type": "axial"
+      },
+      "result": {
+        "inputs": {
+          "fluid_name": "Air",
+          "stage_type": "axial",
+          "inlet_property_pair": "PT_INPUTS",
+          "inlet_property_1": 100000.0,
+          "inlet_property_2": 300.0,
+          "exit_pressure": 50000.0,
+          "mass_flow_rate": 5.0,
+          "stator_inlet_angle": 0.0,
+          "stator_exit_angle": 70.0,
+          "blade_velocity_ratio": 0.7,
+          "degree_reaction": 0.5,
+          "meridional_velocity_ratio_12": 1.0,
+          "meridional_velocity_ratio_23": 1.0,
+          "meridional_velocity_ratio_34": 1.0,
+          "radius_ratio_12": 0.75,
+          "radius_ratio_23": 0.95,
+          "radius_ratio_34": 0.8,
+          "height_radius_ratio": 0.25,
+          "solidity_chord_stator": 1.1209982569657782,
+          "solidity_chord_rotor": 1.0478376504703781,
+          "loss_coeff_stator": 0.05,
+          "loss_coeff_rotor": 0.06
+        },
+        "stage_performance": {
+          "efficiency_tt": 0.926661901317937,
+          "efficiency_ts": 0.8519476837732751,
+          "pressure_ratio_ts": 1.9999999999999991,
+          "volume_ratio_ts": 1.6398096666325295,
+          "flow_coefficient": 0.3735509536323251,
+          "work_coefficient": 0.9381354407273493,
+          "degree_reaction": 0.5,
+          "blade_velocity_ratio": 0.7,
+          "specific_speed": 0.5422797869345634,
+          "spouting_velocity": 329.002575162703,
+          "rotor_exit_velocity": 230.30180261389208,
+          "rotor_exit_diameter": 0.6359616953554432,
+          "rotational_speed": 6916.203392122023,
+          "mass_flow_rate": 5.0,
+          "power_isentropic": 270606.7361592251,
+          "power_actual_tt": 250760.9526387489,
+          "power_actual_ts": 230542.78208429762,
+          "power_kinetic_energy": 21818.28186277662
+        },
+        "geometry": {
+          "stator": {
+            "blade_count": 37,
+            "blade_count_continuous": 36.64461858229888,
+            "blade_count_integer": 37,
+            "radius_in": 0.1812490831763013,
+            "radius_out": 0.24166544423506842,
+            "height": 0.04439156581625585,
+            "chord": 0.03329367436219188,
+            "chord_meridional": 0.03329367436219188,
+            "chord_true": 0.04064407162786263,
+            "spacing": 0.03590878844356644,
+            "opening": 0.014036033108708247,
+            "solidity": 0.9271734248153647,
+            "solidity_meridional": 0.9271734248153647,
+            "solidity_chord": 1.1318697563895275,
+            "pitch_to_chord": 0.8834938775905015,
+            "aspect_ratio": 1.3333333333333335,
+            "flaring_angle": -1.584056705960046,
+            "maximum_thickness": 0.009988102308657565,
+            "maximum_thickness_location": 0.25,
+            "leading_edge_radius": 0.004994051154328783,
+            "trailing_edge_thickness": 0.0007018016554354124,
+            "trailing_edge_wedge_angle": 10.0,
+            "metal_angle_in": 0.0,
+            "metal_angle_out": 70.0
+          },
+          "rotor": {
+            "blade_count": 57,
+            "blade_count_continuous": 56.64352579201404,
+            "blade_count_integer": 57,
+            "radius_in": 0.2543846781421773,
+            "radius_out": 0.3179808476777216,
+            "height": 0.040669632522482506,
+            "chord": 0.030502224391861878,
+            "chord_meridional": 0.030502224391861878,
+            "chord_true": 0.033263432414493574,
+            "spacing": 0.03154630405410269,
+            "opening": 0.010759864264323769,
+            "solidity": 0.9669032651035699,
+            "solidity_meridional": 0.9669032651035699,
+            "solidity_chord": 1.0544319980383745,
+            "pitch_to_chord": 0.9483778962136603,
+            "aspect_ratio": 1.3333333333333335,
+            "flaring_angle": 0.7438894412895872,
+            "maximum_thickness": 0.009150667317558562,
+            "maximum_thickness_location": 0.25,
+            "leading_edge_radius": 0.004575333658779281,
+            "trailing_edge_thickness": 0.0005379932132161885,
+            "trailing_edge_wedge_angle": 10.0,
+            "metal_angle_in": 25.10284465405086,
+            "metal_angle_out": -72.12306905580039
+          }
+        },
+        "flow_stations": [
+          {
+            "p": 99999.99999999997,
+            "T": 300.0,
+            "d": 1.1615996268298834,
+            "q": 1.0,
+            "Z": 0.9996976552654443,
+            "a": 347.318503864127,
+            "h": 426300.77587390563,
+            "s": 3890.501402191561,
+            "v": 0.0,
+            "w": 0.0,
+            "u": 0.0,
+            "alpha": 0.0,
+            "beta": 0.0,
+            "Ma": 0.0,
+            "r": 0.1812490831763013,
+            "H": 0.04531227079407533
+          },
+          {
+            "p": 95766.98995100109,
+            "T": 296.31281037678815,
+            "d": 1.126292789341602,
+            "q": 1.0,
+            "Z": 0.9996788365957846,
+            "a": 345.18016772951665,
+            "h": 422600.24205290806,
+            "s": 3890.501402196954,
+            "v": 86.02945798966289,
+            "w": 86.02945798966289,
+            "u": 0.0,
+            "alpha": 0.0,
+            "beta": 0.0,
+            "Ma": 0.24923059327404815,
+            "r": 0.1812490831763013,
+            "H": 0.04531227079407533
+          },
+          {
+            "p": 67822.44270090495,
+            "T": 268.4606366997361,
+            "d": 0.8805016086592549,
+            "q": 1.0,
+            "Z": 0.9995604174897312,
+            "a": 328.5667727397097,
+            "h": 394666.27340402425,
+            "s": 3890.501402201018,
+            "v": 251.53330781382175,
+            "w": 251.53330781382175,
+            "u": 0.0,
+            "alpha": 70.0,
+            "beta": 70.0,
+            "Ma": 0.765547001957761,
+            "r": 0.24166544423506842,
+            "H": 0.04347086083843636
+          },
+          {
+            "p": 70250.94606032713,
+            "T": 271.1774865963771,
+            "d": 0.9028833694040558,
+            "q": 1.0,
+            "Z": 0.9995701639639802,
+            "a": 330.22486970607684,
+            "h": 397389.8353472904,
+            "s": 3890.501402196939,
+            "v": 240.46180788896706,
+            "w": 95.00267570102383,
+            "u": 184.24144209111367,
+            "alpha": 69.03683656575454,
+            "beta": 25.10284465405086,
+            "Ma": 0.28769085679580353,
+            "r": 0.2543846781421773,
+            "H": 0.040273590128417525
+          },
+          {
+            "p": 50000.00000211912,
+            "T": 246.0215108840425,
+            "d": 0.7083746672039476,
+            "q": 1.0,
+            "Z": 0.9994942350310297,
+            "a": 314.5338304258207,
+            "h": 372179.42864206055,
+            "s": 3890.5014021798097,
+            "v": 93.42008748181864,
+            "w": 280.25048279032177,
+            "u": 230.30180261389208,
+            "alpha": -22.94371914515356,
+            "beta": -72.12306905580039,
+            "Ma": 0.8910026702403184,
+            "r": 0.3179808476777216,
+            "H": 0.04106567491654749
+          }
+        ]
+      },
+      "console": "\nBoundary conditions and operating point\n=======================================\nFluid name                    :        Air\nStage type                    :      axial\nInlet pressure                :     1.0000 bar\nExit pressure                 :     0.5000 bar\nMass flow rate                :     5.0000 kg/s\nRotational speed              :     6916.2 rpm\n\nStage performance\n=================\nTotal-to-total efficiency     :     0.9267 -\nTotal-to-static efficiency    :     0.8519 -\nTotal-to-static pressure ratio:     2.0000 -\nTotal-to-static volume ratio  :     1.6398 -\nFlow coefficient              :     0.3736 -\nLoading coefficient           :     0.9381 -\nDegree of reaction            :     0.5000 -\nBlade velocity ratio          :     0.7000 -\nSpecific speed                :     0.5423 -\nSpouting velocity             :   329.0026 m/s\nRotor exit blade speed        :   230.3018 m/s\n\nGeometry summary\n================\n\nStator:\n  Blade count                 :         37 -\n  Blade count continuous      :    36.6446 -\n  Blade count integer         :         37 -\n  Radius in                   :     181.25 mm\n  Radius out                  :     241.67 mm\n  Height                      :      44.39 mm\n  Chord                       :      33.29 mm\n  Chord meridional            :      33.29 mm\n  Chord true                  :      40.64 mm\n  Spacing                     :      35.91 mm\n  Opening                     :      14.04 mm\n  Solidity                    :     0.9272 -\n  Solidity meridional         :     0.9272 -\n  Solidity chord              :     1.1319 -\n  Pitch to chord              :     0.8835 -\n  Aspect ratio                :     1.3333 -\n  Flaring angle               :      -1.58 deg\n  Maximum thickness           :       9.99 mm\n  Maximum thickness location  :     0.2500 -\n  Leading edge radius         :       4.99 mm\n  Trailing edge thickness     :       0.70 mm\n  Trailing edge wedge angle   :      10.00 deg\n  Metal angle in              :       0.00 deg\n  Metal angle out             :      70.00 deg\n\nRotor:\n  Blade count                 :         57 -\n  Blade count continuous      :    56.6435 -\n  Blade count integer         :         57 -\n  Radius in                   :     254.38 mm\n  Radius out                  :     317.98 mm\n  Height                      :      40.67 mm\n  Chord                       :      30.50 mm\n  Chord meridional            :      30.50 mm\n  Chord true                  :      33.26 mm\n  Spacing                     :      31.55 mm\n  Opening                     :      10.76 mm\n  Solidity                    :     0.9669 -\n  Solidity meridional         :     0.9669 -\n  Solidity chord              :     1.0544 -\n  Pitch to chord              :     0.9484 -\n  Aspect ratio                :     1.3333 -\n  Flaring angle               :       0.74 deg\n  Maximum thickness           :       9.15 mm\n  Maximum thickness location  :     0.2500 -\n  Leading edge radius         :       4.58 mm\n  Trailing edge thickness     :       0.54 mm\n  Trailing edge wedge angle   :      10.00 deg\n  Metal angle in              :      25.10 deg\n  Metal angle out             :     -72.12 deg\n\nFlow stations\n=============\n\n----------------------------------------------------------------------------------------------------------------\nStn    p [bar]     T [K]  rho [kg/m3]    v [m/s]    w [m/s]      Ma  alpha [deg]  beta [deg]    r [mm]    H [mm]\n  0      1.000    300.00       1.1616       0.00       0.00   0.000         0.00        0.00    181.25     45.31\n  1      0.958    296.31       1.1263      86.03      86.03   0.249         0.00        0.00    181.25     45.31\n  2      0.678    268.46       0.8805     251.53     251.53   0.766        70.00       70.00    241.67     43.47\n  3      0.703    271.18       0.9029     240.46      95.00   0.288        69.04       25.10    254.38     40.27\n  4      0.500    246.02       0.7084      93.42     280.25   0.891       -22.94      -72.12    317.98     41.07\n----------------------------------------------------------------------------------------------------------------\n\n",
+      "tables": [
+        [
+          {
+            "Quantity": "Total-to-total efficiency",
+            "Value": 0.926661901317937,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Total-to-static efficiency",
+            "Value": 0.8519476837732751,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Pressure ratio (t-s)",
+            "Value": 1.9999999999999991,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Volume ratio (t-s)",
+            "Value": 1.6398096666325295,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Flow coefficient",
+            "Value": 0.3735509536323251,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Work coefficient",
+            "Value": 0.9381354407273493,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Degree of reaction",
+            "Value": 0.5,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Blade velocity ratio",
+            "Value": 0.7,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Specific speed",
+            "Value": 0.5422797869345634,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Spouting velocity",
+            "Value": 329.002575162703,
+            "Unit": "m/s"
+          },
+          {
+            "Quantity": "Rotor exit blade speed",
+            "Value": 230.30180261389208,
+            "Unit": "m/s"
+          },
+          {
+            "Quantity": "Rotational speed",
+            "Value": 6916.203392122023,
+            "Unit": "rpm"
+          },
+          {
+            "Quantity": "Isentropic power",
+            "Value": 270.60673615922514,
+            "Unit": "kW"
+          },
+          {
+            "Quantity": "Actual power (t-t)",
+            "Value": 250.76095263874888,
+            "Unit": "kW"
+          },
+          {
+            "Quantity": "Actual power (t-s)",
+            "Value": 230.5427820842976,
+            "Unit": "kW"
+          }
+        ],
+        [
+          {
+            "Variable": "Blade count",
+            "Stator": 37.0,
+            "Rotor": 57.0,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Blade count continuous",
+            "Stator": 36.64461858229888,
+            "Rotor": 56.64352579201404,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Blade count integer",
+            "Stator": 37.0,
+            "Rotor": 57.0,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Radius in",
+            "Stator": 181.24908317630133,
+            "Rotor": 254.3846781421773,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Radius out",
+            "Stator": 241.6654442350684,
+            "Rotor": 317.9808476777216,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Height",
+            "Stator": 44.39156581625585,
+            "Rotor": 40.66963252248251,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Chord",
+            "Stator": 33.29367436219188,
+            "Rotor": 30.502224391861876,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Chord meridional",
+            "Stator": 33.29367436219188,
+            "Rotor": 30.502224391861876,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Chord true",
+            "Stator": 40.64407162786263,
+            "Rotor": 33.26343241449357,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Spacing",
+            "Stator": 35.908788443566436,
+            "Rotor": 31.54630405410269,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Opening",
+            "Stator": 14.036033108708247,
+            "Rotor": 10.759864264323769,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Solidity",
+            "Stator": 0.9271734248153647,
+            "Rotor": 0.9669032651035699,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Solidity meridional",
+            "Stator": 0.9271734248153647,
+            "Rotor": 0.9669032651035699,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Solidity chord",
+            "Stator": 1.1318697563895275,
+            "Rotor": 1.0544319980383745,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Pitch to chord",
+            "Stator": 0.8834938775905015,
+            "Rotor": 0.9483778962136603,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Aspect ratio",
+            "Stator": 1.3333333333333335,
+            "Rotor": 1.3333333333333335,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Flaring angle",
+            "Stator": -1.584056705960046,
+            "Rotor": 0.7438894412895872,
+            "Unit": "deg"
+          },
+          {
+            "Variable": "Maximum thickness",
+            "Stator": 9.988102308657565,
+            "Rotor": 9.150667317558563,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Maximum thickness location",
+            "Stator": 0.25,
+            "Rotor": 0.25,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Leading edge radius",
+            "Stator": 4.994051154328782,
+            "Rotor": 4.575333658779281,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Trailing edge thickness",
+            "Stator": 0.7018016554354124,
+            "Rotor": 0.5379932132161884,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Trailing edge wedge angle",
+            "Stator": 10.0,
+            "Rotor": 10.0,
+            "Unit": "deg"
+          },
+          {
+            "Variable": "Metal angle in",
+            "Stator": 0.0,
+            "Rotor": 25.10284465405086,
+            "Unit": "deg"
+          },
+          {
+            "Variable": "Metal angle out",
+            "Stator": 70.0,
+            "Rotor": -72.12306905580039,
+            "Unit": "deg"
+          }
+        ],
+        [
+          {
+            "Station": 0,
+            "p [bar]": 0.9999999999999997,
+            "T [K]": 300.0,
+            "\u03c1 [kg/m\u00b3]": 1.1615996268298834,
+            "q [-]": 1.0,
+            "v [m/s]": 0.0,
+            "w [m/s]": 0.0,
+            "u [m/s]": 0.0,
+            "Ma [-]": 0.0,
+            "\u03b1 [deg]": 0.0,
+            "\u03b2 [deg]": 0.0,
+            "r [mm]": 181.24908317630133,
+            "H [mm]": 45.31227079407533
+          },
+          {
+            "Station": 1,
+            "p [bar]": 0.9576698995100109,
+            "T [K]": 296.31281037678815,
+            "\u03c1 [kg/m\u00b3]": 1.126292789341602,
+            "q [-]": 1.0,
+            "v [m/s]": 86.02945798966289,
+            "w [m/s]": 86.02945798966289,
+            "u [m/s]": 0.0,
+            "Ma [-]": 0.24923059327404815,
+            "\u03b1 [deg]": 0.0,
+            "\u03b2 [deg]": 0.0,
+            "r [mm]": 181.24908317630133,
+            "H [mm]": 45.31227079407533
+          },
+          {
+            "Station": 2,
+            "p [bar]": 0.6782244270090495,
+            "T [K]": 268.4606366997361,
+            "\u03c1 [kg/m\u00b3]": 0.8805016086592549,
+            "q [-]": 1.0,
+            "v [m/s]": 251.53330781382175,
+            "w [m/s]": 251.53330781382175,
+            "u [m/s]": 0.0,
+            "Ma [-]": 0.765547001957761,
+            "\u03b1 [deg]": 70.0,
+            "\u03b2 [deg]": 70.0,
+            "r [mm]": 241.6654442350684,
+            "H [mm]": 43.47086083843636
+          },
+          {
+            "Station": 3,
+            "p [bar]": 0.7025094606032712,
+            "T [K]": 271.1774865963771,
+            "\u03c1 [kg/m\u00b3]": 0.9028833694040558,
+            "q [-]": 1.0,
+            "v [m/s]": 240.46180788896706,
+            "w [m/s]": 95.00267570102383,
+            "u [m/s]": 184.24144209111367,
+            "Ma [-]": 0.28769085679580353,
+            "\u03b1 [deg]": 69.03683656575454,
+            "\u03b2 [deg]": 25.10284465405086,
+            "r [mm]": 254.3846781421773,
+            "H [mm]": 40.273590128417524
+          },
+          {
+            "Station": 4,
+            "p [bar]": 0.5000000000211913,
+            "T [K]": 246.0215108840425,
+            "\u03c1 [kg/m\u00b3]": 0.7083746672039476,
+            "q [-]": 1.0,
+            "v [m/s]": 93.42008748181864,
+            "w [m/s]": 280.25048279032177,
+            "u [m/s]": 230.30180261389208,
+            "Ma [-]": 0.8910026702403184,
+            "\u03b1 [deg]": -22.94371914515356,
+            "\u03b2 [deg]": -72.12306905580039,
+            "r [mm]": 317.9808476777216,
+            "H [mm]": 41.065674916547486
+          }
+        ]
+      ]
+    },
+    "radial": {
+      "inputs": {
+        "fluid_name": "Air",
+        "inlet_property_pair_string": "PT_INPUTS",
+        "inlet_property_1": 100000.0,
+        "inlet_property_2": 300.0,
+        "exit_pressure": 50000.0,
+        "mass_flow_rate": 5.0,
+        "stator_inlet_angle": 0.0,
+        "stator_exit_angle": 70.0,
+        "blade_velocity_ratio": 0.7,
+        "degree_reaction": 0.5,
+        "meridional_velocity_ratio_12": 1.0,
+        "meridional_velocity_ratio_23": 1.0,
+        "meridional_velocity_ratio_34": 1.0,
+        "radius_ratio_12": 0.75,
+        "radius_ratio_23": 0.95,
+        "radius_ratio_34": 0.8,
+        "height_radius_ratio": 0.25,
+        "solidity_chord_stator": 1.1209982569657782,
+        "solidity_chord_rotor": 1.0478376504703781,
+        "loss_coeff_stator": 0.05,
+        "loss_coeff_rotor": 0.06,
+        "stage_type": "radial"
+      },
+      "result": {
+        "inputs": {
+          "fluid_name": "Air",
+          "stage_type": "radial",
+          "inlet_property_pair": "PT_INPUTS",
+          "inlet_property_1": 100000.0,
+          "inlet_property_2": 300.0,
+          "exit_pressure": 50000.0,
+          "mass_flow_rate": 5.0,
+          "stator_inlet_angle": 0.0,
+          "stator_exit_angle": 70.0,
+          "blade_velocity_ratio": 0.7,
+          "degree_reaction": 0.5,
+          "meridional_velocity_ratio_12": 1.0,
+          "meridional_velocity_ratio_23": 1.0,
+          "meridional_velocity_ratio_34": 1.0,
+          "radius_ratio_12": 0.75,
+          "radius_ratio_23": 0.95,
+          "radius_ratio_34": 0.8,
+          "height_radius_ratio": 0.25,
+          "solidity_chord_stator": 1.1209982569657782,
+          "solidity_chord_rotor": 1.0478376504703781,
+          "loss_coeff_stator": 0.05,
+          "loss_coeff_rotor": 0.06
+        },
+        "stage_performance": {
+          "efficiency_tt": 0.926661901317937,
+          "efficiency_ts": 0.8519476837732751,
+          "pressure_ratio_ts": 1.9999999999999991,
+          "volume_ratio_ts": 1.6398096666325295,
+          "flow_coefficient": 0.3735509536323251,
+          "work_coefficient": 0.9381354407273493,
+          "degree_reaction": 0.5,
+          "blade_velocity_ratio": 0.7,
+          "specific_speed": 0.5422797869345634,
+          "spouting_velocity": 329.002575162703,
+          "rotor_exit_velocity": 230.30180261389208,
+          "rotor_exit_diameter": 0.6359616953554432,
+          "rotational_speed": 6916.203392122023,
+          "mass_flow_rate": 5.0,
+          "power_isentropic": 270606.7361592251,
+          "power_actual_tt": 250760.9526387489,
+          "power_actual_ts": 230542.78208429762,
+          "power_kinetic_energy": 21818.28186277662
+        },
+        "geometry": {
+          "stator": {
+            "blade_count": 21,
+            "blade_count_continuous": 20.193768324097757,
+            "blade_count_integer": 21,
+            "radius_in": 0.1812490831763013,
+            "radius_out": 0.24166544423506842,
+            "height": 0.04439156581625585,
+            "chord": 0.060416361058767104,
+            "chord_meridional": 0.060416361058767104,
+            "chord_true": 0.07375475832598007,
+            "spacing": 0.0632678653529504,
+            "opening": 0.034580695227344437,
+            "solidity": 0.954929658551372,
+            "solidity_meridional": 0.954929658551372,
+            "solidity_chord": 1.165753861214169,
+            "pitch_to_chord": 0.857814014837119,
+            "aspect_ratio": 0.7347606681090258,
+            "flaring_angle": -0.8730818167676653,
+            "maximum_thickness": 0.01812490831763013,
+            "maximum_thickness_location": 0.25,
+            "leading_edge_radius": 0.009062454158815065,
+            "trailing_edge_thickness": 0.0017290347613672218,
+            "trailing_edge_wedge_angle": 10.0,
+            "metal_angle_in": 0.0,
+            "metal_angle_out": 70.0
+          },
+          "rotor": {
+            "blade_count": 28,
+            "blade_count_continuous": 27.167572303054747,
+            "blade_count_integer": 28,
+            "radius_in": 0.2543846781421773,
+            "radius_out": 0.3179808476777216,
+            "height": 0.040669632522482506,
+            "chord": 0.06359616953554431,
+            "chord_meridional": 0.06359616953554431,
+            "chord_true": 0.06935320060561415,
+            "spacing": 0.06421926182442335,
+            "opening": 0.02936974342712633,
+            "solidity": 0.990297423682904,
+            "solidity_meridional": 0.990297423682904,
+            "solidity_chord": 1.0799439083436848,
+            "pitch_to_chord": 0.9259740179781234,
+            "aspect_ratio": 0.6394981461855495,
+            "flaring_angle": 0.3568023754467368,
+            "maximum_thickness": 0.019078850860663292,
+            "maximum_thickness_location": 0.25,
+            "leading_edge_radius": 0.009539425430331646,
+            "trailing_edge_thickness": 0.0014684871713563166,
+            "trailing_edge_wedge_angle": 10.0,
+            "metal_angle_in": 25.10284465405086,
+            "metal_angle_out": -72.12306905580039
+          }
+        },
+        "flow_stations": [
+          {
+            "p": 99999.99999999997,
+            "T": 300.0,
+            "d": 1.1615996268298834,
+            "q": 1.0,
+            "Z": 0.9996976552654443,
+            "a": 347.318503864127,
+            "h": 426300.77587390563,
+            "s": 3890.501402191561,
+            "v": 0.0,
+            "w": 0.0,
+            "u": 0.0,
+            "alpha": 0.0,
+            "beta": 0.0,
+            "Ma": 0.0,
+            "r": 0.1812490831763013,
+            "H": 0.04531227079407533
+          },
+          {
+            "p": 95766.98995100109,
+            "T": 296.31281037678815,
+            "d": 1.126292789341602,
+            "q": 1.0,
+            "Z": 0.9996788365957846,
+            "a": 345.18016772951665,
+            "h": 422600.24205290806,
+            "s": 3890.501402196954,
+            "v": 86.02945798966289,
+            "w": 86.02945798966289,
+            "u": 0.0,
+            "alpha": 0.0,
+            "beta": 0.0,
+            "Ma": 0.24923059327404815,
+            "r": 0.1812490831763013,
+            "H": 0.04531227079407533
+          },
+          {
+            "p": 67822.44270090495,
+            "T": 268.4606366997361,
+            "d": 0.8805016086592549,
+            "q": 1.0,
+            "Z": 0.9995604174897312,
+            "a": 328.5667727397097,
+            "h": 394666.27340402425,
+            "s": 3890.501402201018,
+            "v": 251.53330781382175,
+            "w": 251.53330781382175,
+            "u": 0.0,
+            "alpha": 70.0,
+            "beta": 70.0,
+            "Ma": 0.765547001957761,
+            "r": 0.24166544423506842,
+            "H": 0.04347086083843636
+          },
+          {
+            "p": 70250.94606032713,
+            "T": 271.1774865963771,
+            "d": 0.9028833694040558,
+            "q": 1.0,
+            "Z": 0.9995701639639802,
+            "a": 330.22486970607684,
+            "h": 397389.8353472904,
+            "s": 3890.501402196939,
+            "v": 240.46180788896706,
+            "w": 95.00267570102383,
+            "u": 184.24144209111367,
+            "alpha": 69.03683656575454,
+            "beta": 25.10284465405086,
+            "Ma": 0.28769085679580353,
+            "r": 0.2543846781421773,
+            "H": 0.040273590128417525
+          },
+          {
+            "p": 50000.00000211912,
+            "T": 246.0215108840425,
+            "d": 0.7083746672039476,
+            "q": 1.0,
+            "Z": 0.9994942350310297,
+            "a": 314.5338304258207,
+            "h": 372179.42864206055,
+            "s": 3890.5014021798097,
+            "v": 93.42008748181864,
+            "w": 280.25048279032177,
+            "u": 230.30180261389208,
+            "alpha": -22.94371914515356,
+            "beta": -72.12306905580039,
+            "Ma": 0.8910026702403184,
+            "r": 0.3179808476777216,
+            "H": 0.04106567491654749
+          }
+        ]
+      },
+      "console": "\nBoundary conditions and operating point\n=======================================\nFluid name                    :        Air\nStage type                    :     radial\nInlet pressure                :     1.0000 bar\nExit pressure                 :     0.5000 bar\nMass flow rate                :     5.0000 kg/s\nRotational speed              :     6916.2 rpm\n\nStage performance\n=================\nTotal-to-total efficiency     :     0.9267 -\nTotal-to-static efficiency    :     0.8519 -\nTotal-to-static pressure ratio:     2.0000 -\nTotal-to-static volume ratio  :     1.6398 -\nFlow coefficient              :     0.3736 -\nLoading coefficient           :     0.9381 -\nDegree of reaction            :     0.5000 -\nBlade velocity ratio          :     0.7000 -\nSpecific speed                :     0.5423 -\nSpouting velocity             :   329.0026 m/s\nRotor exit blade speed        :   230.3018 m/s\n\nGeometry summary\n================\n\nStator:\n  Blade count                 :         21 -\n  Blade count continuous      :    20.1938 -\n  Blade count integer         :         21 -\n  Radius in                   :     181.25 mm\n  Radius out                  :     241.67 mm\n  Height                      :      44.39 mm\n  Chord                       :      60.42 mm\n  Chord meridional            :      60.42 mm\n  Chord true                  :      73.75 mm\n  Spacing                     :      63.27 mm\n  Opening                     :      34.58 mm\n  Solidity                    :     0.9549 -\n  Solidity meridional         :     0.9549 -\n  Solidity chord              :     1.1658 -\n  Pitch to chord              :     0.8578 -\n  Aspect ratio                :     0.7348 -\n  Flaring angle               :      -0.87 deg\n  Maximum thickness           :      18.12 mm\n  Maximum thickness location  :     0.2500 -\n  Leading edge radius         :       9.06 mm\n  Trailing edge thickness     :       1.73 mm\n  Trailing edge wedge angle   :      10.00 deg\n  Metal angle in              :       0.00 deg\n  Metal angle out             :      70.00 deg\n\nRotor:\n  Blade count                 :         28 -\n  Blade count continuous      :    27.1676 -\n  Blade count integer         :         28 -\n  Radius in                   :     254.38 mm\n  Radius out                  :     317.98 mm\n  Height                      :      40.67 mm\n  Chord                       :      63.60 mm\n  Chord meridional            :      63.60 mm\n  Chord true                  :      69.35 mm\n  Spacing                     :      64.22 mm\n  Opening                     :      29.37 mm\n  Solidity                    :     0.9903 -\n  Solidity meridional         :     0.9903 -\n  Solidity chord              :     1.0799 -\n  Pitch to chord              :     0.9260 -\n  Aspect ratio                :     0.6395 -\n  Flaring angle               :       0.36 deg\n  Maximum thickness           :      19.08 mm\n  Maximum thickness location  :     0.2500 -\n  Leading edge radius         :       9.54 mm\n  Trailing edge thickness     :       1.47 mm\n  Trailing edge wedge angle   :      10.00 deg\n  Metal angle in              :      25.10 deg\n  Metal angle out             :     -72.12 deg\n\nFlow stations\n=============\n\n----------------------------------------------------------------------------------------------------------------\nStn    p [bar]     T [K]  rho [kg/m3]    v [m/s]    w [m/s]      Ma  alpha [deg]  beta [deg]    r [mm]    H [mm]\n  0      1.000    300.00       1.1616       0.00       0.00   0.000         0.00        0.00    181.25     45.31\n  1      0.958    296.31       1.1263      86.03      86.03   0.249         0.00        0.00    181.25     45.31\n  2      0.678    268.46       0.8805     251.53     251.53   0.766        70.00       70.00    241.67     43.47\n  3      0.703    271.18       0.9029     240.46      95.00   0.288        69.04       25.10    254.38     40.27\n  4      0.500    246.02       0.7084      93.42     280.25   0.891       -22.94      -72.12    317.98     41.07\n----------------------------------------------------------------------------------------------------------------\n\n",
+      "tables": [
+        [
+          {
+            "Quantity": "Total-to-total efficiency",
+            "Value": 0.926661901317937,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Total-to-static efficiency",
+            "Value": 0.8519476837732751,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Pressure ratio (t-s)",
+            "Value": 1.9999999999999991,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Volume ratio (t-s)",
+            "Value": 1.6398096666325295,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Flow coefficient",
+            "Value": 0.3735509536323251,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Work coefficient",
+            "Value": 0.9381354407273493,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Degree of reaction",
+            "Value": 0.5,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Blade velocity ratio",
+            "Value": 0.7,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Specific speed",
+            "Value": 0.5422797869345634,
+            "Unit": "-"
+          },
+          {
+            "Quantity": "Spouting velocity",
+            "Value": 329.002575162703,
+            "Unit": "m/s"
+          },
+          {
+            "Quantity": "Rotor exit blade speed",
+            "Value": 230.30180261389208,
+            "Unit": "m/s"
+          },
+          {
+            "Quantity": "Rotational speed",
+            "Value": 6916.203392122023,
+            "Unit": "rpm"
+          },
+          {
+            "Quantity": "Isentropic power",
+            "Value": 270.60673615922514,
+            "Unit": "kW"
+          },
+          {
+            "Quantity": "Actual power (t-t)",
+            "Value": 250.76095263874888,
+            "Unit": "kW"
+          },
+          {
+            "Quantity": "Actual power (t-s)",
+            "Value": 230.5427820842976,
+            "Unit": "kW"
+          }
+        ],
+        [
+          {
+            "Variable": "Blade count",
+            "Stator": 21.0,
+            "Rotor": 28.0,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Blade count continuous",
+            "Stator": 20.193768324097757,
+            "Rotor": 27.167572303054747,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Blade count integer",
+            "Stator": 21.0,
+            "Rotor": 28.0,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Radius in",
+            "Stator": 181.24908317630133,
+            "Rotor": 254.3846781421773,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Radius out",
+            "Stator": 241.6654442350684,
+            "Rotor": 317.9808476777216,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Height",
+            "Stator": 44.39156581625585,
+            "Rotor": 40.66963252248251,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Chord",
+            "Stator": 60.4163610587671,
+            "Rotor": 63.59616953554431,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Chord meridional",
+            "Stator": 60.4163610587671,
+            "Rotor": 63.59616953554431,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Chord true",
+            "Stator": 73.75475832598006,
+            "Rotor": 69.35320060561415,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Spacing",
+            "Stator": 63.267865352950395,
+            "Rotor": 64.21926182442336,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Opening",
+            "Stator": 34.580695227344435,
+            "Rotor": 29.36974342712633,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Solidity",
+            "Stator": 0.954929658551372,
+            "Rotor": 0.990297423682904,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Solidity meridional",
+            "Stator": 0.954929658551372,
+            "Rotor": 0.990297423682904,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Solidity chord",
+            "Stator": 1.165753861214169,
+            "Rotor": 1.0799439083436848,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Pitch to chord",
+            "Stator": 0.857814014837119,
+            "Rotor": 0.9259740179781234,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Aspect ratio",
+            "Stator": 0.7347606681090258,
+            "Rotor": 0.6394981461855495,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Flaring angle",
+            "Stator": -0.8730818167676653,
+            "Rotor": 0.3568023754467368,
+            "Unit": "deg"
+          },
+          {
+            "Variable": "Maximum thickness",
+            "Stator": 18.12490831763013,
+            "Rotor": 19.07885086066329,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Maximum thickness location",
+            "Stator": 0.25,
+            "Rotor": 0.25,
+            "Unit": "-"
+          },
+          {
+            "Variable": "Leading edge radius",
+            "Stator": 9.062454158815065,
+            "Rotor": 9.539425430331645,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Trailing edge thickness",
+            "Stator": 1.729034761367222,
+            "Rotor": 1.4684871713563166,
+            "Unit": "mm"
+          },
+          {
+            "Variable": "Trailing edge wedge angle",
+            "Stator": 10.0,
+            "Rotor": 10.0,
+            "Unit": "deg"
+          },
+          {
+            "Variable": "Metal angle in",
+            "Stator": 0.0,
+            "Rotor": 25.10284465405086,
+            "Unit": "deg"
+          },
+          {
+            "Variable": "Metal angle out",
+            "Stator": 70.0,
+            "Rotor": -72.12306905580039,
+            "Unit": "deg"
+          }
+        ],
+        [
+          {
+            "Station": 0,
+            "p [bar]": 0.9999999999999997,
+            "T [K]": 300.0,
+            "\u03c1 [kg/m\u00b3]": 1.1615996268298834,
+            "q [-]": 1.0,
+            "v [m/s]": 0.0,
+            "w [m/s]": 0.0,
+            "u [m/s]": 0.0,
+            "Ma [-]": 0.0,
+            "\u03b1 [deg]": 0.0,
+            "\u03b2 [deg]": 0.0,
+            "r [mm]": 181.24908317630133,
+            "H [mm]": 45.31227079407533
+          },
+          {
+            "Station": 1,
+            "p [bar]": 0.9576698995100109,
+            "T [K]": 296.31281037678815,
+            "\u03c1 [kg/m\u00b3]": 1.126292789341602,
+            "q [-]": 1.0,
+            "v [m/s]": 86.02945798966289,
+            "w [m/s]": 86.02945798966289,
+            "u [m/s]": 0.0,
+            "Ma [-]": 0.24923059327404815,
+            "\u03b1 [deg]": 0.0,
+            "\u03b2 [deg]": 0.0,
+            "r [mm]": 181.24908317630133,
+            "H [mm]": 45.31227079407533
+          },
+          {
+            "Station": 2,
+            "p [bar]": 0.6782244270090495,
+            "T [K]": 268.4606366997361,
+            "\u03c1 [kg/m\u00b3]": 0.8805016086592549,
+            "q [-]": 1.0,
+            "v [m/s]": 251.53330781382175,
+            "w [m/s]": 251.53330781382175,
+            "u [m/s]": 0.0,
+            "Ma [-]": 0.765547001957761,
+            "\u03b1 [deg]": 70.0,
+            "\u03b2 [deg]": 70.0,
+            "r [mm]": 241.6654442350684,
+            "H [mm]": 43.47086083843636
+          },
+          {
+            "Station": 3,
+            "p [bar]": 0.7025094606032712,
+            "T [K]": 271.1774865963771,
+            "\u03c1 [kg/m\u00b3]": 0.9028833694040558,
+            "q [-]": 1.0,
+            "v [m/s]": 240.46180788896706,
+            "w [m/s]": 95.00267570102383,
+            "u [m/s]": 184.24144209111367,
+            "Ma [-]": 0.28769085679580353,
+            "\u03b1 [deg]": 69.03683656575454,
+            "\u03b2 [deg]": 25.10284465405086,
+            "r [mm]": 254.3846781421773,
+            "H [mm]": 40.273590128417524
+          },
+          {
+            "Station": 4,
+            "p [bar]": 0.5000000000211913,
+            "T [K]": 246.0215108840425,
+            "\u03c1 [kg/m\u00b3]": 0.7083746672039476,
+            "q [-]": 1.0,
+            "v [m/s]": 93.42008748181864,
+            "w [m/s]": 280.25048279032177,
+            "u [m/s]": 230.30180261389208,
+            "Ma [-]": 0.8910026702403184,
+            "\u03b1 [deg]": -22.94371914515356,
+            "\u03b2 [deg]": -72.12306905580039,
+            "r [mm]": 317.9808476777216,
+            "H [mm]": 41.065674916547486
+          }
+        ]
+      ]
+    }
+  },
+  "captured_from": "8a1972f before structural refactoring"
+}

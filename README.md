@@ -83,14 +83,28 @@ Or use the Python launcher, which also opens your browser:
 python -c "import turbodash; turbodash.launch_app_experimental()"
 ```
 
-The stable app lives in `turbodash/app_turbine.py`; the experimental workspace
-lives in `turbodash/app_experimental.py` so it can be refined independently
+The stable app lives in `turbodash/apps/turbine.py`; the experimental workspace
+lives in `turbodash/apps/turbine_experimental.py` so it can be refined independently
 before becoming the default. The original single-stage app is also available
 with `turbodash-stage` or `turbodash.launch_app_stage()`.
 
 Render and the Procfile continue to launch the stable turbine app. To host the
 experimental app separately, install the `mesh` extra and use
-`gunicorn turbodash.app_experimental:server`.
+`gunicorn turbodash.apps.turbine_experimental:server`.
+
+## Application examples and package organization
+
+[Four YAML-driven app runners](demos/apps/README.md) are available under
+`demos/apps/`. Each app has its own runner and startup case. The
+[applications guide](turbodash/apps/README.md) explains the stable, experimental,
+original stage and dimensionless efficiency applications.
+
+Calculations live in `turbodash/core/`, blade geometry in `geometry/`, plotting
+in `visualization/`, report generation in `reporting/`, and external-format
+adapters in `io/`. Production loss models remain in `turbodash/loss_models/`.
+Import implementations from these packages directly. The former flat module
+paths and root module aliases have been removed. Root scientific functions and
+Python app launchers remain available. See the [refactor evaluation and migration map](REFACTOR_EVALUATION.md).
 
 ## Documentation
 

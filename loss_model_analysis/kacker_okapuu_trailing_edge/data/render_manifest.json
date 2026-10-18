@@ -3,12 +3,12 @@
   "model_calls": 0,
   "derivative_recalculations": 0,
   "files": {
-    "digitization_overlay.pdf": "8e3d63d6a4614ed322e630cae4126630c315c42749cf9ff0c50fa1a846d01e24",
-    "reference_fit.pdf": "c832d7c9998dfc065837b12cd8c16fbf6e7531aa44159bf81dc384b06d5a018a",
-    "reference_continuation.pdf": "54fd8a9551a3c57249a3ebc4cea5011509d89534ac94d1cb804bff13a1b77592",
-    "z_interpolation.pdf": "e34b15ef600bff14b4352428163dc4472378b6025a4a6fafccf4416d4782ac77",
-    "thickness_sensitivity.pdf": "80f4d994a6e873a0500286fb2b985379c5d1257418487fb67cd593b9c3f6299b",
-    "mach_sensitivity.pdf": "8a005669580261cc114d1b707ea063007b3461fd3f4e8d68c41bd4617a983411"
+    "digitization_overlay.svg": "ed69a4af8383b87e4c6a2bc21cb80565aefdf8b09c654efb96dcbce98dde12e7",
+    "reference_fit.svg": "0807201510077975b16c5606591e07307fddd4f703ce15a46c21e7c1408360dc",
+    "reference_continuation.svg": "bcd1b03e097c66da6a964ab797c2edf69753f44719ae4cf6f9b1f76e6208a07b",
+    "z_interpolation.svg": "e94ef4d860ec10bc1f177ec5fdd3920589ba6163d770966625e2a3645695cbfa",
+    "thickness_sensitivity.svg": "a44b3cd5c6a094623289bff95c782eadedf8561ca7ae1431bea6a4e79cf1e0c8",
+    "mach_sensitivity.svg": "bc75820b4017f875cef11903ca705550fd9de7d1fdaf8f4ee03a5f460eef43e3"
   },
   "data_sha256": {
     "digitized_points.csv": "f1bbfb09fc02a0bf2f63225111f99ccb0607c8b87848e3ae163704123954f19e",
@@ -20,21 +20,21 @@
     "z_sensitivity.csv": "c90f30e0a83ef2f53ec011901ee18a4f205b029dbd15bbbc0c98f76a3dc2e9f2"
   },
   "code_sha256": {
-    "digitize.py": "9ff83767fe5d7794012fecc3f4c3b1f760b193f714f0c842031d13622d62d9fe",
+    "digitize.py": "82f15e2ebe4ab1dd56b267499c83d1b5866ce3f42d0c41ed4d42005e27e2b1a5",
     "fit.py": "681899a896268a5e084829ae3c99c454b9882d21edc43b003ffc47dae2351bf3",
     "fit_constants.py": "5b7fcdbd58c776ad973515cf54fdbbbbc9421e03ea4cb1ddbbf2be02f7dbf161",
     "model.py": "c907c3060fd3e498072394b17be626126ce446efdafead342b07f85e49a9a6d4",
-    "report.py": "9744a3d9c11292097d3bda40aea74310c729916ad2c040fcf9fa9adb1c44c6f7",
-    "run.py": "f9a88bca37421d87edefb6eb51d0ab1d0179dde617e0aebedec19d2cf5ed1f39",
+    "report.py": "6a16eec4d7b7d75f993a882631ba680050b9278b84e85c874d18e1646256e767",
+    "run.py": "3fdcad6a9206dc7425f50cbd2b72917a010a9dbc93d48a564fdb529fda477543",
     "test_model.py": "42d2ed90b2dfc4c1b2bcdfe259390376fb84024c3bf236c0a9397c1502c6f973"
   },
   "validated_code_sha256": {
-    "digitize.py": "9ff83767fe5d7794012fecc3f4c3b1f760b193f714f0c842031d13622d62d9fe",
+    "digitize.py": "82f15e2ebe4ab1dd56b267499c83d1b5866ce3f42d0c41ed4d42005e27e2b1a5",
     "fit.py": "681899a896268a5e084829ae3c99c454b9882d21edc43b003ffc47dae2351bf3",
     "fit_constants.py": "5b7fcdbd58c776ad973515cf54fdbbbbc9421e03ea4cb1ddbbf2be02f7dbf161",
     "model.py": "c907c3060fd3e498072394b17be626126ce446efdafead342b07f85e49a9a6d4",
-    "report.py": "9744a3d9c11292097d3bda40aea74310c729916ad2c040fcf9fa9adb1c44c6f7",
-    "run.py": "f9a88bca37421d87edefb6eb51d0ab1d0179dde617e0aebedec19d2cf5ed1f39",
+    "report.py": "6a16eec4d7b7d75f993a882631ba680050b9278b84e85c874d18e1646256e767",
+    "run.py": "3fdcad6a9206dc7425f50cbd2b72917a010a9dbc93d48a564fdb529fda477543",
     "test_model.py": "42d2ed90b2dfc4c1b2bcdfe259390376fb84024c3bf236c0a9397c1502c6f973"
   },
   "comparison_source_sha256": {

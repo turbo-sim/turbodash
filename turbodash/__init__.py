@@ -11,16 +11,10 @@ else:
     sys.excepthook = IPython.core.ultratb.FormattedTB(call_pdb=False)
 
 
-from .core_stage import *
-from .graphics import *
-from . import core_turbine
-from . import geom_blade as geometry
-from . import plotting_mpl as mpl
-from . import plotting_plotly_stage as plotly
-
-from . import plotting_plotly_turbine
-
-from . import reporting_utils
+from .core.stage import *
+from .reporting.stage import *
+from .visualization.matplotlib_style import *
+from .apps.launchers import launch_app_stage, launch_app_turbine, launch_app_experimental
 
 # Package info
 __version__ = "0.6.0"
@@ -30,41 +24,3 @@ URL_GITHUB = "https://github.com/turbo-sim/turbodash"
 URL_PYPI = "https://pypi.org/project/turbodash/"
 URL_DTU = "https://thermalpower.dtu.dk/"
 BREAKLINE = 80 * "-"
-
-
-def launch_app_stage():
-    import os
-    import webbrowser
-    from threading import Timer
-    from turbodash.app import app
-
-    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-        Timer(1, lambda: webbrowser.open("http://127.0.0.1:8050/")).start()
-
-    app.run(debug=True)
-
-
-
-def launch_app_turbine():
-    import os
-    import webbrowser
-    from threading import Timer
-    from turbodash.app_turbine import app
-
-    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-        Timer(1, lambda: webbrowser.open("http://127.0.0.1:8050/")).start()
-
-    app.run(debug=True)
-
-
-def launch_app_experimental():
-    """Launch the experimental meanline, geometry and meshing workspace."""
-    import os
-    import webbrowser
-    from threading import Timer
-    from turbodash.app_experimental import app
-
-    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-        Timer(1, lambda: webbrowser.open("http://127.0.0.1:8050/")).start()
-
-    app.run(debug=True)

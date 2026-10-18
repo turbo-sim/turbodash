@@ -66,7 +66,7 @@ I will retain the original Denton equation: the nominal maximum input specifies 
 
 ## 3. Zweifel spacing and the zero-turning case
 
-Your existing calculation in [core_stage.py](../../turbodash/core_stage.py) uses flow angles and computes
+Your existing calculation in [core_stage.py](../../../turbodash/core/stage.py) uses flow angles and computes
 
 $$
 p_{\mathrm{mean}}=

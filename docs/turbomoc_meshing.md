@@ -8,15 +8,15 @@ characteristics nozzle calculation to construct a turbine blade.
 
 | Responsibility | Existing implementation | Integration choice |
 | --- | --- | --- |
-| Turbine thermodynamics and stage sizing | `turbodash/core_turbine.py` and `core_stage.py` | Keep the existing solver and `stages_performance` result schema. |
-| Blade profiles | `turbodash/geom_blade.py` | Construct the same curvature-based camberline and NACA thickness profile used by the existing views. Use absolute stator angles and relative rotor angles. |
-| Existing 3D export | `turbodash/export_turbogrid.py` and `export_turbogrid_assembly.py` | Preserve the TurboGrid workflow, including its separate free-vortex span model. It produces geometry for another mesher, not an in-app CFD mesh. |
+| Turbine thermodynamics and stage sizing | `turbodash/core/turbine.py` and `core/stage.py` | Keep the existing solver and `stages_performance` result schema. |
+| Blade profiles | `turbodash/geometry/blade.py` | Construct the same curvature-based camberline and NACA thickness profile used by the existing views. Use absolute stator angles and relative rotor angles. |
+| Existing 3D export | `turbodash/io/turbogrid.py` and `io/turbogrid_assembly.py` | Preserve the TurboGrid workflow, including its separate free-vortex span model. It produces geometry for another mesher, not an in-app CFD mesh. |
 | General blade-row geometry | `turbo_moc.geometry.blade_row.Design`, `meridional_channel`, `rotor_blade` | Adapt Turbodash's three closed profile segments to SciPy B-splines, then reuse passage construction, containment checks and annular mapping. |
 | 2D reference mesh and 3D sweep | `turbo_moc.meshing.mesh_3d` | Call `reference_mesh`, `load_section`, `volume_mesh` and `export_mesh` directly. These reuse the package's sizing, inflation, recombination, periodic correspondence, volume validation and CGNS audit. |
 | 3D surface models | `turbo_moc.visualization.geometry_preview.preview_geometry` | Reuse closed surfaces for previews and binary STL download. Remove the upstream display-only blade overhang from the exported STL. |
 | Quality and cell inspection | `turbo_moc.meshing.inspection` | Reuse saved cell quality, physical slicing, spanwise layer extraction, threshold filtering and worst-cell selection. |
 | 3D rendering | TurboMoC's `studio.js`, `mesh_edges.js` and `orientation_cube.js`, using Dash VTK | Serve the installed package's renderer directly, including actor reuse, camera controls, original polygon edges, and cell-quality colors. Keep Plotly for the 2D and meanline plots. |
-| Experimental app runtime | `turbodash/app_experimental.py` | Keep meanline controls mounted across three tabs; use a separate subprocess for each Gmsh job. The stable meanline app remains in `app_turbine.py`. |
+| Experimental app runtime | `turbodash/apps/turbine_experimental.py` | Keep meanline controls mounted across three tabs; use a separate subprocess for each Gmsh job. The stable meanline app remains in `apps/turbine.py`. |
 
 The current TurboMoC checkout already has general spline-based meridional
 channels and flared passage support. This first Turbodash adapter deliberately
@@ -82,7 +82,7 @@ launches this three-tab workspace. The existing `turbodash` command and
 `turbodash-stage` retains the original single-stage app.
 The Render/Procfile entrypoints use the stable turbine app without the mesh
 extra. To host the experimental workspace separately, install the mesh extra
-and use `gunicorn turbodash.app_experimental:server`.
+and use `gunicorn turbodash.apps.turbine_experimental:server`.
 
 1. **Meanline:** calculate or load an axial turbine, including its blade geometry.
    The existing performance plots, tables and expandable theory documentation
@@ -144,7 +144,7 @@ conditions and inter-row coupling still belong to the CFD solver setup.
 ```python
 from pathlib import Path
 import yaml
-from turbodash.meshing import generate_mesh, geometry_zip, inspect_mesh
+from turbodash.meshing.turbomoc import generate_mesh, geometry_zip, inspect_mesh
 
 results = yaml.safe_load(Path("demos/basic_demo/demo_axial_turbine.yaml").read_text())
 Path("stator_model.zip").write_bytes(geometry_zip(results, stage_index=0, row="stator"))

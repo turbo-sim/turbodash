@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from turbodash import core_turbine as core
+from turbodash.core import turbine as core
 from turbodash.loss_models import loss_model_benner as benner
 
 

@@ -27,7 +27,7 @@ sys.dont_write_bytecode = True
 sys.path.insert(0, str(REPO))
 
 import numpy as np
-from turbodash.core_turbine import compute_blade_row_geometry
+from turbodash.core.turbine import compute_blade_row_geometry
 from turbodash.loss_models import loss_model_kacker_okapuu as ko
 
 # Reuse the unchanged Air EOS/reference triangles, not the old geometry filter.

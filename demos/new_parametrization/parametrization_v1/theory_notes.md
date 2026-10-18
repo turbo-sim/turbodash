@@ -1003,7 +1003,7 @@ The source links above support standard building blocks and terminology. The det
 
 For external background, the main curve reference is Piegl and Tiller, *The NURBS Book*, second edition, Springer, 1997, [DOI 10.1007/978-3-642-59223-2](https://link.springer.com/book/10.1007/978-3-642-59223-2). The open [Michigan Tech conic notes](https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/spline/NURBS/RB-conics.html) give a directly accessible explanation of the rational-quadratic building block. The sigmoid/logit terminology is supported by the official [logit](https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.logit.html) and [expit](https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.expit.html) definitions.
 
-The historical [discussion document](../parametrization/thickness_parametrization_discussion.md) records the original proposals and your answers. Its earlier arc-length normalization and full-included-angle suggestions are superseded by the meridional normalization and half-angle convention documented here. The short [README](README.md) remains the entry point for running the cases.
+The historical [discussion document](../parametrization_v0/thickness_parametrization_discussion.md) records the original proposals and your answers. Its earlier arc-length normalization and full-included-angle suggestions are superseded by the meridional normalization and half-angle convention documented here. The short [README](README.md) remains the entry point for running the cases.
 
 ## 14. Denton's thickness construction and the existing turbodash implementation
 
@@ -1011,7 +1011,7 @@ The historical [discussion document](../parametrization/thickness_parametrizatio
 
 Denton's 2017 paper describes constructing a blade from a camberline and a thickness distribution, with separate controls for the main body and the edge regions. The relevant material is the STAGEN discussion and Figure 2 on page 4 of the supplied conference paper, *MULTALL—An Open Source, CFD Based, Turbomachinery Design System*, ASME GT2017-63993, [DOI 10.1115/GT2017-63993](https://doi.org/10.1115/GT2017-63993). That page illustrates the distributions but does not print their generating equations.
 
-The equations can be checked in the [publicly mirrored STAGEN Fortran source](https://github.com/paopaoai11/Multall-open-18.3/blob/master/Stagen-18.1/Stagen-18.1.f#L975-L1082). Its filename says 18.1, although its header says 16.4, December 2016; it is therefore identified here by the actual file, without asserting an exact release match to the paper. The main body law also appears in this repository's [`compute_thickness_distribution_Denton`](../../turbodash/geom_blade.py), which provides the basis for the detailed algebra below.
+The equations can be checked in the [publicly mirrored STAGEN Fortran source](https://github.com/paopaoai11/Multall-open-18.3/blob/master/Stagen-18.1/Stagen-18.1.f#L975-L1082). Its filename says 18.1, although its header says 16.4, December 2016; it is therefore identified here by the actual file, without asserting an exact release match to the paper. The main body law also appears in this repository's [`compute_thickness_distribution_Denton`](../../../turbodash/geometry/blade.py), which provides the basis for the detailed algebra below.
 
 The following separates the shared body equation, the STAGEN edge construction, and the local adaptations. The derivatives, radius relations, and parameter assessments are derived here; they are not additional claims made in the paper. None of these equations replaces the prototype implemented in `blade_geometry.py`.
 
@@ -1283,7 +1283,7 @@ A tangential full thickness at a common meridional station corresponds to an ang
 
 ### 14.7. What the current turbodash Denton function actually does
 
-The local implementation retains the baseline-plus-hump equation but makes several specific choices in [`geom_blade.py`](../../turbodash/geom_blade.py).
+The local implementation retains the baseline-plus-hump equation but makes several specific choices in [`geom_blade.py`](../../../turbodash/geometry/blade.py).
 
 **Leading thickness preprocessing.** The dispatcher first chooses a dimensional body thickness from the explicit leading thickness, or twice `radius_leading` when the explicit value is nonpositive. It then bounds that value below by the trailing thickness and above by the larger of $0.95T_{\mathrm{max}}$ and the trailing thickness plus a small numerical floor. These bounds are local implementation choices and couple the endpoint parameters.
 

@@ -16,9 +16,13 @@ import pytest
 import yaml
 from plotly.utils import PlotlyJSONEncoder
 
-from turbodash import core_turbine as core, meshing, reporting_utils
-from turbodash.export_turbogrid import build_turbogrid_files
-from turbodash.turbogrid_assembly import build_assembly_layout
+from turbodash.core import turbine as core
+
+from turbodash.meshing import turbomoc as meshing
+
+from turbodash.reporting import turbine as reporting_utils
+from turbodash.io.turbogrid import build_turbogrid_files
+from turbodash.geometry.assembly import build_assembly_layout
 
 
 GEOMETRY_REFERENCE = json.loads((Path(__file__).parent / "fixtures/meanline_geometry_reference.json").read_text())
@@ -234,14 +238,14 @@ def test_meanline_table_displays_fractional_counts(reference):
     assert data[0]["s1"] == round(result["stages_performance"][0]["geometry_meanline"]["stator"]["blade_count"], 3)
 
 
-@pytest.mark.parametrize("app_name", ["app_turbine", "app_experimental"])
+@pytest.mark.parametrize("app_name", ["turbine", "turbine_experimental"])
 @pytest.mark.parametrize("profile_failure", [False, True])
 def test_app_callback_retains_meanline_result_when_physical_plot_fails(monkeypatch, app_name, profile_failure):
-    app = importlib.import_module(f"turbodash.{app_name}")
+    app = importlib.import_module(f"turbodash.apps.{app_name}")
     if profile_failure:
         def fail(*args, **kwargs):
             raise ValueError("Example invalid physical profile")
-        monkeypatch.setattr(app.td.plotting_plotly_turbine, "plot_turbine_blades", fail)
+        monkeypatch.setattr(app._plotting, "plot_turbine_blades", fail)
     overall = app.OVERALL_DEFAULTS
     ids = [{"key": key} for key in overall]
     outputs = app.update_turbine(list(overall.values()), [], ids, [], [app.stage_defaults_for(overall["turbine_type"])])

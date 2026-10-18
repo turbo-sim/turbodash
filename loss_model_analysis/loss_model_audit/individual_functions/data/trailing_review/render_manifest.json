@@ -3,11 +3,11 @@
   "model_calls": 0,
   "derivative_recalculations": 0,
   "files": {
-    "ko_trailing_reference_fit.pdf": "237a27b723d0e8e193e1a4c31ee091e20f708dc4732b89512a51344ab2430418",
-    "ko_trailing_reference_continuation.pdf": "a971309566998fe3d65473e25efb18f10fd2b6bb819e22fd053620e27f157a6b",
-    "ko_trailing_blending_review.pdf": "af81c6f46e9553ef70dbc10977bf8b93ab5f0b83c952041492e89f3827247efe",
-    "ko_trailing_thickness_review.pdf": "41489ac6280c3a95572a40561fb64f608b067115abae53bbf743e502b8f20faa",
-    "ko_trailing_mach_review.pdf": "e5e5e960bc1e54c106f62f409c012b83fcfe34bf59e52a0c635d636180ead7ba"
+    "ko_trailing_reference_fit.svg": "b6140e958426c4cdde91f76294eb490bfaa3652ed5c25d3ce5d7a56429064632",
+    "ko_trailing_reference_continuation.svg": "743a854a6130180ce2012257a2fbb9d3b69055678ed9fbcb788a1dc0badec558",
+    "ko_trailing_blending_review.svg": "cb8b4b2407be231d9677e217702a901570084f5d05528275bb3ea19274c0583d",
+    "ko_trailing_thickness_review.svg": "6488e0bb3262ac3b03f1c064ab1377e2ab1642ba6a56bee44a30a4a80a42c3d6",
+    "ko_trailing_mach_review.svg": "c2e8b561b591ebd945b0690b68b14376f3c02cd871d4fe6a0b734fd5a54fd024"
   },
   "data_sha256": {
     "references": "84bd39c2bae2f521272a0a6a3d4903c10546eb93a6aac4199643de9cf1b42778",
@@ -18,5 +18,5 @@
     "mach_sensitivity": "ba472a0240e32adfc042fe2f791a7611a9652c6d027318619e8be74abe74e69c",
     "join_checks": "7877dd825a01def1ff4524e644cea437d6c05cc7d95bc0dacb5f92be981ad356"
   },
-  "script_sha256": "a9d4cc307df15a72632a6854e7a9dcc9d3019f55e7585813ddca5e7f83e3cfbe"
+  "script_sha256": "6ac53ff67392cc66a360150f072149ecf60ccc3f838dbfb3b8f4843e8ca61557"
 }

@@ -13,77 +13,77 @@
   "model_calculations": 0,
   "plots_regenerated": 0,
   "figure_sha256": {
-    "sensitivity_isentropic/figures/speed_r0_stator_exit_angle.pdf": "5c6fd18f459e1d5b1268c414ef4d9996af25a0072b09e0278984f04bbec2349e",
-    "sensitivity_kacker_okapuu/figures/speed_r0_stator_exit_angle.pdf": "9374b1ee3e4ec85ec21fa9f5815cba2c4c5796e7a0863a3cfbcf464a976f18e4",
-    "sensitivity_benner/figures/speed_r0_stator_exit_angle.pdf": "61e84ecf9f6758ec7bb5ca2e9dee775815abbe022a6a5af36fdff751066bd2ea",
-    "sensitivity_isentropic/figures/speed_r05_stator_exit_angle.pdf": "e0ed738079c053d691b78a1814237dbffb78b0a9ac4cfc2eaae3d7478f583d03",
-    "sensitivity_kacker_okapuu/figures/speed_r05_stator_exit_angle.pdf": "9b9d2e16f7115e84c6df4cdb50299333ff811e3422cf7bb7379c7e44fedb8da3",
-    "sensitivity_benner/figures/speed_r05_stator_exit_angle.pdf": "8001beb9e06a25eeb44506ca51f58f89cf491c2b83bec62c6f6640877be7f191",
-    "sensitivity_isentropic/figures/reaction_stator_exit_angle.pdf": "5b73b5de1e2253c82b376a97b8c2634eb03f832f22cffca5cf8dc8140e95d892",
-    "sensitivity_kacker_okapuu/figures/reaction_stator_exit_angle.pdf": "d96c73bbf9f46a423b600ad7e77ff20c5bb07b18d6b6fa13b0c0619ad81ffbda",
-    "sensitivity_benner/figures/reaction_stator_exit_angle.pdf": "39e7eb98b0eabeb44661dd245f79734b54ec4d0b2720fdf99bb31458a4e24f3a",
-    "sensitivity_isentropic/figures/speed_r0_pitch_chord.pdf": "98347f670177f638c5908106836eefe81831761348508bc86ea6eabb7fd0fafd",
-    "sensitivity_kacker_okapuu/figures/speed_r0_pitch_chord.pdf": "06f5d5652f0d9a80ecb76dc7a2e28becf4a3f12afc0ea260cacde6563dc70014",
-    "sensitivity_benner/figures/speed_r0_pitch_chord.pdf": "c3ff77bb9cd11a3ae9742ae8dd6895baf8697299a0294651a73602505bff7aa7",
-    "sensitivity_isentropic/figures/speed_r05_pitch_chord.pdf": "e790a46e5d339a16439495bb5157755209b1c7e04d38836cc3232ae10b918575",
-    "sensitivity_kacker_okapuu/figures/speed_r05_pitch_chord.pdf": "034641fb795d1b2900e4d34d7510ef39ca6870cd5c12ee83fecb6bc160fa6eab",
-    "sensitivity_benner/figures/speed_r05_pitch_chord.pdf": "d0bfa930df7085f633018dfd0aa4740028daba7a8071da7663e82e8807b64258",
-    "sensitivity_isentropic/figures/reaction_pitch_chord.pdf": "5296d4db058a68df3fccaf6b5a796b942f5599d00d4bcc4a5272fca8e03d8ac7",
-    "sensitivity_kacker_okapuu/figures/reaction_pitch_chord.pdf": "5cffa6434c10e3f0b765e6c332204f1422e59f0aef5a963f540d057485d4b7d9",
-    "sensitivity_benner/figures/reaction_pitch_chord.pdf": "eee088d52c6d5b2f27d442df703e5acc975a13620cc623d347df8f8af4d02705",
-    "sensitivity_isentropic/figures/speed_r0_aspect_ratio.pdf": "2f5590659d4a655e47fe31d1b47696d96fd75ca8d2d232ab0e9eebd0aa2de01f",
-    "sensitivity_kacker_okapuu/figures/speed_r0_aspect_ratio.pdf": "47e1ed994ddeef306dcd7a9eeaffc9e96ca62886c6807793f4a2ac800386fe97",
-    "sensitivity_benner/figures/speed_r0_aspect_ratio.pdf": "9f89611aaff5faf25e9461229e61db03ffe468c109b3508ef3ac7636665cc2bc",
-    "sensitivity_isentropic/figures/speed_r05_aspect_ratio.pdf": "66e27c69410a8b6d10957bc507f85c8889e49c11882124f80098b249b0293d7d",
-    "sensitivity_kacker_okapuu/figures/speed_r05_aspect_ratio.pdf": "dc508eed82ead0150004c28de757fb8b5f2c1c9c409e124474cf5bec587d0d9c",
-    "sensitivity_benner/figures/speed_r05_aspect_ratio.pdf": "95703a13fc344d06cf287fa0916881880779ab7bdb8cfabfa80c8ad03c73332e",
-    "sensitivity_isentropic/figures/reaction_aspect_ratio.pdf": "7ac6f61ac89eff5b6a9a67a9f8a367683400eec0abfbb9774fd13fd157e60295",
-    "sensitivity_kacker_okapuu/figures/reaction_aspect_ratio.pdf": "8653274291f335770e14bdcf8ed65458c7e39c5496ec6bbafbbaf5937aea7dd1",
-    "sensitivity_benner/figures/reaction_aspect_ratio.pdf": "0f48dc69693e087e3145e392451e5af554ced6ae1f2cb89c4d982583f1fd37a3",
-    "sensitivity_isentropic/figures/speed_r0_trailing_ratio.pdf": "8af65297ab62f5ee6ce0df7bdc3bc29f1fdb26d45039d14a500a2f8862f76c33",
-    "sensitivity_kacker_okapuu/figures/speed_r0_trailing_ratio.pdf": "325722cef5a1fda2006cec55cd5810545779ef045409268587fd4d9de2920ae4",
-    "sensitivity_benner/figures/speed_r0_trailing_ratio.pdf": "4e042a779f428b69a98dfe093ab3b7ae3df7a327bc74f4fc447e7a949238f3cb",
-    "sensitivity_isentropic/figures/speed_r05_trailing_ratio.pdf": "80cbf49a78a798648c70d909e4f42308c410d94af1f320f4c54d9c218f3951c9",
-    "sensitivity_kacker_okapuu/figures/speed_r05_trailing_ratio.pdf": "9d47d5c1cf78b81c054bd76754dc011a97e2d2f662698674c013e6d0f7af09c3",
-    "sensitivity_benner/figures/speed_r05_trailing_ratio.pdf": "cd39dc8dcd24e38da6ca477d7ea9a7d143673fe3ece2fc8df452a3a6e6127e21",
-    "sensitivity_isentropic/figures/reaction_trailing_ratio.pdf": "1aff9d8f0a501dc591a19ce510ff8f0e640194e1af1abba5aa515087bb71fb7a",
-    "sensitivity_kacker_okapuu/figures/reaction_trailing_ratio.pdf": "d79d1f981b63c06a33c011c84db5e023b09a29fb0d21aca8214ab326cf68cc40",
-    "sensitivity_benner/figures/reaction_trailing_ratio.pdf": "fc1be659bb90a40ad4033b73fdc52db670ae8060b8c9fa8922c6b6c15227f139",
-    "sensitivity_isentropic/figures/speed_r0_specific_speed.pdf": "dda46c396b29424e9596284f7cc67fe510e7697bfae7a531f58cb4c4f3171452",
-    "sensitivity_kacker_okapuu/figures/speed_r0_specific_speed.pdf": "4d7aec0c384f2b78ca8fba004bd9bbbeb280267a32baf5073f12e363a1c7812f",
-    "sensitivity_benner/figures/speed_r0_specific_speed.pdf": "75d4585163479b9177e5a08d7c1a0367bee482567fdb1c8361fbfb5e29828a74",
-    "sensitivity_isentropic/figures/speed_r05_specific_speed.pdf": "60c8a49f97450b4ad001de84736184bb5ba1a19d4e872b5d7c0bf233c5fb3a99",
-    "sensitivity_kacker_okapuu/figures/speed_r05_specific_speed.pdf": "24fcf227a2847a2819825db57ce9bcd0bc853217ed3a293a189a981267f6c2ef",
-    "sensitivity_benner/figures/speed_r05_specific_speed.pdf": "7298b629e02d713ed35adb55284266150610a98c4c26f21fbf7e62afd486f69a",
-    "sensitivity_isentropic/figures/reaction_specific_speed.pdf": "bb89034bfc1826fa43e68b585ce496f21dda065fbdb708b900f1c14298663664",
-    "sensitivity_kacker_okapuu/figures/reaction_specific_speed.pdf": "5802b23e11a7c72c0fe138e8004ed45f1703ccdb8f91083df3b695a69d991376",
-    "sensitivity_benner/figures/reaction_specific_speed.pdf": "4cd87445c5181ec9095da121b3e8570c1307ebd6f44d24fedab085773de536a9",
-    "sensitivity_isentropic/figures/speed_r0_mass_flow.pdf": "9588dbf165d5a2e93dc7d75975cfec097d74d351c7f12bc19d6f5966b06439e6",
-    "sensitivity_kacker_okapuu/figures/speed_r0_mass_flow.pdf": "59cea4c5b55f432ed51238ea5009b83b5d4bde9955565a1f36be48505ea74eb6",
-    "sensitivity_benner/figures/speed_r0_mass_flow.pdf": "1379958eb4e48d19ea0d08c1fe3eeab6146f2cc757194ff72218ba39bd4c79c1",
-    "sensitivity_isentropic/figures/speed_r05_mass_flow.pdf": "0bb0887b5dc0f015f17add93cbe2ccc21e8933cd5a53246a09ed8ca5788734b8",
-    "sensitivity_kacker_okapuu/figures/speed_r05_mass_flow.pdf": "f37be7ba2f3647e1b76521a2cc3475e956850fab3646442d2259d530dd65b959",
-    "sensitivity_benner/figures/speed_r05_mass_flow.pdf": "cca65218a3f23105ff8e73eff44a0322da99da479a6b02cdcb725c59c29426fc",
-    "sensitivity_isentropic/figures/reaction_mass_flow.pdf": "971a1a3f48037e1bc72ccf4edb1f0b3cb17f0f446dc77562eb2a39205f36a440",
-    "sensitivity_kacker_okapuu/figures/reaction_mass_flow.pdf": "327980dd2fc589e778554fd0e0418ad59c870615469cbba578e8212d9834c957",
-    "sensitivity_benner/figures/reaction_mass_flow.pdf": "2ca4f0240da5f4563cb829bd46b52e9789ea129408e42e215d7da1238ae44bec",
-    "sensitivity_isentropic/figures/speed_r0_isentropic_mach.pdf": "1b8564197eb69362a8b07006e36c209bdb8f09c3259a2fe1554af81e3cd6bd0e",
-    "sensitivity_kacker_okapuu/figures/speed_r0_isentropic_mach.pdf": "c85e1f33a5e6a307426a02f1b7c73c2d135c09866e391f4a63113fff64c1dfce",
-    "sensitivity_benner/figures/speed_r0_isentropic_mach.pdf": "ffd00f9eebb7b4f84993e6c379808eeae5d929021154a8c127fe5688ac949ae8",
-    "sensitivity_isentropic/figures/speed_r05_isentropic_mach.pdf": "95f6c409da15926b61dc6782b9f590f8ef26842d39a38e0b14f947a09cb54255",
-    "sensitivity_kacker_okapuu/figures/speed_r05_isentropic_mach.pdf": "a7c5738236d55a892b47d10e4ab644828b17cd4fecd76c298b0063513b47fe3f",
-    "sensitivity_benner/figures/speed_r05_isentropic_mach.pdf": "c3b4701d92a037fe9b15a526ed618b5bd9023afbd5996c335ae2c5ec88fbb016",
-    "sensitivity_isentropic/figures/reaction_isentropic_mach.pdf": "90f4588b9217d6f6f593fb7210fbbf266dba4bc0ba8d19843127d90f17467dd5",
-    "sensitivity_kacker_okapuu/figures/reaction_isentropic_mach.pdf": "77eab803b82c2dc8d41a397e557986acb2bd332c89db9c006091931320440493",
-    "sensitivity_benner/figures/reaction_isentropic_mach.pdf": "ef26192249aea7926eaaabb9996bfed51c52c4014647ab6f20f8f53873877bff"
+    "sensitivity_isentropic/figures/speed_r0_stator_exit_angle.svg": "1946b52812c34f9bfe8af7d1242ddfc78a20909f62168c24170ce12ed5064f1f",
+    "sensitivity_kacker_okapuu/figures/speed_r0_stator_exit_angle.svg": "4ebab7693b39d28c6206e7a469ab8f727a8c8ac03e0356a2de7b143abc2f83bf",
+    "sensitivity_benner/figures/speed_r0_stator_exit_angle.svg": "12254f8c7751369783f384c7610bce8e5a24e4962e21230c7367f1b4523922aa",
+    "sensitivity_isentropic/figures/speed_r05_stator_exit_angle.svg": "84544bfa87b645c7a00a6aab7eae148d0cf6f79b08982204a42c3b2685f72838",
+    "sensitivity_kacker_okapuu/figures/speed_r05_stator_exit_angle.svg": "18781f7e7f7d215d40849e997c6774b635cc2154d84325c71e7c5fc7bb4d2def",
+    "sensitivity_benner/figures/speed_r05_stator_exit_angle.svg": "8fa9a20cf9d71833b7a6e1a4b15025d977b45bb5b037bef3de6e67132128a804",
+    "sensitivity_isentropic/figures/reaction_stator_exit_angle.svg": "11ab7e596bb7db4b03f48065dfb002299d0ad46ef12ac377a7e05c777b41e6df",
+    "sensitivity_kacker_okapuu/figures/reaction_stator_exit_angle.svg": "e7812db3e56f9757d8167525677b07b4108efdbd58567895bbaccf62ee02d53a",
+    "sensitivity_benner/figures/reaction_stator_exit_angle.svg": "f94625656b5f221f8ae50a2511a24fabea558e1476826ef7a39687a852d0234f",
+    "sensitivity_isentropic/figures/speed_r0_pitch_chord.svg": "176c46f7d57df55471e46b23f78864a8f3cdd01d6e43f06967886f11e5ac3b73",
+    "sensitivity_kacker_okapuu/figures/speed_r0_pitch_chord.svg": "efe70aec39ccade79f47b52f82421be8c980f1baf320bbbe62a24276b56ab3a9",
+    "sensitivity_benner/figures/speed_r0_pitch_chord.svg": "ffc98e19aeeb91df2354170c2aa8ff225edc0f0fade6425b580081bf54e0e117",
+    "sensitivity_isentropic/figures/speed_r05_pitch_chord.svg": "9385844696db797298e80ee89908f0e7ac1234df73d6ba68a93f3e5efb0000c2",
+    "sensitivity_kacker_okapuu/figures/speed_r05_pitch_chord.svg": "b0f0ccbfdc81b979b434a780825972adfa9add9492fae1af047220a45bf29a41",
+    "sensitivity_benner/figures/speed_r05_pitch_chord.svg": "23463b171e0975d59a307c660ebac88e062f43997b1e271254fad3bf2a925aeb",
+    "sensitivity_isentropic/figures/reaction_pitch_chord.svg": "ee577d201b03c9382230c7e6f057e2a6bb7f43bb07c89862c5430926d18c60e8",
+    "sensitivity_kacker_okapuu/figures/reaction_pitch_chord.svg": "1292b7b7b2ebdce002b43d6490c27176fcd622692089753fb78748c5ba128cdf",
+    "sensitivity_benner/figures/reaction_pitch_chord.svg": "73c7a23ae40d6e5881a2d4baa01c857e004a27ed26e3fa39365745278bd3d6cd",
+    "sensitivity_isentropic/figures/speed_r0_aspect_ratio.svg": "13b9009bac5ed73e88a3f4982f2c64dae927de32f18ed4dffca6264b1ca4e73f",
+    "sensitivity_kacker_okapuu/figures/speed_r0_aspect_ratio.svg": "afa4008be0278c82765bf369afcfd8ba47ec9a89ca961b2c9af8816a0df9438a",
+    "sensitivity_benner/figures/speed_r0_aspect_ratio.svg": "857f05287ae5dbf8461cb5ec6b0179123c5ff33cbd2c336a3ee4e222ae06a89b",
+    "sensitivity_isentropic/figures/speed_r05_aspect_ratio.svg": "85976132cb0a05a08ec7d6312e9339f78a966fc8170dfc63d21d359db10ffe03",
+    "sensitivity_kacker_okapuu/figures/speed_r05_aspect_ratio.svg": "fee138947a3ab41a84addbd6361c01ecf126274ca5b6702bd94b69e865e1ced2",
+    "sensitivity_benner/figures/speed_r05_aspect_ratio.svg": "c6cce7e9cdd79b8cf5cd7e9cffbf96e5cc011feafcaa749d744959fcea42d121",
+    "sensitivity_isentropic/figures/reaction_aspect_ratio.svg": "2647c2af5f3625538c3c0d2f4fd0871fb79077c39a12be0a9bf5d65e494bbe55",
+    "sensitivity_kacker_okapuu/figures/reaction_aspect_ratio.svg": "a052cdf2ecc5df28094feb8aa5684be3e34bca42ba36ab4ae71d9e908a04cae1",
+    "sensitivity_benner/figures/reaction_aspect_ratio.svg": "1e076d4204fa66f0c62e8b9077ad0fcb5d9e9a959d0c604d26625ac00032c307",
+    "sensitivity_isentropic/figures/speed_r0_trailing_ratio.svg": "eb73f351185e1b43be720aca0150a53d8f95f4e456f140d7a51c5abecdcd24a4",
+    "sensitivity_kacker_okapuu/figures/speed_r0_trailing_ratio.svg": "3207f48a4c226f6493a90c426583aef5c2f53324b7d81a69d3cba5d39400d82d",
+    "sensitivity_benner/figures/speed_r0_trailing_ratio.svg": "1b0565618a2a9efde5f10073e649789be0542129dcc0f997ec2015cae1b8e66f",
+    "sensitivity_isentropic/figures/speed_r05_trailing_ratio.svg": "673abdea2b2b4c44f2122ee5d22f9c4b2dc5d8e05245acf38416e47508b49e87",
+    "sensitivity_kacker_okapuu/figures/speed_r05_trailing_ratio.svg": "f67e3c653857986baac8105f64bce4927ba9d97b5b3a9c4d7080cd2a3c521872",
+    "sensitivity_benner/figures/speed_r05_trailing_ratio.svg": "75bdc9d5e50c4f0235ca3e9c57e6a861d8ce3acf5aed264f5195bf02ffb35e41",
+    "sensitivity_isentropic/figures/reaction_trailing_ratio.svg": "279c7ced9c7e13e1f741aac53ad76af7cf80b8e3edaaa03278ff2030f1467406",
+    "sensitivity_kacker_okapuu/figures/reaction_trailing_ratio.svg": "360774c01cb90e0d118da57e1595c88bb762557689a870b959e0050d556fc0b7",
+    "sensitivity_benner/figures/reaction_trailing_ratio.svg": "346b63743bbb2f81bcb644d5269a741e236d348112c9fef4f25bde974e775f01",
+    "sensitivity_isentropic/figures/speed_r0_specific_speed.svg": "41e873f0fb06015a8835f3e2a4e6d1ded8b1579e87fce207cd4bbdb416c346a4",
+    "sensitivity_kacker_okapuu/figures/speed_r0_specific_speed.svg": "a0f40d30aaa8781dbaacc335defe8bd6e2ca296977d564a16b475c54022ed608",
+    "sensitivity_benner/figures/speed_r0_specific_speed.svg": "ea9aec73ca83d7786f50a71c45f0f7162daf83724dcbac24bbe214f97f8836a6",
+    "sensitivity_isentropic/figures/speed_r05_specific_speed.svg": "af027586bc5df02ae0418823e4d3fef73d9144d46513a7f63ab4acf360ba7843",
+    "sensitivity_kacker_okapuu/figures/speed_r05_specific_speed.svg": "385ddd06c9b369ad1a91e8ab51b8fbd3d85b999257242ed894c200715fa53f08",
+    "sensitivity_benner/figures/speed_r05_specific_speed.svg": "d124005c7e866fc84de39f79ab39df33708e5da81a48695c32da5c0fd6a675d8",
+    "sensitivity_isentropic/figures/reaction_specific_speed.svg": "6dd6e47af674609fe5f24b2c25e805db1c4c3b3087082c6443adec4fed16254e",
+    "sensitivity_kacker_okapuu/figures/reaction_specific_speed.svg": "8146f1f11a4d4915153e10fa6457c4ecf6458601990b7e259b01776cf9755010",
+    "sensitivity_benner/figures/reaction_specific_speed.svg": "7e94b4475dcc59c8d4f8fcf78fef03e2253c6dce57b4a7133f197644bf07a01f",
+    "sensitivity_isentropic/figures/speed_r0_mass_flow.svg": "60b690a01e9d24b17d1282da7922d3023a562a9fc0700aa4af68cc48ab0c6b4c",
+    "sensitivity_kacker_okapuu/figures/speed_r0_mass_flow.svg": "387a37bdce44d42862eb832ae7fdb0111f68a8fc15a119b829ab59bbb9e8b3a6",
+    "sensitivity_benner/figures/speed_r0_mass_flow.svg": "2cec2ebd4cfd23a7d5615b1384c8f23842dfb79afc4132881cb01d6b910e6b1b",
+    "sensitivity_isentropic/figures/speed_r05_mass_flow.svg": "20eb20e2541dc1e0b65376fe0f4af2b04fe15541feacca089056553d9c8def5e",
+    "sensitivity_kacker_okapuu/figures/speed_r05_mass_flow.svg": "466ab9ab276cd5a912be890d01e9f61231abc3b2a50c6d73fbd951c2d5a17754",
+    "sensitivity_benner/figures/speed_r05_mass_flow.svg": "1bd490773699a95d3f85c7d89830983b82f378c469fbfffab1360646a40e0821",
+    "sensitivity_isentropic/figures/reaction_mass_flow.svg": "876f840dd47dc73b6558f47bc7759c07ef68bc37e15b84b52e4c5a4c102aad48",
+    "sensitivity_kacker_okapuu/figures/reaction_mass_flow.svg": "4bab326a2219f1d6a9459a692c5998767eae16d756182ae7ea4ef5fdd88d4d2b",
+    "sensitivity_benner/figures/reaction_mass_flow.svg": "bf2a00f89b582ce94a58917667c33968424be42d8ff2e9931fe9f1d980786801",
+    "sensitivity_isentropic/figures/speed_r0_isentropic_mach.svg": "a081de10164d428cac477c9401e4699089f0923667c612043322177e127f4811",
+    "sensitivity_kacker_okapuu/figures/speed_r0_isentropic_mach.svg": "ad9817f34bdec0287b2d7f6b264a5a4e78b6ff4fdeddb62130bfaf27c1b4a394",
+    "sensitivity_benner/figures/speed_r0_isentropic_mach.svg": "60b9ab3a903f2e4ac911c7398f459813144e2f586940083ceff0ef7540610ba3",
+    "sensitivity_isentropic/figures/speed_r05_isentropic_mach.svg": "cad53e4fee8f23071dc0537a8cade12520dc79919ab1ef5a74151aab4b806391",
+    "sensitivity_kacker_okapuu/figures/speed_r05_isentropic_mach.svg": "e963254c81b149c39ab83e1dad7327634f8db82dc55fafe5d8f240046da77fb0",
+    "sensitivity_benner/figures/speed_r05_isentropic_mach.svg": "5ac8c5c66264417012ffc09be6ee0b3362ad5be1c0e6fc861386fea062d570e3",
+    "sensitivity_isentropic/figures/reaction_isentropic_mach.svg": "ab5f7826714302d9674746b2ea4e623fc4938d948a6925be44e99128a166cbbb",
+    "sensitivity_kacker_okapuu/figures/reaction_isentropic_mach.svg": "56242c99dc7d91a4cde0ba76768019813f2b1d3a09dd03651f83cf737070d052",
+    "sensitivity_benner/figures/reaction_isentropic_mach.svg": "efe34fb35968e46d9fe3d013065c005ef244a549ec8ff3c7efcb6b27867d18c4"
   },
   "data_sha256": {
     "../sensitivity_kacker_okapuu/data/kacker_okapuu.csv.gz": "dc45229f4b251ac4fc5084dd6fdb34d046b4d8bd178439ce0ebd7c712b6dfd0a",
     "../sensitivity_benner/data/benner.csv.gz": "8a7b5512c4296b9417dcd29f387b3bf2ce6aea2744bbebe307dd049adcf8841a",
     "../sensitivity_isentropic/data/isentropic.csv.gz": "f65d5f0d6f6abe53caf86fe7759ff79c9113c7780d6ff0d60c7537197cff286c"
   },
-  "report_sha256": "7b79eedbd8fd1cb26c4a8ae6456b82a4e9d1c37569202bc3b98d816e117cf8d6",
-  "report_script_sha256": "17095253fbe5f04e9ea0c48ebe2d84df46a8b08e87fab7570f9e48a922b6de23",
+  "report_sha256": "ab9a585b2b464acdcdbde08f238541118906978dd87d5358f61b2481a5ded815",
+  "report_script_sha256": "f51bb54056776ca61c06c55dc18e038db64b974b406f7aa083d48e2aac0edfcc",
   "section_inventory": [
     {
       "heading": "Stator exit angle: Blade velocity ratio at $R=0$",
@@ -92,15 +92,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/speed_r0_stator_exit_angle.pdf"
+          "svg": "sensitivity_isentropic/figures/speed_r0_stator_exit_angle.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/speed_r0_stator_exit_angle.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/speed_r0_stator_exit_angle.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/speed_r0_stator_exit_angle.pdf"
+          "svg": "sensitivity_benner/figures/speed_r0_stator_exit_angle.svg"
         }
       ]
     },
@@ -111,15 +111,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/speed_r05_stator_exit_angle.pdf"
+          "svg": "sensitivity_isentropic/figures/speed_r05_stator_exit_angle.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/speed_r05_stator_exit_angle.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/speed_r05_stator_exit_angle.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/speed_r05_stator_exit_angle.pdf"
+          "svg": "sensitivity_benner/figures/speed_r05_stator_exit_angle.svg"
         }
       ]
     },
@@ -130,15 +130,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/reaction_stator_exit_angle.pdf"
+          "svg": "sensitivity_isentropic/figures/reaction_stator_exit_angle.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/reaction_stator_exit_angle.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/reaction_stator_exit_angle.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/reaction_stator_exit_angle.pdf"
+          "svg": "sensitivity_benner/figures/reaction_stator_exit_angle.svg"
         }
       ]
     },
@@ -149,15 +149,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/speed_r0_pitch_chord.pdf"
+          "svg": "sensitivity_isentropic/figures/speed_r0_pitch_chord.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/speed_r0_pitch_chord.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/speed_r0_pitch_chord.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/speed_r0_pitch_chord.pdf"
+          "svg": "sensitivity_benner/figures/speed_r0_pitch_chord.svg"
         }
       ]
     },
@@ -168,15 +168,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/speed_r05_pitch_chord.pdf"
+          "svg": "sensitivity_isentropic/figures/speed_r05_pitch_chord.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/speed_r05_pitch_chord.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/speed_r05_pitch_chord.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/speed_r05_pitch_chord.pdf"
+          "svg": "sensitivity_benner/figures/speed_r05_pitch_chord.svg"
         }
       ]
     },
@@ -187,15 +187,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/reaction_pitch_chord.pdf"
+          "svg": "sensitivity_isentropic/figures/reaction_pitch_chord.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/reaction_pitch_chord.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/reaction_pitch_chord.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/reaction_pitch_chord.pdf"
+          "svg": "sensitivity_benner/figures/reaction_pitch_chord.svg"
         }
       ]
     },
@@ -206,15 +206,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/speed_r0_aspect_ratio.pdf"
+          "svg": "sensitivity_isentropic/figures/speed_r0_aspect_ratio.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/speed_r0_aspect_ratio.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/speed_r0_aspect_ratio.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/speed_r0_aspect_ratio.pdf"
+          "svg": "sensitivity_benner/figures/speed_r0_aspect_ratio.svg"
         }
       ]
     },
@@ -225,15 +225,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/speed_r05_aspect_ratio.pdf"
+          "svg": "sensitivity_isentropic/figures/speed_r05_aspect_ratio.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/speed_r05_aspect_ratio.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/speed_r05_aspect_ratio.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/speed_r05_aspect_ratio.pdf"
+          "svg": "sensitivity_benner/figures/speed_r05_aspect_ratio.svg"
         }
       ]
     },
@@ -244,15 +244,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/reaction_aspect_ratio.pdf"
+          "svg": "sensitivity_isentropic/figures/reaction_aspect_ratio.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/reaction_aspect_ratio.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/reaction_aspect_ratio.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/reaction_aspect_ratio.pdf"
+          "svg": "sensitivity_benner/figures/reaction_aspect_ratio.svg"
         }
       ]
     },
@@ -263,15 +263,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/speed_r0_trailing_ratio.pdf"
+          "svg": "sensitivity_isentropic/figures/speed_r0_trailing_ratio.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/speed_r0_trailing_ratio.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/speed_r0_trailing_ratio.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/speed_r0_trailing_ratio.pdf"
+          "svg": "sensitivity_benner/figures/speed_r0_trailing_ratio.svg"
         }
       ]
     },
@@ -282,15 +282,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/speed_r05_trailing_ratio.pdf"
+          "svg": "sensitivity_isentropic/figures/speed_r05_trailing_ratio.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/speed_r05_trailing_ratio.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/speed_r05_trailing_ratio.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/speed_r05_trailing_ratio.pdf"
+          "svg": "sensitivity_benner/figures/speed_r05_trailing_ratio.svg"
         }
       ]
     },
@@ -301,15 +301,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/reaction_trailing_ratio.pdf"
+          "svg": "sensitivity_isentropic/figures/reaction_trailing_ratio.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/reaction_trailing_ratio.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/reaction_trailing_ratio.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/reaction_trailing_ratio.pdf"
+          "svg": "sensitivity_benner/figures/reaction_trailing_ratio.svg"
         }
       ]
     },
@@ -320,15 +320,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/speed_r0_specific_speed.pdf"
+          "svg": "sensitivity_isentropic/figures/speed_r0_specific_speed.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/speed_r0_specific_speed.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/speed_r0_specific_speed.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/speed_r0_specific_speed.pdf"
+          "svg": "sensitivity_benner/figures/speed_r0_specific_speed.svg"
         }
       ]
     },
@@ -339,15 +339,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/speed_r05_specific_speed.pdf"
+          "svg": "sensitivity_isentropic/figures/speed_r05_specific_speed.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/speed_r05_specific_speed.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/speed_r05_specific_speed.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/speed_r05_specific_speed.pdf"
+          "svg": "sensitivity_benner/figures/speed_r05_specific_speed.svg"
         }
       ]
     },
@@ -358,15 +358,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/reaction_specific_speed.pdf"
+          "svg": "sensitivity_isentropic/figures/reaction_specific_speed.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/reaction_specific_speed.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/reaction_specific_speed.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/reaction_specific_speed.pdf"
+          "svg": "sensitivity_benner/figures/reaction_specific_speed.svg"
         }
       ]
     },
@@ -377,15 +377,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/speed_r0_mass_flow.pdf"
+          "svg": "sensitivity_isentropic/figures/speed_r0_mass_flow.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/speed_r0_mass_flow.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/speed_r0_mass_flow.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/speed_r0_mass_flow.pdf"
+          "svg": "sensitivity_benner/figures/speed_r0_mass_flow.svg"
         }
       ]
     },
@@ -396,15 +396,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/speed_r05_mass_flow.pdf"
+          "svg": "sensitivity_isentropic/figures/speed_r05_mass_flow.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/speed_r05_mass_flow.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/speed_r05_mass_flow.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/speed_r05_mass_flow.pdf"
+          "svg": "sensitivity_benner/figures/speed_r05_mass_flow.svg"
         }
       ]
     },
@@ -415,15 +415,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/reaction_mass_flow.pdf"
+          "svg": "sensitivity_isentropic/figures/reaction_mass_flow.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/reaction_mass_flow.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/reaction_mass_flow.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/reaction_mass_flow.pdf"
+          "svg": "sensitivity_benner/figures/reaction_mass_flow.svg"
         }
       ]
     },
@@ -434,15 +434,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/speed_r0_isentropic_mach.pdf"
+          "svg": "sensitivity_isentropic/figures/speed_r0_isentropic_mach.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/speed_r0_isentropic_mach.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/speed_r0_isentropic_mach.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/speed_r0_isentropic_mach.pdf"
+          "svg": "sensitivity_benner/figures/speed_r0_isentropic_mach.svg"
         }
       ]
     },
@@ -453,15 +453,15 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/speed_r05_isentropic_mach.pdf"
+          "svg": "sensitivity_isentropic/figures/speed_r05_isentropic_mach.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/speed_r05_isentropic_mach.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/speed_r05_isentropic_mach.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/speed_r05_isentropic_mach.pdf"
+          "svg": "sensitivity_benner/figures/speed_r05_isentropic_mach.svg"
         }
       ]
     },
@@ -472,18 +472,18 @@
       "columns": [
         {
           "model": "isentropic",
-          "pdf": "sensitivity_isentropic/figures/reaction_isentropic_mach.pdf"
+          "svg": "sensitivity_isentropic/figures/reaction_isentropic_mach.svg"
         },
         {
           "model": "kacker_okapuu",
-          "pdf": "sensitivity_kacker_okapuu/figures/reaction_isentropic_mach.pdf"
+          "svg": "sensitivity_kacker_okapuu/figures/reaction_isentropic_mach.svg"
         },
         {
           "model": "benner",
-          "pdf": "sensitivity_benner/figures/reaction_isentropic_mach.pdf"
+          "svg": "sensitivity_benner/figures/reaction_isentropic_mach.svg"
         }
       ]
     }
   ],
-  "checked_links": 68
+  "checked_links": 131
 }

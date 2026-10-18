@@ -24,7 +24,7 @@ def style():
         "axes.labelcolor":INK,"text.color":INK,"xtick.color":MUTED,"ytick.color":MUTED,
         "axes.edgecolor":"#c4cfd7","axes.spines.top":False,"axes.spines.right":False,
         "axes.facecolor":"white","figure.facecolor":"white","grid.color":"#dce3e9",
-        "grid.alpha":.65,"grid.linewidth":.7,"pdf.fonttype":42,"savefig.facecolor":"white"})
+        "grid.alpha":.65,"grid.linewidth":.7,"svg.fonttype":"path","savefig.facecolor":"white"})
 
 
 def palettes():
@@ -56,9 +56,9 @@ def decorate(ax,xlabel=r"Blade velocity ratio $U/c_0$",xlim=(0,.9)):
 
 def save(fig,name):
     result={}
-    for extension in ("pdf",):
+    for extension in ("svg",):
         path=FIGURES/f"{name}.{extension}"
-        fig.savefig(path,dpi=190,metadata={"Creator":"Turbodash shock continuation study"} if extension=="pdf" else None)
+        fig.savefig(path,dpi=190,metadata={"Creator":"Turbodash shock continuation study"} if extension=="svg" else None)
         result[path.name]=sha256(path)
     plt.close(fig)
     return result
@@ -258,9 +258,9 @@ This study evaluates the [production shock and Reynolds helpers](../../turbodash
 
 **Purpose.** Check the row-specific fit against KO Figure 6 without treating extrapolated points as calibration data.
 
-[Digitized hub-Mach chart and fitted production curves (PDF)](figures/08_hub_mach_fit.pdf)
+![Digitized hub-Mach chart and fitted production curves (SVG)](figures/08_hub_mach_fit.svg)
 
-[Vector PDF](figures/08_hub_mach_fit.pdf) | [Digitized readings](data/digitized_points.csv) | [Fit errors](data/fit_parameters.json)
+[Vector SVG](figures/08_hub_mach_fit.svg) | [Digitized readings](data/digitized_points.csv) | [Fit errors](data/fit_parameters.json)
 
 The [KO paper](source/kacker_okapuu_1982.pdf#page=3), printed page 113, supplies Figure 6 and equations (4)-(6). The source fit is $f_{\mathrm{hub},j}=1+A_j[P_{0.01}(c_j-(r_h/r_t)_{\mathrm{eff}})]^2$, using a compact C2 positive part. Stator parameters are $A_j=4.348048474772493$, $c_j=0.8084516270970612$; rotor parameters are $A_j=5.946253981890890$, $c_j=0.9468539887756984$.
 
@@ -280,9 +280,9 @@ $$
 
 It matches value, slope and curvature at 0.5 and approaches 0.3 as the raw ratio tends to negative infinity. At raw zero it is 0.320513. At raw ratio -1 it is 0.303089. Raw geometry is retained.
 
-[Raw geometry and continued loss coordinate (PDF)](figures/02_geometry.pdf)
+![Raw geometry and continued loss coordinate (SVG)](figures/02_geometry.svg)
 
-[Vector PDF](figures/02_geometry.pdf)
+[Vector SVG](figures/02_geometry.svg)
 
 **Assessment.** The loss input stays positive through zero and negative raw ratios. The map is applied once to the hub-Mach fit, and the identical coordinate supplies the span weight. Its limits are modeling choices, with chart behavior retained at and above 0.5.
 
@@ -305,9 +305,9 @@ Y_{p,\mathrm{shock}}=0.7-\frac{0.45}{1+\dfrac{Y_{p,\mathrm{shock,raw}}-0.25}{0.4
 +\left(\dfrac{Y_{p,\mathrm{shock,raw}}-0.25}{0.45}\right)^2}.
 $$
 
-[Production shock coefficient and derivative (PDF)](figures/03_shock_components.pdf)
+![Production shock coefficient and derivative (SVG)](figures/03_shock_components.svg)
 
-[Vector PDF](figures/03_shock_components.pdf) | [Component values](data/components.json)
+[Vector SVG](figures/03_shock_components.svg) | [Component values](data/components.json)
 
 **Assessment.** The coefficient is finite and nonnegative for valid pressure heads, including signed hub ratios. The same positive coordinate in both shock factors preserves an active shock as the raw hub ratio crosses zero. The 0.7 upper asymptote controls small-exit-head amplification before the outer KO/Reynolds scaling. Pressure heads remain the supplied thermodynamic values.
 
@@ -317,9 +317,9 @@ $$
 
 Total inlet conditions are 50 bar and 600 K; $R=0$, stator exit angle $70^\circ$, $s/c=0.725$, $H/c=1.75$, $t_{\mathrm{TE}}/o=0.2$, mass flow 10 kg/s and overall isentropic expansion Mach 1.15. Specific speeds are 0.1, 0.5, 1.05, 1.5 and 2.0. The [stage study](../loss_model_audit/overall_stage/readme.md) defines the EOS and resizing method.
 
-[Efficiencies across specific speed (PDF)](figures/01_efficiency.pdf)
+![Efficiencies across specific speed (SVG)](figures/01_efficiency.svg)
 
-[Vector PDF](figures/01_efficiency.pdf)
+[Vector SVG](figures/01_efficiency.svg)
 
 **Assessment.** Both efficiencies use solid lines, with blue and orange colormaps. Axes show 0-100%; signed values outside those limits remain saved. No hub-ratio markers are drawn. At blade velocity ratio 0.05:
 
@@ -333,9 +333,9 @@ $$
 Y_p=0.914f_{\mathrm{Re}}\left[\frac23K_pY_{p,\mathrm{reference}}F_t+Y_{p,\mathrm{shock}}\right].
 $$
 
-[Complete profile and shock loss (PDF)](figures/04_profile_and_shock.pdf)
+![Complete profile and shock loss (SVG)](figures/04_profile_and_shock.svg)
 
-[Vector PDF](figures/04_profile_and_shock.pdf)
+[Vector SVG](figures/04_profile_and_shock.svg)
 
 **Assessment.** The unscaled shock and complete profile remain finite at very low blade speed. Both profile contributions receive the same nonzero high-Reynolds multiplier. Secondary, trailing-edge and clearance coefficients are evaluated through their production helpers.
 
@@ -351,9 +351,9 @@ $$
 f_{\mathrm{Re}}\longrightarrow50^{-0.2}=0.457305052.
 $$
 
-[Current Reynolds coordinate and correction (PDF)](figures/07_reynolds_correction.pdf)
+![Current Reynolds coordinate and correction (SVG)](figures/07_reynolds_correction.svg)
 
-[Vector PDF](figures/07_reynolds_correction.pdf)
+[Vector SVG](figures/07_reynolds_correction.svg)
 
 **Assessment.** Value, slope and curvature match at the coordinate joins. The finite factor keeps both reference and shock losses present as blade size grows. At blade velocity ratio $10^{-5}$ and specific speed 1.05, complete stator and rotor profile coefficients are **__STATOR__** and **__ROTOR__**. The limits are extrapolation choices.
 
@@ -367,13 +367,13 @@ $$
 \eta_{ts}=\frac{\Delta h_{0,\mathrm{ideal}}-\sum\Delta h_{\mathrm{loss}}}{h_{01}-h_{4s}}.
 $$
 
-[Signed efficiency and energy budget (PDF)](figures/05_efficiency_budget.pdf)
+![Signed efficiency and energy budget (SVG)](figures/05_efficiency_budget.svg)
 
-[Vector PDF](figures/05_efficiency_budget.pdf)
+[Vector SVG](figures/05_efficiency_budget.svg)
 
-[Low-speed limit of loss, Reynolds correction, energy and efficiency (PDF)](figures/06_low_speed_limit.pdf)
+![Low-speed limit of loss, Reynolds correction, energy and efficiency (SVG)](figures/06_low_speed_limit.svg)
 
-[Vector PDF](figures/06_low_speed_limit.pdf)
+[Vector SVG](figures/06_low_speed_limit.svg)
 
 **Assessment.** Ideal shaft work tends to zero while the loss estimate remains finite. The signed total-total efficiency therefore becomes negative. All values remain in the data; the efficiency axes show only 0-100%.
 
@@ -417,4 +417,4 @@ def generate(provenance):
     write_json(DATA/"render_manifest.json",manifest)
     manifest["checked_links"]=check_links()
     write_json(DATA/"render_manifest.json",manifest)
-    print(f"Wrote {len(outputs)} PDF figures and the report; {manifest['checked_links']} links checked",flush=True)
+    print(f"Wrote {len(outputs)} SVG figures and the report; {manifest['checked_links']} links checked",flush=True)

@@ -18,9 +18,9 @@ The shared Boltzmann min/max are smooth weighted averages rather than strict bou
 
 ## Current values and derivatives
 
-[smooth_bounds: values and d/dx (PDF)](../figures/smooth_bounds.pdf)
+![smooth_bounds: values and d/dx (SVG)](../figures/smooth_bounds.svg)
 
-[smooth_absolute: values and d/dx (PDF)](../figures/smooth_absolute.pdf)
+![smooth_absolute: values and d/dx (SVG)](../figures/smooth_absolute.svg)
 
 ## Quantitative checks
 
@@ -36,7 +36,7 @@ Every figure contains current-source values and derivatives; links below cover a
 
 | Parameter / case | Range | Comparison figure | Numerical data |
 |---|---|---|---|
-| Helper argument · smooth bounds | -0.5 to 0.8 | [Open](../figures/smooth_bounds.pdf) | [prescribed reference](../data/sweeps/fundamental_smooth_bounds.csv.gz) |
-| Helper argument · smooth absolute | -0.02 to 0.02 | [Open](../figures/smooth_absolute.pdf) | [prescribed reference](../data/sweeps/fundamental_smooth_absolute.csv.gz) |
+| Helper argument · smooth bounds | -0.5 to 0.8 | [Open](../figures/smooth_bounds.svg) | [prescribed reference](../data/sweeps/fundamental_smooth_bounds.csv.gz) |
+| Helper argument · smooth absolute | -0.02 to 0.02 | [Open](../figures/smooth_absolute.svg) | [prescribed reference](../data/sweeps/fundamental_smooth_absolute.csv.gz) |
 
 [All individual functions](../readme.md) · [Methods, validation and reproduction](../methodology.md)

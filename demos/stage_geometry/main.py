@@ -1,6 +1,9 @@
 import yaml
 import matplotlib.pyplot as plt
 import turbodash as td
+from turbodash.core.stage import compute_stage_meanline
+from turbodash.reporting.stage import print_stage
+from turbodash.visualization import plotly_stage
 
 
 # TODO
@@ -25,19 +28,16 @@ with open(CONFIG, "r") as f:
     inputs = yaml.safe_load(f)["inputs"]
 
 # Compute stage performance and geometry
-# out = td.compute_stage_meanline(**inputs)
-out = td.dev.compute_stage_performance(**inputs)
+out = compute_stage_meanline(**inputs)
 
 
 
 # Print and plot results
-td.dev.print_stage(out)
-td.mpl.plot_stage(out)
-# td.mpl.plot_rotor_velocity_triangles(out)
+print_stage(out)
+plotly_stage.plot_meridional_channel(out).show()
+plotly_stage.plot_blades(out).show()
 
-# td.plotly.plot_blades(out).show()
-# td.plotly.plot_meridional_channel(out).show()
-# td.plotly.plot_eta_ts(out).show()
-# td.plotly.plot_eta_tt(out).show()
+# plotly_stage.plot_eta_ts(out).show()
+# plotly_stage.plot_eta_tt(out).show()
 
 plt.show()

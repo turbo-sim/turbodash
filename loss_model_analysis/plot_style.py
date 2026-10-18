@@ -4,7 +4,7 @@ from pathlib import Path
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
-from turbodash.graphics import set_plot_options
+from turbodash.visualization.matplotlib_style import set_plot_options
 
 ROOT = Path(__file__).resolve().parent
 EXTRAPOLATION_COLOR = "#c7bda9"
@@ -17,7 +17,7 @@ def colors(count):
 def apply_style(fontsize=11):
     set_plot_options(fontsize=fontsize, grid=True, color_order=list(colors(6)),
                      linewidth=1.5, minor_ticks=False)
-    plt.rcParams.update({"grid.alpha": .22, "axes.spines.top": True,
+    plt.rcParams.update({"svg.fonttype": "path", "grid.alpha": .22, "axes.spines.top": True,
                          "axes.spines.right": True, "axes.labelpad": 5,
                          "axes.titlepad": 8})
 

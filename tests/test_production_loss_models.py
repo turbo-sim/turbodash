@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 import yaml
 
-from turbodash import core_turbine as core
+from turbodash.core import turbine as core
 from turbodash.loss_models.loss_model import evaluate_loss_model
 
 

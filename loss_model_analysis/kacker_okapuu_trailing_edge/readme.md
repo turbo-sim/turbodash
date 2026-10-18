@@ -68,9 +68,9 @@ The cubic is the lowest tested polynomial degree that resolves both traces withi
 
 Five points per family were withheld when checking predictive error. The final coefficients were then refitted to all 21 points per family. The held-out samples belong to the same printed curve: they test interpolation of that curve, not prediction of independent cascade experiments. All final cubic residuals are smaller than the assigned vertical reading uncertainties.
 
-[Reference curves, digitized readings, current production helper and residuals (PDF)](figures/reference_fit.pdf)
+![Reference curves, digitized readings, current production helper and residuals (SVG)](figures/reference_fit.svg)
 
-[PDF](figures/reference_fit.pdf) · [Residual CSV](data/fit_residuals.csv)
+[SVG](figures/reference_fit.svg) · [Residual CSV](data/fit_residuals.csv)
 
 The current production helper is shown alongside the fitted source curves; their agreement checks the implemented reference functions. The fitted endpoint values are **0.141453** for nozzle and **0.073057** for impulse. Error bars describe digitization uncertainty, not the experimental scatter underlying the paper's correlation.
 
@@ -116,9 +116,9 @@ $$
 
 These are numerical modeling choices, approximately 1.8 times the respective chart endpoints. They leave every fitted value inside Figure 14 unchanged, maintain reference ordering and allow further loss growth beyond the chart. The paper provides no evidence selecting these particular ceilings. They should be revisited if large-blockage measurements become available.
 
-[Reference values, first derivatives and second derivatives across the continuation (PDF)](figures/reference_continuation.pdf)
+![Reference values, first derivatives and second derivatives across the continuation (SVG)](figures/reference_continuation.svg)
 
-[PDF](figures/reference_continuation.pdf) · [CSV](data/references.csv)
+[SVG](figures/reference_continuation.svg) · [CSV](data/references.csv)
 
 Beige shading identifies $\hat{t}_{\mathrm{TE}}>0.4$, outside Figure 14. Dashed curves show why direct cubic extrapolation is unsuitable. Ratios near or above one are stress tests of the numerical function, rather than validated blade geometries or proof that a real passage would remain operable.
 
@@ -177,9 +177,9 @@ $$
 
 The 20% extrapolation allowances are engineering choices, not additional information from the paper. They retain the signed trend while preventing either unbounded growth or negative losses. The negative-$z$ behavior differs from the adopted profile-loss continuation because the ordering of the two trailing-edge references is reversed. Trailing-edge blockage can also produce loss at zero turning; the $z=-1$ curve need not vanish.
 
-[Energy-loss interpolation and its z derivative for different thickness ratios (PDF)](figures/z_interpolation.pdf)
+![Energy-loss interpolation and its z derivative for different thickness ratios (SVG)](figures/z_interpolation.svg)
 
-[PDF](figures/z_interpolation.pdf) · [CSV](data/z_sensitivity.csv)
+[SVG](figures/z_interpolation.svg) · [CSV](data/z_sensitivity.csv)
 
 Beige shading marks extrapolation outside $0\le z\le1$. The gray dashed line is the unbounded paper algebra for $\hat{t}_{\mathrm{TE}}=0.4$, including its negative positive-$z$ tail. Every solid curve remains nonnegative and decreases smoothly from the bounded nozzle-side extension to the bounded impulse-side extension.
 
@@ -236,9 +236,9 @@ The conversion therefore remains away from its singularity. The zero-Mach and $\
 
 This figure evaluates the complete proposed $Y_{\mathrm{TE}}(\hat{t}_{\mathrm{TE}},z,M_2,\gamma)$ at $M_2=0.7$ and $\gamma=1.4$. It includes both measured reference families, angle extrapolation and the pressure conversion.
 
-[Full trailing-edge pressure loss and its thickness-ratio derivative (PDF)](figures/thickness_sensitivity.pdf)
+![Full trailing-edge pressure loss and its thickness-ratio derivative (SVG)](figures/thickness_sensitivity.svg)
 
-[PDF](figures/thickness_sensitivity.pdf) · [CSV](data/thickness_sensitivity.csv)
+[SVG](figures/thickness_sensitivity.svg) · [CSV](data/thickness_sensitivity.csv)
 
 All curves start at exactly zero with a finite thickness derivative. They increase smoothly, preserve the nozzle/impulse ordering and approach finite limits beyond the chart. Beige shading marks $\hat{t}_{\mathrm{TE}}>0.4$. Holding the other correlation inputs fixed, the sensitivities to physical thickness and opening follow from the chain rule:
 
@@ -253,9 +253,9 @@ $$
 
 The top row holds $z=0.5$ and $\gamma=1.4$, with curves for different thickness ratios. The bottom row holds $z=0.5$ and $\hat{t}_{\mathrm{TE}}=0.2$, varying $\gamma$.
 
-[Complete pressure-loss sensitivity to outlet Mach and specific-heat ratio (PDF)](figures/mach_sensitivity.pdf)
+![Complete pressure-loss sensitivity to outlet Mach and specific-heat ratio (SVG)](figures/mach_sensitivity.svg)
 
-[PDF](figures/mach_sensitivity.pdf) · [CSV](data/mach_sensitivity.csv)
+[SVG](figures/mach_sensitivity.svg) · [CSV](data/mach_sensitivity.csv)
 
 The dashed gray line in the top-left panel shows unrestricted equation (18) at $\hat{t}_{\mathrm{TE}}=0.2$; the dotted line is the current production result at that ratio. The colored curves include the proposed Mach continuation. Blue shading marks the affected upper subsonic interval and beige marks $M_2>1$.
 
@@ -265,9 +265,9 @@ Thickness/opening, $z$, outlet Mach and $\gamma$ are the inputs to this correlat
 
 The supplied PDF was rendered at 300 dpi and Figure 14 cropped without altering its curves. The digitizer uses manually selected curve windows, then measures the dark stroke. Where text touches the upper stroke edge, it uses the lower edge minus the observed two-pixel half-width, with larger assigned uncertainty. The printed axes calibrate the coordinates, including their small scan skew and nonuniform vertical tick spacing.
 
-[Digitized points and fitted curves over the supplied Figure 14 scan (PDF)](figures/digitization_overlay.pdf)
+![Digitized points and fitted curves over the supplied Figure 14 scan (SVG)](figures/digitization_overlay.svg)
 
-[PDF](figures/digitization_overlay.pdf) · [Source crop](source/kacker_okapuu_1982.pdf#page=6) · [Digitized CSV](data/digitized_points.csv) · [Calibration and source hashes](data/calibration.json)
+[SVG](figures/digitization_overlay.svg) · [Source crop](source/kacker_okapuu_1982.pdf#page=6) · [Digitized CSV](data/digitized_points.csv) · [Calibration and source hashes](data/calibration.json)
 
 The unresolved merged strokes near the origin were excluded. The 42 retained readings span approximately $0.054\le\hat{t}_{\mathrm{TE}}\le0.4$. Reading uncertainty includes stroke thickness and axis placement, but cannot establish the underlying experiments' uncertainty. An independent retracing would be a useful additional check before treating more coefficient digits as physically meaningful.
 
@@ -290,7 +290,7 @@ from loss_model_analysis.kacker_okapuu_trailing_edge.model import trailing_loss
 Y_te = trailing_loss(thickness_opening=0.2, z=0.5, mach=0.7, gamma=1.4)
 ```
 
-The normal run redigitizes the saved crop, refits, calculates the sensitivity data and regenerates this note and all six PDF figures. Add `--prepare-source` to rerender the crop from the included PDF; this requires `pdftoppm`. Add `--render-only` to redraw the saved numerical results after verifying the numerical-source and data hashes. Source and data hashes identify the current calculation used for the figures. The [render manifest](data/render_manifest.json) records both the validated numerical sources and the current report/plotting sources. Plotting uses the repository's `set_plot_options()` and ordered viridis colors.
+The normal run redigitizes the saved crop, refits, calculates the sensitivity data and regenerates this note and all six SVG figures. Add `--prepare-source` to rerender the crop from the included PDF; this requires `pdftoppm`. Add `--render-only` to redraw the saved numerical results after verifying the numerical-source and data hashes. Source and data hashes identify the current calculation used for the figures. The [render manifest](data/render_manifest.json) records both the validated numerical sources and the current report/plotting sources. Plotting uses the repository's `set_plot_options()` and ordered viridis colors.
 
 | File | Purpose |
 |---|---|

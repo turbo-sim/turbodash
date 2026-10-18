@@ -19,9 +19,9 @@ A full-factor quintic Hermite transition over H/c = 1.8–2.2 matches original e
 
 ## Current values and derivatives
 
-[benner_secondary_aspect_ratio: values and d/dx (PDF)](../figures/benner_secondary_aspect_ratio.pdf)
+![benner_secondary_aspect_ratio: values and d/dx (SVG)](../figures/benner_secondary_aspect_ratio.svg)
 
-[benner_secondary_delta_ref: values and d/dx (PDF)](../figures/benner_secondary_delta_ref.pdf)
+![benner_secondary_delta_ref: values and d/dx (SVG)](../figures/benner_secondary_delta_ref.svg)
 
 ## Quantitative checks
 
@@ -47,10 +47,10 @@ Every figure contains current-source values and derivatives; links below cover a
 
 | Parameter / case | Range | Comparison figure | Numerical data |
 |---|---|---|---|
-| Aspect ratio H/c | 0.05 to 10 (log axis) | [Open](../figures/benner_secondary_aspect_ratio.pdf) | [stator](../data/sweeps/fundamental_benner_secondary_aspect_ratio__stator.csv.gz) |
-| Incidence | -30 to 30 | [Open](../figures/benner_secondary_incidence.pdf) | [stator](../data/sweeps/fundamental_benner_secondary_incidence__stator.csv.gz) |
-| Signed exit angle in design direction | -20 to 80 | [Open](../figures/benner_secondary_exit_angle.pdf) | [stator](../data/sweeps/fundamental_benner_secondary_exit_angle__stator.csv.gz) |
-| Reference boundary-layer thickness | 0 to 0.15 | [Open](../figures/benner_secondary_delta_ref.pdf) | [stator](../data/sweeps/fundamental_benner_secondary_delta_ref__stator.csv.gz) |
-| Stagger angle | -89.9 to 89.9 | [Open](../figures/benner_secondary_stagger.pdf) | [stator](../data/sweeps/fundamental_benner_secondary_stagger__stator.csv.gz) |
+| Aspect ratio H/c | 0.05 to 10 (log axis) | [Open](../figures/benner_secondary_aspect_ratio.svg) | [stator](../data/sweeps/fundamental_benner_secondary_aspect_ratio__stator.csv.gz) |
+| Incidence | -30 to 30 | [Open](../figures/benner_secondary_incidence.svg) | [stator](../data/sweeps/fundamental_benner_secondary_incidence__stator.csv.gz) |
+| Signed exit angle in design direction | -20 to 80 | [Open](../figures/benner_secondary_exit_angle.svg) | [stator](../data/sweeps/fundamental_benner_secondary_exit_angle__stator.csv.gz) |
+| Reference boundary-layer thickness | 0 to 0.15 | [Open](../figures/benner_secondary_delta_ref.svg) | [stator](../data/sweeps/fundamental_benner_secondary_delta_ref__stator.csv.gz) |
+| Stagger angle | -89.9 to 89.9 | [Open](../figures/benner_secondary_stagger.svg) | [stator](../data/sweeps/fundamental_benner_secondary_stagger__stator.csv.gz) |
 
 [All individual functions](../readme.md) · [Methods, validation and reproduction](../methodology.md)

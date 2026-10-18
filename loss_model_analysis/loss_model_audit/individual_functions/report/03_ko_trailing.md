@@ -33,9 +33,9 @@ The source retains the full fitted coefficient precision. The zero intercept enf
 
 The study digitized 21 points per family from the supplied scan. The maximum absolute fit errors are 0.000467 for the nozzle and 0.000498 for the impulse, both within the assigned scan-reading uncertainties. Five points per family were also withheld during degree selection; their maximum prediction errors are below 0.00036. These checks measure agreement with the scanned curves, rather than independent experimental validation.
 
-[Production reference fits and residuals against the digitized Figure 14 points (PDF)](../figures/ko_trailing_reference_fit.pdf)
+![Production reference fits and residuals against the digitized Figure 14 points (SVG)](../figures/ko_trailing_reference_fit.svg)
 
-[PDF](../figures/ko_trailing_reference_fit.pdf) ? [Residual CSV](../data/trailing_review/fit_residuals.csv) ? [Digitization overlay](../../../kacker_okapuu_trailing_edge/figures/digitization_overlay.pdf) ? [Digitized points](../../../kacker_okapuu_trailing_edge/data/digitized_points.csv)
+[SVG](../figures/ko_trailing_reference_fit.svg) ? [Residual CSV](../data/trailing_review/fit_residuals.csv) ? [Digitization overlay](../../../kacker_okapuu_trailing_edge/figures/digitization_overlay.svg) ? [Digitized points](../../../kacker_okapuu_trailing_edge/data/digitized_points.csv)
 
 The curves rise smoothly throughout the chart interval. Error bars show assigned reading uncertainty. The unresolved strokes close to the origin were excluded from digitization; the origin is a physical constraint on the fit.
 
@@ -63,9 +63,9 @@ $$
 
 For the fitted curves, $D_j,A_j,B_j$ are positive. Each continuation therefore increases toward its limit and matches the cubic's value, slope and curvature at 0.4. The resulting reference functions are $C^2$ at the join and retain $R\ge I$.
 
-[Bounded production reference continuations and thickness derivatives (PDF)](../figures/ko_trailing_reference_continuation.pdf)
+![Bounded production reference continuations and thickness derivatives (SVG)](../figures/ko_trailing_reference_continuation.svg)
 
-[PDF](../figures/ko_trailing_reference_continuation.pdf) ? [CSV](../data/trailing_review/references.csv)
+[SVG](../figures/ko_trailing_reference_continuation.svg) ? [CSV](../data/trailing_review/references.csv)
 
 Beige marks extrapolation beyond the chart; dotted lines show the chosen asymptotes. The limits are numerical modeling choices, approximately 1.8 times the respective chart-end values. They are not fits to additional KO measurements, and do not establish physical feasibility at large blockage. There is no finite-thickness constant tail. The reciprocal implementation avoids constructing very large squared extrapolation coordinates.
 
@@ -125,9 +125,9 @@ $$
 
 Both outer joins match value, slope and curvature. The 20% allowances and the small signed-square smoothing interval are numerical choices. In particular, the profile-loss negative-$z$ reduction cannot simply be copied here, because the trailing-edge references have the opposite ordering.
 
-[Blended energy increments and complete pressure losses versus angle coordinate, with a physical outlet-angle sweep through zero in the existing lower-right panel (PDF)](../figures/ko_trailing_blending_review.pdf)
+![Blended energy increments and complete pressure losses versus angle coordinate, with a physical outlet-angle sweep through zero in the existing lower-right panel (SVG)](../figures/ko_trailing_blending_review.svg)
 
-[PDF](../figures/ko_trailing_blending_review.pdf) | [Angle-coordinate CSV](../data/trailing_review/z_sensitivity.csv) | [Physical-angle CSV](../data/trailing_review/angle_sensitivity.csv)
+[SVG](../figures/ko_trailing_blending_review.svg) | [Angle-coordinate CSV](../data/trailing_review/z_sensitivity.csv) | [Physical-angle CSV](../data/trailing_review/angle_sensitivity.csv)
 
 The existing four-panel figure shows the interpolation and the low-angle safeguard together, at $M_2=0.7$, $\gamma=1.4$. The top row retains energy increment versus $z$ and its derivative; the lower-left panel retains the complete pressure loss versus $z$. These three panels keep the familiar range $-2\le z\le2$, with beige shading outside $0\le z\le1$. The gray dashed energy curve shows why unrestricted signed-square extrapolation is unsuitable: it eventually becomes negative for $z>1$.
 
@@ -180,9 +180,9 @@ $$
 
 so the gas conversion remains away from its singularity. No separate pressure-loss floor or cap is added.
 
-[Complete production trailing-edge pressure losses and Mach derivatives for different thickness and gas ratios (PDF)](../figures/ko_trailing_mach_review.pdf)
+![Complete production trailing-edge pressure losses and Mach derivatives for different thickness and gas ratios (SVG)](../figures/ko_trailing_mach_review.svg)
 
-[PDF](../figures/ko_trailing_mach_review.pdf) ? [CSV](../data/trailing_review/mach_sensitivity.csv)
+[SVG](../figures/ko_trailing_mach_review.svg) ? [CSV](../data/trailing_review/mach_sensitivity.csv)
 
 The top row varies thickness/opening at $\gamma=1.4$; the bottom varies $\gamma$ at $x=0.2$. All curves use $z=0.5$. Blue identifies the upper-subsonic modification, and beige identifies supersonic extrapolation. The gray dashed comparator retains equation (18) without Mach continuation at $x=0.2$.
 
@@ -197,9 +197,9 @@ $$
 
 where $\mathcal{P}$ is the conversion in Section 4. The following figure fixes $M_2=0.7$ and $\gamma=1.4$, varies thickness/opening, and uses several nozzle/impulse angle coordinates. Every loss value is computed by the public production function.
 
-[Complete production trailing-edge loss versus thickness/opening for different angle coordinates, with derivatives (PDF)](../figures/ko_trailing_thickness_review.pdf)
+![Complete production trailing-edge loss versus thickness/opening for different angle coordinates, with derivatives (SVG)](../figures/ko_trailing_thickness_review.svg)
 
-[PDF](../figures/ko_trailing_thickness_review.pdf) ? [CSV](../data/trailing_review/thickness_sensitivity.csv)
+[SVG](../figures/ko_trailing_thickness_review.svg) ? [CSV](../data/trailing_review/thickness_sensitivity.csv)
 
 Loss starts exactly at zero and rises monotonically toward a finite limit. The first thickness derivative is finite and positive at the zero-thickness boundary, and joins continuously at $x=0.4$. These are right derivatives at zero; negative thickness remains invalid.
 

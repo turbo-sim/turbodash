@@ -5,4 +5,4 @@ services:
     plan: free
     autoDeploy: true
     buildCommand: "poetry install --no-root --without dev"
-    startCommand: "gunicorn turbodash.app_turbine:server"
+    startCommand: "gunicorn turbodash.apps.turbine:server"

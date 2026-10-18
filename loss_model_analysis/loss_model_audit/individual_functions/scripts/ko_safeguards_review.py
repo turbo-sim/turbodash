@@ -146,7 +146,7 @@ def render():
     def finish(fig, name, note):
         fig.text(.5, .02, note, ha="center", va="bottom", fontsize=9)
         fig.tight_layout(rect=(0, .13, 1, .94))
-        for extension in ("pdf",):
+        for extension in ("svg",):
             path = FIGURES / ("ko_safeguard_"+name+"."+extension)
             fig.savefig(path, dpi=180, bbox_inches="tight")
             outputs[path.name] = sha256(path)

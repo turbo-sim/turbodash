@@ -1,6 +1,6 @@
 # TurboGrid web export
 
-The separate `turbodash/export_turbogrid.py` module creates TurboGrid ZIP bytes
+The separate `turbodash/io/turbogrid.py` module creates TurboGrid ZIP bytes
 from the solved results already stored by the turbine app. It does not recompute
 the turbine, modify the supplied results, or write temporary files. The original
 rotor export script remains available independently.
@@ -27,17 +27,17 @@ the archive is prepared, and export errors are displayed beside the button.
 If an input change has failed to calculate, the stored results still represent
 the last successful design; resolve the calculation error before exporting.
 
-The panel and download callbacks live in `turbodash/app_turbogrid.py`.
-`app_turbine.py` only registers them and appends the panel to the results layout.
+The panel and download callbacks live in `turbodash/apps/components/turbogrid.py`.
+`apps/turbine.py` only registers them and appends the panel to the results layout.
 Existing calculation, plotting, and YAML save/load callbacks are unchanged.
 
 ## Python API
 
 The following API and options describe **independent-row** mode. Assembly export
-lives separately in `turbodash/export_turbogrid_assembly.py`.
+lives separately in `turbodash/io/turbogrid_assembly.py`.
 
 ```python
-from turbodash.export_turbogrid import export_turbogrid_zip
+from turbodash.io.turbogrid import export_turbogrid_zip
 
 zip_bytes = export_turbogrid_zip(results)
 ```

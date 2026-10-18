@@ -22,5 +22,13 @@ The fixtures are independent of the analysis scripts:
 - `ko_trailing_edge_points.csv` contains the 42 KO Figure 14 readings, including
   the held-out points, from the trailing-edge study. Tests evaluate the current
   production fit against these measurements directly.
+- `stage_refactor_reference.json` preserves original axial/radial stage results,
+  report tables and console output captured before the package relocation.
+
+`test_refactored_layout.py` checks calculation/report parity, the Excel adapter,
+all four YAML app cases through Dash's HTTP calculation callbacks, demo runners,
+and actual worker module execution from outside the checkout. Tests import the
+implementation modules directly; tests of removed compatibility paths are gone.
+`test_core.py` remains unchanged and commented out.
 
 Study-specific tests remain alongside their analyses in `loss_model_analysis/`.

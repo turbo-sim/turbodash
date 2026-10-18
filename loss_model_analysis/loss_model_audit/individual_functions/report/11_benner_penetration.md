@@ -18,11 +18,11 @@ No penetration, loading or weighting equation changed. Fundamental plots expose 
 
 ## Current values and derivatives
 
-[penetration_cap: values and d/dx (PDF)](../figures/penetration_cap.pdf)
+![penetration_cap: values and d/dx (SVG)](../figures/penetration_cap.svg)
 
-[benner_penetration_aspect_ratio: values and d/dx (PDF)](../figures/benner_penetration_aspect_ratio.pdf)
+![benner_penetration_aspect_ratio: values and d/dx (SVG)](../figures/benner_penetration_aspect_ratio.svg)
 
-[loading_inlet: values and d/dx (PDF)](../figures/loading_inlet.pdf)
+![loading_inlet: values and d/dx (SVG)](../figures/loading_inlet.svg)
 
 ## Quantitative checks
 
@@ -45,14 +45,14 @@ Every figure contains current-source values and derivatives; links below cover a
 
 | Parameter / case | Range | Comparison figure | Numerical data |
 |---|---|---|---|
-| Aspect ratio H/c | 0.05 to 10 (log axis) | [Open](../figures/benner_penetration_aspect_ratio.pdf) | [stator](../data/sweeps/fundamental_benner_penetration_aspect_ratio__stator.csv.gz) |
-| Pitch/chord ratio | 0.05 to 5 | [Open](../figures/benner_penetration_pitch_chord.pdf) | [stator](../data/sweeps/fundamental_benner_penetration_pitch_chord__stator.csv.gz) |
-| Incidence | -30 to 30 | [Open](../figures/benner_penetration_incidence.pdf) | [stator](../data/sweeps/fundamental_benner_penetration_incidence__stator.csv.gz) |
-| Signed exit angle in design direction | -20 to 80 | [Open](../figures/benner_penetration_exit_angle.pdf) | [stator](../data/sweeps/fundamental_benner_penetration_exit_angle__stator.csv.gz) |
-| Reference boundary-layer thickness | 0 to 0.15 | [Open](../figures/benner_penetration_delta_ref.pdf) | [stator](../data/sweeps/fundamental_benner_penetration_delta_ref__stator.csv.gz) |
-| Inlet Reynolds number | 10000 to 1e+07 (log axis) | [Open](../figures/benner_penetration_re_in.pdf) | [stator](../data/sweeps/fundamental_benner_penetration_re_in__stator.csv.gz) |
-| Raw penetration ratio · penetration cap | 0 to 0.9 | [Open](../figures/penetration_cap.pdf) | [prescribed reference](../data/sweeps/fundamental_penetration_cap.csv.gz) |
-| Incidence · loading inlet | -30 to 30 | [Open](../figures/loading_inlet.pdf) | [prescribed reference](../data/sweeps/fundamental_loading_inlet.csv.gz) |
+| Aspect ratio H/c | 0.05 to 10 (log axis) | [Open](../figures/benner_penetration_aspect_ratio.svg) | [stator](../data/sweeps/fundamental_benner_penetration_aspect_ratio__stator.csv.gz) |
+| Pitch/chord ratio | 0.05 to 5 | [Open](../figures/benner_penetration_pitch_chord.svg) | [stator](../data/sweeps/fundamental_benner_penetration_pitch_chord__stator.csv.gz) |
+| Incidence | -30 to 30 | [Open](../figures/benner_penetration_incidence.svg) | [stator](../data/sweeps/fundamental_benner_penetration_incidence__stator.csv.gz) |
+| Signed exit angle in design direction | -20 to 80 | [Open](../figures/benner_penetration_exit_angle.svg) | [stator](../data/sweeps/fundamental_benner_penetration_exit_angle__stator.csv.gz) |
+| Reference boundary-layer thickness | 0 to 0.15 | [Open](../figures/benner_penetration_delta_ref.svg) | [stator](../data/sweeps/fundamental_benner_penetration_delta_ref__stator.csv.gz) |
+| Inlet Reynolds number | 10000 to 1e+07 (log axis) | [Open](../figures/benner_penetration_re_in.svg) | [stator](../data/sweeps/fundamental_benner_penetration_re_in__stator.csv.gz) |
+| Raw penetration ratio · penetration cap | 0 to 0.9 | [Open](../figures/penetration_cap.svg) | [prescribed reference](../data/sweeps/fundamental_penetration_cap.csv.gz) |
+| Incidence · loading inlet | -30 to 30 | [Open](../figures/loading_inlet.svg) | [prescribed reference](../data/sweeps/fundamental_loading_inlet.csv.gz) |
 
 [All individual functions](../readme.md) · [Methods, validation and reproduction](../methodology.md)
 

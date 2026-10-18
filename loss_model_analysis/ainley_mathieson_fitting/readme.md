@@ -102,25 +102,25 @@ The data include approximate readings in the crowded low-spacing region, with la
 
 The original nozzle 75°/80° dashes do not provide visible points near s/c=0.3. Their low-spacing continuation is constrained by angle ordering, rather than being presented as digitized evidence. The source overlays distinguish approximate crowded readings from resolved trace centres.
 
-[Low-spacing paired comparisons (PDF)](figures/low_spacing_ordering.pdf)
+![Low-spacing paired comparisons (SVG)](figures/low_spacing_ordering.svg)
 
-[The separate slope check](figures/low_spacing_slopes.pdf) verifies the ordering without crowding the comparison.
+![The separate slope check](figures/low_spacing_slopes.svg) verifies the ordering without crowding the comparison.
 
 ### Nozzle: both slice directions
 
-[nozzle spacing families (PDF)](figures/nozzle_pitch_families.pdf)
+![nozzle spacing families (SVG)](figures/nozzle_pitch_families.svg)
 
-[nozzle angle families (PDF)](figures/nozzle_angle_families.pdf)
+![nozzle angle families (SVG)](figures/nozzle_angle_families.svg)
 
-[Separate angle panels](figures/nozzle_angle_slices.pdf) make close curves easier to inspect. Angle-plot symbols are actual measured points within ±0.002 of the stated s/c; no additional data points are interpolated. A few slices lack symbols where the scan has gaps or ambiguous ink.
+![Separate angle panels](figures/nozzle_angle_slices.svg) make close curves easier to inspect. Angle-plot symbols are actual measured points within ±0.002 of the stated s/c; no additional data points are interpolated. A few slices lack symbols where the scan has gaps or ambiguous ink.
 
 ### Impulse: both slice directions
 
-[impulse spacing families (PDF)](figures/impulse_pitch_families.pdf)
+![impulse spacing families (SVG)](figures/impulse_pitch_families.svg)
 
-[impulse angle families (PDF)](figures/impulse_angle_families.pdf)
+![impulse angle families (SVG)](figures/impulse_angle_families.svg)
 
-[Separate angle panels](figures/impulse_angle_slices.pdf) make close curves easier to inspect. Angle-plot symbols are actual measured points within ±0.002 of the stated s/c; no additional data points are interpolated. A few slices lack symbols where the scan has gaps or ambiguous ink.
+![Separate angle panels](figures/impulse_angle_slices.svg) make close curves easier to inspect. Angle-plot symbols are actual measured points within ±0.002 of the stated s/c; no additional data points are interpolated. A few slices lack symbols where the scan has gaps or ambiguous ink.
 
 ### Wider spacing range and bounded extrapolation
 
@@ -128,19 +128,19 @@ The original rational fit diverged as spacing approached zero and exceeded 0.5 a
 
 ### Nozzle: s/c from zero to three
 
-[nozzle wide spacing comparison (PDF)](figures/nozzle_spacing_extrapolation.pdf)
+![nozzle wide spacing comparison (SVG)](figures/nozzle_spacing_extrapolation.svg)
 
-[nozzle wide spacing angle slices (PDF)](figures/nozzle_angle_extrapolation.pdf)
+![nozzle wide spacing angle slices (SVG)](figures/nozzle_angle_extrapolation.svg)
 
-[Unbounded versus bounded continuation](figures/nozzle_continuation_diagnostic.pdf) shows what the continuation changes without adding another set of curves to the main comparisons.
+![Unbounded versus bounded continuation](figures/nozzle_continuation_diagnostic.svg) shows what the continuation changes without adding another set of curves to the main comparisons.
 
 ### Impulse: s/c from zero to three
 
-[impulse wide spacing comparison (PDF)](figures/impulse_spacing_extrapolation.pdf)
+![impulse wide spacing comparison (SVG)](figures/impulse_spacing_extrapolation.svg)
 
-[impulse wide spacing angle slices (PDF)](figures/impulse_angle_extrapolation.pdf)
+![impulse wide spacing angle slices (SVG)](figures/impulse_angle_extrapolation.svg)
 
-[Unbounded versus bounded continuation](figures/impulse_continuation_diagnostic.pdf) shows what the continuation changes without adding another set of curves to the main comparisons.
+![Unbounded versus bounded continuation](figures/impulse_continuation_diagnostic.svg) shows what the continuation changes without adding another set of curves to the main comparisons.
 
 ## 3. Error analysis
 
@@ -162,7 +162,7 @@ For context, evaluating the unchanged Aungier expression on those same held-out 
 
 These holdouts do not demonstrate a general accuracy advantage over Aungier at unseen angles. The supported gains here are improved agreement when all chart curves are fitted together, continuous derivatives, bounded positive spacing tails, and the requested low-spacing angle ordering.
 
-[Residuals (PDF)](figures/residuals.pdf)
+![Residuals (SVG)](figures/residuals.svg)
 
 ### Historical model selection
 
@@ -197,10 +197,10 @@ The Aungier comparator executes the two preserved repository function definition
 
 The new surfaces have no angle joins, and the spacing shape cannot turn down after its sole minimum. That removes these numerical pathologies, but **smooth, positive extrapolation is not evidence of aerodynamic accuracy**. In particular, 0–40° and angles above the last source curve are unsupported. No low-angle data have been invented to constrain them. Detailed derivative and extrapolation plots show this explicitly:
 
-- [Nozzle angle values and slopes](figures/nozzle_angle_derivatives.pdf)
-- [Impulse angle values and slopes](figures/impulse_angle_derivatives.pdf)
-- [Nozzle spacing extrapolation](figures/nozzle_spacing_extrapolation.pdf)
-- [Impulse spacing extrapolation](figures/impulse_spacing_extrapolation.pdf)
+- ![Nozzle angle values and slopes](figures/nozzle_angle_derivatives.svg)
+- ![Impulse angle values and slopes](figures/impulse_angle_derivatives.svg)
+- ![Nozzle spacing extrapolation](figures/nozzle_spacing_extrapolation.svg)
+- ![Impulse spacing extrapolation](figures/impulse_spacing_extrapolation.svg)
 
 ## 4. Digitization and provenance
 
@@ -226,9 +226,9 @@ The [source PDF](source/arc-rm-2974.pdf), [rendered page](source/arc-rm-2974.pdf
 
 Inspect the points against the actual source ink:
 
-[Nozzle digitization (PDF)](figures/nozzle_digitization.pdf)
+![Nozzle digitization (SVG)](figures/nozzle_digitization.svg)
 
-[Impulse digitization (PDF)](figures/impulse_digitization.pdf)
+![Impulse digitization (SVG)](figures/impulse_digitization.svg)
 
 ### Reproduce
 
@@ -241,7 +241,7 @@ python -B run.py
 python -B verify.py
 ```
 
-The digitization scripts regenerate measurements from saved pixel selections and paper PDFs rendered in memory. `run.py --render-only` redraws and rewrites this report using the saved selected coefficients. Figures are available as PDF only. `plot_comparisons.py` owns the paired layouts, and `extrapolation_fit.py` reproduces the extended ordering constraint. Refitting and evaluation require no network access. [Numerical validation](data/validation.json) checks the exported evaluator, shape constraints, derivatives and agreement with the current production reference helpers. [Run metadata](data/run_manifest.json) records source hashes and timings.
+The digitization scripts regenerate measurements from saved pixel selections and paper PDFs rendered in memory. `run.py --render-only` redraws and rewrites this report using the saved selected coefficients. Figures are available as SVG only. `plot_comparisons.py` owns the paired layouts, and `extrapolation_fit.py` reproduces the extended ordering constraint. Refitting and evaluation require no network access. [Numerical validation](data/validation.json) checks the exported evaluator, shape constraints, derivatives and agreement with the current production reference helpers. [Run metadata](data/run_manifest.json) records source hashes and timings.
 
 
 All plots use the repository's `set_plot_options()` style and ordered viridis colors. Every exit-angle axis begins at -20 degrees; upper limits retain their chart or diagnostic values. Reference families follow the production positive-design angle continuation, with blue shading below 10 degrees and beige outside chart coverage. The spacing comparisons retain their correlation-range and 0–3 views. Plotting does not change the fitted coefficients.

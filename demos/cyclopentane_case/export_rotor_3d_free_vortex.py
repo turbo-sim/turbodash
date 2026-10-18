@@ -18,7 +18,7 @@ DEFAULT_OUTPUT_DIR = CASE_DIR / "output" / "rotor_3d_free_vortex"
 
 
 def _load_compute_blade_coordinates_cartesian():
-    module_path = REPO_ROOT / "turbodash" / "geom_blade.py"
+    module_path = REPO_ROOT / "turbodash" / "geometry" / "blade.py"
     spec = importlib.util.spec_from_file_location("geom_blade_local", module_path)
     if spec is None or spec.loader is None:
         raise ImportError(f"Could not load geometry module from {module_path}")
@@ -38,9 +38,9 @@ def load_results(yaml_path: Path, *, recompute: bool):
 
     if str(REPO_ROOT) not in sys.path:
         sys.path.insert(0, str(REPO_ROOT))
-    import turbodash as td
+    from turbodash.core.turbine import compute_turbine_performance
 
-    return td.core_turbine.compute_turbine_performance(cfg)
+    return compute_turbine_performance(cfg)
 
 
 def _float(value):

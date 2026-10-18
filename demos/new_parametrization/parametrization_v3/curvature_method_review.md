@@ -149,7 +149,7 @@ See [script](review/diagnose_v3.py), [CSV](review/v3_diagnostics.csv), and [vect
 
 ## How much of the geometry is actually available from meanline?
 
-The existing [core_turbine.py](../../turbodash/core_turbine.py), `compute_blade_row_geometry` around lines 381–498, already supplies meridional chord, blade count/pitch, an estimated opening, thickness quantities, wedge angles, and fields named metal angles. That makes your proposed integration natural, but the definitions need an explicit adapter:
+The existing [core_turbine.py](../../../turbodash/core/turbine.py), `compute_blade_row_geometry` around lines 381–498, already supplies meridional chord, blade count/pitch, an estimated opening, thickness quantities, wedge angles, and fields named metal angles. That makes your proposed integration natural, but the definitions need an explicit adapter:
 
 | Quantity | Current status | Recommended treatment |
 | --- | --- | --- |
@@ -185,7 +185,7 @@ An arc-length formulation, `dtheta/ds=kappa`, `dx/ds=cos(theta)`, `dy/ds=sin(the
 
 An automated version could derive a baseline from the meanline inputs, expose a few normalized shape modes, and solve for internal coefficients to satisfy the geometric constraints. It would need deterministic initialization, a chosen solution branch, rejection of infeasible shapes, and suitable derivatives for optimization. A GUI is optional; a well-designed closure and feasibility strategy is essential.
 
-The existing `turbodash/geom_blade.py::_curvature_core` is also a different concept: it integrates a spline twice to construct a reference camberline and adjusts its scale to match endpoint angles. That is a second-derivative-controlled camberline, not direct prescription of the two physical blade-surface curvatures. Improving or reusing that component would not by itself solve the nose issue.
+The existing `turbodash/geometry/blade.py::_curvature_core` is also a different concept: it integrates a spline twice to construct a reference camberline and adjusts its scale to match endpoint angles. That is a second-derivative-controlled camberline, not direct prescription of the two physical blade-surface curvatures. Improving or reusing that component would not by itself solve the nose issue.
 
 ## Suggested next construction
 

@@ -35,7 +35,7 @@ import numpy as np
 import CoolProp.CoolProp as CP
 from CoolProp import AbstractState
 from scipy.optimize import brentq
-from turbodash.core_turbine import (
+from turbodash.core.turbine import (
     compute_stage_velocity_triangles,
     compute_blade_row_geometry,
 )
@@ -90,7 +90,7 @@ def model_directory(model):
 
 
 def source_hashes():
-    paths = [REPO / "turbodash/core_turbine.py", REPO / "turbodash/math.py",
+    paths = [REPO / "turbodash/core/turbine.py", REPO / "turbodash/math.py",
              *sorted((REPO / "turbodash/loss_models").glob("*.py"))]
     return {p.relative_to(REPO).as_posix(): sha256(p) for p in paths}
 

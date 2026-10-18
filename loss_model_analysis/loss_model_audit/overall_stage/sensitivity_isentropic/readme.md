@@ -18,9 +18,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Isolate how stator exit angle changes the velocity triangles and unrecovered exit kinetic energy, with every row-loss component set to zero.
 
-[Isentropic (zero losses) stator_exit_angle speed_r0 (PDF)](figures/speed_r0_stator_exit_angle.pdf)
+![Isentropic (zero losses) stator_exit_angle speed_r0 (SVG)](figures/speed_r0_stator_exit_angle.svg)
 
-[Vector PDF](figures/speed_r0_stator_exit_angle.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/speed_r0_stator_exit_angle.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. Stator angle changes exit kinetic energy and therefore total-static efficiency; total-total efficiency remains exactly 100% for every finite reference design. At $U/c_0$=0.6, total-static efficiency ranges from 39.85% to 92.35%. Retained finite samples include 405 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -28,9 +28,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Isolate how stator exit angle changes the velocity triangles and unrecovered exit kinetic energy, with every row-loss component set to zero.
 
-[Isentropic (zero losses) stator_exit_angle speed_r05 (PDF)](figures/speed_r05_stator_exit_angle.pdf)
+![Isentropic (zero losses) stator_exit_angle speed_r05 (SVG)](figures/speed_r05_stator_exit_angle.svg)
 
-[Vector PDF](figures/speed_r05_stator_exit_angle.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/speed_r05_stator_exit_angle.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. Stator angle changes exit kinetic energy and therefore total-static efficiency; total-total efficiency remains exactly 100% for every finite reference design. At $U/c_0$=0.6, total-static efficiency ranges from 73.96% to 97.28%. Retained finite samples include 471 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -38,9 +38,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Isolate how stator exit angle changes the velocity triangles and unrecovered exit kinetic energy, with every row-loss component set to zero.
 
-[Isentropic (zero losses) stator_exit_angle reaction (PDF)](figures/reaction_stator_exit_angle.pdf)
+![Isentropic (zero losses) stator_exit_angle reaction (SVG)](figures/reaction_stator_exit_angle.svg)
 
-[Vector PDF](figures/reaction_stator_exit_angle.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/reaction_stator_exit_angle.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. Stator angle changes exit kinetic energy and therefore total-static efficiency; total-total efficiency remains exactly 100% for every finite reference design. At $R$=0.5, total-static efficiency ranges from 73.96% to 97.28%. Retained finite samples include 94 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -48,9 +48,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Verify that spacing has no aerodynamic efficiency effect when the loss model is isentropic; retain the common geometry checks.
 
-[Isentropic (zero losses) pitch_chord speed_r0 (PDF)](figures/speed_r0_pitch_chord.pdf)
+![Isentropic (zero losses) pitch_chord speed_r0 (SVG)](figures/speed_r0_pitch_chord.svg)
 
-[Vector PDF](figures/speed_r0_pitch_chord.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/speed_r0_pitch_chord.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $U/c_0$=0.6, total-static efficiency ranges from 81.53% to 81.53%. Retained finite samples include 420 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -58,9 +58,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Verify that spacing has no aerodynamic efficiency effect when the loss model is isentropic; retain the common geometry checks.
 
-[Isentropic (zero losses) pitch_chord speed_r05 (PDF)](figures/speed_r05_pitch_chord.pdf)
+![Isentropic (zero losses) pitch_chord speed_r05 (SVG)](figures/speed_r05_pitch_chord.svg)
 
-[Vector PDF](figures/speed_r05_pitch_chord.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/speed_r05_pitch_chord.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $U/c_0$=0.6, total-static efficiency ranges from 92.98% to 92.98%. Retained finite samples include 490 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -68,9 +68,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Verify that spacing has no aerodynamic efficiency effect when the loss model is isentropic; retain the common geometry checks.
 
-[Isentropic (zero losses) pitch_chord reaction (PDF)](figures/reaction_pitch_chord.pdf)
+![Isentropic (zero losses) pitch_chord reaction (SVG)](figures/reaction_pitch_chord.svg)
 
-[Vector PDF](figures/reaction_pitch_chord.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/reaction_pitch_chord.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $R$=0.5, total-static efficiency ranges from 92.98% to 92.98%. Retained finite samples include 77 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -78,9 +78,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Verify that blade aspect ratio affects sizing but cannot create secondary or clearance losses in the zero-loss model.
 
-[Isentropic (zero losses) aspect_ratio speed_r0 (PDF)](figures/speed_r0_aspect_ratio.pdf)
+![Isentropic (zero losses) aspect_ratio speed_r0 (SVG)](figures/speed_r0_aspect_ratio.svg)
 
-[Vector PDF](figures/speed_r0_aspect_ratio.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/speed_r0_aspect_ratio.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $U/c_0$=0.6, total-static efficiency ranges from 81.53% to 81.53%. Retained finite samples include 300 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -88,9 +88,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Verify that blade aspect ratio affects sizing but cannot create secondary or clearance losses in the zero-loss model.
 
-[Isentropic (zero losses) aspect_ratio speed_r05 (PDF)](figures/speed_r05_aspect_ratio.pdf)
+![Isentropic (zero losses) aspect_ratio speed_r05 (SVG)](figures/speed_r05_aspect_ratio.svg)
 
-[Vector PDF](figures/speed_r05_aspect_ratio.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/speed_r05_aspect_ratio.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $U/c_0$=0.6, total-static efficiency ranges from 92.98% to 92.98%. Retained finite samples include 350 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -98,9 +98,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Verify that blade aspect ratio affects sizing but cannot create secondary or clearance losses in the zero-loss model.
 
-[Isentropic (zero losses) aspect_ratio reaction (PDF)](figures/reaction_aspect_ratio.pdf)
+![Isentropic (zero losses) aspect_ratio reaction (SVG)](figures/reaction_aspect_ratio.svg)
 
-[Vector PDF](figures/reaction_aspect_ratio.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/reaction_aspect_ratio.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $R$=0.5, total-static efficiency ranges from 92.98% to 92.98%. Retained finite samples include 55 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -108,9 +108,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Verify that trailing-edge thickness adds no loss in the isentropic model; retain the same reference-geometry checks as the empirical studies.
 
-[Isentropic (zero losses) trailing_ratio speed_r0 (PDF)](figures/speed_r0_trailing_ratio.pdf)
+![Isentropic (zero losses) trailing_ratio speed_r0 (SVG)](figures/speed_r0_trailing_ratio.svg)
 
-[Vector PDF](figures/speed_r0_trailing_ratio.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/speed_r0_trailing_ratio.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $U/c_0$=0.6, total-static efficiency ranges from 81.53% to 81.53%. Retained finite samples include 300 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -118,9 +118,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Verify that trailing-edge thickness adds no loss in the isentropic model; retain the same reference-geometry checks as the empirical studies.
 
-[Isentropic (zero losses) trailing_ratio speed_r05 (PDF)](figures/speed_r05_trailing_ratio.pdf)
+![Isentropic (zero losses) trailing_ratio speed_r05 (SVG)](figures/speed_r05_trailing_ratio.svg)
 
-[Vector PDF](figures/speed_r05_trailing_ratio.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/speed_r05_trailing_ratio.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $U/c_0$=0.6, total-static efficiency ranges from 92.98% to 92.98%. Retained finite samples include 350 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -128,9 +128,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Verify that trailing-edge thickness adds no loss in the isentropic model; retain the same reference-geometry checks as the empirical studies.
 
-[Isentropic (zero losses) trailing_ratio reaction (PDF)](figures/reaction_trailing_ratio.pdf)
+![Isentropic (zero losses) trailing_ratio reaction (SVG)](figures/reaction_trailing_ratio.svg)
 
-[Vector PDF](figures/reaction_trailing_ratio.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/reaction_trailing_ratio.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $R$=0.5, total-static efficiency ranges from 92.98% to 92.98%. Retained finite samples include 55 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -138,9 +138,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Check that rotational speed and annulus sizing leave the prescribed dimensionless triangles and zero-loss efficiencies unchanged.
 
-[Isentropic (zero losses) specific_speed speed_r0 (PDF)](figures/speed_r0_specific_speed.pdf)
+![Isentropic (zero losses) specific_speed speed_r0 (SVG)](figures/speed_r0_specific_speed.svg)
 
-[Vector PDF](figures/speed_r0_specific_speed.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/speed_r0_specific_speed.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $U/c_0$=0.6, total-static efficiency ranges from 81.53% to 81.53%. Retained finite samples include 293 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -148,9 +148,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Check that rotational speed and annulus sizing leave the prescribed dimensionless triangles and zero-loss efficiencies unchanged.
 
-[Isentropic (zero losses) specific_speed speed_r05 (PDF)](figures/speed_r05_specific_speed.pdf)
+![Isentropic (zero losses) specific_speed speed_r05 (SVG)](figures/speed_r05_specific_speed.svg)
 
-[Vector PDF](figures/speed_r05_specific_speed.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/speed_r05_specific_speed.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $U/c_0$=0.6, total-static efficiency ranges from 92.98% to 92.98%. Retained finite samples include 343 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -158,9 +158,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Check that rotational speed and annulus sizing leave the prescribed dimensionless triangles and zero-loss efficiencies unchanged.
 
-[Isentropic (zero losses) specific_speed reaction (PDF)](figures/reaction_specific_speed.pdf)
+![Isentropic (zero losses) specific_speed reaction (SVG)](figures/reaction_specific_speed.svg)
 
-[Vector PDF](figures/reaction_specific_speed.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/reaction_specific_speed.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $R$=0.5, total-static efficiency ranges from 92.98% to 92.98%. Retained finite samples include 222 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -168,9 +168,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Check size invariance: mass flow changes dimensions and Reynolds numbers, but neither row losses nor normalized velocity triangles.
 
-[Isentropic (zero losses) mass_flow speed_r0 (PDF)](figures/speed_r0_mass_flow.pdf)
+![Isentropic (zero losses) mass_flow speed_r0 (SVG)](figures/speed_r0_mass_flow.svg)
 
-[Vector PDF](figures/speed_r0_mass_flow.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/speed_r0_mass_flow.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $U/c_0$=0.6, total-static efficiency ranges from 81.53% to 81.53%. Retained finite samples include 300 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -178,9 +178,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Check size invariance: mass flow changes dimensions and Reynolds numbers, but neither row losses nor normalized velocity triangles.
 
-[Isentropic (zero losses) mass_flow speed_r05 (PDF)](figures/speed_r05_mass_flow.pdf)
+![Isentropic (zero losses) mass_flow speed_r05 (SVG)](figures/speed_r05_mass_flow.svg)
 
-[Vector PDF](figures/speed_r05_mass_flow.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/speed_r05_mass_flow.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $U/c_0$=0.6, total-static efficiency ranges from 92.98% to 92.98%. Retained finite samples include 350 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -188,9 +188,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Check size invariance: mass flow changes dimensions and Reynolds numbers, but neither row losses nor normalized velocity triangles.
 
-[Isentropic (zero losses) mass_flow reaction (PDF)](figures/reaction_mass_flow.pdf)
+![Isentropic (zero losses) mass_flow reaction (SVG)](figures/reaction_mass_flow.svg)
 
-[Vector PDF](figures/reaction_mass_flow.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/reaction_mass_flow.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $R$=0.5, total-static efficiency ranges from 92.98% to 92.98%. Retained finite samples include 55 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -198,9 +198,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Vary dimensional expansion and thermodynamic states while checking that the prescribed normalized exit kinetic energy, and hence ideal efficiency, is unchanged.
 
-[Isentropic (zero losses) isentropic_mach speed_r0 (PDF)](figures/speed_r0_isentropic_mach.pdf)
+![Isentropic (zero losses) isentropic_mach speed_r0 (SVG)](figures/speed_r0_isentropic_mach.svg)
 
-[Vector PDF](figures/speed_r0_isentropic_mach.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/speed_r0_isentropic_mach.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $U/c_0$=0.6, total-static efficiency ranges from 81.53% to 81.53%. Retained finite samples include 360 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -208,9 +208,9 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Vary dimensional expansion and thermodynamic states while checking that the prescribed normalized exit kinetic energy, and hence ideal efficiency, is unchanged.
 
-[Isentropic (zero losses) isentropic_mach speed_r05 (PDF)](figures/speed_r05_isentropic_mach.pdf)
+![Isentropic (zero losses) isentropic_mach speed_r05 (SVG)](figures/speed_r05_isentropic_mach.svg)
 
-[Vector PDF](figures/speed_r05_isentropic_mach.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/speed_r05_isentropic_mach.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $U/c_0$=0.6, total-static efficiency ranges from 92.98% to 92.98%. Retained finite samples include 420 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.
 
@@ -218,8 +218,8 @@ The blue total-total curves lie exactly on the upper 100% boundary. Both efficie
 
 **Purpose.** Vary dimensional expansion and thermodynamic states while checking that the prescribed normalized exit kinetic energy, and hence ideal efficiency, is unchanged.
 
-[Isentropic (zero losses) isentropic_mach reaction (PDF)](figures/reaction_isentropic_mach.pdf)
+![Isentropic (zero losses) isentropic_mach reaction (SVG)](figures/reaction_isentropic_mach.svg)
 
-[Vector PDF](figures/reaction_isentropic_mach.pdf) | [Samples](data/isentropic.csv.gz)
+[Vector SVG](figures/reaction_isentropic_mach.svg) | [Samples](data/isentropic.csv.gz)
 
 **Consistent.** All row-loss components are exactly zero and total-total efficiency is exactly 100%. The parameter levels overlap because this parameter does not change the prescribed dimensionless triangles and no empirical loss correction is active. At $R$=0.5, total-static efficiency ranges from 92.98% to 92.98%. Retained finite samples include 66 negative-hub designs. Gaps use the same reference-design checks as the empirical studies.

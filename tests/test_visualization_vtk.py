@@ -7,7 +7,7 @@ from dash import Dash, html
 import numpy as np
 import pytest
 
-from turbodash import visualization_vtk as vtk
+from turbodash.visualization import vtk
 
 
 @pytest.fixture

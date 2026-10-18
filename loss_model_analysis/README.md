@@ -1,7 +1,8 @@
 # Loss model analysis
 
-Figures are exported as PDF only. Reports link to these vector plots, including
-the three-column stage comparison. The original paper PDFs remain the source
+Figures are exported as SVG only and embedded directly in the Markdown reports,
+including the three-column stage comparison, whose previews link to full-size
+figures. The original paper PDFs remain the source
 for digitization: Poppler renders their scanned charts in memory at the recorded
 resolution, so no raster image files are needed. Scanned backgrounds embedded
 in digitization overlays retain the paper's original raster content.

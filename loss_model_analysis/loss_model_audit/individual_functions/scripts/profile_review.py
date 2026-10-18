@@ -21,7 +21,7 @@ VERSIONS = ("candidate",)
 ANGLES = {"nozzle": (40, 50, 60, 65, 70, 75, 80), "impulse": (40, 50, 55, 60, 65, 70)}
 SPACINGS = (0.5, 0.65, 0.8, 1.0, 1.2)
 DATA_FILES = ("pitch_families.csv", "angle_transitions.csv", "transition_probes.csv")
-PLOT_FILES = ("am_nozzle_pitch_chord.pdf", "am_impulse_pitch_chord.pdf", "am_angle_transitions.pdf", "am_angle_zoom.pdf")
+PLOT_FILES = ("am_nozzle_pitch_chord.svg", "am_impulse_pitch_chord.svg", "am_angle_transitions.svg", "am_angle_zoom.svg")
 
 
 def shared_grid(start, stop, refinement_samples, anchors=()):
@@ -163,8 +163,8 @@ def render():
         axes[0].set_xlim(.3,1.2);axes[0].set_ylim(bottom=0)
         for ax in axes:
             shade_outside(ax, (.3, 1.1 if family == "nozzle" else 1.), (.3, 1.2))
-        finish(fig,f"am_{family}_pitch_chord.pdf",f"Ainley-Mathieson reference curves: {family}",handles,"tmax/c=0.2; current analytical reference curves. Colors identify exit-angle magnitude.")
-    for name,lo,hi in [("am_angle_transitions.pdf",-20,80),("am_angle_zoom.pdf",-20,60)]:
+        finish(fig,f"am_{family}_pitch_chord.svg",f"Ainley-Mathieson reference curves: {family}",handles,"tmax/c=0.2; current analytical reference curves. Colors identify exit-angle magnitude.")
+    for name,lo,hi in [("am_angle_transitions.svg",-20,80),("am_angle_zoom.svg",-20,60)]:
         fig,axes=plt.subplots(2,2,figsize=(16,7.5),sharex=True)
         for row,family in enumerate(ANGLES):
             for i,pitch in enumerate(SPACINGS):

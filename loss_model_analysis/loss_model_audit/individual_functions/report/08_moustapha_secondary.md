@@ -18,9 +18,9 @@ The correction factor is unchanged. The separate KO secondary component on which
 
 ## Current values and derivatives
 
-[moustapha_secondary_incidence: values and d/dx (PDF)](../figures/moustapha_secondary_incidence.pdf)
+![moustapha_secondary_incidence: values and d/dx (SVG)](../figures/moustapha_secondary_incidence.svg)
 
-[moustapha_secondary_leading_edge_ratio: values and d/dx (PDF)](../figures/moustapha_secondary_leading_edge_ratio.pdf)
+![moustapha_secondary_leading_edge_ratio: values and d/dx (SVG)](../figures/moustapha_secondary_leading_edge_ratio.svg)
 
 ## Quantitative checks
 
@@ -42,8 +42,8 @@ Every figure contains current-source values and derivatives; links below cover a
 
 | Parameter / case | Range | Comparison figure | Numerical data |
 |---|---|---|---|
-| Incidence | -30 to 30 | [Open](../figures/moustapha_secondary_incidence.pdf) | [stator](../data/sweeps/fundamental_moustapha_secondary_incidence__stator.csv.gz) |
-| Leading-edge ratio | 0.001 to 0.2 (log axis) | [Open](../figures/moustapha_secondary_leading_edge_ratio.pdf) | [stator, inlet offset=+10 deg](../data/sweeps/fundamental_moustapha_secondary_leading_edge_ratio__stator.csv.gz) |
+| Incidence | -30 to 30 | [Open](../figures/moustapha_secondary_incidence.svg) | [stator](../data/sweeps/fundamental_moustapha_secondary_incidence__stator.csv.gz) |
+| Leading-edge ratio | 0.001 to 0.2 (log axis) | [Open](../figures/moustapha_secondary_leading_edge_ratio.svg) | [stator, inlet offset=+10 deg](../data/sweeps/fundamental_moustapha_secondary_leading_edge_ratio__stator.csv.gz) |
 
 [All individual functions](../readme.md) · [Methods, validation and reproduction](../methodology.md)
 

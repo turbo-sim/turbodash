@@ -2,7 +2,7 @@
 
 import pytest
 
-from turbodash import plotting_mesh as plots
+from turbodash.visualization import plotly_mesh as plots
 
 
 def test_profile_uses_axial_tangential_mm_and_closes_blade():

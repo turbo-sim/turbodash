@@ -1,0 +1,178 @@
+{
+  "baseline_commit": "8a1972f",
+  "production_tests": {
+    "passed": 411,
+    "skipped": 8
+  },
+  "individual_function_tests": 78,
+  "trailing_edge_tests": 17,
+  "applications": {
+    "turbine": {
+      "passed": true,
+      "plots": 5,
+      "browser_errors": 0,
+      "installed_wheel": true
+    },
+    "turbine_experimental": {
+      "passed": true,
+      "plots": 8,
+      "browser_errors": 0,
+      "installed_wheel": true
+    },
+    "stage": {
+      "passed": true,
+      "plots": 4,
+      "browser_errors": 0,
+      "installed_wheel": true
+    },
+    "stage_efficiency": {
+      "passed": true,
+      "plots": 2,
+      "browser_errors": 0,
+      "installed_wheel": true
+    }
+  },
+  "final_package": {
+    "passed": true,
+    "apps": {
+      "turbine": [
+        "blades_plot",
+        "efficiency_trends_plot",
+        "geom_table",
+        "loss_plot",
+        "meridional_plot",
+        "perf_table",
+        "result_store",
+        "stations_table",
+        "triangles_container"
+      ],
+      "turbine_experimental": [
+        "blades_plot",
+        "efficiency_trends_plot",
+        "geom_table",
+        "loss_plot",
+        "meridional_plot",
+        "perf_table",
+        "result_input_signature",
+        "result_store",
+        "stations_table",
+        "triangles_container"
+      ],
+      "stage": [
+        "blades_plot",
+        "efficiency_ts_plot",
+        "efficiency_tt_plot",
+        "geom_table",
+        "meridional_plot",
+        "perf_table",
+        "stage_result_store",
+        "stations_table"
+      ],
+      "stage_efficiency": [
+        "efficiency_ts_plot",
+        "efficiency_tt_plot"
+      ]
+    },
+    "css_routes": true,
+    "excel_configuration_root": true,
+    "ordinary_packages": true,
+    "wheel_sha256": "31576048438f79a9fce041c245fcaed897773e947fdd5b7b2b140a519f98e9c6",
+    "removed_files_absent_from_wheel": 24,
+    "isolated_wheel_apps": 4
+  },
+  "numerical_tables_unchanged": 158,
+  "legacy_module_apis_retained": false,
+  "preserved_file_sha256": {
+    "tests/test_core.py": "829c3c770cd527176c1f7aa2950966bce1daa29b5272d0e16cda04bcefd2675e",
+    "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
+    "turbodash/loss_models/__init__.py": "fcc03d0e9ee610b36333efe8c19d8ad9f49f79c2d91e48654bd454103e3374b5",
+    "turbodash/loss_models/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
+    "turbodash/loss_models/_blade_loading.py": "b5b4956b978eb10ed75ee40e0b0f4bfbb4e34e4e8ebf9edee85186f8277ab18a",
+    "turbodash/loss_models/_numerics.py": "09bb30e75bf4ec4a25a2cba06578f68bebe483db1aba79dafce8af185983532b",
+    "turbodash/loss_models/_trailing_edge.py": "bb922ddffcab0f786fb8a9f8dde21840cc6df41ba80ce7b461e5a4501bbe3d00",
+    "turbodash/loss_models/loss_coefficient_conversion.py": "a9a8a5943bd91c352c4607fade51272e5ad60de02f8d14f4759e5407b02c1279",
+    "turbodash/loss_models/loss_model.py": "8fc6bc7d5e32bd060a0c836a6be110e49065ed618f5483c70df50d68d6f10975",
+    "turbodash/loss_models/loss_model_benner.py": "6a95683659c639508bf93d5a743d09a5a5998d4cbf5e4ce750fc484f9490bbcd",
+    "turbodash/loss_models/loss_model_kacker_okapuu.py": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51",
+    "turbodash/loss_models/loss_model_moustapha.py": "0748aa6c29528f98e0e6a12e61b9ed34f263f9f576f3664b9ebf322ef3098d23"
+  },
+  "source_relocations": {
+    "core_stage": "core.stage",
+    "core_turbine": "core.turbine",
+    "geom_blade": "geometry.blade",
+    "graphics": "visualization.matplotlib_style",
+    "plotting_mpl": "visualization.matplotlib_turbine",
+    "plotting_plotly_stage": "visualization.plotly_stage",
+    "plotting_plotly_turbine": "visualization.plotly_turbine",
+    "plotting_mesh": "visualization.plotly_mesh",
+    "visualization_vtk": "visualization.vtk",
+    "vtk_assets": "visualization.vtk_assets",
+    "reporting_utils": "reporting.turbine",
+    "export_turbogrid": "io.turbogrid",
+    "export_turbogrid_assembly": "io.turbogrid_assembly",
+    "turbogrid_assembly": "geometry.assembly",
+    "meshing": "meshing.turbomoc",
+    "mesh_jobs": "apps.mesh_jobs",
+    "excel_interface_stage": "io.excel_stage",
+    "excel_interface_turbine": "io.excel_turbine",
+    "app": "apps.stage",
+    "app_lite": "apps.stage_efficiency",
+    "app_turbine": "apps.turbine",
+    "app_experimental": "apps.turbine_experimental",
+    "app_meshing": "apps.components.meshing",
+    "app_turbogrid": "apps.components.turbogrid"
+  },
+  "documentation_links_checked": 48,
+  "analysis_markdown": {
+    "passed": true,
+    "markdown_files": 27,
+    "inline_equations": 1325,
+    "display_equations": 166,
+    "local_links": 775
+  },
+  "note": "Breaking module-path cleanup. Numerical implementations, math and commented test_core are unchanged. Native meshing/VTK and Excel-host coverage remains limited as documented.",
+  "production_tests_before_compatibility_cleanup": {
+    "passed": 425,
+    "skipped": 8
+  },
+  "compatibility_only_checks_removed": 14,
+  "plot_svgs": 214,
+  "root_scientific_exports_retained": true,
+  "compatibility_files_removed": [
+    "turbodash/app.py",
+    "turbodash/app_experimental.py",
+    "turbodash/app_lite.py",
+    "turbodash/app_meshing.py",
+    "turbodash/app_turbine.py",
+    "turbodash/app_turbogrid.py",
+    "turbodash/core_stage.py",
+    "turbodash/core_turbine.py",
+    "turbodash/excel_interface_stage.py",
+    "turbodash/excel_interface_turbine.py",
+    "turbodash/export_turbogrid.py",
+    "turbodash/export_turbogrid_assembly.py",
+    "turbodash/geom_blade.py",
+    "turbodash/graphics.py",
+    "turbodash/mesh_jobs.py",
+    "turbodash/plotting_mesh.py",
+    "turbodash/plotting_mpl.py",
+    "turbodash/plotting_plotly_stage.py",
+    "turbodash/plotting_plotly_turbine.py",
+    "turbodash/reporting_utils.py",
+    "turbodash/turbogrid_assembly.py",
+    "turbodash/visualization_vtk.py",
+    "turbodash/vtk_assets.py",
+    "turbodash/_compat.py"
+  ],
+  "compatibility_cleanup_validation": {
+    "passed": true,
+    "removed_compatibility_files": 24,
+    "numerical_tables_unchanged": 219,
+    "protected_numerical_files_unchanged": true,
+    "svg_figures": 214,
+    "figure_hashes_checked": 273,
+    "reports_checked": 40,
+    "local_links_checked": 949,
+    "python_files_parsed": 158
+  }
+}

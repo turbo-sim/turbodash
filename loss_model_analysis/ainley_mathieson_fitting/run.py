@@ -281,7 +281,7 @@ STYLE = [Line2D([], [], color="black", marker="o", linestyle="none", markersize=
 
 
 def save(fig, name):
-    fig.savefig(FIGURES / (name+".pdf"), dpi=180, bbox_inches="tight")
+    fig.savefig(FIGURES / (name+".svg"), dpi=180, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -389,13 +389,13 @@ def report(results, points):
               "The original nozzle 75°/80° dashes do not provide visible points near s/c=0.3. Their low-spacing "
               "continuation is constrained by angle ordering, rather than being presented as digitized evidence. "
               "The source overlays distinguish approximate crowded readings from resolved trace centres.", "",
-              "[Low-spacing paired comparisons (PDF)](figures/low_spacing_ordering.pdf)", "",
-              "[The separate slope check](figures/low_spacing_slopes.pdf) verifies the ordering without crowding the comparison.", ""]
+              "![Low-spacing paired comparisons (SVG)](figures/low_spacing_ordering.svg)", "",
+              "![The separate slope check](figures/low_spacing_slopes.svg) verifies the ordering without crowding the comparison.", ""]
     for family in FAMILIES:
         lines += [f"### {family.capitalize()}: both slice directions", "",
-                  f"[{family} spacing families (PDF)](figures/{family}_pitch_families.pdf)", "",
-                  f"[{family} angle families (PDF)](figures/{family}_angle_families.pdf)", "",
-                  f"[Separate angle panels](figures/{family}_angle_slices.pdf) make close curves easier to inspect. "
+                  f"![{family} spacing families (SVG)](figures/{family}_pitch_families.svg)", "",
+                  f"![{family} angle families (SVG)](figures/{family}_angle_families.svg)", "",
+                  f"![Separate angle panels](figures/{family}_angle_slices.svg) make close curves easier to inspect. "
                   "Angle-plot symbols are actual measured points within ±0.002 of the stated s/c; no additional "
                   "data points are interpolated. A few slices lack symbols where the scan has gaps or ambiguous ink.", ""]
     lines += ["### Wider spacing range and bounded extrapolation", "",
@@ -406,9 +406,9 @@ def report(results, points):
               "panel so they do not obscure the useful loss range.", ""]
     for family in FAMILIES:
         lines += [f"### {family.capitalize()}: s/c from zero to three", "",
-                  f"[{family} wide spacing comparison (PDF)](figures/{family}_spacing_extrapolation.pdf)", "",
-                  f"[{family} wide spacing angle slices (PDF)](figures/{family}_angle_extrapolation.pdf)", "",
-                  f"[Unbounded versus bounded continuation](figures/{family}_continuation_diagnostic.pdf) "
+                  f"![{family} wide spacing comparison (SVG)](figures/{family}_spacing_extrapolation.svg)", "",
+                  f"![{family} wide spacing angle slices (SVG)](figures/{family}_angle_extrapolation.svg)", "",
+                  f"![Unbounded versus bounded continuation](figures/{family}_continuation_diagnostic.svg) "
                   "shows what the continuation changes without adding another set of curves to the main comparisons.", ""]
     lines += ["For the raw fit $Y_r$, set $T=0.25$ and $D=0.5-T=0.25$:", "",
               "$$Y_p=\\begin{cases}Y_r,&Y_r\\le T,\\\\ "
@@ -513,8 +513,8 @@ def report(results, points):
             values = [p["pitch_chord"] for p in rows]
             lines.append(f"| {family} | {angle:g}° | {min(values):.4f}–{max(values):.4f} | {len(rows)} |")
     lines += ["", "Inspect the points against the actual source ink:", "",
-              "[Nozzle digitization (PDF)](figures/nozzle_digitization.pdf)", "",
-              "[Impulse digitization (PDF)](figures/impulse_digitization.pdf)", "",
+              "![Nozzle digitization (SVG)](figures/nozzle_digitization.svg)", "",
+              "![Impulse digitization (SVG)](figures/impulse_digitization.svg)", "",
               "## Selection, residuals and limitations", "",
               "The initial selection compared nine explicit surfaces: a quadratic, five rational quadratics with low-degree angle "
               "polynomials, two rational forms with smooth softplus minimum levels, and a convex quartic. "
@@ -547,7 +547,7 @@ def report(results, points):
     lines += ["", "These holdouts do not demonstrate a general accuracy advantage over Aungier at unseen angles. "
               "The supported gains here are improved agreement when all chart curves are fitted together, "
               "continuous derivatives, bounded positive spacing tails, and the requested low-spacing angle ordering."]
-    lines += ["", "[Residuals (PDF)](figures/residuals.pdf)", "",
+    lines += ["", "![Residuals (SVG)](figures/residuals.svg)", "",
               "The Aungier comparator executes the two preserved repository function definitions directly. "
               "It therefore includes the original 60°/63° branches, not the subsequently smoothed candidate. "
               "The comparison checks this implementation against the chart; it is not a fresh transcription "
@@ -557,15 +557,15 @@ def report(results, points):
               "evidence of aerodynamic accuracy**. In particular, 0–40° and angles above the last source curve "
               "are unsupported. No low-angle data have been invented to constrain them. Detailed derivative "
               "and extrapolation plots show this explicitly:", "",
-              "- [Nozzle angle values and slopes](figures/nozzle_angle_derivatives.pdf)",
-              "- [Impulse angle values and slopes](figures/impulse_angle_derivatives.pdf)",
-              "- [Nozzle spacing extrapolation](figures/nozzle_spacing_extrapolation.pdf)",
-              "- [Impulse spacing extrapolation](figures/impulse_spacing_extrapolation.pdf)", "",
+              "- ![Nozzle angle values and slopes](figures/nozzle_angle_derivatives.svg)",
+              "- ![Impulse angle values and slopes](figures/impulse_angle_derivatives.svg)",
+              "- ![Nozzle spacing extrapolation](figures/nozzle_spacing_extrapolation.svg)",
+              "- ![Impulse spacing extrapolation](figures/impulse_spacing_extrapolation.svg)", "",
               "## Reproduce", "", "Run from this directory with NumPy, SciPy, Matplotlib and Pillow installed:", "",
               "```powershell", "python -B digitize_nozzle.py", "python -B digitize_impulse.py", "python -B run.py", "python -B verify.py", "```", "",
               "The digitization scripts regenerate measurements from saved pixel selections and paper PDFs rendered in memory. "
               "`run.py --render-only` redraws and rewrites this report using the saved selected coefficients. "
-              "Figures are available as PDF only. `plot_comparisons.py` owns the paired layouts, "
+              "Figures are available as SVG only. `plot_comparisons.py` owns the paired layouts, "
               "and `extrapolation_fit.py` reproduces the extended ordering constraint. Refitting and evaluation "
               "require no network access. "
               "[Numerical validation](data/validation.json) checks the exported evaluator, shape constraints, "

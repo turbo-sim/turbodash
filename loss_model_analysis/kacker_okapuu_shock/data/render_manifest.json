@@ -1,17 +1,17 @@
 {
   "figures": 8,
   "figure_sha256": {
-    "01_efficiency.pdf": "377e49d527fc60de11705a743cc820e853f7eac06991b2652c1e263b353933ac",
-    "02_geometry.pdf": "2c969b38fa0a0a4f369e50568cea623cc8c45abf2c2342e7e6d2b0b697d65b0b",
-    "04_profile_and_shock.pdf": "a0cd7c32b077ac8cb0881a23c7a4964fc1465b6478a65b16b210603be81976cc",
-    "05_efficiency_budget.pdf": "c384d3a0841502bd564fb9de2800508cf0842b43f7129f7bdc9464d6fe85bf33",
-    "06_low_speed_limit.pdf": "6789a9983560674e0c10e6ab97d7e7c78d172669c64f237738f92dcc460119b7",
-    "07_reynolds_correction.pdf": "27a147d94db3ec2cd02e36afc31e762b642bab9aab057734cef6044986b3afb5",
-    "03_shock_components.pdf": "77b2595df017c284980e98d561c6265be623dbc8a83226b6414daefe4ba7ac78",
-    "08_hub_mach_fit.pdf": "b69cbcfcb033d98b7b0e1f75050fd5e5cc44094d1271e0f009290e1251e02779"
+    "01_efficiency.svg": "344e894e3c6eb7335e8fd0900c657a7bfdb5b498da6ca34adfa65273a1b557f9",
+    "02_geometry.svg": "c0a5ad4894612ec12a7bda30d08adc3397e595c926d8dbe76fe0c41b6078461c",
+    "04_profile_and_shock.svg": "70f40f5632905636f602a7d7d705c3111205037b83a57b7ed28b71f6d08f7d55",
+    "05_efficiency_budget.svg": "ba8bcfc3b33ab840e30cf500d3407bfe0aecbe8df1445d7c3f0f7ff7e597bf73",
+    "06_low_speed_limit.svg": "aef1e58c1a569f5f0450e94e895ecd8784ab52a1559168a9a066738d452dd229",
+    "07_reynolds_correction.svg": "45b91b02775a713fe6eb1a9325e2cc38d88ad9ba2a084f10caf0a16f02af8ab5",
+    "03_shock_components.svg": "ee62a3b0620574e5c899222a1392fbbb0bb61e73800252d0fee805c98c6a5af1",
+    "08_hub_mach_fit.svg": "327f6e53d8c392e2d5219d7ac32021d51c6d7cd8e1ccbc74b119b414e104c5c0"
   },
-  "report_sha256": "a73cb9905c134d9d268df4d2bd85d1c998a2939039a424ac04a81e238dcde201",
-  "report_script_sha256": "56b9ce104b4a41ed39aa3b11ac78d4c093b7082c2f7bbb7d21ed8b582fdaac69",
+  "report_sha256": "ba9524a5a6cbfa7b540285c01ef25332a9716b9e20e2c151d759e479d7e8702a",
+  "report_script_sha256": "4d8c47723514bf319e27a4eb9429aa8d27868f331b9621d93c8927e617fd5063",
   "data_sha256": "cda8daed6e41ddb32d283cfb9266607c7dd5b6b1978deb58361d972cc26f1fd4",
   "sources_match_worktree": true,
   "checked_links": 29

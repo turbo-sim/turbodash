@@ -3,7 +3,7 @@
 from dash import Dash, html
 import pytest
 
-from turbodash import vtk_assets
+from turbodash.visualization import vtk_assets
 
 
 def test_meanline_app_needs_no_vtk_assets(monkeypatch):

@@ -16,7 +16,7 @@
     ]
   ],
   "profile_factor_matches_production": true,
-  "calculation_seconds": 4.674606200002017,
+  "calculation_seconds": 0.32940579999558395,
   "high_continuation_start": 10000000.0,
   "high_reynolds_asymptote": 50000000.0,
   "factor_asymptote": 0.45730505192732634,
@@ -25,12 +25,12 @@
   "max_high_re_derivative_error": 2.4619542007538273e-19,
   "note": "Factors come from the current production profile normalized at Re=500000. Complex-step slopes are checked against independent real differences; logarithmic slope includes the effective-coordinate chain rule.",
   "source_sha256": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51",
-  "script_sha256": "0f24859a79b248ae890a4d58c15dfc3efc2026666cbb85bc798643fcbe83a117",
+  "script_sha256": "ac8ff45ee527229c419388551d7e3c500a0bc59db56458f9e674ba8e2689cdd6",
   "data_sha256": "1501ff6bec1357fb98a7e5d5c328254690f93ba8467f816df6adbb9ac94fc761",
   "data_files": [
     "data/reynolds_review/samples.csv"
   ],
   "figures": [
-    "figures/reynolds_transitions.pdf"
+    "figures/reynolds_transitions.svg"
   ]
 }

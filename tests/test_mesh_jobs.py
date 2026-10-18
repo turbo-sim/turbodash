@@ -12,7 +12,7 @@ from zipfile import ZipFile
 import numpy as np
 import pytest
 
-from turbodash import mesh_jobs as jobs
+from turbodash.apps import mesh_jobs as jobs
 
 
 @pytest.fixture(autouse=True)
@@ -109,7 +109,7 @@ def test_cleanup_removes_only_expired_terminal_folders():
 
 
 def test_worker_completion_publishes_manifest_and_preserves_progress(monkeypatch):
-    from turbodash import meshing
+    from turbodash.meshing import turbomoc as meshing
 
     _, folder = make_job(state="running")
     request = {"results": {"solved": True}, "stage_index": 1, "row": "rotor", "options": {}}
@@ -131,7 +131,7 @@ def test_worker_completion_publishes_manifest_and_preserves_progress(monkeypatch
 
 
 def test_worker_failure_is_published(monkeypatch):
-    from turbodash import meshing
+    from turbodash.meshing import turbomoc as meshing
 
     handle, folder = make_job(state="running")
     jobs._write_json(folder / "request.json", {"results": {}, "stage_index": 0, "row": "stator", "options": {}})
@@ -163,7 +163,7 @@ def test_dead_native_worker_is_reported_as_failed():
 
 
 def test_start_validates_before_allocating_worker(monkeypatch):
-    from turbodash import meshing
+    from turbodash.meshing import turbomoc as meshing
 
     def reject(*args, **kwargs):
         raise ValueError("Unsupported radial turbine")
@@ -176,7 +176,7 @@ def test_start_validates_before_allocating_worker(monkeypatch):
 
 
 def test_admission_counts_jobs_from_other_server_processes(monkeypatch):
-    from turbodash import meshing
+    from turbodash.meshing import turbomoc as meshing
 
     handle, _ = make_job(state="running")
     folder = jobs.CACHE_ROOT / ("b" * 32)
@@ -262,7 +262,7 @@ def test_corrupted_status_is_unavailable_and_dead_worker_is_reaped(status):
     ("status.json", {}), ("status.json", []), ("manifest.json", []),
 ])
 def test_corrupt_cache_entry_does_not_block_new_jobs(monkeypatch, filename, value):
-    from turbodash import meshing
+    from turbodash.meshing import turbomoc as meshing
 
     _, folder = make_job()
     jobs._write_json(folder / filename, value)

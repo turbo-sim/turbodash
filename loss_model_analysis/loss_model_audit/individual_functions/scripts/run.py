@@ -27,7 +27,7 @@ def main():
         comparisons.extend(differences)
         if study["group"] not in groups and study["group"] not in ("ko_profile_Re_out", "nozzle_angle"):
             groups.add(study["group"])
-            plots.append(dict(group=study["group"], mechanism=study["mechanism"], path=f"figures/{study['group'].lower()}.pdf"))
+            plots.append(dict(group=study["group"], mechanism=study["mechanism"], path=f"figures/{study['group'].lower()}.svg"))
         if number % 20 == 0 or number == 78:
             print(f"Evaluated {number}/78 individual-function sweeps", flush=True)
     calculation_seconds = perf_counter() - started

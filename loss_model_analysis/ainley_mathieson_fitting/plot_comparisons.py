@@ -75,7 +75,7 @@ def _color_handles(values, colors, spacing=False):
 
 
 def _save(fig, name, saved):
-    for extension in ("pdf",):
+    for extension in ("svg",):
         path = FIGURES / f"{name}.{extension}"
         fig.savefig(path, dpi=180, bbox_inches="tight")
         saved.append(path.relative_to(BASE).as_posix())
@@ -328,7 +328,7 @@ def _diagnostics(family, points, aungier, runtime, saved):
 
 
 def render(results, points, aungier, runtime):
-    """Render PDF files; return their paths relative to this script folder.
+    """Render SVG files; return their paths relative to this script folder.
 
     ``runtime`` is the generated analytic_fits module and must expose both
     ``profile_loss`` (bounded continuation) and ``raw_profile_loss`` (chart fit).
@@ -383,7 +383,7 @@ def render(results, points, aungier, runtime):
         writer.writeheader()
         writer.writerows(sample_rows)
     record = dict(saved_fit_unchanged=True, files=saved,
-                  style="turbodash.graphics.set_plot_options; viridis",
+                  style="turbodash.visualization.matplotlib_style.set_plot_options; viridis",
                   renderer_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                   signed_display_minimum=-20, samples=len(sample_rows),
                   signed_angle_mapping="Production effective outlet angle with fixed positive design direction, bounded tangent angle, then sqrt(angle^2+1e-5). No angle reflection.",

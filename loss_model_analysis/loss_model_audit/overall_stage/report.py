@@ -43,7 +43,7 @@ def style():
   "text.color":INK,"axes.labelcolor":INK,"xtick.color":MUTED,"ytick.color":MUTED,
   "axes.edgecolor":"#c5cfd7","axes.spines.top":False,"axes.spines.right":False,
   "axes.facecolor":"white","figure.facecolor":"white","grid.color":"#dce3e9",
-  "grid.alpha":.65,"grid.linewidth":.7,"pdf.fonttype":42,"savefig.facecolor":"white"})
+  "grid.alpha":.65,"grid.linewidth":.7,"svg.fonttype":"path","savefig.facecolor":"white"})
 
 def palette(name):
  return LinearSegmentedColormap.from_list(name+"_readable",plt.get_cmap(name)(np.linspace(.4,.96,256)))
@@ -106,7 +106,7 @@ def plot_group(model,sweep,parameter,rows,ko_rows=None):
  finite=sum(r["status"]=="ok" for r in rows)
  fig.text(.085,.025,f"{finite:,}/{len(rows):,} finite samples; signed efficiencies retained. Gray: no real reference design.",size=8.4,color=MUTED)
  output={};directory=model_directory(model)/"figures";directory.mkdir(parents=True,exist_ok=True)
- for ext in ("pdf",):
+ for ext in ("svg",):
   path=directory/f"{filename(sweep,parameter)}.{ext}";fig.savefig(path,dpi=185)
   output[path.relative_to(BASE).as_posix()]=sha256(path)
  plt.close(fig);return output
@@ -192,8 +192,8 @@ def model_report(model,rows,ko_rows=None):
   key=f"{sweep}/{parameter}";results[key]=metrics
   purpose=(ISENTROPIC_PURPOSES if model=="isentropic" else PURPOSES)[parameter]
   content += [f"## {PARAMETERS[parameter]['name']}: {title(sweep)}","",f"**Purpose.** {purpose}","",
-   f"[{MODELS[model]} {parameter} {sweep} (PDF)](figures/{filename(sweep,parameter)}.pdf)","",
-   f"[Vector PDF](figures/{filename(sweep,parameter)}.pdf) | [Samples](data/{model}.csv.gz)","",text,""]
+   f"![{MODELS[model]} {parameter} {sweep} (SVG)](figures/{filename(sweep,parameter)}.svg)","",
+   f"[Vector SVG](figures/{filename(sweep,parameter)}.svg) | [Samples](data/{model}.csv.gz)","",text,""]
   if ko_rows is not None:
    reference={(r['coordinate'],r['parameter_value']):r for r in group_rows(ko_rows,sweep,parameter)}
    differences=[100*(r['eta_tt']-reference[(r['coordinate'],r['parameter_value'])]['eta_tt']) for r in selected if r['status']=='ok' and reference[(r['coordinate'],r['parameter_value'])]['status']=='ok']
@@ -255,7 +255,7 @@ The angle-only loading domain is strictly $(-90^\circ,90^\circ)$. Exactly grazin
 
 ## Pressure-loss conversion and signed efficiency
 
-The [core](../../../turbodash/core_turbine.py) supplies reference triangles and geometry; row losses come from the [current implementation](../../../turbodash/loss_models/). Each pressure-loss coefficient gives
+The [core](../../../turbodash/core/turbine.py) supplies reference triangles and geometry; row losses come from the [current implementation](../../../turbodash/loss_models/). Each pressure-loss coefficient gives
 
 $$
 p_{0,\mathrm{rel,is}}=p_{0,\mathrm{rel,out}}+Y(p_{0,\mathrm{rel,out}}-p_{\mathrm{out}}),\qquad
@@ -312,7 +312,7 @@ def comparison_report(provenance,model_rows=None):
  """Write the matching sections in three columns using existing figures.
 
  Check matching configuration grids and section headings before comparing
- saved results. Source PDF files are linked, never regenerated.
+ saved results. Existing SVG figures are embedded without regeneration.
  """
  if not set(COMPARISON_MODELS).issubset(provenance['models']):
   raise ValueError("The overall report requires saved isentropic, KO and Benner studies")
@@ -333,7 +333,7 @@ def comparison_report(provenance,model_rows=None):
   'Each section uses the same saved designs and parameter levels, with **isentropic, Kacker–Okapuu and Benner** in fixed left-to-right columns. '
   'Air enters at 50 bar and 600 K. All plots retain the same axes, 0–100% efficiency limits, blue total-total and orange total-static colormaps, and solid lines. '
   'Negative hub ratios remain in the data without boundary markers.','',
-  'Open the vector PDF in each column to inspect the plot. The three models stay in one table row; a narrow preview may need horizontal scrolling. '
+  'SVG figures are embedded in each column; click an image to inspect it at full size. The three models stay in one table row; a narrow preview may need horizontal scrolling. '
   'Isentropic total-total efficiency is exactly 100%; its total-static efficiency includes unrecovered exit kinetic energy. Coincident ideal curves are expected for parameters that only affect sizing or loss corrections.','']
  figure_hashes={};sections=[]
  for parameter in PARAMETERS:
@@ -346,14 +346,14 @@ def comparison_report(provenance,model_rows=None):
    section_files=[]
    for model in COMPARISON_MODELS:
     stem=f'{model_directory(model).name}/figures/{filename(sweep,parameter)}'
-    pdf=stem+'.pdf'
-    path=BASE/pdf
+    svg=stem+'.svg'
+    path=BASE/svg
     assert path.is_file(),path
-    figure_hashes[pdf]=sha256(path)
+    figure_hashes[svg]=sha256(path)
     alt=escape(f'{names[model]}: {PARAMETERS[parameter]["name"]}, {sweep}',quote=True)
     content += ['<td width="33.333%" align="center" valign="top">',
-     f'<a href="{pdf}" title="{alt}">Open vector PDF</a>','</td>']
-    section_files.append(dict(model=model,pdf=pdf))
+     f'<a href="{svg}" title="{alt}"><img src="{svg}" alt="{alt}" width="100%" style="width:100%;height:auto" /></a>','</td>']
+    section_files.append(dict(model=model,svg=svg))
    content += ['</tr></tbody>','</table>','']
    groups={model:group_rows(rows[model],sweep,parameter) for model in COMPARISON_MODELS}
    common_keys=set.intersection(*[{case_key(row) for row in groups[model] if row['status']=='ok'} for model in COMPARISON_MODELS])
@@ -410,11 +410,11 @@ def generate(provenance):
  for setting in PARAMETERS.values():baseline.append(f"| {setting['name']} {setting['symbol']} | {setting['values'][0]:g} to {setting['values'][-1]:g} {setting['unit']} | {setting['baseline']:g} {setting['unit']} |")
  text=METHOD.replace('__REPORTS__','\n'.join(reports)).replace('__BASELINE__','\n'.join(baseline))
  text=text.replace('__COMPARISON__','[Side-by-side model comparison](comparison.md)' if set(COMPARISON_MODELS).issubset(model_rows) else '')
- text=text.replace('__COUNTS__',f"The saved run contains {sum(len(r) for r in model_rows.values()):,} samples in {len(outputs)} PDF figures. Each model retains all seven sensitivity families and all three sweeps.")
+ text=text.replace('__COUNTS__',f"The saved run contains {sum(len(r) for r in model_rows.values()):,} samples in {len(outputs)} SVG figures. Each model retains all seven sensitivity families and all three sweeps.")
  (BASE/'readme.md').write_text(text,encoding='utf-8');write_json(DATA/'assessments.json',assessments)
  if set(COMPARISON_MODELS).issubset(model_rows):comparison_report(provenance,model_rows)
  write_render_manifest(provenance,outputs)
- print(f"Wrote {len(outputs)} current-model PDF figures",flush=True)
+ print(f"Wrote {len(outputs)} current-model SVG figures",flush=True)
 
 
 def write_render_manifest(provenance,outputs=None):
@@ -424,7 +424,7 @@ def write_render_manifest(provenance,outputs=None):
   for model in provenance['models']:
    for parameter in PARAMETERS:
     for sweep in SWEEPS:
-     for extension in ("pdf",):
+     for extension in ("svg",):
       path=model_directory(model)/'figures'/f'{filename(sweep,parameter)}.{extension}'
       outputs[path.relative_to(BASE).as_posix()]=sha256(path)
  documents=[BASE/'readme.md',*(model_directory(m)/'readme.md' for m in provenance['models'])]
@@ -462,7 +462,7 @@ if __name__=='__main__':
  from study import verify_saved
  parser=argparse.ArgumentParser(description=__doc__)
  parser.add_argument('--comparison-only',action='store_true',required=True,
-                     help='Build the three-column report from existing PDF figures and samples')
+                     help='Build the three-column report from existing SVG figures and samples')
  parser.parse_args()
  provenance=verify_saved()
  result=comparison_report(provenance)

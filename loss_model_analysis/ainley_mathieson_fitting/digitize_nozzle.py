@@ -218,7 +218,7 @@ def main():
                  "Circles: resolved ink; squares: approximate crowded readings with larger uncertainty")
     ax.legend(ncol=4,loc="upper center",bbox_to_anchor=(.5,-.11),frameon=False)
     fig.tight_layout()
-    fig.savefig(ROOT / "figures/nozzle_digitization.pdf",dpi=160,bbox_inches="tight")
+    fig.savefig(ROOT / "figures/nozzle_digitization.svg",dpi=160,bbox_inches="tight")
     plt.close(fig)
     print(f"Wrote {len(rows)} nozzle samples, including "
           f"{calibration['approximate_readings']['count']} approximate crowded readings.")

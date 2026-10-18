@@ -276,7 +276,7 @@ def plot_group(group, curves, metrics, log=False, directory=None):
     )
     fig.suptitle(group.replace("_", " ") + " — values and first derivatives", y=0.995)
     fig.tight_layout(rect=(0, 0, 1, 1 - 0.85 / (2.5 * len(metrics) + 1)))
-    path = output_path((directory or BASE / "figures") / f"{group.lower()}.pdf")
+    path = output_path((directory or BASE / "figures") / f"{group.lower()}.svg")
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path, dpi=140, bbox_inches="tight")
     plt.close(fig)

@@ -218,7 +218,7 @@ def main():
     ax.legend(loc="lower right",fontsize=9,framealpha=.95)
     fig.tight_layout()
     (ROOT/"figures").mkdir(exist_ok=True)
-    fig.savefig(ROOT/"figures"/"impulse_digitization.pdf",dpi=170)
+    fig.savefig(ROOT/"figures"/"impulse_digitization.svg",dpi=170)
     plt.close(fig)
     print(json.dumps({"points":len(rows),"counts":calibration["point_counts"],
                       "csv":str(out),"max_grid_line_rms_px":max(v["rms_px"] for v in vertical+horizontal)}))

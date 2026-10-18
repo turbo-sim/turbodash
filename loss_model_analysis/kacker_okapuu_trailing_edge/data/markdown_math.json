@@ -1,9 +1,10 @@
 {
   "passed": true,
-  "inline_equations": 79,
+  "inline_equations": 77,
   "display_equations": 20,
-  "links": 33,
+  "links": 34,
   "errors": [],
   "katex_version": "0.13.11",
-  "readme_sha256": "9496bff4aaad66289417c9bc759f7f4cc39789da044b00bca2b32661f7cb4a30"
+  "readme_sha256": "b9add47c1d40a427088b11fdaa9359aa810210c2c901cea339c91528364660f2",
+  "renderer": "Installed VS Code Markdown+Math, dollar delimiters"
 }

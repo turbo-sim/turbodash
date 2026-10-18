@@ -27,8 +27,8 @@ def _components(component):
 @pytest.mark.parametrize(
     "module_name,labels,experimental",
     [
-        ("app_turbine", ["Turbodash", "Documentation"], False),
-        ("app_experimental", ["Meanline", "Turbine geometry", "Mesh"], True),
+        ("apps.turbine", ["Turbodash", "Documentation"], False),
+        ("apps.turbine_experimental", ["Meanline", "Turbine geometry", "Mesh"], True),
     ],
 )
 def test_each_app_serves_its_own_workspace(module_name, labels, experimental):
@@ -55,7 +55,7 @@ def test_each_app_serves_its_own_workspace(module_name, labels, experimental):
 
 
 def test_apps_have_independent_servers_and_callbacks():
-    from turbodash import app_experimental, app_turbine
+    from turbodash.apps import turbine as app_turbine, turbine_experimental as app_experimental
 
     assert app_turbine.app is not app_experimental.app
     assert app_turbine.server is not app_experimental.server
@@ -63,8 +63,8 @@ def test_apps_have_independent_servers_and_callbacks():
 
 
 @pytest.mark.parametrize("module_name,launcher", [
-    ("app_turbine", "launch_app_turbine"),
-    ("app_experimental", "launch_app_experimental"),
+    ("apps.turbine", "launch_app_turbine"),
+    ("apps.turbine_experimental", "launch_app_experimental"),
 ])
 @pytest.mark.parametrize("reloader_child", [False, True])
 def test_launchers_run_the_selected_app_and_open_one_browser(
@@ -104,10 +104,10 @@ def test_stable_app_starts_without_importing_experimental_dependencies():
         import sys
 
         blocked = (
-            "turbodash.app_experimental", "turbodash.app_meshing",
-            "turbodash.meshing", "turbodash.mesh_jobs",
-            "turbodash.plotting_mesh", "turbodash.visualization_vtk",
-            "turbodash.vtk_assets", "turbo_moc", "dash_vtk",
+            "turbodash.apps.turbine_experimental", "turbodash.apps.components.meshing",
+            "turbodash.meshing", "turbodash.apps.mesh_jobs",
+            "turbodash.visualization.plotly_mesh", "turbodash.visualization.vtk",
+            "turbodash.visualization.vtk_assets", "turbo_moc", "dash_vtk",
         )
 
         class BlockExperimentalImports:
@@ -116,7 +116,7 @@ def test_stable_app_starts_without_importing_experimental_dependencies():
                     raise ImportError("Stable app imported " + fullname)
 
         sys.meta_path.insert(0, BlockExperimentalImports())
-        from turbodash.app_turbine import server
+        from turbodash.apps.turbine import server
         assert server.test_client().get("/_dash-layout").status_code == 200
     """)
     result = subprocess.run(

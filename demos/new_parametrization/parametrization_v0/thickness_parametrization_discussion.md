@@ -18,7 +18,7 @@ Impulse, reaction, and impeller-like profiles should be examples produced by one
 | --- | --- |
 | [Axial demo](demo_axial_turbine_blades.py) and [configuration](axial_turbine_blades.yaml) | Uses the Cartesian blade-coordinate wrapper and its default NACA thickness model. |
 | [Radial demo](demo_radial_turbine_blades.py) and [configuration](radial_turbine_blades.yaml) | Uses the radial wrapper and its default NACA thickness model. |
-| [Geometry implementation](../../turbodash/geom_blade.py) | Includes NACA, constrained B-spline, and Denton-style thickness models. The thickness dispatcher defaults to Denton, but both coordinate wrappers explicitly default to NACA. |
+| [Geometry implementation](../../../turbodash/geometry/blade.py) | Includes NACA, constrained B-spline, and Denton-style thickness models. The thickness dispatcher defaults to Denton, but both coordinate wrappers explicitly default to NACA. |
 | `nurbspy/demos/blade_parametrization/quadratic_bezier_endpoint_radius.py` | Adjusts a rational quadratic's middle weight to prescribe one endpoint radius while retaining its control polygon. |
 | `nurbspy/demos/blade_parametrization/blade_profile_boundary.py` | Chains four segments through five actual boundary anchors. It enforces curvature matching at the first interior join only. |
 | `nurbspy/docs/source/theory/g2_continuity.md` | Already distinguishes matching curvature vectors from matching curvature magnitudes. This is the appropriate continuity convention. |

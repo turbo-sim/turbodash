@@ -64,7 +64,7 @@ The angle-only loading domain is strictly $(-90^\circ,90^\circ)$. Exactly grazin
 
 ## Pressure-loss conversion and signed efficiency
 
-The [core](../../../turbodash/core_turbine.py) supplies reference triangles and geometry; row losses come from the [current implementation](../../../turbodash/loss_models/). Each pressure-loss coefficient gives
+The [core](../../../turbodash/core/turbine.py) supplies reference triangles and geometry; row losses come from the [current implementation](../../../turbodash/loss_models/). Each pressure-loss coefficient gives
 
 $$
 p_{0,\mathrm{rel,is}}=p_{0,\mathrm{rel,out}}+Y(p_{0,\mathrm{rel,out}}-p_{\mathrm{out}}),\qquad
@@ -92,6 +92,6 @@ python -B loss_model_analysis/loss_model_audit/overall_stage/study.py --render-o
 python -B loss_model_analysis/loss_model_audit/overall_stage/study.py --check
 ```
 
-The saved run contains 86,760 samples in 63 PDF figures. Each model retains all seven sensitivity families and all three sweeps.
+The saved run contains 86,760 samples in 63 SVG figures. Each model retains all seven sensitivity families and all three sweeps.
 
 Checks cover the Mach boundary, Euler/reaction identities, geometry ratios, size similarity, EOS pressure/enthalpy round trips and the signed efficiency identity. Source files are hashed before and after calculation. [Provenance](data/provenance.json) | [Validation](data/validation.json) | [Assessments](data/assessments.json) | [Render hashes](data/render_manifest.json)

@@ -11,7 +11,7 @@ import numpy as np
 import pytest
 import yaml
 
-from turbodash import meshing
+from turbodash.meshing import turbomoc as meshing
 
 
 @pytest.fixture(scope="module")
@@ -112,7 +112,7 @@ def test_geometry_zip_is_closed_and_uses_physical_endwalls(solved, backend):
 
 
 def test_selected_row_meridional_preview_uses_the_same_cylindrical_design(solved, backend):
-    from turbodash.plotting_mesh import plot_geometry_meridional
+    from turbodash.visualization.plotly_mesh import plot_geometry_meridional
 
     preview = meshing.preview_blade_row(solved, row="rotor", options={"profile_points": 60})
     original = deepcopy(preview["meridional_figure"])
@@ -165,7 +165,7 @@ def test_real_annular_mesh_export_and_inspection(solved, backend, tmp_path, row,
                            for axis in "XYZ"])
     assert np.linalg.norm(xyz[:, :2], axis=1).min() == pytest.approx(manifest["metadata"]["hub_radius_mm"] * .001)
 
-    from turbodash.plotting_mesh import mesh_figures
+    from turbodash.visualization.plotly_mesh import mesh_figures
     from turbo_moc.meshing.mesh_3d import load_section
 
     def no_gmsh_session(*args, **kwargs):

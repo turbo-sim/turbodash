@@ -152,9 +152,9 @@ It has no inverse aspect ratio. At the endpoint, $n(0)=1-\sqrt{2}/4>0$, so $f_{\
 
 The onset at 0.8 and upper limit of one are engineering choices for continuation beyond the useful range of the original correlation. Kacker and Okapuu did not propose or calibrate these limits. The new Moustapha model shares this KO secondary contribution before applying its incidence multiplier; Benner uses its own secondary-loss expression.
 
-[Published and implemented aspect-ratio factors and their first derivatives (PDF)](../figures/ko_secondary_factor.pdf)
+![Published and implemented aspect-ratio factors and their first derivatives (SVG)](../figures/ko_secondary_factor.svg)
 
-[PDF](../figures/ko_secondary_factor.pdf) | [CSV](../data/secondary_review/factor.csv)
+[SVG](../figures/ko_secondary_factor.svg) | [CSV](../data/secondary_review/factor.csv)
 
 The full-range panels cover $0.2\le\mathrm{AR}\le5$ on a linear horizontal axis; the close-up shows the smoothing around two. The solid curve is the implemented $f_{\mathrm{AR}}$, the dashed curve is the intermediate $f_0$ before the upper continuation, and the dotted curve is the paper's expression. The horizontal line marks the asymptote at one. At $\mathrm{AR}=0.2$, the implemented factor is approximately 0.99884 and still has a nonzero derivative. The published derivative is undefined at two, so its plotted gap is intentional. Monotonicity here concerns $f_{\mathrm{AR}}$ alone: multiplying by an aspect-ratio-dependent compressibility factor can change the trend of the complete $Y_s$.
 
@@ -176,9 +176,9 @@ $$
 
 where $C_{\mathrm{angles}}=1.2(0.0334)Z\cos(\beta_{\mathrm{out}})/\cos(\theta_{\mathrm{in}})$ is constant along each curve. We sweep $0.2\le \mathrm{AR}\le5$ on a linear horizontal axis. The two rows fix inlet flow angles $\alpha_1=0^\circ$ and $40^\circ$; the colors show outlet flow angles $\alpha_2=20^\circ,30^\circ,\ldots,80^\circ$.
 
-[Secondary loss versus aspect ratio for seven outlet angles and two fixed inlet angles (PDF)](../figures/ko_secondary_geometry_ar.pdf)
+![Secondary loss versus aspect ratio for seven outlet angles and two fixed inlet angles (SVG)](../figures/ko_secondary_geometry_ar.svg)
 
-[PDF](../figures/ko_secondary_geometry_ar.pdf) | [CSV](../data/secondary_review/geometry_ar.csv)
+[SVG](../figures/ko_secondary_geometry_ar.svg) | [CSV](../data/secondary_review/geometry_ar.csv)
 
 Solid curves show the complete secondary coefficient with the bounded aspect factor; dashed curves show the same calculation using $f_0$ before its upper continuation. The right-hand panels show derivatives of the implemented result. As height decreases, each implemented coefficient approaches its own angular coefficient $C_{\mathrm{angles}}$, rather than a common limit of 0.5. The curves remain smooth and decreasing with increasing aspect ratio, and both versions coincide wherever $f_0\le0.8$.
 
@@ -208,9 +208,9 @@ The reference cases have a direct geometric interpretation:
 
 Intermediate negative $z$ values describe same-sign inlet and outlet directions; positive $z$ values describe opposite-sign directions. Here $z$ only selects the angle inputs to the secondary-loss equation. No interpolation between separate nozzle and impulse secondary-loss correlations is applied.
 
-[Secondary loss and its fixed-z outlet-angle derivative for nine inlet/outlet angle ratios (PDF)](../figures/ko_secondary_geometry_angle.pdf)
+![Secondary loss and its fixed-z outlet-angle derivative for nine inlet/outlet angle ratios (SVG)](../figures/ko_secondary_geometry_angle.svg)
 
-[PDF](../figures/ko_secondary_geometry_angle.pdf) | [CSV](../data/secondary_review/geometry_angle.csv)
+[SVG](../figures/ko_secondary_geometry_angle.svg) | [CSV](../data/secondary_review/geometry_angle.csv)
 
 The left panel shows the final $Y_s=G$. Dashed curves identify negative $z$; solid curves identify $z\ge0$. On the positive-angle side, the impulse curve rises throughout, while several intermediate curves reach a maximum and then decrease as the loading and cosine factors compete. The new negative-angle part reverses every prescribed angle along each fixed-$z$ path, so the loss mirrors its positive-angle values, while its angle derivative reverses sign. The right panel makes these changes of slope visible and shows the total derivative per degree along each fixed-$z$ curve. Because the inlet angles also move, this is different from an outlet-angle derivative with the inlet held fixed:
 
@@ -266,9 +266,9 @@ $$
 
 At zero incidence and equal meridional velocity this ratio is $w_{\mathrm{in}}/w_{\mathrm{out}}$, with a finite nonzero high-reaction limit. Inlet metal angles must also be strictly within the forward-flow angular domain. The profile-reference angle continuation remains separate and is not used for this projection. Secondary and clearance use the same production loading helper.
 
-[Physical secondary loss and loading near grazing flow (PDF)](../figures/ko_secondary_robustness_angle.pdf)
+![Physical secondary loss and loading near grazing flow (SVG)](../figures/ko_secondary_robustness_angle.svg)
 
-[PDF](../figures/ko_secondary_robustness_angle.pdf) | [CSV](../data/secondary_review/robustness_angle.csv)
+[SVG](../figures/ko_secondary_robustness_angle.svg) | [CSV](../data/secondary_review/robustness_angle.csv)
 
 **Purpose.** Compare the complete secondary coefficient and loading on nozzle-to-impulse paths and fixed-outlet inlet-angle paths. The dashed curves retain the original expression through 89 degrees. Beige beyond 90 degrees marks invalid angular inputs, saved as NaN rather than extended periodically. The lower row uses a symmetric logarithmic scale: a fixed-outlet inlet-grazing path has a growing physical turning factor, even though its mean secant is bounded. This is distinct from the coherent high-reaction turbine family, where both angles approach grazing together.
 
@@ -356,9 +356,9 @@ $$
 
 The following figure fixes $\alpha_1=40^\circ$, $\alpha_2=60^\circ$, $M_1=0.6$, $M_2=0.8$ and $b/c=\cos45^\circ$. Its four panels show raw and bounded influence, the resulting $K_s$, the complete loss with and without compressibility, and their aspect-ratio derivatives. Every horizontal axis is linear and spans $0.2\le\mathrm{AR}\le5$.
 
-[Bounded compressibility influence, correction factor, complete secondary loss and aspect-ratio derivatives (PDF)](../figures/ko_secondary_compressibility_ar.pdf)
+![Bounded compressibility influence, correction factor, complete secondary loss and aspect-ratio derivatives (SVG)](../figures/ko_secondary_compressibility_ar.svg)
 
-[PDF](../figures/ko_secondary_compressibility_ar.pdf) | [CSV](../data/secondary_review/compressibility_ar.csv)
+[SVG](../figures/ko_secondary_compressibility_ar.svg) | [CSV](../data/secondary_review/compressibility_ar.csv)
 
 Here $K_p\simeq0.57836$, and the $K_3$ continuation starts below $\mathrm{AR}\simeq0.79057$. At $\mathrm{AR}=0.2$, $\widetilde K_3\simeq0.999943$, $K_s\simeq0.578383$ and $Y_s\simeq0.10942$. At $\mathrm{AR}=2$, the influence is unchanged from KO and $Y_s\simeq0.08426$.
 
@@ -368,9 +368,9 @@ Beige shading marks $b/H>1.2$, beyond the extent of Figure 13. For this chord ra
 
 ### 4.3 Direct evaluation at zero aspect ratio
 
-[Complete secondary coefficient and its geometry factors evaluated through zero aspect ratio (PDF)](../figures/ko_secondary_robustness_ar.pdf)
+![Complete secondary coefficient and its geometry factors evaluated through zero aspect ratio (SVG)](../figures/ko_secondary_robustness_ar.svg)
 
-[PDF](../figures/ko_secondary_robustness_ar.pdf) | [CSV](../data/secondary_review/robustness_ar.csv)
+[SVG](../figures/ko_secondary_robustness_ar.svg) | [CSV](../data/secondary_review/robustness_ar.csv)
 
 This additional linear-axis sweep includes $\mathrm{AR}=0$ explicitly, at fixed $\alpha_1=40^\circ$, $\alpha_2=60^\circ$ and $b/c=\cos45^\circ$. Circles are direct production evaluations at zero height, rather than values inferred from a small positive height. The complete coefficient approaches $C_{\mathrm{angles}}K_p$ and has zero right derivative there. At zero Mach, $K_p=K_s=1$ throughout; the other curves show the finite compressibility reduction. Chord remains positive. The simultaneously zero height and meridional chord case is deliberately invalid because its $b/H$ limit depends on the path.
 
@@ -393,9 +393,9 @@ The angles remain $\alpha_1=40^\circ$ and $\alpha_2=60^\circ$. Rows compare $\ma
 
 We sweep $0\le M_2\le2$ with curves for $M_1=0,0.3,0.6,0.9,1.2,1.5$.
 
-[Secondary loss and outlet-Mach derivatives for different fixed inlet Mach numbers (PDF)](../figures/ko_secondary_mach_out.pdf)
+![Secondary loss and outlet-Mach derivatives for different fixed inlet Mach numbers (SVG)](../figures/ko_secondary_mach_out.svg)
 
-[PDF](../figures/ko_secondary_mach_out.pdf) | [CSV](../data/secondary_review/mach_out.csv)
+[SVG](../figures/ko_secondary_mach_out.svg) | [CSV](../data/secondary_review/mach_out.csv)
 
 At zero outlet Mach the shared helper returns $K_p=1$, so there is no compressibility reduction. As $M_2$ changes, the interaction between the outlet-Mach correction and the ratio $M_1/M_2$ can produce a minimum followed by recovery. There is no additional floor-induced plateau: stationary points and any flat regions are inherited from the shared profile correction. The $M_1=0$ curve is constant because $K_2=0$ and hence $K_p=K_s=1$ for every outlet Mach.
 
@@ -405,9 +405,9 @@ At zero outlet Mach the shared helper returns $K_p=1$, so there is no compressib
 
 We sweep $0\le M_1\le1.5$ with curves for $M_2=0,0.3,0.6,0.9,1.2,1.5$.
 
-[Secondary loss and inlet-Mach derivatives for different fixed outlet Mach numbers (PDF)](../figures/ko_secondary_mach_in.pdf)
+![Secondary loss and inlet-Mach derivatives for different fixed outlet Mach numbers (SVG)](../figures/ko_secondary_mach_in.svg)
 
-[PDF](../figures/ko_secondary_mach_in.pdf) | [CSV](../data/secondary_review/mach_in.csv)
+[SVG](../figures/ko_secondary_mach_in.svg) | [CSV](../data/secondary_review/mach_in.csv)
 
 At fixed positive $M_2$, increasing $M_1$ increases the bounded ratio factor $K_2$ and reduces $K_p$. Consequently $Y_s$ decreases smoothly toward a finite positive limit, without a separate secondary-factor plateau. The smooth approach of $K_2$ to one prevents the unbounded squared Mach ratio from driving the shared profile correction negative. At $M_2=0$, the returned $K_p=1$ makes this coefficient constant despite the separately undefined raw Mach ratio at the joint origin.
 
@@ -457,10 +457,10 @@ The figures use the repository plotting style and ordered colors for each angle 
 
 | Sweep | Comparison figure | Numerical data |
 |---|---|---|
-| Aspect ratio | [Open](../figures/ko_secondary_aspect_ratio.pdf) | [CSV](../data/sweeps/fundamental_ko_secondary_aspect_ratio__stator.csv.gz) |
-| Incidence | [Open](../figures/ko_secondary_incidence.pdf) | [CSV](../data/sweeps/fundamental_ko_secondary_incidence__stator.csv.gz) |
-| Exit flow angle | [Open](../figures/ko_secondary_exit_angle.pdf) | [CSV](../data/sweeps/fundamental_ko_secondary_exit_angle__stator.csv.gz) |
-| Outlet Mach number | [Open](../figures/ko_secondary_ma_rel_out.pdf) | [CSV](../data/sweeps/fundamental_ko_secondary_ma_rel_out__stator.csv.gz) |
-| Stagger angle | [Open](../figures/ko_secondary_stagger.pdf) | [CSV](../data/sweeps/fundamental_ko_secondary_stagger__stator.csv.gz) |
+| Aspect ratio | [Open](../figures/ko_secondary_aspect_ratio.svg) | [CSV](../data/sweeps/fundamental_ko_secondary_aspect_ratio__stator.csv.gz) |
+| Incidence | [Open](../figures/ko_secondary_incidence.svg) | [CSV](../data/sweeps/fundamental_ko_secondary_incidence__stator.csv.gz) |
+| Exit flow angle | [Open](../figures/ko_secondary_exit_angle.svg) | [CSV](../data/sweeps/fundamental_ko_secondary_exit_angle__stator.csv.gz) |
+| Outlet Mach number | [Open](../figures/ko_secondary_ma_rel_out.svg) | [CSV](../data/sweeps/fundamental_ko_secondary_ma_rel_out__stator.csv.gz) |
+| Stagger angle | [Open](../figures/ko_secondary_stagger.svg) | [CSV](../data/sweeps/fundamental_ko_secondary_stagger__stator.csv.gz) |
 
 [All individual functions](../readme.md) | [Methods and validation](../methodology.md)

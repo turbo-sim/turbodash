@@ -2,8 +2,8 @@
 
 Digitization needs pixels from the scanned papers. Poppler renders a page to
 an in-memory PPM stream at the recorded resolution, then Pillow crops it.
-Plots and overlays are exported separately as PDF; scanned paper backgrounds
-remain raster content inside those PDFs.
+Plots and overlays are exported separately as SVG; scanned paper backgrounds
+remain embedded raster content inside those SVGs.
 """
 
 from functools import lru_cache

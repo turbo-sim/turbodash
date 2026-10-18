@@ -63,9 +63,9 @@ Here $A(v)=v/\sqrt{1+v^2}$ is odd. The helper requires finite inputs and positiv
 
 Fixed $s/c=0.7$, with $\alpha_2=40^\circ,\ 50^\circ,\ 60^\circ,\ 70^\circ$ and $-1.2\le z\le2$.
 
-[Implemented reference blend for different outlet angles (PDF)](figures/blend_alpha2.pdf)
+![Implemented reference blend for different outlet angles (SVG)](figures/blend_alpha2.svg)
 
-[PDF](figures/blend_alpha2.pdf) · [CSV](data/vary_alpha2.csv)
+[SVG](figures/blend_alpha2.svg) · [CSV](data/vary_alpha2.csv)
 
 These curves show only $B$. They include neither the thickness factor nor downstream KO corrections.
 
@@ -73,9 +73,9 @@ These curves show only $B$. They include neither the thickness factor nor downst
 
 Fixed $\alpha_2=60^\circ$, with $s/c=0.4,\ 0.6,\ 0.8,\ 1.0$.
 
-[Implemented reference blend for different pitch-to-chord ratios (PDF)](figures/blend_pitch_chord.pdf)
+![Implemented reference blend for different pitch-to-chord ratios (SVG)](figures/blend_pitch_chord.svg)
 
-[PDF](figures/blend_pitch_chord.pdf) · [CSV](data/vary_pitch_chord.csv)
+[SVG](figures/blend_pitch_chord.svg) · [CSV](data/vary_pitch_chord.csv)
 
 At fixed negative $z$, all reaction losses are multiplied by the same positive factor. This preserves the reaction family's spacing dependence.
 
@@ -108,9 +108,9 @@ Here $E(z)=z$ through $z=1$ and $E(z)=1+A(z-1)$ above one, gradually approaching
 
 The figures use $\alpha_2=60^\circ$, $s/c=0.7$, exit $Re=500000$, inlet/outlet Mach numbers 0.2/0.5, hub/tip ratio 0.8 and zero incidence. Here $f_{\mathrm{Re}}=1$, $K_p=0.94$ and $Y_{\mathrm{shock}}=0$. The horizontal coordinate is $-1.2\le z\le2$, with curves for $\tau=0.05,\ 0.15,\ 0.20,\ 0.25,\ 0.40$.
 
-[Final KO profile loss versus z for different maximum thickness-to-chord ratios (PDF)](figures/thickness_z.pdf)
+![Final KO profile loss versus z for different maximum thickness-to-chord ratios (SVG)](figures/thickness_z.svg)
 
-[PDF](figures/thickness_z.pdf) ? [CSV](data/vary_thickness.csv)
+[SVG](figures/thickness_z.svg) ? [CSV](data/vary_thickness.csv)
 
 All curves coincide for $z\le0$. Thickness dependence develops gradually through the blue transition band, and the original power law is recovered exactly at $z=0.05$. The full coefficient is $C^1$ at zero for every positive thickness. It remains generally not $C^2$ there because the reference interpolation has a curvature change.
 
@@ -120,9 +120,9 @@ Beige shading marks extrapolation outside $0\le z\le1$; blue shading marks numer
 
 The close-up uses $-0.1\le z\le0.1$. Loss values and their first derivatives are shown side by side.
 
-[Smoothed final profile loss and continuous first derivatives (PDF)](figures/thickness_z_zero_zoom.pdf)
+![Smoothed final profile loss and continuous first derivatives (SVG)](figures/thickness_z_zero_zoom.svg)
 
-[PDF](figures/thickness_z_zero_zoom.pdf) ? [Values and derivatives CSV](data/thickness_z_zero_zoom.csv) ? [One-sided limits CSV](data/thickness_z_zero_limits.csv)
+[SVG](figures/thickness_z_zero_zoom.svg) ? [Values and derivatives CSV](data/thickness_z_zero_zoom.csv) ? [One-sided limits CSV](data/thickness_z_zero_limits.csv)
 
 All values meet at $Y_p(0)=0.914(2/3)(0.94)R$, with zero slope from both sides. Filled circles mark matching values and derivatives at $z=0$ and $z=0.05$. Complex-step derivatives from the full production function are checked against independent analytical expressions and shrinking one-sided real differences. The thickness factor is $C^2$ at both joins; the full coefficient is $C^1$ at zero and matches through second derivatives at the upper boundary. See [the profile report](../loss_model_audit/individual_functions/report/01_ko_profile.md) for the full equations using descriptive loss-coefficient subscripts.
 

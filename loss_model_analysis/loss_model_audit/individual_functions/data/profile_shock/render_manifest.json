@@ -2,12 +2,12 @@
   "figures": 4,
   "model_calls": 0,
   "files": {
-    "ko_shock_hub_factor.pdf": "631934eefddb013e650feae0e9cc653787474e642fa7881e2ff8e14ae7a963d0",
-    "ko_shock_hub_tip.pdf": "c327d24bc85d58ae0528d8fd0867e20008b208009f8dc4bced9ae2972d0c0fb8",
-    "ko_shock_exit_mach.pdf": "0321d2d01a1c3621edcce2609dc60a41d0355e3f0d7351851f15840b5d5bce81",
-    "ko_shock_onset.pdf": "de1288c1b1d9b11f4ab4b111fa22a2d5a2aafe845aaf8d8bfdc2abe81d8c296c"
+    "ko_shock_hub_factor.svg": "8df1b97428757e6405108369d28040ec824f62b386da68508291cc299ace5781",
+    "ko_shock_hub_tip.svg": "e1dc8b2e48a96fcc7e188f449e09c514d42f126162708953206db2f5a7614392",
+    "ko_shock_exit_mach.svg": "b4d5fad6e14aca504110dfcf533c4b6c289c215827aa214041fd5b9e288ad138",
+    "ko_shock_onset.svg": "77b50cac1326c3ae3aae4a41ae99ebca108089b74f1f2f4e6b930f6f09a1a93f"
   },
-  "script_sha256": "c7b268712e20fc0132014130b45bbb1f1dd0e0e7fab14cf26baa66791ec967e6",
+  "script_sha256": "7d725a8d4701b64402d1339fa5131cca68e7d980ced87f65fc23fe22daeedfc6",
   "data_sha256": {
     "hub_factor": "03d833ae7d376698ee8db503b3ea3a255d6062f3092d3f20803694cb4886a2cf",
     "hub_tip": "29a54898643d8b96dce893f98205fe6f13efd5a858287ac559d2c71f29583a62",

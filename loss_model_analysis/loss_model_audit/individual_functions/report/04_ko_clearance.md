@@ -159,9 +159,9 @@ The factor is positive, increasing and concave for positive gaps. It lies slight
 
 The width corresponds to 0.1% of chord, or 0.05 mm for a 50 mm chord. It is a numerical regularization choice, not a measured threshold. For another width, the endpoint sensitivity scales as $\delta^{-0.22}$. Negative clearance remains invalid and returns NaN: smoothness at zero means finite right derivatives on the physical domain, with a $C^2$ join to the power law at $\delta$.
 
-[Gap factor, first derivative and second derivative around zero clearance (PDF)](../figures/ko_clearance_gap_factor.pdf)
+![Gap factor, first derivative and second derivative around zero clearance (SVG)](../figures/ko_clearance_gap_factor.svg)
 
-[PDF](../figures/ko_clearance_gap_factor.pdf) · [CSV](../data/clearance_review/gap_factor.csv)
+[SVG](../figures/ko_clearance_gap_factor.svg) · [CSV](../data/clearance_review/gap_factor.csv)
 
 Blue shading marks the numerical patch. The dashed power law has singular first and second derivatives at zero; those singular branches extend beyond the displayed derivative limits. The solid curves have finite endpoint derivatives and meet the dashed curves continuously in value, slope and curvature at $x=0.001$.
 
@@ -181,9 +181,9 @@ $$
 
 We hold $c=0.05$ m, $\alpha_2=\beta_{\mathrm{out}}=60^\circ$ and $z=0.5$, giving $\beta_{\mathrm{in}}=-30^\circ$. The horizontal axis is effective gap/height, $0\le g\le0.03$, and the curves use $\mathrm{AR}=0.2,0.5,1,2,3,5$. Height is $H=\mathrm{AR}\,c$ and effective gap is $k'=gH$, so a given horizontal coordinate represents the same relative gap across curves, rather than the same gap in millimetres.
 
-[Rotor clearance loss versus effective gap/height for different aspect ratios, with first derivatives (PDF)](../figures/ko_clearance_gap_review.pdf)
+![Rotor clearance loss versus effective gap/height for different aspect ratios, with first derivatives (SVG)](../figures/ko_clearance_gap_review.svg)
 
-[PDF](../figures/ko_clearance_gap_review.pdf) | [CSV](../data/clearance_review/gap_sensitivity.csv)
+[SVG](../figures/ko_clearance_gap_review.svg) | [CSV](../data/clearance_review/gap_sensitivity.csv)
 
 Every loss curve starts at zero and increases smoothly. Circles mark the end of each small-gap patch, $g=0.001/\mathrm{AR}$. They indicate recovery of the gap power law; the aspect-ratio continuation still applies below $\mathrm{AR}=1$.
 
@@ -200,9 +200,9 @@ $$
 =0.37Z\,F(x)G'(\mathrm{AR}).
 $$
 
-[Clearance aspect factor and complete loss at fixed gap/chord, including zero aspect ratio (PDF)](../figures/ko_clearance_ar_review.pdf)
+![Clearance aspect factor and complete loss at fixed gap/chord, including zero aspect ratio (SVG)](../figures/ko_clearance_ar_review.svg)
 
-[PDF](../figures/ko_clearance_ar_review.pdf) | [Factor CSV](../data/clearance_review/aspect_factor.csv) | [Loss CSV](../data/clearance_review/aspect_sensitivity.csv)
+[SVG](../figures/ko_clearance_ar_review.svg) | [Factor CSV](../data/clearance_review/aspect_factor.csv) | [Loss CSV](../data/clearance_review/aspect_sensitivity.csv)
 
 The beige region marks the numerical continuation. The original inverse factor and its slope diverge beyond the displayed limits; the implemented curves remain finite and have continuous first derivatives at the join.
 
@@ -237,9 +237,9 @@ $$
 
 Derivatives are per degree and include the change in both flow angles. The inlet metal angle does not enter the clearance function directly.
 
-[Rotor clearance loss versus outlet angle at fixed aspect ratio and effective gap, with curves for different z (PDF)](../figures/ko_clearance_angle_review.pdf)
+![Rotor clearance loss versus outlet angle at fixed aspect ratio and effective gap, with curves for different z (SVG)](../figures/ko_clearance_angle_review.svg)
 
-[PDF](../figures/ko_clearance_angle_review.pdf) | [CSV](../data/clearance_review/angle_sensitivity.csv)
+[SVG](../figures/ko_clearance_angle_review.svg) | [CSV](../data/clearance_review/angle_sensitivity.csv)
 
 The $z=-1$ curve has equal inlet/outlet angles and therefore zero loading and loss throughout. At $z=0$ the inlet flow is axial; $z=1$ has equal-and-opposite angles, giving symmetric impulse turning. Negative-$z$ curves have same-sign flow angles and are dashed to identify these diagnostic extensions.
 
@@ -260,9 +260,9 @@ $$
 
 This fixed multiplier explains why the two columns have the same curve shapes but different magnitudes. It exposes the effect of the mean-secant continuation on the actual loss coefficient.
 
-[Complete rotor clearance loss in the left column and loading in the right column for extreme inlet and outlet angles (PDF)](../figures/ko_clearance_loading_review.pdf)
+![Complete rotor clearance loss in the left column and loading in the right column for extreme inlet and outlet angles (SVG)](../figures/ko_clearance_loading_review.svg)
 
-[PDF](../figures/ko_clearance_loading_review.pdf) | [CSV](../data/clearance_review/loading_sensitivity.csv)
+[SVG](../figures/ko_clearance_loading_review.svg) | [CSV](../data/clearance_review/loading_sensitivity.csv)
 
 The top row uses $\beta_{\mathrm{out}}=\alpha_2$ and $\beta_{\mathrm{in}}=-z\alpha_2$, with $z=0,0.5,1$. The bottom row retains inlet-angle magnitude from $0^\circ$ to $120^\circ$ while fixing the outlet angle at $20^\circ$, $40^\circ$, $60^\circ$ or $80^\circ$.
 

@@ -35,50 +35,50 @@
     "turbodash/loss_models/loss_coefficient_conversion.py": "a9a8a5943bd91c352c4607fade51272e5ad60de02f8d14f4759e5407b02c1279"
   },
   "imported_sources": {
-    "turbodash.core_stage": {
-      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\core_stage.py",
-      "relative_path": "turbodash/core_stage.py",
-      "sha256": "e0126d1fbd61f41fd13ce23f42189daf3f9e0772f7c8c2518a038c97b8d134ba"
+    "turbodash.core": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\core\\__init__.py",
+      "relative_path": "turbodash/core/__init__.py",
+      "sha256": "f211044a535d511362d3360e5020a4f6b3a2501d610a76239f203611b24cfb70"
     },
-    "turbodash.graphics": {
-      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\graphics.py",
-      "relative_path": "turbodash/graphics.py",
-      "sha256": "2e8e2a8afca76df900d272d03bca44754e98eef6a69a5e89072253fc7732de4a"
+    "turbodash.core.stage": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\core\\stage.py",
+      "relative_path": "turbodash/core/stage.py",
+      "sha256": "598da0d550944e16564ce929b430b5e0328843c8957abd75dfd5eb0d6224df90"
     },
-    "turbodash.core_turbine": {
-      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\core_turbine.py",
-      "relative_path": "turbodash/core_turbine.py",
-      "sha256": "a9c3706955a1350c3d4d105a3779bed43201a440ffb1ebf2fd0a6641023857eb"
+    "turbodash.reporting": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\reporting\\__init__.py",
+      "relative_path": "turbodash/reporting/__init__.py",
+      "sha256": "db09a63d0c317770e3254d95a96f7c5e4e4c6246945e540fb5ffb9c6e6689542"
     },
-    "turbodash.geom_blade": {
-      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\geom_blade.py",
-      "relative_path": "turbodash/geom_blade.py",
-      "sha256": "b386a1fa3b4d848cdcf3a2f994927c7eb99cb4ce4db697fcb99e986c2a1b20d8"
+    "turbodash.reporting.stage": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\reporting\\stage.py",
+      "relative_path": "turbodash/reporting/stage.py",
+      "sha256": "2ea740bba3c1d40398ad5d0c0968f62997235c8d1037c40905f4efa8b593d719"
     },
-    "turbodash.plotting_mpl": {
-      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\plotting_mpl.py",
-      "relative_path": "turbodash/plotting_mpl.py",
-      "sha256": "af77f23594d8111f6ce4333e28f7ec7de190bd7513d5b51ebff0680de79ce937"
+    "turbodash.visualization": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\visualization\\__init__.py",
+      "relative_path": "turbodash/visualization/__init__.py",
+      "sha256": "79821eb0ea87d7bf016a91d781fcdb6178f810e57ec1e7c887ea902f624a3a89"
     },
-    "turbodash.plotting_plotly_stage": {
-      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\plotting_plotly_stage.py",
-      "relative_path": "turbodash/plotting_plotly_stage.py",
-      "sha256": "c9e160298bf696a6d4befb015f5d71ec27d4dabf4bc3d107f0fcc5898cabd738"
+    "turbodash.visualization.matplotlib_style": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\visualization\\matplotlib_style.py",
+      "relative_path": "turbodash/visualization/matplotlib_style.py",
+      "sha256": "90c2ecb9a8b72c2159cc9e263d88ac271cd43b848b629fc4c44fb6bf84d112b7"
     },
-    "turbodash.plotting_plotly_turbine": {
-      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\plotting_plotly_turbine.py",
-      "relative_path": "turbodash/plotting_plotly_turbine.py",
-      "sha256": "d7b7c56ae4f626934642e09a56f104472ac6f010139cd75d102b4d272084a3b8"
+    "turbodash.apps": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\apps\\__init__.py",
+      "relative_path": "turbodash/apps/__init__.py",
+      "sha256": "2f085e5232e36776d5130ca1f8e04e60656ea73179cbef2025a0975431082ee6"
     },
-    "turbodash.reporting_utils": {
-      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\reporting_utils.py",
-      "relative_path": "turbodash/reporting_utils.py",
-      "sha256": "cccc32cff5e44396ec0ded04815470e37d680c0a4d43af339d65b329f47d0db8"
+    "turbodash.apps.launchers": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\apps\\launchers.py",
+      "relative_path": "turbodash/apps/launchers.py",
+      "sha256": "6583cebeea4e01a66bd5befaf23ae2d21ae37235179798789ddd1efa845004e0"
     },
     "turbodash": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\__init__.py",
       "relative_path": "turbodash/__init__.py",
-      "sha256": "4c7737a35da6c41e775164eabe7db6fe91180dd5cdc9b0449c548a99a29454aa"
+      "sha256": "9836a407612efc0b58d0895bb27e8ce5e77e2fc1abd5d0f545a2d996720b6a31"
     },
     "turbodash.loss_models": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\__init__.py",
@@ -136,7 +136,7 @@
       "sha256": "8fc6bc7d5e32bd060a0c836a6be110e49065ed618f5483c70df50d68d6f10975"
     }
   },
-  "script_sha256": "a9d4cc307df15a72632a6854e7a9dcc9d3019f55e7585813ddca5e7f83e3cfbe",
+  "script_sha256": "6ac53ff67392cc66a360150f072149ecf60ccc3f838dbfb3b8f4843e8ca61557",
   "study_model_sha256": "c907c3060fd3e498072394b17be626126ce446efdafead342b07f85e49a9a6d4",
   "digitized_points_sha256": "f1bbfb09fc02a0bf2f63225111f99ccb0607c8b87848e3ae163704123954f19e",
   "data_sha256": {

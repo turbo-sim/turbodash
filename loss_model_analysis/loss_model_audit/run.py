@@ -63,7 +63,7 @@ def main():
     parser.add_argument("--render-only", action="store_true", help="Redraw existing data without repeating the simulations.")
     parser.add_argument("--check", action="store_true", help="Only check navigation and script packaging.")
     args = parser.parse_args()
-    if not (REPO / "turbodash/core_turbine.py").is_file():
+    if not (REPO / "turbodash/core/turbine.py").is_file():
         parser.error("Keep loss_model_audit inside loss_model_analysis in the Turbodash repository.")
     if args.check:
         return 0 if check_bundle() else 1

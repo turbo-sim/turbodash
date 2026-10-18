@@ -38,7 +38,7 @@ def verify(require_figures=True):
             if not target or '://' in target:continue
             path=(document.parent/target).resolve()
             if path in ((BASE/'data/validation/reproduction.json').resolve(),(BASE/'data/provenance/render_manifest.json').resolve()):continue
-            if not require_figures and path.suffix == '.pdf':continue
+            if not require_figures and path.suffix == '.svg':continue
             if not path.exists():broken.append(f'{document.name}: {target}')
             checked+=1
     result=dict(passed=not broken,sweeps=len(sweeps),base_points=200,implementation='current production source',

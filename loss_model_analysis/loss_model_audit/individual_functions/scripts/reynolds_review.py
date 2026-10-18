@@ -11,7 +11,7 @@ from differentiation import derivative
 import numpy as np
 
 DATA = BASE / "data/reynolds_review"
-FIGURE = BASE / "figures/reynolds_transitions.pdf"
+FIGURE = BASE / "figures/reynolds_transitions.svg"
 
 
 def calculate():
@@ -67,7 +67,7 @@ def calculate():
         source_sha256=sha256(ko.__file__), script_sha256=sha256(__file__),
         data_sha256=sha256(DATA/"samples.csv"),
         data_files=["data/reynolds_review/samples.csv"],
-        figures=["figures/reynolds_transitions.pdf"])
+        figures=["figures/reynolds_transitions.svg"])
     write_json(DATA / "summary.json", result)
     return result
 

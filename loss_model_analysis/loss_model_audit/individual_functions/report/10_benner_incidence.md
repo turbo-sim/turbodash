@@ -20,13 +20,13 @@ A quintic Hermite patch on chi in [-0.1, 0] matches the negative polynomial at -
 
 Beige shading marks the continuation beyond the polynomial's upper join at $\chi=5$.
 
-[incidence_chi_detail: values and d/dx (PDF)](../figures/incidence_chi_detail.pdf)
+![incidence_chi_detail: values and d/dx (SVG)](../figures/incidence_chi_detail.svg)
 
-[incidence_chi: values and d/dx (PDF)](../figures/incidence_chi.pdf)
+![incidence_chi: values and d/dx (SVG)](../figures/incidence_chi.svg)
 
-[benner_incidence_incidence: values and d/dx (PDF)](../figures/benner_incidence_incidence.pdf)
+![benner_incidence_incidence: values and d/dx (SVG)](../figures/benner_incidence_incidence.svg)
 
-[benner_incidence_Ma_rel_out: values and d/dx (PDF)](../figures/benner_incidence_ma_rel_out.pdf)
+![benner_incidence_Ma_rel_out: values and d/dx (SVG)](../figures/benner_incidence_ma_rel_out.svg)
 
 ## Quantitative checks
 
@@ -52,12 +52,12 @@ Every figure contains current-source values and derivatives; links below cover a
 
 | Parameter / case | Range | Comparison figure | Numerical data |
 |---|---|---|---|
-| Incidence | -30 to 30 | [Open](../figures/benner_incidence_incidence.pdf) | [stator](../data/sweeps/fundamental_benner_incidence_incidence__stator.csv.gz) · [rotor](../data/sweeps/fundamental_benner_incidence_incidence__rotor.csv.gz) |
-| Leading-edge ratio | 0.001 to 0.2 (log axis) | [Open](../figures/benner_incidence_leading_edge_ratio.pdf) | [stator, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_leading_edge_ratio__stator.csv.gz) · [rotor, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_leading_edge_ratio__rotor.csv.gz) |
-| Leading-edge wedge angle | 0.1 to 90 | [Open](../figures/benner_incidence_wedge.pdf) | [stator, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_wedge__stator.csv.gz) · [rotor, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_wedge__rotor.csv.gz) |
-| Pitch/chord ratio | 0.05 to 5 | [Open](../figures/benner_incidence_pitch_chord.pdf) | [stator, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_pitch_chord__stator.csv.gz) · [rotor, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_pitch_chord__rotor.csv.gz) |
-| Exit relative Mach number | 0 to 3 | [Open](../figures/benner_incidence_ma_rel_out.pdf) | [stator, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_ma_rel_out__stator.csv.gz) · [rotor, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_ma_rel_out__rotor.csv.gz) |
-| Incidence parameter chi | -10 to 20 | [Open](../figures/incidence_chi.pdf) | [prescribed reference](../data/sweeps/fundamental_incidence_chi.csv.gz) |
-| Incidence parameter chi · incidence chi detail | -0.15 to 0.1 | [Open](../figures/incidence_chi_detail.pdf) | [prescribed reference](../data/sweeps/fundamental_incidence_chi_detail.csv.gz) |
+| Incidence | -30 to 30 | [Open](../figures/benner_incidence_incidence.svg) | [stator](../data/sweeps/fundamental_benner_incidence_incidence__stator.csv.gz) · [rotor](../data/sweeps/fundamental_benner_incidence_incidence__rotor.csv.gz) |
+| Leading-edge ratio | 0.001 to 0.2 (log axis) | [Open](../figures/benner_incidence_leading_edge_ratio.svg) | [stator, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_leading_edge_ratio__stator.csv.gz) · [rotor, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_leading_edge_ratio__rotor.csv.gz) |
+| Leading-edge wedge angle | 0.1 to 90 | [Open](../figures/benner_incidence_wedge.svg) | [stator, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_wedge__stator.csv.gz) · [rotor, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_wedge__rotor.csv.gz) |
+| Pitch/chord ratio | 0.05 to 5 | [Open](../figures/benner_incidence_pitch_chord.svg) | [stator, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_pitch_chord__stator.csv.gz) · [rotor, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_pitch_chord__rotor.csv.gz) |
+| Exit relative Mach number | 0 to 3 | [Open](../figures/benner_incidence_ma_rel_out.svg) | [stator, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_ma_rel_out__stator.csv.gz) · [rotor, inlet offset=+10 deg](../data/sweeps/fundamental_benner_incidence_ma_rel_out__rotor.csv.gz) |
+| Incidence parameter chi | -10 to 20 | [Open](../figures/incidence_chi.svg) | [prescribed reference](../data/sweeps/fundamental_incidence_chi.csv.gz) |
+| Incidence parameter chi · incidence chi detail | -0.15 to 0.1 | [Open](../figures/incidence_chi_detail.svg) | [prescribed reference](../data/sweeps/fundamental_incidence_chi_detail.csv.gz) |
 
 [All individual functions](../readme.md) · [Methods, validation and reproduction](../methodology.md)

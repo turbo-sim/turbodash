@@ -122,7 +122,7 @@ def render():
         if handles: fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(.5, .94), ncol=4, frameon=False)
         fig.text(.5, .02, note, ha="center", fontsize=9)
         fig.tight_layout(rect=(0, .11, 1, .87 if handles else .93))
-        for ext in ("pdf",):
+        for ext in ("svg",):
             path = FIGURES/(name+"."+ext)
             fig.savefig(path, dpi=180)
             outputs[path.name] = sha256(path)

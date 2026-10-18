@@ -1,0 +1,23 @@
+{
+  "figures": 5,
+  "files": [
+    "figures/hub_factor.png",
+    "figures/hub_factor.pdf",
+    "figures/shock_inlet_mach.png",
+    "figures/shock_inlet_mach.pdf",
+    "figures/shock_exit_mach.png",
+    "figures/shock_exit_mach.pdf",
+    "figures/shock_onset_smoothness.png",
+    "figures/shock_onset_smoothness.pdf",
+    "figures/digitization_overlay.png",
+    "figures/digitization_overlay.pdf"
+  ],
+  "renderer_sha256": "0d2a160fe315330b7f5c2a6dd5c9402dfb03753b1eed9e2399c436732ac804af",
+  "plot_style_sha256": "51bcb77c77ef1ca32fff9ff93ea592499fdde5138347c13b822e163b554ff69d",
+  "data_hashes": {
+    "digitized_points.csv": "cc4f3cd8963c8bd6d7af46bbb727f00e443ee00c4e2886bcbb18b308236d9a5f",
+    "hub_factor.csv": "ace7aaf86c7a00a331bfd31008e0af63961c8db996c1d4157942baee83200b03",
+    "shock_sweeps.csv": "d68ae6691cdc6542960b5b5adc0d10315f5fe40893a3b1b0f87374fac7fe32fd",
+    "shock_onset_zoom.csv": "5f8d785224bbff24e0bfdb1011a6a7a80a6606db8eafa599980c2e3dc9b2af03"
+  }
+}

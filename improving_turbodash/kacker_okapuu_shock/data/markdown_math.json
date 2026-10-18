@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "parser": "VS Code Markdown+Math / markdown-it-texmath",
+  "katex_version": "0.13.11",
+  "modules": "C:\\Users\\roagr\\.vscode\\extensions\\goessner.mdmath-2.7.4\\node_modules",
+  "counts": {
+    "inline": 45,
+    "display": 9,
+    "local_links": 35
+  },
+  "errors": [],
+  "readme_sha256": "f9661e34f3ce87cd252d41351e1470e28bf6a7117b4c38f4687ce6fe72e49c54"
+}

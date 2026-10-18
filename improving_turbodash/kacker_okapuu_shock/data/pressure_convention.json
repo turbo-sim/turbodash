@@ -1,0 +1,16 @@
+{
+  "mach_in": 0.7,
+  "mach_out": 0.6,
+  "hub_tip_ratio": 0.6,
+  "row": "rotor",
+  "p01": 200000.0,
+  "p02": 180000.0,
+  "p1": 144185.5721983831,
+  "p2": 141120.71115649992,
+  "paper_Y_p_shock": 0.43790063364896253,
+  "production_profile_isolated_Y_shock": 0.39207898165086524,
+  "production_helper_Y_shock": 0.3920789816508652,
+  "production_raw_relative_difference": 0.0,
+  "all_components_match_approved_helper": true,
+  "finding": "Production and standalone use the actual inlet head p0_rel_in-p_in. The profile calls the shared helper; p0_rel_is does not affect the shock term."
+}

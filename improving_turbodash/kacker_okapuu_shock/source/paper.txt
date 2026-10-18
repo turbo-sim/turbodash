@@ -1,0 +1,713 @@
+                                                      A Mean Line Prediction Method
+
+
+
+
+                                                                                                                                                                              Downloaded from http://asmedigitalcollection.asme.org/gasturbinespower/article-pdf/104/1/111/5529077/111_1.pdf by Technical University of Denmark user on 16 March 2023
+                          S. C. Kacker
+                       Staff Aerodynamicist.
+     Pratt & Whitney Aircraft of Canada Ltd.,         for Axial Flow Turbine Efficiency
+                             U. Okapuu                A mean line loss system is described, capable of predicting the design point ef-
+                                                      ficiencies of current axial turbines of gas turbine engines. This loss system is a
+               Chief, Turbine Aerodynamics.
+                                                       development of the Ainley I Mathieson technique of 1951. The prediction method is
+     Pratt & Whitney Aircraft of Canada Ltd.,          tested against the "Smith's chart" and against the known efficiencies of 33 turbines
+                 Longueuil, Quebec, Canada             of recent design. It is shown to be able to predict the efficiencies of a wide range of
+                                                      axial turbines of conventional stage loadings to within ± 1'A percent.
+
+
+ Introduction
+    In choosing the gas path for a new turbine the designer has                            .10
+ to carry out an optimization study which involves the
+                                                                                                                                                                  8 0 = Ot2
+calculation of velocity triangles. Blade lengths and radii are                             .08
+thereby determined early in the design cycle, before blade
+shapes are known. This is done by means of a "mean line"
+velocity triangle calculation, which is based on the assumption                            .06
+that the thermodynamic processes undergone by the working
+fluid can be represented by velocity triangles at midspan. To
+                                                                                           .04
+produce an optimum gas path such a calculation must in-
+corporate a system of aerodynamic losses expressed as a
+function of blade row inlet and exit velocity triangles. Its                               .02     -
+excellence is ultimately judged by its ability to predict the
+aerodynamic efficiencies of known turbines of "competent"
+                                                                                           .00
+design.
+                                                                                                 0.0    0.2          0.4      0.6         08              10         1.2
+   Over the past 30 yr, a number of such turbine mean line loss
+systems have been described in the open literature, Traupel                                                                   S/C
+[1], Craig and Cox [2], and Stewart [3]. Perhaps the best                      Fig. 1 Profile loss coefficient for /3-| = 0, JMAX' C = ° - 2 a " e r Ainley and
+known and most completely documented of these is that due                      Mathieson [4]
+to Ainley and Mathieson [4], published in 1951. Due to the
+improvement in our analytical capability and the ac-                                      .20     r"                                                          .70°= CX,
+cumulation of test results on a variety of turbines, it is fitting                                                                                    •
+                                                                                                                                                  s
+that such a loss system be critically reviewed and updated at                                                                                    *
+least once every decade. It is a tribute to the durability of the                         .16     --                                                          ,65°
+                                                                                                              v\ S                  ^ *                   *
+Ainley/Mathieson system that it has become a foundation
+worthy of subsequent refinement, the most notable of which                                .12
+                                                                                                                m.N ^                     *>*'*           ^> 60°
+was published in 1970 by Dunham and Came [5]. Now, a                                                                 ^                              ^55°
+decade later, may be an appropriate time to take a fresk look                      Yp                                     ^                     ^ ^ ^ 5 0 °
+at the subject.
+   The present paper describes modifications to the
+                                                                                         .08
+                                                                                                                              ^—r^-400
+Ainley/Mathieson/Dunham/Came (AMDC) loss system.
+These modifications are tested against experimental results                               .04     -
+where possible. The complete loss system is finally tested
+against design point efficiencies of 33 recent turbines.                                 .00             i            i        i            i                 i        i
+
+
+                                                                                                0.0     0.2          0.4      0.6          08             1.0        1.2
+Overall Description of Loss System                                                                                            S/C
+   The loss of total pressure in a cascade of blades, expressed                Fig. 2 Profile loss coefficient for /31 = a 2 . ' M A ' c = 0.2 after Ainley and
+                                                                               Mathieson [4]
+
+
+
+                                                                               in terms of cascade exit dynamic pressure, is assumed to be
+  Contributed by the Gas Turbine Division and presented at the International
+Gas Turbine Conference and Products Show, Houston, Texas, March 9-12,
+                                                                               the sum of profile, secondary, trailing edge and tip leakage
+1981, of THE AMERICAN SOCIETY OF MECHANICAL ENGINEERS. Manuscript              losses, where the profile losses are corrected for Reynolds'
+received at ASME Headquarters, December 9, 1980. Paper No. 81-GT-58.           number effects
+
+Journal of Engineering for Power                                                                                           JANUARY1982, Vol. 104/111
+                                                          Copyright © 1982 by ASME
+                     INLET
+                    ANGLE                                                   .28
+                                 GAS ANGLE o< 1
+                                 METAL ANGLE R*                             .24
+
+                                                                       > s .20
+                                                                        <
+                                                                        S                                   ©     ©
+                                                                             .16
+
+                                                                             .12
+
+
+
+
+                                                                                                                                                  Downloaded from http://asmedigitalcollection.asme.org/gasturbinespower/article-pdf/104/1/111/5529077/111_1.pdf by Technical University of Denmark user on 16 March 2023
+                                                                               t0     ~20      40      60     80 l^O 120 140                160
+                                                                                                            (3l + 32) DEGREES
+                   GAS ANGLE <X2
+                                                                            Fig. 4   Thickness/chord ratio for typical turbine blade sections
+      EXIT         METAL ANGLE B2
+     ANGLE
+                  Fig. 3   Blade section terminology                   The Profile Loss Coefficient YP
+                                                                          The basis for the profile loss coefficient is a set of cascade
+                 YT — F P / ( R e ) + Ys + YTET + YTC              (1) test results incorporated in the AMDC loss system [4]. These
+This formulation is seen to differ from that of the AMDC results are expressed in terms of pitch/chord ratio and cascade
+system [4, 5], which is                                                exit gas angle a2 for two special cases of /^ = 0 (Fig. 1) and
+                                                                       /3, = a2 (Fig. 2). For any other combination of angles, these
+               YT = [(YP + y s )REFAC + YTC] YTET                (2) graphs are interpolated by means of the following equation:
+where Y TET in Equ. (2) is a multiplier, not a loss coefficient.
+   In equation (1), blade Reynolds' number is taken to affect           Y        AY               Ah\(h\\Y
+only the profile loss coefficient, and the trailing edge loss                                    <*2
+coefficient is separated from the other loss terms. This would
+appear a more logical arrangement, since it is difficult to                            - r w,=o,J](^-)«2                            (3)
+justify a connection between trailing edge losses and tip
+clearance losses, for example.                                            The foregoing equation is similar to the interpolation
+
+
+
+
+                 bx            axial chord
+                  C =          true chord                                                   Yr = total loss coefficient for a blade row
+                 cL ==         airfoil lift coefficient                                     YP = profile loss coefficient
+                 c             axial velocity component                                     Ys = secondary loss coefficient
+               CFMx =          supersonic drag rise multiplying                       ^SHOCK = component of profile loss coefficient
+                               factor to profile loss coefficient YP                              due to leading edge shock
+                 f(AR) = aspect ratio function                                           YjET   = trailing edge loss multiplier, in
+                   / ( R e ) = Reynolds number correction factor                                  AMDC loss system
+                          h = blade or vane height                                     1
+                                                                                           TET = trailing edge loss coefficient
+                      AH = enthalpy drop                                                  YTC = tip clearance loss coefficient
+                          k = tip clearance                                                   a = absolute/relative gas angles for
+                        k' = equivalent tip clearance for shrouded                                vane/blade
+                               blade                                                       <*m = mean gas angle defined in equation
+   K\ ,K2 ,A"3 ,Kp ,KS = correction factors defined in text                                       (13)
+                        M = Mach number                                                       0 = metal angle for vane or blade
+                          0 = throat opening                                                  7 = ratio of specific heats
+                         P = total pressure                                           A<p T E T = trailing edge K.E. loss coefficient
+                          P = static pressure                                              Vt-t = turbine efficiency (total-to-total)
+                          q = dynamic head (P-p)                                            Vo = 1),., at zero tip clearance
+             REFAC = Reynolds number correction factor                                       * = stagger angle
+                               for AMDC loss system                                         4>2= kinetic energy coefficient = (actual
+                     Rec = Reynolds number based on true                                          gas exit velocity/ideal gas exit
+                               chord and exit gas conditions                                      velocity)2
+                         R = radius                                    Subscripts
+                           s = pitch                                                      H =       hub
+                         U = blade velocity at mid height                                  T =      tip
+                           t = trailing edge thickness (TET)                             1,2 =      inlet and exit conditions
+                  ^MAX = blade maximum thickness                                        Sub =       subsonic
+                          y = loss coefficient AP/q where q is                        AMDC =        as per Ainley, Mathieson, Dunham
+                               (generally) taken at blade exit                                      and Came
+
+112 / Vol. 104, JANUARY 1982                                                                                    Transactions of the ASME
+                                                                          22         ROTORS
+
+                                                                          2.0
+
+                                                                          1.8
+
+                                                                          1.6
+
+                                                                          1.4       NOZZLES
+
+                                                                          1.2
+
+                                                                         1.0
+                                                                               H^ 5              .6     .7    8     .9               1.0
+                                                                                     R H /R T - HUB/TIP RADIUS RATIO
+
+
+
+
+                                                                                                                                           Downloaded from http://asmedigitalcollection.asme.org/gasturbinespower/article-pdf/104/1/111/5529077/111_1.pdf by Technical University of Denmark user on 16 March 2023
+                                                                     Fig 6     Inlet Mach number ratio for nonfree-vortex turbine blades
+        -40      "20     0     20    40      60
+              BLADE SECTION INLET ANGLE P i DEGREES
+       Fig. 5 Stagger angle for typical turbine blade sections
+
+
+
+
+ equation given by the AMDC method except for the
+ terml|3i/a 2 1, which was introduced to allow for negative
+ inlet angle.
+    Figure 3 clarifies the terminology. Figure 4, a plot of
+thickness/chord ratios of a number of recent blade designs,
+proposes a general curve for this ratio, to be used when blade
+sections are not yet designed. Figure 5, similarly of statistical
+derivation, proposes values of stagger angle which can be used
+to estimate true chords, c, from axial chords which are
+generally established early in the design.
+    The cascade results of Figs. 1 and 2 are valid for vanes and
+blades having a trailing edge thickness to pitch ratio (t/s) of
+0.02. In the AMDC loss system YP is multiplied by Y TET to
+obtain the combined profile and trailing edge loss at any other              .2       A        .6         .8
+t/s ratio. In the present loss system, since Y' J^J- is a separate                                     M-|,HUB
+additive loss, YP from Figs. 1 and 2 is multiplied by 0.914, Fig. 7 Combined effect of leading edge shock on inner end wall flow
+which is the value of YTET at t/s = 0 according to AMDC loss and the blade channel next to it
+system, to obtain YP at zero trailing edge thickness.
+   The AMDC profile loss correlations, Figs. 1 and 2, were
+perfectly valid at the time of publication of the original inner endwall of a blade can then be found from Fig. 7, which
+AMDC loss system, and efficiencies of turbines of that era states
+should be predictable by these data. However, advances in
+aerodynamic analysis, made over the last three decades,                                  = 0.75(M, , H U B - 0 . 4 ) '         (4)
+suggest that a factor of 2/3 should be applied to these loss                    qx /HUB
+coefficients for the efficiency prediction of present-day However, since this loss is only local, it would be unfair to
+turbines.                                                          penalize the whole blade by this amount: a long blade would
+                                                                   be less affected, overall, by a loss here than would a short
+   The Subsonic Mach Number Correction. Cascade tests in blade. Therefore, the contribution to the mean line loss of
+the decades following the publication of the AMDC loss blade inlet shock losses is taken to be
+system have revealed that the profile loss coefficient YP is in
+general not independent of Mach number, even in the sub-                             AP\
+                                                                                                                       \       (5)
+sonic flow regime. Compressibility can affect YP in two ways,                        qx /SHOCK     \RTT/)
+                                                                                                   \R         \V qxx /HUB
+by causing shocks at blade leading edges and by affecting the
+                                                                   Finally, the subsonic shock loss coefficient, until now ex-
+flow acceleration within blade channels.
+                                                                   pressed in terms of blade inlet mean line dynamic head, can be
+   Shock Loss. Shocks at blade leading edges can set in at expressed in terms of blade exit dynamic head by
+relatively low average inlet Mach number levels, due to the
+                                                                         AP\                        AP\
+local flow acceleration adjacent to the highly curved leading                          • y*!
+edges. Evidence of the possible detrimental effects of this can          q 2  /SHOCK                 qx /SHOCK ( - )
+be deduced from design rules of bygone days, which warn us                                                             \p2J
+about designing for relative inlet Mach numbers greater than
+approximately 0.6, and admonish us to design thinner leading
+edges when inlet Mach numbers are high.                                                                                       (6)
+   Due to the radial variation in gas conditions, necessary for
+the flow to be in equilibrium, incident Mach numbers are
+always higher at the hub than at midspan. A sampling of
+known turbines resulted in the curve shown in Fig. 6, which          Channel Flow Acceleration. Flow in the passage formed by
+estimates the incident Mach number at the hub of nonfree- two adjacent blades will undergo a larger velocity change
+vortex turbine blades when midspan Mach number and when operated at a higher (subsonic) Mach number level. This
+hub/tip radius ratio are known. The "shock loss" next to the is a consequence of the compressibility of the working
+
+Journal of Engineering for Power                                                                     JANUARY 1982, Vol. 104/113
+     1.0
+                                                                          .10r                                                        1
+
+     0.8                                                                                   PRESENT PREDICTION                   /
+                                                                                           AMDC LOSS SYSTEM                    J
+     0.6                                                                  .08                                                     i
+                                                                                                                              i
+
+     0.4
+                                                                          .06-        o ( D A T A F R 0 M 4 DIFFERENT       ;' A j ' o A
+                                                                                      A (TRANSONIC CASCADE RIGS             ,' J
+    0.2          Kt • 1-1.25|M2-0.2|FOfl         Ma*0.2                               ®)                                    /A?
+                                                                     <    .04
+    0.0                                                                                                                    / LJ
+                                                                                                                          / r-f®
+           0.0        0.2         0.4         0.6       08     1.0
+
+
+
+
+                                                                                                                                                       Downloaded from http://asmedigitalcollection.asme.org/gasturbinespower/article-pdf/104/1/111/5529077/111_1.pdf by Technical University of Denmark user on 16 March 2023
+                                                                          .02-
+                                        M,                                                                  9       0*°"
+Fig. 8 Mach number correction factor K1 for the profile loss coef-
+ficient, for accelerating cascades of M -, - M2                                                                                            1
+                                                                               0. —    i       i      i         1     1           1
+                                                                                      Q2      0.4    0.6      0.8   1.0   1.2             1.4
+                                                                                                           M2(ISENTR0PIC)
+
+                                                                     Fig. 10 Comparison of transonic cascade test results with prediction,
+                                                                     blade profile 23
+
+
+
+                                                                     pears to be the major shortcoming of this correction in that it
+                                                                     ignores limit loading of airfoils.
+                                                                        Limit load is the condition at which a given cascade of
+                                                                     airfoils operating at a constant inlet pressure develops
+                                                                     maximum tangential force. When blade trailing edges are
+                                                                     more tangential, this condition occurs at a higher Mach
+                                                                     number, and therefore different cascades will have different
+                                                                     limit load exit Mach numbers. Limit load Mach number can
+                                                                     be estimated from blade geometry [6,7], but it can also be
+Fig. 9 Mach number correction factor K2 for the profile loss coef-   predicted from supersonic drag rise, if that is known [8].
+ficient
+                                                                     Alternatively, the supersonic drag rise may be deduced from
+                                                                     known limit load Mach number calculated from blade
+                                                                     geometry. Work on this approach is currently in progress.
+medium. In an accelerating flow passage, therefore, operation        Early results look promising as shown in Fig. 10. This regime
+closer to sonic exit velocities will tend to cause suppression of    is as yet primarily of interest for efficiency prediction at off-
+local separations and the thinning of boundary layers. This          design operating conditions, however. Design point exit Mach
+effect is most pronounced where inlet Mach numbers are only          numbers of turbines in current gas turbine engines rarely
+slightly lower than exit Mach numbers.                               assume magnitudes where supersonic drag rise plays a
+   Profile loss coefficients shown in Figs. 1 and 2 are derived      significant part in the loss system.
+from cascade tests carried out at low subsonic velocities and
+are therefore pessimistic when applied to turbines operating at        Reynolds' Number Correction. It is assumed that the
+higher Mach number levels. Figures 8 and 9 correct for the           profile loss coefficient YP is calculated at a reference
+effects of exit Mach number and channel acceleration,                Reynolds' number of 2 x 10 5 , based on true chord, and
+respectively. The combined effect of these corrections is            cascade exit gas conditions. At any other Reynolds' number,
+                         KP = l-K2(l-Kl)                       (7)   the correction / (Re) in equation (1) is
+  In the subsonic regime of operation of a cascade of blades,
+therefore, the profile loss coefficient YP becomes:                                       Rec
+                                                                      /((Re)                     ^       for Rec < 2 x l 0 5
+                                                                                      \2xl05/
+           YP = 0 . 9 1 4 ( | YPAMDCKP + y S H oc K )          (8)               =    1.0 for 2 x l 0 5 < R e c < 1 0 6                         (10)
+                                                                                      / R e c \ -°- 2
+  As discussed in the forthcoming section, "Verification of                                           for Rec>10 6
+Loss System," these compressibility corrections were
+necessary to make the AMDC loss system predict the correct
+shapes of the efficiency islands on "Smith's chart."                 This formulation is similar but not identical to Denton's [9].
+                                                                     It is applied to the profile loss coefficient only as there is little
+   Supersonic Drag Rise. In the regime of supersonic exit            evidence in the literature that other loss terms are affected.
+velocities additional pressure losses occur as a result of shocks    The Reynolds' number independence in the 2 x 105 to 106
+originating in the trailing edge wake. Due to the lack of            range is an approximation to the complex loss coefficient
+cascade test results of adequate quality, a reliable loss model      variation in the transitional regime. The true variation of loss
+is not yet available.                                                coefficient with Reynolds' number cannot be estimated
+   The AMDC loss system assumes a supersonic drag rise               without a detailed knowledge of blade shapes.
+according to
+                       CFM = 1 + 6 0 ( M 2 - 1 ) 2             (9)   The Secondary Loss Coefficient Ys
+where CFM is applied as a multiplier to YP, when the exit              The secondary loss coefficient calculation is the same as
+Mach number exceeds unity. This factor is taken to be in-            given by Dunham and Came [5], except for its dependence on
+dependent of blade (metal) exit angle. This assumption ap-           blade aspect ratio. In [5] it is assumed that Ys varies as the
+
+114/Vol. 104, JANUARY 1982                                                                                  Transactions of the AS ME
+             .90
+
+                                             -O—EXPERIMENT |10|
+             .85                                 D S C PREDICTION |51
+
+
+             .80
+      Ht-t
+             .75
+
+
+             .70
+
+
+
+
+                                                                                                                                                   Downloaded from http://asmedigitalcollection.asme.org/gasturbinespower/article-pdf/104/1/111/5529077/111_1.pdf by Technical University of Denmark user on 16 March 2023
+             .65
+                                 1.0           2.0          ao
+                                       TyF
+Fig. 11 Comparison of the effect of blade aspect ratio as predicted by
+the Dunham and Came method [5] with the test results of Rogo [10]              Fig. 13 Mach number correction factor K 3 for the secondary loss
+                                                                               coefficient
+
+
+                                 ) — TEST RESULTS 111)
+                                                                               secondary losses and the trailing edge losses are not linked.
+                                     D & C PREDICTION | 5 |
+                                                                               Therefore, it is required that Y s , as given by equation (11),
+                                     PRESENT LOSS SYSTEM, EQU.16               should be suitably modified before it can be used in the
+                                                                               present loss system. This is done by multiplying Ys (equation
+                                                                               (11)) by a factor of 1.2. An initial estimate for the multiplying
+                                                                               factor was based on the assumption that Dunham and Came
+                                                                               [5] developed their loss system for turbines having a typical
+                                                                               value of t/o — .1 and an airfoil gas exit angle of 60 deg. This
+                                                                               implied that their turbines had t/s — .05. In the AMDC loss
+                                                                               system, for t/s — 0.05, the value of YTET is not much dif-
+                                                                               ferent from 1.2. The value of the multiplying factor was
+                                                                               further confirmed by optimisation of the present loss system
+                                                                               performance (to be discussed later).
+                                                                                  The Subsonic Mach number Correction. As with profile
+                                                                               losses, compressibility also has an effect on the acceleration of
+Fig. 12 Comparison of the effect of blade aspect ratio as predicted by
+Dunham and Came [5] and the present method, with the test results of
+                                                                               flow next to endwalls, and hence endwall losses. To account
+Okapuu[11]                                                                     for this the subsonic Mach number correction factor for
+                                                                               secondary losses is defined in terms of the factor for profile
+                                                                               loss and aspect ratio as
+reciprocal of blade aspect ratio, over the complete range of                                         K, = 1-K3(\-KP)                      (15)
+aspect ratios. Its authors noted that their method predicted a
+more rapid increase in losses, as aspect ratio was reduced,                    where K} is defined in Fig. 13 and Kp as defined in equation
+than shown by the experimental data of Rogo [10], Fig. 11.                     (7). Leading edge shocks at high subsonic incident Mach
+The same trend has been confirmed by the data of Okapuu                        numbers are also likely to have some effect on secondary
+[11]. In the present loss system this rise in Ys (with a reduction             losses. These effects are here assumed to be included in the
+in aspect ratio) is less rapid for aspect ratios less than two. The            term ysHocK. equation (6), and not separately accounted for
+following equations are employed:                                              here. In the supersonic exit regime no additional Mach
+                                                                               number correction is applied to Y s , which is kept fixed at its
+                             /cosa, \ / C, \ 2 cos2a2                          value corresponding to exit Mach number of unity.
+                             \cos/3, / \s/c/     cosJa„,                       Therefore:
+where                                                                                                Ys — 1.2 YSiAMDCKs                    (16)
+
+                             = 2(tana, +tana 2 )cosa
+                                                 )sa,„                  (12)
+                      s/c                                                      The Trailing Edge Loss Coefficient Y' TET
+                   a„, = tan ' - (tana, - tana 2 )                      (13)      The physically most meaningful expression of pressure
+                                                     •>]                       losses due to trailing edge blockage is in terms of trailing edge
+                                                                               blockage itself, i.e., in terms of the trailing edge
+                       1-0.25V2-A/C                                            thickness/throat opening ratio of a cascade.
+  ' (AR)                                             or h/c<2                     An extensive survey of published and in-house cascade
+                            h/c
+                                                                    • (14)     results produced the relationship shown in Fig. 14. Trailing
+                                                                               edge losses are here expressed in terms of an energy coefficient
+                        1                                                      A<I>2TET. Two distinct curves exist for axial entry nozzles and
+                                                     or h/c>2
+                       JTc                                                     impulse blades. The difference lies in the thicknesses of
+                                                                               profile boundary layers at the trailing edges of blades: im-
+Figure 12 shows the effect of aspect ratio on predicted turbine                pulse blades, with their thick boundary layers have lower (less
+efficiency. The modification introduced here is seen to                        negative) base pressure coefficients and thus have lower
+provide a better prediction of test results.                                   trailing edge losses, while the trailing edge thickness con-
+   In the AMDC loss system, Ys given by equation (11) is                       tributes significantly to the drag of highly accelerating
+multipled by Y TET . However, in the present loss system the                   cascades. For blades other than the two basic types shown,
+
+Journal of Engineering for Power                                                                             JANUARY 1982, Vol. 104/115
+                                                                                                                                                       Downloaded from http://asmedigitalcollection.asme.org/gasturbinespower/article-pdf/104/1/111/5529077/111_1.pdf by Technical University of Denmark user on 16 March 2023
+                                                                                       0.4    0.5    0.6   0.7    0.8     0.9    1.0    1.1    1.2
+Fig. 14 Trailing edge loss [energy] coefficient correlated against the
+ratio of trailing edge thickness to throat opening                                                            Cx/U
+                                                                              Fig. 15 Turbine stage efficiency at zero tip leakage, after Smith [12]
+trailing edge losses are interpolated in a manner similar to
+equation (3), i.e.,
+              r
+A<t>TET = &<t>TET(
+                Wi=0)                                                       case of unshrouded blades was that tip leakage losses were
+                       A TET                  A                             found to be overpredicted by that system on recent turbines.
+        <*2
+              \£)     [ ^       ^ =«2> - *TET (ei=0) ]               (17)
+                                                                            Verification of Loss System
+The conversion from kinetic energy loss coefficient to the
+pressure loss coefficient is given by                                           The loss system outlined in the foregoing evolved to its final
+                                                             7                formulation largely thanks to a 1965 paper by Smith [12],
+              [.-^«(: 1           -A07TE
+                                                           7-1   1            which proposes a correlation of turbine efficiency on a
+                                                                              "loading diagram" having stage loading factor AH/If1 as one
+                                                                     (18)     axis and stage flow factor Cx/U as the other (Fig. 15). Design
+                                  1
+                                y-     , „ \ ~^r
+                      - 0+ ^ * 0              7-1                            point efficiencies (corrected to zero tip clearance) of some 69
+                                                                             turbines, plotted on this diagram, strongly suggest concentric
+The variation of Y'TET with Mach number is not well                          locii of constant efficiency. This correlation is so convincing
+documented at present. For supersonic exit velocities the                    that it must be accepted as one of the tests which any mean
+supersonic drag rise, as discussed under profile losses, is                  line loss system must satisfy.
+assumed to include trailing edge losses.                                        These 69 turbines were, clearly, all designed before 1965. In
+                                                                             addition they all share certain common design features
+The Tip Clearance Loss Coefficient                   YTp                     described in [12], features which are a reflection of the
+                                                                             consistent design philosophy in the organization whence they
+   Overtip leakage losses on unshrouded rotor blades con-                    originated. Considering the probable sizes of these turbines,
+stitute a major source of turbine inefficiency. A large body of              the state of the (design) art at the time and the manner of
+experimental data exists on this subject, relating changes in                testing, one arrives at the conclusion that the efficiency
+turbine efficiency to changes in rotor tip clearance. Most of               contours shown in Fig. 15 are caused mainly by profile losses
+the available results correlated within ± 15 percent with the               and somewhat more weakly (due to the prevailing moderate to
+following expression:                                                       large aspect ratios) by secondary losses. Therefore, if a
+                                 ATJ                                        candidate loss system fails to duplicate the Smith's chart, the
+                                                                            fault is likely to lie with its profile and/or secondary loss
+                                 Vo                                         components.
+                                                    = 0.93           (19)
+                        Ak             Ri                                       To test these loss system components, the equivalent of 103
+                      h cosa-,        RK
+                                                                             turbine stages were designed, using design rules and
+                                                                             mechanical limitations current in the 1950's. As a guide,
+   When the loss system is structured as equation (1) Arj has to             multistage turbine gas paths and approximate cycle design
+be converted to an equivalent loss coefficient YTC. This may                 points of three engines of this period were used as a
+be done iteratively (by first calculating turbine efficiency with            framework for these stages. The design point efficiency of
+zero tip clearance, assessing the efficiency penalty due to                 each was then calculated by a candidate loss system and a plot
+clearance and increasing the rotor loss coefficient until the               similar to the Smith's chart was constructed.
+process converges on efficiency, all the while recalculating the                The Ainley/Mathieson loss system, while predicting quite
+velocity triangles and other loss coefficients) or directly, by             well the variation of efficiency with AH/U2, failed to
+making certain simplifying assumptions. The exact process is                adequately predict its variation with Cx/U at Cxi U values in
+beyond the scope of this paper.                                             excess of 0.6. In this respect our results were quite similar to
+  In the case of shrouded turbine blades the loss system in-                those of Amann and Sheridan [13]. After examining various
+corporates the relationship proposed in [5], i.e.                           alternatives we were forced to conclude that only the com-
+                                                                            pressibility and shock loss corrections to profile and secon-
+         y ™ = 0.37-        —
+                                                     cos z a 2              dary loss coefficiencts, described in the foregoing, can
+                                                                     (20)
+                       /Ac/                 \s/c)    cos3 a,„               produce an adequate simulation of Smith's chart. It was
+where                                                                       found that the shock loss correction (FSHOCK) mainly affected
+                                                                            the high Cx/U regime of the chart, while the acceleration
+               k' =                                                  (21)   correction (Kp) affected the general level of the efficiency
+                      (number of seals) 0M                                  contours. Figures 6, 7, 8, 9 and 13 were evolved by trial and
+The reason for deviating from the \ M D C loss system in the                error until a simulation of Smith's curves was obtained. The
+
+116/Vol. 104, JANUARY 1982                                                                                       Transactions of the ASME
+                                 30
+
+
+                                 2.6
+
+
+                                 2.2
+
+
+                           ^1.8
+                                                    ^***^     _*--f525             KZh**^        .912 \
+
+
+
+
+                                                                                                                                                       Downloaded from http://asmedigitalcollection.asme.org/gasturbinespower/article-pdf/104/1/111/5529077/111_1.pdf by Technical University of Denmark user on 16 March 2023
+                                 1.4
+
+
+                                 1.01                                    J T /                        ///
+                                 0.6
+                                   0.4        0.5       0.6       0.7    0.8        0.9          10       1.1       1.2   1.3
+                                                                           cx/u
+                                        Fig. 16 Turbine stage efficiency at zero tip leakage calculated by the
+                                        present method
+
+
+
+ EFFICIENCY                                                                    EFFICIENCY
+ DIFFERENCE                                                                    DIFFERENCE
+.025 TO . 0 3 0             EXPERIMENTAL EFFICIENCY LESS
+. 0 2 0 TO . 0 2 5        THAN EFFICIENCY FROM CONTOURS
+                                                                               .025 TO .030      H1              CALCULATED EFFICIENCY LESS
+                                                                               . 0 2 0 TO .025
+.015 TO . 0 2 0                                                                                                 THAN EFFICIENCY FROM CONTOURS
+                                                                   n           .015 TO .020
+. 0 1 0 TO .015
+. 0 0 5 TO .010
+                           12.                                                 .010 TO .015
+                                 1 14                                          . 0 0 5 TO .010
+     0 TO . 0 0 5                                                                    0 TO .005                                      131
+   0 TO .005                                                                         0 TO 73oT                             T    _
+.005 TO .010
+.010 TO .015         r?                                                        . 0 0 5 TO . 0 1 0
+                                                                               . 0 1 0 TO .015
+                                                                               .015 TO . 0 2 0
+                                                                                                  &&p*mi>#to*m$f"
+
+
+
+                            EXPERIMENTAL EFFICIENCY MORE                                                          CALCULATED EFFICIENCY MORE
+                          THAN EFFICIENCY FROM CONTOURS                                                         THAN EFFICIENCY FROM CONTOURS
+Fig. 17 Histogram for experimental data used to define contours in             Fig. 18 Histogram for calculated data used to define contours in Fig.
+Fig. 15, after Amann and Sheridan [13]                                         16
+
+
+
+result is shown in Fig. 16. Calculations were carried out with                 speculations aside, the quantitative agreement may never-
+the whole AMDC value of YP (rather than 2/3) in equation                       theless be considered satisfactory in the light of the inevitable
+(8) to simulate the state of blade design art of the time.                     data scatter inherent in both figures. Figure 18 shows the
+   A qualitative comparison of Figs. 15 and 16 indicates that a                corresponding differences between data points and contours
+satisfactory duplication of the shapes of efficiency contours                  of Fig. 16, for completeness.
+has been achieved. At low values of AH/U2 there is                                The second test of a loss system is the demonstration of its
+unquestionably an initial increase in efficiency with AH/U2,                   ability to predict the design point efficiencies of existing
+at constant Cx/U. The lack of this feature has been the major                  turbines of more recent vintage. Design point data were
+shortcoming of the AMDC loss system as demonstrated in                         collected for 33 turbines ranging from the gas generator
+Fig. 9 of [13].                                                                turbine of a small automobile engine to the low pressure
+   Quantitatively, Fig. 16 differs from Fig. 15 in that a given                turbine of a 45,000-lb thrust turbofan. In view of the ad-
+efficiency curve of Fig. 16 attains a lower peak AH/U2 value                   vances made in blade profile design over the last 25 yr, the loss
+but extends to a higher peak Cx/U value. At 90 percent ef-                     system was operated with only 2/3 of the AMDC profile loss
+ficiency, for example, the maximum discrepancy amounts to                      coefficient. Since none of these turbines had bladerow exit
+ 1 Vi efficiency points in each regime, while at 94 percent the                Mach numbers in excess of 1.17 the supersonic drag rise
+discrepancy is Vi efficiency point. This is partly explained by                correction (by the present prediction, Fig. 10) had only a
+an examination of the data from which efficiency contours                      small effect on the efficiencies of transonic stages. Figure 19
+were derived. Figure 17 describes the differences between data                 shows the comparison. The closed symbols describe P&WA
+points and contours of Fig. 15, as reported in [13], It is clear               turbines. The open symbols describe turbines from other
+that a considerable uncertainty exists in the positioning of                   sources. Table 1 lists the more important design parameters of
+efficiency contours. It is also evident that a bias exists in the              these turbines.
+contours, which are predicting efficiencies approximately Vi                     The agreement is generally very good, the majority of
+point higher than supported by data points. This would tend                    predictions falling within an error band of 1 Vi efficiency
+to reduce the discrepancy between Figs. 15 and 16, at peak                     points. Of the few turbines which fall significantly outside this
+AH/U2. As to the region of peak Cx/U, Fig. 15 has too few                      error band two can readily be shown to be "incompetent"
+data points at Cx/U > 1.0 to substantiate the curves drawn.                    designs, and the experimental techniques used in the case of
+Unpublished test data from other sources suggest that these                    two more are open to criticism.
+curves may in fact extend to higher Cx/U, as in Fig. 16. These                   Figure 20 shows an identical comparison of the same 33
+
+Journal of Engineering for Power                                                                                      JANUARY 1982, Vol. 104/117
+        .95
+                                                                                                                       PRESS.        V cc
+                                                                     NO.   1 SOURCE    STAGES STAGE   MVU2     Cx/O           1
+                                                                                                                       RATIO j NOZZLE
+               • PWA TURBINES                                                                                                             ROTOR
+
+               O OTHER TURBINES                                       1        PSWA     1       1     1.88    .54      2.67        .366   1.75
+  >•
+                                                                      2    ;   PSWA     1       1     1.51    .533     4.00        .612   1.98
+  %
+  W . 9 0 L-                                       **>.               3        PSWA     1       1     1.45    .565     3.89        .571   1.72
+
+  U                                                                   4        PSWA     1       1     1.55    .570     2.95        .437   2.188
+  u.                                         •6.                      5        OTHER    1       1     1.25    .613     2.98        .520     .671
+  iii                                                27®.23
+                                                                      6        OTHER    1       1     1.55    .675     2.90        .55
+                                     50                                                                                                     .825
+  a                                  e /                              7        OTHER    1       1     1.59    .642     2.90        .725   1.26
+  IS                            Oio/        Pa /                      8        OTHER    1      1                       1.48       1.50
+                                                                                                      1.11    .38 3                       1.50
+
+                       ° 5 1 f ^ V • ' On
+
+
+
+
+                                                                                                                                                     Downloaded from http://asmedigitalcollection.asme.org/gasturbinespower/article-pdf/104/1/111/5529077/111_1.pdf by Technical University of Denmark user on 16 March 2023
+  «.85l-                                                              9        OTHER    1      1      1.656   .595     2.77       1.0     1.0
+
+  g                             '1   '
+                                                                     10        OTHER    2      1
+                                                                                               2
+                                                                                                       .989
+                                                                                                       .987
+                                                                                                              .309
+                                                                                                              .318
+                                                                                                                       1.11
+                                                                                                                       1.11
+                                                                                                                                  1.44
+                                                                                                                                  1.32
+                                                                                                                                          1 . 4 56
+                                                                                                                                          1.489
+  Q.
+                                                                     11        OTHER    1       1     1.672   .696     1.82        .71    1.01
+
+                                                                     12        PSWA     1      1      1.19    .397     2.00        .317     .739
+
+                                                                     13        PSWA     1       1     1.19    .531     2.00        .247     .777
+        .80               ^                                          14        PSWA     1      i      1.19    . 4 97   2.00        .253     .670
+
+
+                - i t'N
+                                                                     15        PSWA     1      I      1.139   .322     3.40        .24      .486
+                      :               j _             _i_
+                 .80                 .85              .90            16        OTHER    2       I     1.65    .690     1.71       1.47    1.87
+                                                              .<«                               2     1.65    .813     1.87       1.54    2.16
+                    EXPERIMENTAL EFFICIENCY                          17        OTHER    1       1     2.00    .721     1.99        .468     .847
+Fig. 19 Comparison of predicted efficency with experimental ef-      18        P&WA     1      1      1.44    .566     2.76        .637   1.9
+ficiency of 33 turbines (new loss system)                            19        PSWA     2      1      1.50    .924     1.45       1.27    2.09
+                                                                                               2      1.77    .990     1.65       1.95    2.47
+
+                                                                     20        PSWA     2      1       .9     .622     1.44       1.102   2.23
+        .95                                                                                    2       .83    .502     1.53       1.81    3.02
+
+                                                                     21        PSWA     2      2      1.28    .758     1.70       1.102   2.23
+                % PWA TURBINES                                                                 1      1.02    .698     1.73       1.81    3.02
+
+                                                                     22        PSWA     1      1      1.94    .529     2.24       1.23    2.67
+                O OTHER TURBINES
+                                                                     23        PSWA     1      1      2.388   .712     2.68       1.23    2.67
+
+                                                                     24        PSWA     1      1      1.45    .565     3.89        .571   1.08
+
+                                                                    25         PSWA     1      1      1.45    .561     3.89        .984   1.72
+
+                                                                    26         PSWA     1      1      1.516   .583     2.81        .421   1.95
+
+                                                                    27         PSWA     1      1      1.463   .492     3.23        .527   2.155
+
+                                                                    28         PSWA     1      1      1.38    .485     1.99        .710    .921
+
+                                                                    29         PSWA     1      1      1.58    .545     1.94       1.328   1.111
+
+                                                                    30         PSWA     4      1      2.44    1.50     1.33       2.61    3.94
+
+                                                                    31      "             2   2.32    1.28   1.35  4.07    4.98
+                                                                     32     "             3   2.38    1.25  1.45   5.01    5.76
+
+                                                                     33     "             4   2.71   1.50    1.68  5.68    5.80
+
+
+                                                                    novel techniques to minimize overtip leakage losses and fully
+                                                                    three-dimensional flow analysis methods are already showing
+                                                                    promise of a bright future.
+                                                                        A mean line efficiency prediction method is the sum of a
+                                                                    large number of loss components. While some of them may
+                                                                    prove to be quantitatively imperfect, the manner in which
+                                                                    they are combined may cause errors to cancel. The final proof
+        .75-                                                        of a loss system must be its ability to correctly predict the
+                                                                    efficiencies of well documented turbines.
+               Oe
+                 _1_      »13         -1_             _1_           Conclusion
+                 .80                 .85              .90     .95      Regardless of the degree of sophistication of analytical
+                    EXPERIMENTAL             EFFICIENCY             tools available for the detail design of turbine blading, a mean
+Fig. 20 Comparison of predicted efficiency with experimental ef-    line design technique will always be needed for the op-
+ficency of 33 turbines (AMDC loss system)                           timization of the turbine gas path and the prediction of at-
+                                                                    tainable turbine efficiency of a new engine.
+                                                                       The mean line loss system described, a development of the
+                                                                    Ainley/Mathieson/Dunham/Came system, appears to be
+turbines carried out with the AMDC loss system. The                 capable of predicting design point efficiencies of current
+agreement is not satisfactory.                                      turbines of conventional stage loadings and "competent"
+   The design point efficiencies under discussion here are          design to within ± 1 Vi efficiency points. A major departure
+those obtainable on rotating aerodynamic rigs. In the engine        from AMDC is the restructuring of the loss system and the
+environment these turbines will generally show a lower ef-          introduction of compressibility effects and shock losses into
+ficiency for a variety of reasons such as effects of secondary      the calculation of profile and secondary loss coefficients.
+air injection, leakages, nonuniformities in the turbine inlet
+flow, etc. These features are not accounted for the in the loss     Acknowledgments
+system described in the foregoing. Also not accounted for are
+the inevitable future advances in the art of turbine design:         The work reported herein has been partially funded by the
+
+118/Vol. 104, JANUARY 1982                                                                                    Transactions of the ASME
+Research and Development Centre of Transport Canada,                               6 Hauser, C , and Plohr, H.W., "Two-Dimensional Cascade Investigation
+                                                                               of the Maximum Exit Tangential Velocity Component and Other Flow Con-
+Contract No. 107380 under the program management of W.                         ditions at the Exit of Several Turbine Blade Designs at Supercritical Pressure
+H. D. Hanchet. Technical contributions by V. Ozarapoglu, K.                    Ratios," NACARME51F12, Aug. 1951.
+K. Lam and M. Mueller are hereby also acknowledged.                                7 Fruchtman, I.. "The Limit Load of Transonic Turbine Blading," ASME
+                                                                               Paper No. 74-GT-80, Apr. 1974.
+                                                                                   8 Okapuu, U., "Limit Load and Supersonic Drag Rise of Transonic
+References                                                                     Turbine Cascades," Pratt & Whitney Aircraft of Canada, Internal Memo, July
+                                                                               1974.
+     1 Traupel, W., "Thermische Turbomaschinen," Springer-Verlag, Berlin,          9 Denton, J.D., "A Survey and Comparison of Methods for Predicting the
+1966.                                                                          Profile Loss of Turbine Blades," Institute of Mechanical Engineers Conference
+    2 Craig, H.R.M., and Cox, H.J.A., "PerformanceEstimateof Axial Flow        Publication 3, Paper C76/73, 1973, pp. 204-212.
+Turbines," Proceedings of the Institution of Mechanical Engineers, Vol. 185,      10 Rogo, C , "Experimental Aspect Ratio and Tip Clearance Investigation
+No. 32, 1971, pp. 407-424.                                                     on Small Turbines," SAE Paper 680448, Mid Year Meeting Detroit, Mich.,
+    3 Stewart, W.L., "A Study of Axial Flow Turbine Efficiency Charac-         May 20-24, 1968.
+teristics in Terms of Velocity Diagram Parameters," ASME Paper No. 61-WA-         11 Okapuu, U., "Some Results from Tests on a High Work Axial Gas
+
+
+
+
+                                                                                                                                                                Downloaded from http://asmedigitalcollection.asme.org/gasturbinespower/article-pdf/104/1/111/5529077/111_1.pdf by Technical University of Denmark user on 16 March 2023
+37, 1961.                                                                      Generator Turbine," ASME Paper No. 74-GT-81, Apr. 1974.
+    4 Ainley, D.G., and Mathieson, G.C.R., "A Method of Performance               12 Smith, S.F., " A Simple Correlation of Turbine Efficiency," Journal of
+Estimation for Axial Flow Turbines," British ARC, R&M 2974, 1951.              Royal Aeronautical Society, Vol. 69, July 1965, pp. 467-470.
+    5 Dunham, J., and Came, P.M., "Improvements to the Ainley/Mathieson           13 Amann, C.A., and Sheridan, D.C., "A Comparison of Some Analytical
+Method of Turbine Performance Prediction," ASME JOURNAL OF                     and Experimental Correlations of Axial Flow Turbine Efficiency," ASME
+ENGINEERING FOR POWER, July 1970, pp. 252-256.                                 Paper No. 67-WA/GT-6, Nov. 1967.
+
+
+
+
+Journal of Engineering for Power                                                                                   JANUARY 1982, Vol. 104 /119
+

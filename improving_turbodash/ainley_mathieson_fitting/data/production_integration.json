@@ -3,9 +3,21 @@
   "authorized_changes": {
     "turbodash/loss_models_new/loss_model_kacker_okapuu.py": {
       "before_sha256": "f75083e50008952dac5ffc7c9867dde4fbe620d9866c043ce2ea4c22a80894bc",
-      "after_sha256": "3b6876f0be6cb53388288a53a58089c413b1032512407fd8353339ea0f286f66",
-      "reason": "Replace nozzle/impulse Aungier references with fixed current_fit constants and stable bounded continuation; retain downstream corrections."
+      "after_sha256": "d05b542f42d2a0ec7a8e2d8e7c3fa6a1da3b7fab429b4803d8a2e65520f47057",
+      "reason": "User-authorized analytical AM references, bounded reaction/impulse extrapolation, no minimum outlet angle, quintic thickness onset, and gradual K1/K2 asymptotic continuations. Fit coefficients unchanged.",
+      "preceding_after_sha256": "3b6876f0be6cb53388288a53a58089c413b1032512407fd8353339ea0f286f66",
+      "documentation_revision": {
+        "file": "turbodash/loss_models_new/loss_model_kacker_okapuu.py",
+        "before_sha256": "3fe7223b940849e8193583017d995262db75085d52ca7c87b5ece5248279d4d1",
+        "after_sha256": "7194587b320b8623390fb5193d8ad7b86032bae22c70bfa4894a357c7f4fa3fc",
+        "runtime_ast_unchanged": true,
+        "note": "Only the profile-function docstring equation was corrected after calculation. Executable Python AST is identical; the recorded numerical runs remain applicable."
+      },
+      "before_thickness_smoothing_sha256": "7194587b320b8623390fb5193d8ad7b86032bae22c70bfa4894a357c7f4fa3fc",
+      "before_compressibility_revision_sha256": "f0a4402e7a4d3f035bf28218b52a3db236be1ffcfe6a8dcfb0c59036e2340352",
+      "before_compressibility_asymptotes_sha256": "3c4fc1e50a7b51a21fd5383c583a1d3e587e05e90fe231efa4a1a8b8098cf243"
     }
   },
-  "historical_archive": "data/history/before_analytical_integration.zip"
+  "historical_archive": "data/history/before_analytical_integration.zip",
+  "latest_revision_archive": "data/history/before_compressibility_asymptotes.zip"
 }

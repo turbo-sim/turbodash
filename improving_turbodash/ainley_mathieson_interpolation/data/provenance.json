@@ -28,7 +28,7 @@
     "turbodash/loss_models_new/loss_coefficient_conversion.py": "eab232ff2304b104726b2b3af4a87c96c65f302903e807ea9dd3dc2db827ae98",
     "turbodash/loss_models_new/loss_model.py": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11",
     "turbodash/loss_models_new/loss_model_benner.py": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba",
-    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "28917e5a84b895324214814cb4848329615c60631d139c15438bbeb4c4bcea61",
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "4295e119d25fc43579ec79059484913ed0af83822088eaf2bd50af41f3fa5395",
     "turbodash/loss_models_new/loss_model_moustapha.py": "923339d879bb7edf952112296b605073d9c5f466e541ea04b3ce10f3f8e1f489",
     "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
     "turbodash/mesh_jobs.py": "7c25d0d21557ecf7cec876846bbc09d1a1486db97808076ba5ee1f95f219bf85",
@@ -43,10 +43,12 @@
     "turbodash/vtk_assets.py": "af1c3d7e9a0e1b3f9e2f1749c7daf743cb0f0f4eacfdf7064ac7699d1c8cbeb1"
   },
   "production_unchanged_during_calculation": true,
-  "calculation_script_sha256": "fed8a3477d89b922cd7ae71b9d99f71da956d91e2b3d97f73112084feeff6447",
+  "calculation_script_sha256": "ab1374a9104228962cc7f79560cffd3c9959bf17dd1e89f39edbb5eb5e9ce0fe",
   "data_hashes": {
-    "vary_alpha2.csv": "71f753c89d8db2beef7a21b19d050f2ad8be1d465a99fe515ebb4c2ea1949a16",
+    "vary_alpha2.csv": "4ece9037bdb8f2f921838efa84301cc81363f785f64fe7f2de2465da5f6c75f7",
     "vary_pitch_chord.csv": "4baa8846f590be00a945058df3be132fecca7d3ec196cd5e9123b3c7e92122a9",
-    "vary_thickness.csv": "970ebd7629f38f4904f8312009ac6be3be596d061a86077039dbbe11fb93eb26"
+    "vary_thickness.csv": "8585c705d4582ecf37a725228fa55937c6ec62a4854c89dac6d5855fda3a3078",
+    "thickness_z_zero_zoom.csv": "f9ac875546f4c7d18a283a7de220fcf8cde59c497cf4677c20cae30c5f252a8f",
+    "thickness_z_zero_limits.csv": "cc94b796ff64220da8b662e2ac8064f752636e2f11f191249877eacec4f06e13"
   }
 }

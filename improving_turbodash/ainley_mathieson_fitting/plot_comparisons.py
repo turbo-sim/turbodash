@@ -5,6 +5,7 @@ right column compares that same expression with the preserved Aungier formula.
 No plotted measurements are interpolated, and comparator values are not capped.
 """
 from pathlib import Path
+import sys
 
 import numpy as np
 import matplotlib
@@ -16,6 +17,8 @@ from fit_models import SPECIFICATIONS, angle_derivative
 
 
 BASE = Path(__file__).resolve().parent
+sys.path.insert(0, str(BASE.parents[1]))
+from improving_turbodash.plot_style import apply_style, shade_outside, in_chart
 FIGURES = BASE / "figures"
 FAMILIES = ("nozzle", "impulse")
 LW = 1.05
@@ -145,7 +148,7 @@ def _angle_pair(family, points, aungier, runtime, saved, wide=False):
     approximate = np.array(["approximate" in p.get("quality", "") for p in points])
     targets = np.array([0., .3, .6, 1., 2., 3.]) if wide else np.array([.3, .4, .55, .65, .75, .95])
     colors = _colors(len(targets))
-    aa = np.unique(np.r_[np.linspace(min(alpha), max(alpha), 1601), 60., 63.])
+    aa = np.unique(np.r_[np.linspace(0 if wide else min(alpha), 80 if wide else max(alpha), 1601), 60., 63.])
     fig, axes = plt.subplots(1, 2, figsize=(15.5, 6.2), sharey=not wide)
     old_values = []
     for target, color in zip(targets, colors):
@@ -163,8 +166,9 @@ def _angle_pair(family, points, aungier, runtime, saved, wide=False):
         axes[0].set_ylim(0., .52)
         for ax in axes:
             ax.axhline(.5, color="grey", lw=.65, ls=":")
+            shade_outside(ax, (min(alpha), max(alpha)), (0, 80))
         _comparison_scale(axes[1], old_values)
-        note += " Spacings 0, 2 and 3 have no chart data."
+        note += " Tint: angle extrapolation. Spacings 0, 2 and 3 have no chart data."
     _finish_pair(fig, f"{family.capitalize()}: angle families" +
                  (" across s/c = 0 to 3" if wide else ""),
                  _color_handles(targets, colors, spacing=True), note)
@@ -312,8 +316,7 @@ def render(results, points, aungier, runtime):
     ``aungier`` maps the family name to its preserved repository function.
     """
     FIGURES.mkdir(exist_ok=True)
-    plt.rcParams.update({"font.size": 10, "axes.grid": True, "grid.alpha": .2,
-                         "axes.spines.top": False, "axes.spines.right": False})
+    apply_style()
     saved = []
     for family in FAMILIES:
         _pitch_pair(family, points[family], aungier, runtime, saved)

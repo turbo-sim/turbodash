@@ -202,7 +202,7 @@ The new surfaces have no angle joins, and the spacing shape cannot turn down aft
 
 ## 4. Digitization and provenance
 
-Source: [Ainley and Mathieson, R&M 2974, Figure 4](https://reports.aerade.cranfield.ac.uk/handle/1826.2/3538), printed page 24 / PDF page 25 (December 1951 report, published 1957). The chart gives reference $Y_p=(p_{0,\mathrm{in}}-p_{0,\mathrm{out}})/(p_{0,\mathrm{out}}-p_{\mathrm{out}})$ for conventional sections at zero incidence, $t_{\max}/c=0.2$, $Re=2\times10^5$, $M<0.6$. These expressions fit those reference curves, before KO Reynolds, Mach, thickness and floor corrections.
+Source: [Ainley and Mathieson, R&M 2974, Figure 4](https://reports.aerade.cranfield.ac.uk/handle/1826.2/3538), printed page 24 / PDF page 25 (December 1951 report, published 1957). The chart gives reference $Y_p=(p_{0,\mathrm{in}}-p_{0,\mathrm{out}})/(p_{0,\mathrm{out}}-p_{\mathrm{out}})$ for conventional sections at zero incidence, $t_{\max}/c=0.2$, $Re=2\times10^5$, $M<0.6$. These expressions fit those reference curves, before KO Reynolds, Mach, thickness and reaction/impulse interpolation corrections.
 
 The [source PDF](source/arc-rm-2974.pdf), [rendered page](source/page_25.png), and [source hashes](data/provenance.json) are saved locally. Visually selected ink measurements retain their pixel positions, angle labels, original solid/dashed status and reading tolerances. Grid calibration corrects the scan's small skew/distortion; it does not interpolate loss data. Labels and dash gaps are omitted. Crowded low-spacing traces include explicitly approximate readings as requested; those tolerances are larger. Estimated tolerances describe digitization resolution; they do not quantify uncertainty in the historical empirical correlation.
 
@@ -240,3 +240,6 @@ python -B verify.py
 ```
 
 The digitization scripts regenerate measurements from saved pixel selections and source images. `run.py --render-only` redraws and rewrites this report using the saved selected coefficients. Figures are available as both PNG and SVG. `plot_comparisons.py` owns the paired layouts, and `extrapolation_fit.py` reproduces the extended ordering constraint. Refitting and evaluation require no network access. The earlier result is preserved in [a single historical archive](data/history/before_bounded_extrapolation.zip). [Numerical validation](data/validation.json) checks the exported evaluator, shape constraints, derivatives, protected baseline hashes and the explicitly authorized candidate integration. [Run metadata](data/run_manifest.json) records source hashes and timings.
+
+
+All plots use the repository's `set_plot_options()` style and ordered viridis colors. The extended angle comparisons span 0–80 degrees, with shading outside each family's source-angle range; the spacing comparisons retain their correlation-range and 0–3 views. Styling and extended plotting ranges do not change the fitted coefficients.

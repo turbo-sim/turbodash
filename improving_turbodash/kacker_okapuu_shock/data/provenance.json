@@ -1,0 +1,28 @@
+{
+  "production_sources": {
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "63a8765eb8f4a18366fd232c2dd95145ff20acd7ce3edbe5f40d5a5937ff7cc0",
+    "turbodash/core_turbine.py": "7bfb9ca303ddba914c126519ede33c6603c40970a6d9c52e3f49abd6fd24054d"
+  },
+  "production_sources_unchanged": true,
+  "source_pdf_sha256": "c6e2e9913e8a5c42462abf1ef08161b7e33ff5184b0d720d51cd93d704d191fe",
+  "source_figure_sha256": "329d64f24b0be9288069287d71ca1a0c0f024c3dd7721168463a5182c31b30c9",
+  "script_hashes": {
+    "digitize.py": "9aa02d115fba3da128b3487aea9d1c270ca3a63746ffe48293de01682c8882f2",
+    "model.py": "1cb0c29d2f280c4347d851a24d809c03c69f11336a3ba3ae5a5ff7de988934d8",
+    "render_source.py": "8276352b2a43bf3deb5c9a282024f8aa97718b0ccc7ed9de7ae167b2828e996f",
+    "run.py": "0d2a160fe315330b7f5c2a6dd5c9402dfb03753b1eed9e2399c436732ac804af",
+    "sensitivity.py": "83ff2027ed08acefae69c14af6944d65611e0e40ab82246b793bd92a71a04be6",
+    "shock_loss.py": "ec262b7c9a24170cc1251e03407ff35c0ea4dc8138e81a116330f3546b77fc74",
+    "test_shock_loss.py": "4d9d0223213c779bbbc29d77c15c9f0afe1610ae0b3bc0c816190ab8f3021d1d"
+  },
+  "data_hashes": {
+    "digitized_points.csv": "cc4f3cd8963c8bd6d7af46bbb727f00e443ee00c4e2886bcbb18b308236d9a5f",
+    "hub_factor.csv": "ace7aaf86c7a00a331bfd31008e0af63961c8db996c1d4157942baee83200b03",
+    "shock_sweeps.csv": "d68ae6691cdc6542960b5b5adc0d10315f5fe40893a3b1b0f87374fac7fe32fd",
+    "shock_onset_zoom.csv": "5f8d785224bbff24e0bfdb1011a6a7a80a6606db8eafa599980c2e3dc9b2af03",
+    "calibration.json": "201dcb1b2dfa52594b9552994b8098f8829c5c318acf2c0e08cadd7f5ac4f69a",
+    "fit_parameters.json": "1fccf396185b9c521d44a3e55bc2c3c6b1de0c4b10fd42188e172506f543c099",
+    "pressure_convention.json": "2065edc49626aed72ef46ec7ce819f743c44d4d9b9cb9ef964df73ea2c48cfe6",
+    "summary.json": "1d8df6ea56098a4fc48a37dcefc904e02da3d3cb6467d63937cf37a2260a41a7"
+  }
+}

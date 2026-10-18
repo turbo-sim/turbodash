@@ -1,0 +1,34 @@
+{
+  "families": {
+    "stator": {
+      "amplitude": 4.348048474772493,
+      "end_ratio": 0.8084516270970612,
+      "points": 12,
+      "rmse": 0.0024884991668724125,
+      "max_abs_error": 0.0048261978978270115
+    },
+    "rotor": {
+      "amplitude": 5.94625398189089,
+      "end_ratio": 0.9468539887756984,
+      "points": 20,
+      "rmse": 0.0034077136584677683,
+      "max_abs_error": 0.007125270002424022
+    }
+  },
+  "rounding_width": 0.01,
+  "settings": {
+    "gamma": 1.4,
+    "p0": 200000.0,
+    "fixed_exit_mach": 0.6,
+    "fixed_hub_tip_ratio": 0.5,
+    "onset_center": 0.45,
+    "onset_half_width": 0.05,
+    "flattening_ratio": 0.3,
+    "continuation_start": 0.25,
+    "shock_asymptote": 0.5,
+    "mach_samples": 241,
+    "hub_samples": 301,
+    "onset_samples": 101
+  },
+  "interpretation": "Figure 6 fit unchanged above ratio 0.3; C2 coordinate continuation flattens its low-ratio tail."
+}

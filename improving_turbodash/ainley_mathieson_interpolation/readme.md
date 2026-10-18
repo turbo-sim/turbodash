@@ -14,7 +14,7 @@ R=Y_{\mathrm{nozzle}}(s/c,\widetilde{\alpha}_2),
 I=Y_{\mathrm{impulse}}(s/c,\widetilde{\alpha}_2).
 $$
 
-The reference-fit input $\widetilde{\alpha}_2$ is the positive effective angle obtained from the source's smooth absolute value and minimum near $40^\circ$. Both reference families use the same pitch/true-chord ratio $s/c$. Nozzle/reaction means axial entry.
+The reference-fit input is $\widetilde{\alpha}_2=\sqrt{\alpha_2^2+10^{-5}}$, the source's smooth angle magnitude. There is no minimum outlet angle; low-angle inputs extrapolate the analytical references directly. Both reference families use the same pitch/true-chord ratio $s/c$. Nozzle/reaction means axial entry.
 
 | Coordinate | Meaning |
 |---|---|
@@ -24,7 +24,7 @@ The reference-fit input $\widetilde{\alpha}_2$ is the positive effective angle o
 | $0<z<1$ | Interpolation |
 | $z<0$ or $z>1$ | Extrapolation |
 
-The [analytical fit study](../ainley_mathieson_fit/readme.md) documents the reference data and their coverage. The interpolation coordinate uses signed angles; the fit evaluation uses their effective outlet magnitude.
+The [analytical fit study](../ainley_mathieson_fitting/readme.md) documents the reference data and their coverage. The interpolation coordinate uses signed angles; the fit evaluation uses their effective outlet magnitude.
 
 ## Implemented expression
 
@@ -79,39 +79,65 @@ Fixed $\alpha_2=60^\circ$, with $s/c=0.4,\ 0.6,\ 0.8,\ 1.0$.
 
 At fixed negative $z$, all reaction losses are multiplied by the same positive factor. This preserves the reaction family's spacing dependence.
 
-## Final profile loss versus thickness
+## Final profile loss versus z for different thicknesses
 
-The full profile function retains
+The full profile function uses
 
 $$
 Y_p=0.914f_{\mathrm{Re}}
-\left[
-\frac{2}{3}B(z)
-\left(\frac{t_{\max}/c}{0.2}\right)^{\max(0,z)}K_p
-+Y_{\mathrm{shock}}
-\right].
+\left[\frac{2}{3}B(z)F_t(\tau,z)K_p+Y_{\mathrm{shock}}\right],
+\qquad \tau=t_{\max}/c>0.
 $$
 
-The figure below uses $\alpha_2=60^\circ$, $s/c=0.7$, exit $Re=500000$, inlet/outlet Mach numbers 0.2/0.5, hub/tip ratio 0.8, and zero incidence. Here $f_{\mathrm{Re}}=1$, $K_p=0.94$, $Y_{\mathrm{shock}}=0$, so the coefficient multiplying the thickness-corrected blend is 0.5727733333.
+The thickness factor uses a quintic smoothstep over $0<z<\delta$, with $\delta=0.05$, centered at $z=0.025$:
 
-![Final KO profile loss versus thickness for several z values](figures/thickness_z.png)
+$$
+S(q)=10q^3-15q^4+6q^5,\qquad q=z/\delta,
+$$
 
-[PDF](figures/thickness_z.pdf) · [CSV](data/vary_thickness.csv)
+$$
+F_t(\tau,z)=
+\begin{cases}
+1,&z\le0,\\[3pt]
+1+S(q)\left[\left(\dfrac{\tau}{0.2}\right)^z-1\right],&0<z<\delta,\\[5pt]
+\left(\dfrac{\tau}{0.2}\right)^z,&z\ge\delta.
+\end{cases}
+$$
 
-The $z=-1,-0.5,0$ curves are distinct, at 90%, 96% and 100% of the corrected reaction reference. They remain flat in thickness because the retained exponent is zero for $z\le0$. This model behavior does not establish physical thickness independence. Away from $t_{\max}/c=0.2$, that exponent also causes a first-derivative jump in the full coefficient with respect to $z$ at zero; the $C^1$ claim applies to the reference blend.
+This is a convex blend of positive thickness factors. At the midpoint, $S=0.5$. At both boundaries, $S'$ and $S''$ vanish, so the factor matches the value, slope and curvature of the outer laws. It is $C^2$ at both joins and identically one for $\tau=0.2$. The reference interpolation itself is unchanged. The transition width is a numerical modeling choice, not another AM calibration.
 
-The range $0.05\le t_{\max}/c\le0.40$ is diagnostic. AM's original impulse/nearly-impulse thickness relation was restricted approximately to 0.15–0.25; the wider sweep does not validate its extremes. See [R&M 2974, section 5.2](https://reports.aerade.cranfield.ac.uk/handle/1826.2/3538).
+The figures use $\alpha_2=60^\circ$, $s/c=0.7$, exit $Re=500000$, inlet/outlet Mach numbers 0.2/0.5, hub/tip ratio 0.8 and zero incidence. Here $f_{\mathrm{Re}}=1$, $K_p=0.94$ and $Y_{\mathrm{shock}}=0$. The horizontal coordinate is $-1.2\le z\le1.2$, with curves for $\tau=0.05,\ 0.15,\ 0.20,\ 0.25,\ 0.40$.
+
+![Final KO profile loss versus z for different maximum thickness-to-chord ratios](figures/thickness_z.png)
+
+[PDF](figures/thickness_z.pdf) ? [CSV](data/vary_thickness.csv)
+
+All curves coincide for $z\le0$. Thickness dependence develops gradually through the blue transition band, and the original power law is recovered exactly at $z=0.05$. The full coefficient is $C^1$ at zero for every positive thickness. It remains generally not $C^2$ there because the reference interpolation has a curvature change.
+
+Beige shading marks extrapolation outside $0\le z\le1$; blue shading marks numerical smoothing. Dashed curves identify thickness ratios 0.05 and 0.40, outside the original impulse/nearly-impulse thickness-relation interval of approximately 0.15?0.25. The interval does not establish calibration for reaction or negative-$z$ cases.
+
+### Close-up of both joins
+
+The close-up uses $-0.1\le z\le0.1$. Loss values and their first derivatives are shown side by side.
+
+![Smoothed final profile loss and continuous first derivatives](figures/thickness_z_zero_zoom.png)
+
+[PDF](figures/thickness_z_zero_zoom.pdf) ? [Values and derivatives CSV](data/thickness_z_zero_zoom.csv) ? [One-sided limits CSV](data/thickness_z_zero_limits.csv)
+
+All values meet at $Y_p(0)=0.914(2/3)(0.94)R$, with zero slope from both sides. Filled circles mark matching values and derivatives at $z=0$ and $z=0.05$. Complex-step derivatives from the full production function are checked against independent analytical expressions and shrinking one-sided real differences. The thickness factor is $C^2$ at both joins; the full coefficient is $C^1$ at zero and matches through second derivatives at the upper boundary. See [the profile report](../loss_model_audit/1_individual_functions/report/01_ko_profile.md) for the full equations using descriptive loss-coefficient subscripts.
 
 ## Reproduction and validation
 
 From the repository root, using the project Python environment:
 
-    python -B improving_turbodash/ainley_matheison_interpolation/run.py
-    python -B improving_turbodash/ainley_matheison_interpolation/run.py --render-only
-    python -B improving_turbodash/ainley_matheison_interpolation/run.py --verify-only
+    python -B improving_turbodash/ainley_mathieson_interpolation/run.py
+    python -B improving_turbodash/ainley_mathieson_interpolation/run.py --render-only
+    python -B improving_turbodash/ainley_mathieson_interpolation/run.py --verify-only
 
-[study.py](study.py) calls the production helper and full profile function. [plot.py](plot.py) renders the saved CSVs without model evaluation. In the first two CSVs, blended_reference is the plotted ordinate; profile_loss additionally records the corrected coefficient. The thickness figure plots profile_loss.
+[study.py](study.py) calls the production helper and full profile function. [plot.py](plot.py) renders saved values and derivatives without model evaluation. All four figures use `z` as the horizontal coordinate. In the first two CSVs, `blended_reference` is the plotted ordinate; `profile_loss` additionally records the corrected coefficient. The third figure plots `profile_loss` with curves grouped by `thickness_chord` in `vary_thickness.csv`. The close-up uses separate `thickness_z_zero_zoom.csv` and `thickness_z_zero_limits.csv` tables, with both transition boundaries included explicitly.
 
-[Validation](data/validation.json) checks 13 curves against independent expressions, exact endpoints, the zero-turning value, complex-step slopes, sign reflection and positivity over 605,151 diagnostic grid points. The grid spans $40^\circ\le\alpha_2\le70^\circ$, $0.3\le s/c\le1.1$, $-1.2\le z\le1.2$; it is an implementation test, not a rectangular claim of chart coverage. [Provenance](data/provenance.json) identifies the production sources and saved data.
+[Validation](data/validation.json) checks the 13 main curves and five close-up curves against independent expressions, exact endpoints, the zero-turning value, complex-step slopes, one-sided join limits, sign reflection and positivity over 605,151 diagnostic grid points. The grid spans $40^\circ\le\alpha_2\le70^\circ$, $0.3\le s/c\le1.1$, $-1.2\le z\le1.2$; it is an implementation test, not a rectangular claim of chart coverage. [Provenance](data/provenance.json) identifies the production sources and saved data.
 
-The [profile report](../loss_audit_v3/1_individual_functions/report/01_ko_profile.md) embeds these same three calculations. [verify_markdown.cjs](verify_markdown.cjs), run with Node, checks dollar-delimited equations and local links using VS Code Markdown+Math and KaTeX.
+The [profile report](../loss_model_audit/1_individual_functions/report/01_ko_profile.md) embeds the same four figures. [verify_markdown.cjs](verify_markdown.cjs), run with Node, checks dollar-delimited equations and local links using VS Code Markdown+Math and KaTeX.
+
+All four figures use the repository `set_plot_options()` style and ordered viridis colors. Beige shading marks extrapolation outside $0\le z\le1$. In both final-loss figures, dashed curves additionally mark thickness ratios outside 0.15–0.25.

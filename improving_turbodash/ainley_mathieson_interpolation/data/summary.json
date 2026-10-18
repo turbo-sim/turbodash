@@ -4,8 +4,11 @@
     -1.2,
     1.2
   ],
-  "thickness_range": [
+  "thickness_values": [
     0.05,
+    0.15,
+    0.2,
+    0.25,
     0.4
   ],
   "settings": {
@@ -20,9 +23,23 @@
   "asymptotic_fraction": 0.8,
   "first_two_ordinates": "blended_reference_before_all_KO_corrections",
   "third_ordinate": "final_KO_profile_loss",
+  "third_coordinate": "z",
+  "third_curve_parameter": "thickness_chord",
+  "zero_zoom_range": [
+    -0.1,
+    0.1
+  ],
+  "zero_zoom_derivatives": "Complex step including zero; matching one-sided limits at z=0 and z=0.05",
+  "thickness_transition": [
+    0.0,
+    0.05
+  ],
+  "thickness_transition_center": 0.025,
   "rows": {
     "vary_alpha2": 4808,
     "vary_pitch_chord": 4808,
-    "vary_thickness": 1760
+    "vary_thickness": 6010,
+    "thickness_z_zero_zoom": 5015,
+    "thickness_z_zero_limits": 10
   }
 }

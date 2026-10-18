@@ -14,8 +14,8 @@
 - Lightweight, dependency-minimal design based on Plotly Dash.
 - Automatic synchronization between sliders and numeric inputs.
 - Support import/export of configuration files.
-- Three working tabs: meanline calculation, turbine geometry, and mesh generation/inspection.
-- Optional TurboMoC integration for cylindrical axial blade models (STL), periodic 3D passage meshes (Gmsh/CGNS), and VTK geometry/mesh visualization with cell-quality inspection.
+- Experimental app with three tabs: meanline calculation, turbine geometry, and mesh generation/inspection.
+- Optional TurboMoC integration in the experimental app for cylindrical axial blade models (STL), periodic 3D passage meshes (Gmsh/CGNS), and VTK geometry/mesh visualization with cell-quality inspection.
 - Documentation describing the derivation of governing equations.  
 
 ## 🛠️ Installation
@@ -36,7 +36,7 @@ cd turbodash
 poetry install
 ```
 
-**Enable 3D geometry and meshing:**
+**Enable experimental 3D geometry and meshing:**
 
 For development with the companion repository, install it in the same Python
 environment as Turbodash. From the `turbodash` directory:
@@ -48,23 +48,49 @@ python -m pip install -e ../method_of_characteristics
 
 Alternatively, `poetry install -E mesh` installs the tested TurboMoC Git revision
 recorded in `poetry.lock`. With pip, use `python -m pip install -e ".[mesh]"`.
-The meanline calculator remains available without this optional dependency.
+The stable meanline app does not require this optional dependency.
 See [the integration assessment and mesh workflow](docs/turbomoc_meshing.md)
 for assumptions, outputs, and the Python API.
 
 ## 🚀 Run the app locally
 
-Once installed, launch the interactive calculator dashboard with:
+The stable turbine meanline app keeps its existing Python launcher:
 ```bash
 python -c "import turbodash; turbodash.launch_app_turbine()"
 ```
 
-Or if you installed from source with Poetry:
+The equivalent console command is `turbodash`. With Poetry, prefix either
+command with `poetry run`, for example:
 ```bash
 poetry run python -c "import turbodash; turbodash.launch_app_turbine()"
 ```
 
 This will start a local server and open the dashboard in your web browser.
+
+To launch the experimental app with the Meanline, Turbine geometry and Mesh
+tabs, use its separate command:
+
+```bash
+turbodash-experimental
+```
+
+After updating an existing checkout, rerun `poetry install` or
+`python -m pip install -e .` to register the new console command.
+
+Or use the Python launcher, which also opens your browser:
+
+```bash
+python -c "import turbodash; turbodash.launch_app_experimental()"
+```
+
+The stable app lives in `turbodash/app_turbine.py`; the experimental workspace
+lives in `turbodash/app_experimental.py` so it can be refined independently
+before becoming the default. The original single-stage app is also available
+with `turbodash-stage` or `turbodash.launch_app_stage()`.
+
+Render and the Procfile continue to launch the stable turbine app. To host the
+experimental app separately, install the `mesh` extra and use
+`gunicorn turbodash.app_experimental:server`.
 
 ## Documentation
 
@@ -73,13 +99,22 @@ and separate integer geometry for physical visualization, meshing and export.
 Axial and radial rows take true-chord solidity (`solidity_chord = chord / pitch`)
 as their spacing input. Existing Zweifel inputs remain supported for archived
 cases; the apps convert them at the loaded design point.
-See [the geometry calculation policy and API](docs/meanline_geometry.md) for
-result fields, compatibility notes and verification.
+The [loss audit](<loss_model_analysis/loss_model_audit/readme.md>) separates individual
+loss-function diagnostics from full stage/turbine loss and efficiency sweeps.
+All analyses and turbine solvers use the production models in
+`turbodash/loss_models/`, selected by `benner`, `kacker_okapuu`, `moustapha`,
+or `isentropic` (zero losses). The shared KO components include the bounded
+shock, finite high-Reynolds correction and physical-turning loading formulation.
+The stage reports compare isentropic, Kacker–Okapuu and Benner predictions using
+the same continuous geometry, true-chord solidity and Benner half-height cap.
+Each section includes the scripts and inputs needed to regenerate its figures,
+using the existing model functions in this repository.
 
-The Benner loss model uses a smooth half-height penetration bound.
-See [the model policy and diagnostics](docs/benner_penetration.md).
+The [Arianna reproduction prompt](<loss_model_analysis/arianna_comparison/prompt.md>)
+describes how to reproduce the original analyses and distinguish historical
+whole-model changes from a controlled comparison of loss correlations.
 
-The theoretical derivation of the governing equations, efficiency definitions, and validation against analytical special cases are available in the expandable Documentation section of the Meanline tab.
+The theoretical derivation of the governing equations, efficiency definitions, and validation against analytical special cases are available in the stable app's Documentation tab and the experimental app's expandable Documentation section in the Meanline tab.
 
 ## License
 This project is released under the MIT License.

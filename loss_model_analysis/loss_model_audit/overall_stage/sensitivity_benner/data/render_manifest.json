@@ -1,0 +1,36 @@
+{
+  "figures": 21,
+  "figure_sha256": {
+    "figures/speed_r0_stator_exit_angle.pdf": "61e84ecf9f6758ec7bb5ca2e9dee775815abbe022a6a5af36fdff751066bd2ea",
+    "figures/speed_r05_stator_exit_angle.pdf": "8001beb9e06a25eeb44506ca51f58f89cf491c2b83bec62c6f6640877be7f191",
+    "figures/reaction_stator_exit_angle.pdf": "39e7eb98b0eabeb44661dd245f79734b54ec4d0b2720fdf99bb31458a4e24f3a",
+    "figures/speed_r0_pitch_chord.pdf": "c3ff77bb9cd11a3ae9742ae8dd6895baf8697299a0294651a73602505bff7aa7",
+    "figures/speed_r05_pitch_chord.pdf": "d0bfa930df7085f633018dfd0aa4740028daba7a8071da7663e82e8807b64258",
+    "figures/reaction_pitch_chord.pdf": "eee088d52c6d5b2f27d442df703e5acc975a13620cc623d347df8f8af4d02705",
+    "figures/speed_r0_aspect_ratio.pdf": "9f89611aaff5faf25e9461229e61db03ffe468c109b3508ef3ac7636665cc2bc",
+    "figures/speed_r05_aspect_ratio.pdf": "95703a13fc344d06cf287fa0916881880779ab7bdb8cfabfa80c8ad03c73332e",
+    "figures/reaction_aspect_ratio.pdf": "0f48dc69693e087e3145e392451e5af554ced6ae1f2cb89c4d982583f1fd37a3",
+    "figures/speed_r0_trailing_ratio.pdf": "4e042a779f428b69a98dfe093ab3b7ae3df7a327bc74f4fc447e7a949238f3cb",
+    "figures/speed_r05_trailing_ratio.pdf": "cd39dc8dcd24e38da6ca477d7ea9a7d143673fe3ece2fc8df452a3a6e6127e21",
+    "figures/reaction_trailing_ratio.pdf": "fc1be659bb90a40ad4033b73fdc52db670ae8060b8c9fa8922c6b6c15227f139",
+    "figures/speed_r0_specific_speed.pdf": "75d4585163479b9177e5a08d7c1a0367bee482567fdb1c8361fbfb5e29828a74",
+    "figures/speed_r05_specific_speed.pdf": "7298b629e02d713ed35adb55284266150610a98c4c26f21fbf7e62afd486f69a",
+    "figures/reaction_specific_speed.pdf": "4cd87445c5181ec9095da121b3e8570c1307ebd6f44d24fedab085773de536a9",
+    "figures/speed_r0_mass_flow.pdf": "1379958eb4e48d19ea0d08c1fe3eeab6146f2cc757194ff72218ba39bd4c79c1",
+    "figures/speed_r05_mass_flow.pdf": "cca65218a3f23105ff8e73eff44a0322da99da479a6b02cdcb725c59c29426fc",
+    "figures/reaction_mass_flow.pdf": "2ca4f0240da5f4563cb829bd46b52e9789ea129408e42e215d7da1238ae44bec",
+    "figures/speed_r0_isentropic_mach.pdf": "ffd00f9eebb7b4f84993e6c379808eeae5d929021154a8c127fe5688ac949ae8",
+    "figures/speed_r05_isentropic_mach.pdf": "c3b4701d92a037fe9b15a526ed618b5bd9023afbd5996c335ae2c5ec88fbb016",
+    "figures/reaction_isentropic_mach.pdf": "ef26192249aea7926eaaabb9996bfed51c52c4014647ab6f20f8f53873877bff"
+  },
+  "report_sha256": "54401c7c18e51f55071cc4c054bd696ea6ff1574a0d3e4939a7eb49ff17e756a",
+  "report_script_sha256": "17095253fbe5f04e9ea0c48ebe2d84df46a8b08e87fab7570f9e48a922b6de23",
+  "hub_ratio_markers": false,
+  "physical_turning": true,
+  "physical_secondary_projection": false,
+  "mean_secant_onset_degrees": 80.0,
+  "mean_secant_limit_degrees": 87.5,
+  "data_sha256": {
+    "benner.csv.gz": "8a7b5512c4296b9417dcd29f387b3bf2ce6aea2744bbebe307dd049adcf8841a"
+  }
+}

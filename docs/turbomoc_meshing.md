@@ -1,7 +1,7 @@
 # TurboMoC geometry and meshing integration
 
-Turbodash now connects its solved meanline blade profiles directly to the
-`turbo_moc` package. It does not copy the Gmsh mesher or run a method-of-
+The experimental Turbodash app connects its solved meanline blade profiles
+directly to the `turbo_moc` package. It does not copy the Gmsh mesher or run a method-of-
 characteristics nozzle calculation to construct a turbine blade.
 
 ## Assessment of the two repositories
@@ -16,7 +16,7 @@ characteristics nozzle calculation to construct a turbine blade.
 | 3D surface models | `turbo_moc.visualization.geometry_preview.preview_geometry` | Reuse closed surfaces for previews and binary STL download. Remove the upstream display-only blade overhang from the exported STL. |
 | Quality and cell inspection | `turbo_moc.meshing.inspection` | Reuse saved cell quality, physical slicing, spanwise layer extraction, threshold filtering and worst-cell selection. |
 | 3D rendering | TurboMoC's `studio.js`, `mesh_edges.js` and `orientation_cube.js`, using Dash VTK | Serve the installed package's renderer directly, including actor reuse, camera controls, original polygon edges, and cell-quality colors. Keep Plotly for the 2D and meanline plots. |
-| App runtime | `turbodash/app_turbine.py` | Keep meanline controls mounted across three tabs; use a separate subprocess for each Gmsh job. |
+| Experimental app runtime | `turbodash/app_experimental.py` | Keep meanline controls mounted across three tabs; use a separate subprocess for each Gmsh job. The stable meanline app remains in `app_turbine.py`. |
 
 The current TurboMoC checkout already has general spline-based meridional
 channels and flared passage support. This first Turbodash adapter deliberately
@@ -70,16 +70,19 @@ From the Turbodash checkout, using the intended virtual environment:
 ```bash
 python -m pip install -e .
 python -m pip install -e ../method_of_characteristics
-python -c "import turbodash; turbodash.launch_app_turbine()"
+python -c "import turbodash; turbodash.launch_app_experimental()"
 ```
 
 The second command installs the companion checkout in editable mode, so its
 meshing implementation is called directly. Alternatively, install the pinned
 optional dependency with `poetry install -E mesh` or
-`python -m pip install -e ".[mesh]"`. The default `turbodash` console command
-now launches the turbine app; `turbodash-stage` retains the old single-stage app.
-The Render/Procfile entrypoints also use the turbine app. Render enables the
-mesh extra; a meanline-only installation can omit it.
+`python -m pip install -e ".[mesh]"`. The `turbodash-experimental` console command
+launches this three-tab workspace. The existing `turbodash` command and
+`turbodash.launch_app_turbine()` launch the stable meanline turbine app;
+`turbodash-stage` retains the original single-stage app.
+The Render/Procfile entrypoints use the stable turbine app without the mesh
+extra. To host the experimental workspace separately, install the mesh extra
+and use `gunicorn turbodash.app_experimental:server`.
 
 1. **Meanline:** calculate or load an axial turbine, including its blade geometry.
    The existing performance plots, tables and expandable theory documentation

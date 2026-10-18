@@ -1,0 +1,26 @@
+{
+  "figures": 8,
+  "model_calls": 0,
+  "derivative_recalculations": 0,
+  "files": {
+    "ko_secondary_factor.pdf": "d01503bdc8e8b773bbab566194c78fd89e0a5d9c6a5b446ab5d99a6f9957c1fa",
+    "ko_secondary_geometry_ar.pdf": "c9108d4843a07958a18c5ca9f13d279c68276c7421bd04222169207000c7b5be",
+    "ko_secondary_geometry_angle.pdf": "4a02d8da944868174b211c87cd1c309d1b336c52336caf313990fc800d73c12d",
+    "ko_secondary_compressibility_ar.pdf": "8c9daf46743ef3756227684e61745778c1462518fc68e0036e483eb763607261",
+    "ko_secondary_mach_out.pdf": "dddea2b2d5e907bf4895265cd3c6774af054ff39044e50df54fd0864d457224f",
+    "ko_secondary_mach_in.pdf": "eedad3128e25b22a2a77f7d51271af9eaa19dcf818ccb737f77a7b48b6531c7a",
+    "ko_secondary_robustness_angle.pdf": "c605f308ae4774e26c843d888e841a27f661090e67e9a398e3dd8f65b0e0b39c",
+    "ko_secondary_robustness_ar.pdf": "71f24553aa25c8b51791ead8813368c67f9ad76abbd0f57e4e33c1c8ade62bf2"
+  },
+  "script_sha256": "7b19e311dcaba8b19ddf27f600f9fe281ae60db5e60581e420fe26c7acbf8c0c",
+  "data_sha256": {
+    "factor": "e701f72543d09a495fc5dfd6a7e5e2472487ad770f2aee53b898d96571e4a422",
+    "geometry_ar": "24dd7b7f284982c2a385bc2b483528504debfb536ab2cab1a74d9894e13ae9dc",
+    "geometry_angle": "e3ce3d9c98f115425e66e2aa399b2765f2225ff9ef492f0feeb9242ce5e87f46",
+    "compressibility_ar": "08a98b1a54dca04ff0df7b92da9b4f8d65f8d3797cf0a7f3730d9882410de535",
+    "mach_out": "388677bf9b30ff5eb002b4d85a9349983b473d456024937b08ccb6e585331026",
+    "mach_in": "196fa7c6732ce2b52a578dd51b7d90444a144ae77b6ec3cca7759f7b2c492c68",
+    "robustness_angle": "de2d45d9f94e2164cbfc82b30f2ef9a387456685c2eea63e851aa544ef5bb207",
+    "robustness_ar": "a007fe2c765d76902a2cbc6293b646340a6d05cd15705f88e1bafb6ef1c2915b"
+  }
+}

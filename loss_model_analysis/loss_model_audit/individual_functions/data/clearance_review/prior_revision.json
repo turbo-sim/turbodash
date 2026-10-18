@@ -1,0 +1,166 @@
+{
+  "formula": "0.37*Z*(c/H)*(k/H)",
+  "source_hashes": {
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "c45452b0733449772f8661eff1a2b2928f9fe42cab529051ca3701d700143fae",
+    "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
+    "turbodash/loss_models/__init__.py": "225e50f404dd5fcc97a95c6d3ff9d8a94844c73c4f0bfaa4fd65d0ff88747b18",
+    "turbodash/loss_models/loss_coefficient_conversion.py": "21ffa896097129972ec2130ba6cf54377fc6726ba5960d73c8fd40cd90454309",
+    "turbodash/loss_models/loss_model.py": "156fbe3b0a9510b760f32e73b39c09533edf8e3e4798df9cdb08cd32f905a3e4",
+    "turbodash/loss_models/loss_model_benner.py": "ce5e2aae37a04718c0ad8b6801b67be2e7824fdacd407affcb00e279ff46d649",
+    "turbodash/loss_models/loss_model_kacker_okapuu.py": "197794ed5736c997b865e43860ffeccdaf4dfd21dbc2f99b2191f4a28abab28d",
+    "turbodash/loss_models/loss_model_moustapha.py": "9918fc36bf9e3ed59d65256332d21780f0baff6ade302e8ee49c342e31b1d762"
+  },
+  "previous_note": "# Kacker\u2013Okapuu: tip-clearance loss\n\n[Previous: Kacker\u2013Okapuu: trailing-edge loss](03_ko_trailing.md) \u00b7 [Section index](../readme.md) \u00b7 [Next: Candidate coefficient conversions](05_conversions.md)\n\nComparison recorded on 2026-10-17: **previous implementation (baseline)** versus **revised implementation (candidate)**. These are individual-function results; [return to the audit overview](../../readme.md) for stage-level evidence.\n\n## Functions and dependencies\n\n`get_tip_clearance_loss`.\n\n## Observed behavior\n\nThe active rotor law is linear in gap/H with an artificial 1e-9 offset; it is already smooth but leaves a small nonzero loss at zero clearance. Stator clearance loss is zero.\n\n## Implemented changes\n\nRemoved only the 1e-9 offset. Both stator and rotor now have exact zero-clearance limits, and the active linear rotor law retains finite monotone growth. No new smoothing band is needed.\n\n## Baseline versus candidate\n\n[ko_clearance_clearance: values and d/dx (PDF)](../figures/ko_clearance_clearance.pdf)\n\n[ko_clearance_aspect_ratio: values and d/dx (PDF)](../figures/ko_clearance_aspect_ratio.pdf)\n\nSolid: preserved baseline; dashed: revised candidate. Both use the same inputs, 200 base points and shared adaptive refinement. Right panels are d/dx, including logarithmic x axes. NaN value gaps remain explicit; omitted close derivative support does not delete value records.\n\n## Quantitative checks\n\nReference check `zero_rotor_clearance`: baseline **2.67917566e-09**, candidate **0**.\n\n10 fundamental sweeps for this mechanism. [Value/gradient data and manifest](../data/sweep_manifest.json), [first-derivative convergence](../data/provenance/fundamental_join_intervals.csv), [second-derivative convergence](../data/provenance/fundamental_curvature_intervals.csv). C2 claims additionally use endpoint regression tests; C1 table interpolation and retained C1 branches are explicitly distinguished.\n\n## Remaining limitations\n\nThe historical documented 0.78 exponent and row/shroud applicability remain unresolved source questions. They were not restored. Retained grazing-angle clipping is outside this zero-limit fix.\n\n## All sweeps for this mechanism\n\nEvery figure contains the previous and revised curves; links below cover all saved sweeps, including those not embedded above. CSV files are gzip-compressed.\n\n| Parameter / case | Range | Comparison figure | Numerical data |\n|---|---|---|---|\n| Tip clearance | 0 to 0.1 | [Open](../figures/ko_clearance_clearance.pdf) | [stator](../data/sweeps/fundamental_ko_clearance_clearance__stator.csv.gz) \u00b7 [rotor](../data/sweeps/fundamental_ko_clearance_clearance__rotor.csv.gz) |\n| Aspect ratio H/c | 0.05 to 10 (log axis) | [Open](../figures/ko_clearance_aspect_ratio.pdf) | [stator](../data/sweeps/fundamental_ko_clearance_aspect_ratio__stator.csv.gz) \u00b7 [rotor](../data/sweeps/fundamental_ko_clearance_aspect_ratio__rotor.csv.gz) |\n| Incidence | -30 to 30 | [Open](../figures/ko_clearance_incidence.pdf) | [stator](../data/sweeps/fundamental_ko_clearance_incidence__stator.csv.gz) \u00b7 [rotor](../data/sweeps/fundamental_ko_clearance_incidence__rotor.csv.gz) |\n| Exit flow angle | 30 to 80 | [Open](../figures/ko_clearance_exit_angle.pdf) | [stator](../data/sweeps/fundamental_ko_clearance_exit_angle__stator.csv.gz) \u00b7 [rotor](../data/sweeps/fundamental_ko_clearance_exit_angle__rotor.csv.gz) |\n| Pitch/chord ratio | 0.05 to 5 | [Open](../figures/ko_clearance_pitch_chord.pdf) | [stator](../data/sweeps/fundamental_ko_clearance_pitch_chord__stator.csv.gz) \u00b7 [rotor](../data/sweeps/fundamental_ko_clearance_pitch_chord__rotor.csv.gz) |\n\n[All individual functions](../readme.md) \u00b7 [Methods, validation and reproduction](../methodology.md)\n",
+  "samples": [
+    {
+      "AR": 0.2,
+      "gap_height": 0.0,
+      "Ycl": 0.0
+    },
+    {
+      "AR": 0.2,
+      "gap_height": 0.0001,
+      "Ycl": 0.0011393045312008613
+    },
+    {
+      "AR": 0.2,
+      "gap_height": 0.001,
+      "Ycl": 0.011393045312008614
+    },
+    {
+      "AR": 0.2,
+      "gap_height": 0.01,
+      "Ycl": 0.11393045312008614
+    },
+    {
+      "AR": 0.2,
+      "gap_height": 0.03,
+      "Ycl": 0.34179135936025834
+    },
+    {
+      "AR": 0.5,
+      "gap_height": 0.0,
+      "Ycl": 0.0
+    },
+    {
+      "AR": 0.5,
+      "gap_height": 0.0001,
+      "Ycl": 0.0004557218124803446
+    },
+    {
+      "AR": 0.5,
+      "gap_height": 0.001,
+      "Ycl": 0.004557218124803445
+    },
+    {
+      "AR": 0.5,
+      "gap_height": 0.01,
+      "Ycl": 0.04557218124803446
+    },
+    {
+      "AR": 0.5,
+      "gap_height": 0.03,
+      "Ycl": 0.13671654374410336
+    },
+    {
+      "AR": 1.0,
+      "gap_height": 0.0,
+      "Ycl": 0.0
+    },
+    {
+      "AR": 1.0,
+      "gap_height": 0.0001,
+      "Ycl": 0.0002278609062401723
+    },
+    {
+      "AR": 1.0,
+      "gap_height": 0.001,
+      "Ycl": 0.0022786090624017227
+    },
+    {
+      "AR": 1.0,
+      "gap_height": 0.01,
+      "Ycl": 0.02278609062401723
+    },
+    {
+      "AR": 1.0,
+      "gap_height": 0.03,
+      "Ycl": 0.06835827187205168
+    },
+    {
+      "AR": 2.0,
+      "gap_height": 0.0,
+      "Ycl": 0.0
+    },
+    {
+      "AR": 2.0,
+      "gap_height": 0.0001,
+      "Ycl": 0.00011393045312008615
+    },
+    {
+      "AR": 2.0,
+      "gap_height": 0.001,
+      "Ycl": 0.0011393045312008613
+    },
+    {
+      "AR": 2.0,
+      "gap_height": 0.01,
+      "Ycl": 0.011393045312008614
+    },
+    {
+      "AR": 2.0,
+      "gap_height": 0.03,
+      "Ycl": 0.03417913593602584
+    },
+    {
+      "AR": 3.0,
+      "gap_height": 0.0,
+      "Ycl": 0.0
+    },
+    {
+      "AR": 3.0,
+      "gap_height": 0.0001,
+      "Ycl": 7.595363541339075e-05
+    },
+    {
+      "AR": 3.0,
+      "gap_height": 0.001,
+      "Ycl": 0.0007595363541339075
+    },
+    {
+      "AR": 3.0,
+      "gap_height": 0.01,
+      "Ycl": 0.007595363541339075
+    },
+    {
+      "AR": 3.0,
+      "gap_height": 0.03,
+      "Ycl": 0.022786090624017225
+    },
+    {
+      "AR": 5.0,
+      "gap_height": 0.0,
+      "Ycl": 0.0
+    },
+    {
+      "AR": 5.0,
+      "gap_height": 0.0001,
+      "Ycl": 4.557218124803446e-05
+    },
+    {
+      "AR": 5.0,
+      "gap_height": 0.001,
+      "Ycl": 0.00045572181248034464
+    },
+    {
+      "AR": 5.0,
+      "gap_height": 0.01,
+      "Ycl": 0.004557218124803446
+    },
+    {
+      "AR": 5.0,
+      "gap_height": 0.03,
+      "Ycl": 0.013671654374410338
+    }
+  ]
+}

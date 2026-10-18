@@ -1,7 +1,7 @@
 """Compressibility contracts: bounded factors, smooth joins and zero-Mach limits."""
 import numpy as np
 import pytest
-from turbodash.loss_models_new import loss_model_kacker_okapuu as ko
+from turbodash.loss_models import loss_model_kacker_okapuu as ko
 
 
 def derivative(function, x):

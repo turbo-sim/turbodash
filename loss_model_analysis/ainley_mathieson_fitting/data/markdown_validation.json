@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "renderer": "Installed VS Code Markdown+Math, dollar delimiters",
+  "katex_version": "0.13.11",
+  "modules": "C:\\Users\\roagr\\.vscode\\extensions\\goessner.mdmath-2.7.4\\node_modules",
+  "excluded_directories": [],
+  "files": [
+    {
+      "file": "loss_model_analysis/ainley_mathieson_fitting/readme.md",
+      "inline_equations": 48,
+      "display_equations": 5,
+      "local_links": 33,
+      "sha256": "f50e7284aaecfb1ab95f0dd8255c81b55030c4cd2cab82f8b4877b35defc428b"
+    }
+  ],
+  "errors": [],
+  "markdown_files": 1,
+  "inline_equations": 48,
+  "display_equations": 5,
+  "local_links": 33
+}

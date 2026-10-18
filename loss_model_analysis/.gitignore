@@ -1,0 +1,20 @@
+# Keep reviewable figures and numerical evidence despite global results rules.
+!**/results*/
+!**/figures/
+!**/figures/**
+!loss_audit_v2/**/figures/
+!loss_audit_v2/**/figures/**
+!loss_audit_v3/**/figures/
+!loss_audit_v3/**/figures/**
+!loss_model_audit/**/figures/
+!loss_model_audit/**/figures/**
+.pytest_cache/
+.pytest_tmp*/
+
+# Analysis plots are exported as vector PDF only.
+*.png
+*.PNG
+*.jpg
+*.jpeg
+*.zip
+*.ZIP

@@ -1,0 +1,242 @@
+{
+  "comparison_figures": 66,
+  "validation_figures": 2,
+  "supplemental_profile_figures": 25,
+  "supplemental_secondary_figures": 8,
+  "render_seconds": 251.90691449999576,
+  "supplemental_clearance_figures": 5,
+  "supplemental_trailing_figures": 5,
+  "supplemental_safeguard_figures": 3,
+  "saved_values_and_derivatives_unchanged": true,
+  "input_data_sha256": {
+    "data/sweeps/fundamental_ko_profile_pitch_chord__stator.csv.gz": "b10c2a04d8ce6880059ad06f2299be94c26c2ff7fbb2eef58734ea7da5bf5f15",
+    "data/sweeps/fundamental_ko_profile_exit_angle__stator.csv.gz": "9b1eefea45de44318ae762da6ec66d96bdebce8597843336b7a5c10285f36b91",
+    "data/sweeps/fundamental_ko_profile_re_out__stator.csv.gz": "84d6244e7c4750c1c73685a6eedfb4466ee0ec503c3dd75906f97cca725ec359",
+    "data/sweeps/fundamental_ko_profile_ma_rel_in__stator.csv.gz": "2be158516f811e5f9ed685ba85dde2706d6fd01d8037f36697b4d0f39714b416",
+    "data/sweeps/fundamental_ko_profile_ma_rel_out__stator.csv.gz": "7f1a35f3f334e3a8b61be72a9b57b14fbba0443b6b0e67abeb790bd495fe13eb",
+    "data/sweeps/fundamental_ko_profile_thickness_chord__stator.csv.gz": "82b624f91086e3eb2400608b03dde12eee76bc89981ed1a61e09a92811dc75e1",
+    "data/sweeps/fundamental_ko_profile_hub_tip__stator.csv.gz": "11ae590083259c5431a4c229551596d129dfcf07dfb720bf7a2d34788fc6ffe8",
+    "data/sweeps/fundamental_ko_secondary_aspect_ratio__stator.csv.gz": "ef853bc624ece14f0d6b71b2f945aad501acdb0cd517c0c9c3073c09f5bbf313",
+    "data/sweeps/fundamental_ko_secondary_incidence__stator.csv.gz": "caa4fa07e848e58b7defdf716f4dde1cbc1df498d13d6ad33801f37796a2a76b",
+    "data/sweeps/fundamental_ko_secondary_exit_angle__stator.csv.gz": "2efbd558b830c66317dbc189b1efb4fbbf2522b79052567f73aa817707a685d9",
+    "data/sweeps/fundamental_ko_secondary_ma_rel_out__stator.csv.gz": "a6efc9a40051d666dd6794802f6fa755c2bfbd6eee031bd445947595c28e0f81",
+    "data/sweeps/fundamental_ko_secondary_stagger__stator.csv.gz": "be9c61b1f58069b12e10abd091ba977dcf35b575d7354a6384d9d5a03f1d0409",
+    "data/sweeps/fundamental_ko_clearance_clearance__stator.csv.gz": "8cf8f6648c716e171b1bb30338585176c16d17d95e9eeea6a699f5e602d6029d",
+    "data/sweeps/fundamental_ko_clearance_clearance__rotor.csv.gz": "a8d50325389e1b3dce5efa7f0768e61257f4ca01d62dee5a620dd87e4825d890",
+    "data/sweeps/fundamental_ko_clearance_aspect_ratio__stator.csv.gz": "8fc5d2fe489ecfb7d23f6cbbafde14968861437762f27d5e10b0443f1396373a",
+    "data/sweeps/fundamental_ko_clearance_aspect_ratio__rotor.csv.gz": "cad53dee57f6b6b7b3a62f34549d86aef721f23f87ea77fbe37913f854ebc551",
+    "data/sweeps/fundamental_ko_clearance_incidence__stator.csv.gz": "b9f68320274e168d2eb33b1873f43609c2f83bf749d5edc28a282a99c8a597e5",
+    "data/sweeps/fundamental_ko_clearance_incidence__rotor.csv.gz": "ef3e132981143845ef7ae3bff2a3ccfd12bb6abff1d9dd13a8a65aa7cc147371",
+    "data/sweeps/fundamental_ko_clearance_exit_angle__stator.csv.gz": "7b46eddc2ba3e6f1776ab01baf28c1408e472fd327c50506377a7f303aea2479",
+    "data/sweeps/fundamental_ko_clearance_exit_angle__rotor.csv.gz": "1d7d4da0b72d8f0dc417f96a1ccc196d55d7796d1c518f0d87510eff5b41132a",
+    "data/sweeps/fundamental_ko_clearance_pitch_chord__stator.csv.gz": "58e46941c5bf3dba1c6df86b80b8c9b37b64f15776e7d49b2690a31008c22d94",
+    "data/sweeps/fundamental_ko_clearance_pitch_chord__rotor.csv.gz": "da685b9acdf7f2e2e14efbffcba0e95c12ee4e77e5b1177752c52a7d0e55c196",
+    "data/sweeps/fundamental_ko_trailing_trailing_ratio__stator.csv.gz": "9c51a575269d4a4286444dd917e8914953c8ec9eb7cd3d71544f599d0ef6a8ca",
+    "data/sweeps/fundamental_ko_trailing_exit_angle__stator.csv.gz": "173f9312e33975b16e0160cb186883f6b2cd6d3469fc2a1214143af9785bc4b4",
+    "data/sweeps/fundamental_ko_trailing_ma_rel_out__stator.csv.gz": "c0cfaab7d2efaddc5551e19c63eda65134d570e6dc3d61a79781cebfc1ac7d14",
+    "data/sweeps/fundamental_benner_secondary_aspect_ratio__stator.csv.gz": "7b337311ee1fe7a0f202efd01cc840425f369a2156d82cb1a162460286bcc26f",
+    "data/sweeps/fundamental_benner_secondary_incidence__stator.csv.gz": "33b901904d1debb7e069808a32daa2172b275385f11338d80cd6f6e04b61cc79",
+    "data/sweeps/fundamental_benner_secondary_exit_angle__stator.csv.gz": "ef97733becfd075076436d669b9f8a2628378aa53adcc6a0564344aa13cc2c99",
+    "data/sweeps/fundamental_benner_secondary_delta_ref__stator.csv.gz": "50903c0c3bc68cc30971c040339e706d728aec79873663e123a013e6c06c4999",
+    "data/sweeps/fundamental_benner_secondary_stagger__stator.csv.gz": "103fb5af00d6b2ce2be7a92147a7db95fa4ef13996c564ae2ad5172d753e43f1",
+    "data/sweeps/fundamental_benner_penetration_aspect_ratio__stator.csv.gz": "ab633b65d85d270ce9299e04044768e6e00467fe0b176e1e3de89dab739c6e44",
+    "data/sweeps/fundamental_benner_penetration_pitch_chord__stator.csv.gz": "e02e5c5bceb79ca91ddcd50a78dc60b338910657089df6528b49b14e48235ee1",
+    "data/sweeps/fundamental_benner_penetration_incidence__stator.csv.gz": "05144bd55d6e588ff13618eca1d3aa5898918dcd86871a5b8fb3fa81f641b5d4",
+    "data/sweeps/fundamental_benner_penetration_exit_angle__stator.csv.gz": "c23e634f47fd3e2152bced9c922e00651774fe420cb4999bbaf76144affb89a0",
+    "data/sweeps/fundamental_benner_penetration_delta_ref__stator.csv.gz": "4db87aa3c53ec0d47c7eccc67f568e8ae3e02e71e8e5398c3a398d817585a481",
+    "data/sweeps/fundamental_benner_penetration_re_in__stator.csv.gz": "806bc2ff4ac645d23c71ec426492112c959b30748180913fe98cfe6bc6f4011e",
+    "data/sweeps/fundamental_benner_incidence_incidence__stator.csv.gz": "36da348a583631f972bc94c47ac422a1a6470f50952d8c8929a87e384cbec4bc",
+    "data/sweeps/fundamental_benner_incidence_incidence__rotor.csv.gz": "ccbf76dc51fc78aa54e9a7d40faddba39a83f49d8a35675823a25b9836c98935",
+    "data/sweeps/fundamental_benner_incidence_leading_edge_ratio__stator.csv.gz": "1f528330d156dfbc041317087d237ca2cbf8b7817885bf5eb6e54c29b833b706",
+    "data/sweeps/fundamental_benner_incidence_leading_edge_ratio__rotor.csv.gz": "ec2b6ccd1bbd013635d965c267c14e5fdbc2d5cf3e3a0b4594cbbd444af9bf84",
+    "data/sweeps/fundamental_benner_incidence_wedge__stator.csv.gz": "cfdf0847f8d90be483718cf8c53ad9d9b3ecb2670cb9701e72aa0f9c0088105e",
+    "data/sweeps/fundamental_benner_incidence_wedge__rotor.csv.gz": "ccd5246267254ad089ebab98f7550b2d15b7e6509998aed3906c335879c7526d",
+    "data/sweeps/fundamental_benner_incidence_pitch_chord__stator.csv.gz": "cd1801d6ae6df6f28d0b2633537e207e32d4a440f77f5b4eec83c4008708015d",
+    "data/sweeps/fundamental_benner_incidence_pitch_chord__rotor.csv.gz": "2a0d9dcb9f5b4e31231a7b7a935dbb5222e96fa03503cc251e3fd0038bb09b66",
+    "data/sweeps/fundamental_benner_incidence_ma_rel_out__stator.csv.gz": "20e9fbe18bf24caa8760b6da239bd3a39aa7c2a73b045ad77b2eb2a8b1fdf53d",
+    "data/sweeps/fundamental_benner_incidence_ma_rel_out__rotor.csv.gz": "140346cd0e121bbbd0fbcb043d007a4eacf4b009624d0092ff2eb46bf568bf9c",
+    "data/sweeps/fundamental_moustapha_incidence_incidence__stator.csv.gz": "bb535a2c8a41268a9ca1f45dfec9408ae877963384a484a254f1f5f253d0d374",
+    "data/sweeps/fundamental_moustapha_incidence_leading_edge_ratio__stator.csv.gz": "43cc3910478ecc11af4fce1e5de50fb07ae7218aa6c2a486248e945d79a57e34",
+    "data/sweeps/fundamental_moustapha_incidence_pitch_chord__stator.csv.gz": "9f38f9dec481d9272b9b4546b0bd6b9b9793620e5c0faca16adcac37c42d068a",
+    "data/sweeps/fundamental_moustapha_incidence_ma_rel_out__stator.csv.gz": "1724b5ff5466c795fa3a131ca4eea49ea14236a785ef27d01d254a0ba125c363",
+    "data/sweeps/fundamental_moustapha_secondary_incidence__stator.csv.gz": "bb7dbdb9b53356f92c03dbfd90f4fea9c42ce29dde55ddb4a3feab9959c5bd60",
+    "data/sweeps/fundamental_moustapha_secondary_leading_edge_ratio__stator.csv.gz": "d50bc229990ee7a454ab2b41be0369ae88183af396074cf80b816f69bbdd0b7a",
+    "data/sweeps/fundamental_nozzle_angle.csv.gz": "1b673c38853ca4d28bab32b34d9ef1837d9c97cc8cef56cc30acd3977b1c3bf0",
+    "data/sweeps/fundamental_penetration_cap.csv.gz": "882d0c33743e5fe574c203d3d9a5dfa572a936d6e7e887ac91e8f54bf3cd3c60",
+    "data/sweeps/fundamental_incidence_chi.csv.gz": "c4756dbc80bb392d8841bfcc90b815479eb39546007ad4c6eb443c85b12123c5",
+    "data/sweeps/fundamental_loading_inlet.csv.gz": "a7b1419f2d320c3378bde277531769ab74adde389ffc01beed745da7b1d0797c",
+    "data/sweeps/fundamental_incidence_chi_detail.csv.gz": "a8256169a465ccb95d120ed63b0df77854388afcf985f4a873dcc6661d2fab86",
+    "data/sweeps/fundamental_hub_interpolation.csv.gz": "cef6eb8afde6ade6365c683cfdafbf2e0b98651ee87807fee4212db254593549",
+    "data/sweeps/fundamental_compressibility_mach.csv.gz": "ecc80b118526ee634f9256e7959d25ef5dbfba1dd8c0edced5d8f749d10208de",
+    "data/sweeps/fundamental_conversion_loss_g1.1_m0.2.csv.gz": "5a855c188e0d64f9004330d210a5230694d90e8933e97487c72d3521040c3f34",
+    "data/sweeps/fundamental_conversion_loss_g1.1_m0.7.csv.gz": "09d384c779a731b7d37816af18d106c9fee410dee7542dcf6d8c9d4aa932ceca",
+    "data/sweeps/fundamental_conversion_loss_g1.1_m1.2.csv.gz": "5a88e7e189ace56596d7cd1be1c81400850098cf77c51e6a835a23ff2884319b",
+    "data/sweeps/fundamental_conversion_loss_g1.1_m2.0.csv.gz": "616616b656f1106a2e89e26fd2e1ad12b57ecbb7e7b9c5ea116def52dfb20c4e",
+    "data/sweeps/fundamental_conversion_loss_g1.33_m0.2.csv.gz": "b95f0de9c29b9bf348604159a69aa6361d6b5263789da9d8ccaf2fd829c469d3",
+    "data/sweeps/fundamental_conversion_loss_g1.33_m0.7.csv.gz": "37adffe592b30743d94ebaca1d82e6a35b4062d1393753ff86382d7e50ec2aed",
+    "data/sweeps/fundamental_conversion_loss_g1.33_m1.2.csv.gz": "ff61c8b727597fb4da51c221e977f8272ba8d509ab8be78d8d6388b03f725300",
+    "data/sweeps/fundamental_conversion_loss_g1.33_m2.0.csv.gz": "084edcc61596abeaeb378b2b94035f9f64d295b7602f0776b11d8dbe2b405094",
+    "data/sweeps/fundamental_conversion_loss_g1.4_m0.2.csv.gz": "b0549dbc325445743169cf593ecd3f3a003ab336250d38ebeedb36fd0d3d9b15",
+    "data/sweeps/fundamental_conversion_loss_g1.4_m0.7.csv.gz": "73553cd8a001c0ec4ea9b877e0f7354e3c86c907392d3708348695b7253fcc77",
+    "data/sweeps/fundamental_conversion_loss_g1.4_m1.2.csv.gz": "2fc04e689c7561917942f4b19a91dd7534c6984b2004f7bb0c1dad2f93fe82f2",
+    "data/sweeps/fundamental_conversion_loss_g1.4_m2.0.csv.gz": "be42dd907e792974cd067bb0d2f7e1cf12259f0ae5eea5bd07788f72583ed0fd",
+    "data/sweeps/fundamental_conversion_mach_d0.001.csv.gz": "f64320a62afdffd558769dcc4ac9836a02b4fc839a63a4a1523dee048303a8cd",
+    "data/sweeps/fundamental_conversion_mach_d0.05.csv.gz": "352d433f2cca61a91813de3bdd00353329e3f7c3749a54f564c6e262cc4dd03c",
+    "data/sweeps/fundamental_conversion_mach_d0.3.csv.gz": "2033f2109497c7a9feefde993ec2ec658deb1c31684aefcfc0c4e92bbf7d3cf4",
+    "data/sweeps/fundamental_conversion_mach_d0.8.csv.gz": "151caf467080b4d75a51f4b75c4851e50b5d0308f736d3e2e30a18d2f9e2735c",
+    "data/sweeps/fundamental_conversion_gamma.csv.gz": "109de2cdb8c7dbf5d4ba222bebf555fd424fccb1f8b679f0e397308172aa834a",
+    "data/sweeps/fundamental_smooth_bounds.csv.gz": "8269c7301a65d7b798affbab4aee1a90835eb4273d4ef2c207e65c8e91aba2b9",
+    "data/sweeps/fundamental_smooth_absolute.csv.gz": "a8bc29db6a4f7b7ed8d6a23f694c06713ebb62778b6fb1472a5421e0f1fada4a",
+    "data/validation/samples.csv": "f630a9e9646385a395ec4a49530234852a1920cab25e7ce811f2e083c728a5eb",
+    "data/profile_final/geometry_spacing.csv": "bd220b758d778da652e75e2eb41381b54414d1fdf3bf6634ee749361354f8352",
+    "data/profile_final/geometry_angle.csv": "1e1334d07a926112b6eebc5954167239a2d635de7b7279a1d4e1d0bf9f7391f5",
+    "data/profile_final/mach_inlet.csv": "4e35c9f487e104ab41ab7e1dcb2f205488fb8b4a2310ba428f752ea23dda1efe",
+    "data/profile_final/mach_hub.csv": "6b7eb02991e7d059f6d60ec6bd00e95b2243d003a173328e621be02da8e5cd95",
+    "data/profile_final/component_budget.csv": "d012308413c12b8f692aabd6d0f51217f68e2eac8bbb0f713f759eb8274c73bb",
+    "data/profile_final/thickness_factor.csv": "9b71cbc6aa4677ba83d703e80e05c04161a3c5ea2177160db6d3f01d3abea9e1",
+    "data/secondary_review/factor.csv": "e701f72543d09a495fc5dfd6a7e5e2472487ad770f2aee53b898d96571e4a422",
+    "data/secondary_review/geometry_ar.csv": "24dd7b7f284982c2a385bc2b483528504debfb536ab2cab1a74d9894e13ae9dc",
+    "data/secondary_review/geometry_angle.csv": "e3ce3d9c98f115425e66e2aa399b2765f2225ff9ef492f0feeb9242ce5e87f46",
+    "data/secondary_review/compressibility_ar.csv": "08a98b1a54dca04ff0df7b92da9b4f8d65f8d3797cf0a7f3730d9882410de535",
+    "data/secondary_review/mach_out.csv": "388677bf9b30ff5eb002b4d85a9349983b473d456024937b08ccb6e585331026",
+    "data/secondary_review/mach_in.csv": "196fa7c6732ce2b52a578dd51b7d90444a144ae77b6ec3cca7759f7b2c492c68",
+    "data/secondary_review/robustness_angle.csv": "de2d45d9f94e2164cbfc82b30f2ef9a387456685c2eea63e851aa544ef5bb207",
+    "data/secondary_review/robustness_ar.csv": "a007fe2c765d76902a2cbc6293b646340a6d05cd15705f88e1bafb6ef1c2915b",
+    "data/clearance_review/gap_factor.csv": "babffdc33ff2093d02e8b498d4edd7ad71662d7bbcd1df1acc91bbfea7184c75",
+    "data/clearance_review/gap_sensitivity.csv": "2509deda923eabfa3831f3b6777b265821fc831e8fb925df8056bc185506c461",
+    "data/clearance_review/angle_sensitivity.csv": "66c86b10b9070ca020569aebe29387ea2aa9d54e999262ca5658e150d44b99d8",
+    "data/clearance_review/aspect_factor.csv": "fbe74f001d5fab7bcd927332f2477b1387a8efe0107a127583c6d3fc4d9c1cc2",
+    "data/clearance_review/aspect_sensitivity.csv": "5c15924b32cb74cfb08cf716f60236545c8ed1f3ecaeaedd26a3ec827a762d7f",
+    "data/clearance_review/loading_sensitivity.csv": "e5e66a078e1bf839864ade9799aab32cceeda7b326e611e2b5e1918a25651fb8",
+    "data/trailing_review/references.csv": "84bd39c2bae2f521272a0a6a3d4903c10546eb93a6aac4199643de9cf1b42778",
+    "data/trailing_review/fit_residuals.csv": "223b50989bb5d42d9314dfcfb80544e55d2b38e9490506fd30f2af289174b112",
+    "data/trailing_review/z_sensitivity.csv": "c43fbbea271731c89cd8198d4846704c1630250c9733417c1023baa7492f5e62",
+    "data/trailing_review/angle_sensitivity.csv": "64b8ca0c979f35f9065cf2030abea01111ff40d0803050068f129a15d3c74140",
+    "data/trailing_review/thickness_sensitivity.csv": "2c3d0932765f26b92be67ae7113420a7e4490af0111df43fad566b938d319efc",
+    "data/trailing_review/mach_sensitivity.csv": "ba472a0240e32adfc042fe2f791a7611a9652c6d027318619e8be74abe74e69c",
+    "data/trailing_review/join_checks.csv": "7877dd825a01def1ff4524e644cea437d6c05cc7d95bc0dacb5f92be981ad356",
+    "data/ko_safeguards/profile_z.csv": "cf8209c2a62032efada5ccb30f93cf570671eec4f0cadcb84bb222850a378d93",
+    "data/ko_safeguards/reference_order.csv": "64ed605125cc0af30119d43a9892798c48440c0c30fb787148f95190db894c12",
+    "data/ko_safeguards/reynolds.csv": "1f4263a11d9c2018b4af39b50eaad53a57833b24efde3ec676e1065293b7c2f9",
+    "data/ko_safeguards/axial_angle.csv": "9283e2684be1feb116486048b0de303ccb6bc1a3dac1cea55023832c5ff94fdb"
+  },
+  "model_calls": 0,
+  "derivative_recalculations": 0,
+  "script_sha256": {
+    "render_saved.py": "5004cfdb978dc3200288d963ae0c2a2d9546f757ec4aea2503296f9cc5102766",
+    "plotting.py": "dd10afac4f668aedbfb1fde7d1368e9d94b520569c1dbab2cfa330c57022ad13",
+    "reynolds_review.py": "0f24859a79b248ae890a4d58c15dfc3efc2026666cbb85bc798643fcbe83a117",
+    "profile_review.py": "6a6ff595681c75c6edf71efcfd194461934c8979e3fa066a430c1ffaba842d22",
+    "profile_interpolation_review.py": "9b929d9061b99641e3be383efbe79a59760611bbb56b54ac3baad9aab771e0e1",
+    "profile_terms.py": "7de59e4b3f5c2c8738e5b5ca338af7b522c7c992defb59200074c88a64e4ba38",
+    "shock_review.py": "c7b268712e20fc0132014130b45bbb1f1dd0e0e7fab14cf26baa66791ec967e6",
+    "profile_final_review.py": "01f440940f0fcbca396c1a9f472a8a22693bf3138a5cdaf8e9586c608db946b4",
+    "secondary_review.py": "7b19e311dcaba8b19ddf27f600f9fe281ae60db5e60581e420fe26c7acbf8c0c",
+    "clearance_review.py": "2de1828dd54665aaef66e81d73bae1990b3be38174e871c9a2a0929c51511e22",
+    "trailing_review.py": "a9d4cc307df15a72632a6854e7a9dcc9d3019f55e7585813ddca5e7f83e3cfbe",
+    "ko_safeguards_review.py": "b28a84733dae5681ba6d20e4778417bc2f62b4806726a92bf4c41b1a24a1b865"
+  },
+  "imported_model_modules": {
+    "turbodash.core_stage": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\core_stage.py",
+      "relative_path": "turbodash/core_stage.py",
+      "sha256": "e0126d1fbd61f41fd13ce23f42189daf3f9e0772f7c8c2518a038c97b8d134ba"
+    },
+    "turbodash.graphics": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\graphics.py",
+      "relative_path": "turbodash/graphics.py",
+      "sha256": "2e8e2a8afca76df900d272d03bca44754e98eef6a69a5e89072253fc7732de4a"
+    },
+    "turbodash.core_turbine": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\core_turbine.py",
+      "relative_path": "turbodash/core_turbine.py",
+      "sha256": "a9c3706955a1350c3d4d105a3779bed43201a440ffb1ebf2fd0a6641023857eb"
+    },
+    "turbodash.geom_blade": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\geom_blade.py",
+      "relative_path": "turbodash/geom_blade.py",
+      "sha256": "b386a1fa3b4d848cdcf3a2f994927c7eb99cb4ce4db697fcb99e986c2a1b20d8"
+    },
+    "turbodash.plotting_mpl": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\plotting_mpl.py",
+      "relative_path": "turbodash/plotting_mpl.py",
+      "sha256": "af77f23594d8111f6ce4333e28f7ec7de190bd7513d5b51ebff0680de79ce937"
+    },
+    "turbodash.plotting_plotly_stage": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\plotting_plotly_stage.py",
+      "relative_path": "turbodash/plotting_plotly_stage.py",
+      "sha256": "c9e160298bf696a6d4befb015f5d71ec27d4dabf4bc3d107f0fcc5898cabd738"
+    },
+    "turbodash.plotting_plotly_turbine": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\plotting_plotly_turbine.py",
+      "relative_path": "turbodash/plotting_plotly_turbine.py",
+      "sha256": "d7b7c56ae4f626934642e09a56f104472ac6f010139cd75d102b4d272084a3b8"
+    },
+    "turbodash.reporting_utils": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\reporting_utils.py",
+      "relative_path": "turbodash/reporting_utils.py",
+      "sha256": "cccc32cff5e44396ec0ded04815470e37d680c0a4d43af339d65b329f47d0db8"
+    },
+    "turbodash": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\__init__.py",
+      "relative_path": "turbodash/__init__.py",
+      "sha256": "4c7737a35da6c41e775164eabe7db6fe91180dd5cdc9b0449c548a99a29454aa"
+    },
+    "turbodash.loss_models": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\__init__.py",
+      "relative_path": "turbodash/loss_models/__init__.py",
+      "sha256": "fcc03d0e9ee610b36333efe8c19d8ad9f49f79c2d91e48654bd454103e3374b5"
+    },
+    "turbodash.loss_models._backend": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\_backend.py",
+      "relative_path": "turbodash/loss_models/_backend.py",
+      "sha256": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff"
+    },
+    "turbodash.math": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\math.py",
+      "relative_path": "turbodash/math.py",
+      "sha256": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772"
+    },
+    "turbodash.loss_models._numerics": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\_numerics.py",
+      "relative_path": "turbodash/loss_models/_numerics.py",
+      "sha256": "09bb30e75bf4ec4a25a2cba06578f68bebe483db1aba79dafce8af185983532b"
+    },
+    "turbodash.loss_models._trailing_edge": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\_trailing_edge.py",
+      "relative_path": "turbodash/loss_models/_trailing_edge.py",
+      "sha256": "bb922ddffcab0f786fb8a9f8dde21840cc6df41ba80ce7b461e5a4501bbe3d00"
+    },
+    "turbodash.loss_models._blade_loading": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\_blade_loading.py",
+      "relative_path": "turbodash/loss_models/_blade_loading.py",
+      "sha256": "b5b4956b978eb10ed75ee40e0b0f4bfbb4e34e4e8ebf9edee85186f8277ab18a"
+    },
+    "turbodash.loss_models.loss_model_kacker_okapuu": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model_kacker_okapuu.py",
+      "relative_path": "turbodash/loss_models/loss_model_kacker_okapuu.py",
+      "sha256": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51"
+    },
+    "turbodash.loss_models.loss_coefficient_conversion": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_coefficient_conversion.py",
+      "relative_path": "turbodash/loss_models/loss_coefficient_conversion.py",
+      "sha256": "a9a8a5943bd91c352c4607fade51272e5ad60de02f8d14f4759e5407b02c1279"
+    },
+    "turbodash.loss_models.loss_model_benner": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model_benner.py",
+      "relative_path": "turbodash/loss_models/loss_model_benner.py",
+      "sha256": "6a95683659c639508bf93d5a743d09a5a5998d4cbf5e4ce750fc484f9490bbcd"
+    },
+    "turbodash.loss_models.loss_model_moustapha": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model_moustapha.py",
+      "relative_path": "turbodash/loss_models/loss_model_moustapha.py",
+      "sha256": "0748aa6c29528f98e0e6a12e61b9ed34f263f9f576f3664b9ebf322ef3098d23"
+    },
+    "turbodash.loss_models.loss_model": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model.py",
+      "relative_path": "turbodash/loss_models/loss_model.py",
+      "sha256": "8fc6bc7d5e32bd060a0c836a6be110e49065ed618f5483c70df50d68d6f10975"
+    }
+  },
+  "note": "Existing imports can be present when invoked after run.py; the renderer calls no loss function."
+}

@@ -1,0 +1,355 @@
+{
+  "provenance": "Captured from the revised implementations before promotion to turbodash.loss_models; plain model names must preserve these results.",
+  "cases": {
+    "eps0": {
+      "benner": {
+        "overall_performance": {
+          "efficiency_ts": 0.8488186428634183,
+          "efficiency_tt": 0.9016058258036936,
+          "mass_flow_rate": 15.735,
+          "power_isentropic": 161058.22145244814,
+          "power_actual": 136709.22095526292,
+          "shaft_torque": 164.616086668203,
+          "rotational_speed": 7930.433308790938,
+          "isentropic_enthalpy_drop": 10235.667076736456,
+          "spouting_velocity": 143.07807013470972,
+          "pressure_ratio_ts": 4.824999999971394,
+          "volume_ratio_ts": 23.823756946020808,
+          "exit_blade_speed": 100.1546490942968,
+          "exit_rotor_diameter": 0.24119903954284827,
+          "maximum_mach_number": 1.4118020483124762,
+          "specific_speed": 0.5,
+          "blade_velocity_ratio": 0.7,
+          "flow_coefficient": null,
+          "work_coefficient": null,
+          "degree_reaction": null
+        },
+        "losses": [
+          {
+            "stator": {
+              "loss_profile": 0.03880570748652404,
+              "loss_incidence": 0.0,
+              "loss_trailing": 0.010394982343088053,
+              "loss_secondary": 0.015706189153826672,
+              "loss_clearance": 0.0,
+              "loss_total": 0.06490687898343876,
+              "diagnostics": {
+                "penetration_raw_ratio": 0.05424220021787728,
+                "tangential_loading_parameter": 1.6506779118175425,
+                "convergence_ratio": 5.758770483143631,
+                "aspect_ratio_true_chord": 1.5320888862379558,
+                "inlet_displacement_thickness_height_ratio": 0.01270411721432415,
+                "penetration_effective_ratio": 0.05424220021787728,
+                "primary_loss_weight": 0.9457577997821227,
+                "penetration_smoothing_active": false,
+                "penetration_outside_model_domain": false,
+                "profile_loss_unweighted": 0.04103133751100317,
+                "trailing_loss_unweighted": 0.010991167448455385,
+                "incidence_loss_unweighted": 0.0,
+                "primary_loss_unweighted": 0.05202250495945856,
+                "primary_loss_weighted": 0.04920068982961209
+              },
+              "loss_definition": 0.0,
+              "loss_error": -0.06490687898343876
+            },
+            "rotor": {
+              "loss_profile": 0.02143952560476009,
+              "loss_incidence": 0.0,
+              "loss_trailing": 0.009474922902384532,
+              "loss_secondary": 0.025116240676358356,
+              "loss_clearance": 0.06081033517342613,
+              "loss_total": 0.11684102435692911,
+              "diagnostics": {
+                "penetration_raw_ratio": 0.11579126415103948,
+                "tangential_loading_parameter": 2.4090129282664554,
+                "convergence_ratio": 2.97925707913996,
+                "aspect_ratio_true_chord": 1.0512698010010986,
+                "inlet_displacement_thickness_height_ratio": 0.009419051795985374,
+                "penetration_effective_ratio": 0.11579126415103948,
+                "primary_loss_weight": 0.8842087358489605,
+                "penetration_smoothing_active": false,
+                "penetration_outside_model_domain": false,
+                "profile_loss_unweighted": 0.024247131628003238,
+                "trailing_loss_unweighted": 0.010715708314380448,
+                "incidence_loss_unweighted": 0.0,
+                "primary_loss_unweighted": 0.03496283994238369,
+                "primary_loss_weighted": 0.030914448507144626
+              },
+              "loss_definition": 0.0,
+              "loss_error": -0.11684102435692911
+            }
+          }
+        ]
+      },
+      "kacker_okapuu": {
+        "overall_performance": {
+          "efficiency_ts": 0.8148574836450037,
+          "efficiency_tt": 0.8655326560402717,
+          "mass_flow_rate": 15.735,
+          "power_isentropic": 161058.22145244814,
+          "power_actual": 131239.49705308164,
+          "shaft_torque": 158.02981152420764,
+          "rotational_speed": 7930.433308790938,
+          "isentropic_enthalpy_drop": 10235.667076736456,
+          "spouting_velocity": 143.07807013470972,
+          "pressure_ratio_ts": 4.824999999971394,
+          "volume_ratio_ts": 23.823756946020808,
+          "exit_blade_speed": 100.1546490942968,
+          "exit_rotor_diameter": 0.24119903954284827,
+          "maximum_mach_number": 1.4118020483124762,
+          "specific_speed": 0.5,
+          "blade_velocity_ratio": 0.7,
+          "flow_coefficient": null,
+          "work_coefficient": null,
+          "degree_reaction": null
+        },
+        "losses": [
+          {
+            "stator": {
+              "loss_profile": 0.04103133751100317,
+              "loss_incidence": 0.0,
+              "loss_trailing": 0.010991167448455385,
+              "loss_secondary": 0.04388167570692549,
+              "loss_clearance": 0.0,
+              "loss_total": 0.09590418066638405,
+              "loss_definition": 0.0,
+              "loss_error": -0.09590418066638405
+            },
+            "rotor": {
+              "loss_profile": 0.024247131628003238,
+              "loss_incidence": 0.0,
+              "loss_trailing": 0.010715708314380448,
+              "loss_secondary": 0.056911689351276655,
+              "loss_clearance": 0.06081033517342613,
+              "loss_total": 0.15268486446708646,
+              "loss_definition": 0.0,
+              "loss_error": -0.15268486446708646
+            }
+          }
+        ]
+      },
+      "isentropic": {
+        "overall_performance": {
+          "efficiency_ts": 0.9414520387601486,
+          "efficiency_tt": 0.9999999999970506,
+          "mass_flow_rate": 15.735,
+          "power_isentropic": 161058.22145244814,
+          "power_actual": 151628.5909454908,
+          "shaft_torque": 182.5809926649246,
+          "rotational_speed": 7930.433308790938,
+          "isentropic_enthalpy_drop": 10235.667076736456,
+          "spouting_velocity": 143.07807013470972,
+          "pressure_ratio_ts": 4.824999999971394,
+          "volume_ratio_ts": 23.823756946020808,
+          "exit_blade_speed": 100.1546490942968,
+          "exit_rotor_diameter": 0.24119903954284827,
+          "maximum_mach_number": 1.4118020483124762,
+          "specific_speed": 0.5,
+          "blade_velocity_ratio": 0.7,
+          "flow_coefficient": null,
+          "work_coefficient": null,
+          "degree_reaction": null
+        },
+        "losses": [
+          {
+            "stator": {
+              "loss_profile": 0.0,
+              "loss_incidence": 0.0,
+              "loss_trailing": 0.0,
+              "loss_secondary": 0.0,
+              "loss_clearance": 0.0,
+              "loss_total": 0.0,
+              "loss_definition": 0.0,
+              "loss_error": 0.0
+            },
+            "rotor": {
+              "loss_profile": 0.0,
+              "loss_incidence": 0.0,
+              "loss_trailing": 0.0,
+              "loss_secondary": 0.0,
+              "loss_clearance": 0.0,
+              "loss_total": 0.0,
+              "loss_definition": 0.0,
+              "loss_error": 0.0
+            }
+          }
+        ]
+      }
+    },
+    "eps80": {
+      "benner": {
+        "overall_performance": {
+          "efficiency_ts": 0.8415710704242522,
+          "efficiency_tt": 0.8987118684412172,
+          "mass_flow_rate": 10.432,
+          "power_isentropic": 38648.85194425972,
+          "power_actual": 32525.755701399088,
+          "shaft_torque": 50.021633247046765,
+          "rotational_speed": 6209.275221515507,
+          "isentropic_enthalpy_drop": 3704.836267662933,
+          "spouting_velocity": 86.07945478060294,
+          "pressure_ratio_ts": 4.824999999997984,
+          "volume_ratio_ts": 14.619084966648531,
+          "exit_blade_speed": 60.255618346422054,
+          "exit_rotor_diameter": 0.1853352444548488,
+          "maximum_mach_number": 1.605283503061063,
+          "specific_speed": 0.5000000000000001,
+          "blade_velocity_ratio": 0.7,
+          "flow_coefficient": null,
+          "work_coefficient": null,
+          "degree_reaction": null
+        },
+        "losses": [
+          {
+            "stator": {
+              "loss_profile": 0.04456994836225428,
+              "loss_incidence": 0.0,
+              "loss_trailing": 0.010623080628560488,
+              "loss_secondary": 0.015902178007270125,
+              "loss_clearance": 0.0,
+              "loss_total": 0.07109520699808489,
+              "diagnostics": {
+                "penetration_raw_ratio": 0.05521610530065922,
+                "tangential_loading_parameter": 1.650677911817542,
+                "convergence_ratio": 5.758770483143631,
+                "aspect_ratio_true_chord": 1.532088886237956,
+                "inlet_displacement_thickness_height_ratio": 0.01382669968755311,
+                "penetration_effective_ratio": 0.05521610530065922,
+                "primary_loss_weight": 0.9447838946993408,
+                "penetration_smoothing_active": false,
+                "penetration_outside_model_domain": false,
+                "profile_loss_unweighted": 0.04717475457859896,
+                "trailing_loss_unweighted": 0.011243926455733116,
+                "incidence_loss_unweighted": 0.0,
+                "primary_loss_unweighted": 0.05841868103433208,
+                "primary_loss_weighted": 0.055193028990814776
+              },
+              "loss_definition": 0.0,
+              "loss_error": -0.07109520699808489
+            },
+            "rotor": {
+              "loss_profile": 0.021332744786479046,
+              "loss_incidence": 0.0,
+              "loss_trailing": 0.009709668368486031,
+              "loss_secondary": 0.025802202002959455,
+              "loss_clearance": 0.05829698933266241,
+              "loss_total": 0.11514160449058694,
+              "diagnostics": {
+                "penetration_raw_ratio": 0.1165628825605978,
+                "tangential_loading_parameter": 2.3605392624092163,
+                "convergence_ratio": 2.8618478621335997,
+                "aspect_ratio_true_chord": 1.057089194970599,
+                "inlet_displacement_thickness_height_ratio": 0.010432222813349799,
+                "penetration_effective_ratio": 0.1165628825605978,
+                "primary_loss_weight": 0.8834371174394022,
+                "penetration_smoothing_active": false,
+                "penetration_outside_model_domain": false,
+                "profile_loss_unweighted": 0.024147439999250796,
+                "trailing_loss_unweighted": 0.010990786074994237,
+                "incidence_loss_unweighted": 0.0,
+                "primary_loss_unweighted": 0.035138226074245035,
+                "primary_loss_weighted": 0.031042413154965077
+              },
+              "loss_definition": 0.0,
+              "loss_error": -0.11514160449058694
+            }
+          }
+        ]
+      },
+      "kacker_okapuu": {
+        "overall_performance": {
+          "efficiency_ts": 0.8082944831514995,
+          "efficiency_tt": 0.8631758751374473,
+          "mass_flow_rate": 10.432,
+          "power_isentropic": 38648.85194425972,
+          "power_actual": 31239.653806684237,
+          "shaft_torque": 48.043726326563096,
+          "rotational_speed": 6209.275221515507,
+          "isentropic_enthalpy_drop": 3704.836267662933,
+          "spouting_velocity": 86.07945478060294,
+          "pressure_ratio_ts": 4.824999999997984,
+          "volume_ratio_ts": 14.619084966648531,
+          "exit_blade_speed": 60.255618346422054,
+          "exit_rotor_diameter": 0.1853352444548488,
+          "maximum_mach_number": 1.605283503061063,
+          "specific_speed": 0.5000000000000001,
+          "blade_velocity_ratio": 0.7,
+          "flow_coefficient": null,
+          "work_coefficient": null,
+          "degree_reaction": null
+        },
+        "losses": [
+          {
+            "stator": {
+              "loss_profile": 0.04717475457859896,
+              "loss_incidence": 0.0,
+              "loss_trailing": 0.011243926455733116,
+              "loss_secondary": 0.04392716511321559,
+              "loss_clearance": 0.0,
+              "loss_total": 0.10234584614754766,
+              "loss_definition": 0.0,
+              "loss_error": -0.10234584614754766
+            },
+            "rotor": {
+              "loss_profile": 0.024147439999250796,
+              "loss_incidence": 0.0,
+              "loss_trailing": 0.010990786074994237,
+              "loss_secondary": 0.05597549024151544,
+              "loss_clearance": 0.05829698933266241,
+              "loss_total": 0.1494107056484229,
+              "loss_definition": 0.0,
+              "loss_error": -0.1494107056484229
+            }
+          }
+        ]
+      },
+      "isentropic": {
+        "overall_performance": {
+          "efficiency_ts": 0.936419223976558,
+          "efficiency_tt": 0.999999999999994,
+          "mass_flow_rate": 10.432,
+          "power_isentropic": 38648.85194425972,
+          "power_actual": 36191.52794522857,
+          "shaft_torque": 55.6592552113584,
+          "rotational_speed": 6209.275221515507,
+          "isentropic_enthalpy_drop": 3704.836267662933,
+          "spouting_velocity": 86.07945478060294,
+          "pressure_ratio_ts": 4.824999999997984,
+          "volume_ratio_ts": 14.619084966648531,
+          "exit_blade_speed": 60.255618346422054,
+          "exit_rotor_diameter": 0.1853352444548488,
+          "maximum_mach_number": 1.605283503061063,
+          "specific_speed": 0.5000000000000001,
+          "blade_velocity_ratio": 0.7,
+          "flow_coefficient": null,
+          "work_coefficient": null,
+          "degree_reaction": null
+        },
+        "losses": [
+          {
+            "stator": {
+              "loss_profile": 0.0,
+              "loss_incidence": 0.0,
+              "loss_trailing": 0.0,
+              "loss_secondary": 0.0,
+              "loss_clearance": 0.0,
+              "loss_total": 0.0,
+              "loss_definition": 0.0,
+              "loss_error": 0.0
+            },
+            "rotor": {
+              "loss_profile": 0.0,
+              "loss_incidence": 0.0,
+              "loss_trailing": 0.0,
+              "loss_secondary": 0.0,
+              "loss_clearance": 0.0,
+              "loss_total": 0.0,
+              "loss_definition": 0.0,
+              "loss_error": 0.0
+            }
+          }
+        ]
+      }
+    }
+  }
+}

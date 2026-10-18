@@ -1,8 +1,8 @@
 """Separate continuous performance sizing from physical integer realization.
 
-The fixture was captured before the production change, using the isolated
-unrounded sizing diagnostic and the original integer solver/exporter. It checks
-numerical parity independently of the new geometry implementation.
+The reference retains independently captured geometry, flow stations and
+integer export hashes. Losses and efficiencies are covered separately by
+test_production_loss_models.py.
 """
 
 from copy import deepcopy
@@ -21,17 +21,17 @@ from turbodash.export_turbogrid import build_turbogrid_files
 from turbodash.turbogrid_assembly import build_assembly_layout
 
 
-BASELINE = json.loads((Path(__file__).parent / "fixtures/continuous_geometry_baseline.json").read_text())
+GEOMETRY_REFERENCE = json.loads((Path(__file__).parent / "fixtures/meanline_geometry_reference.json").read_text())
 ROWS = ("stator", "rotor")
 
 
 def solve(case="eps0", **overrides):
-    inputs = deepcopy(BASELINE[case]["inputs"])
+    inputs = deepcopy(GEOMETRY_REFERENCE[case]["inputs"])
     inputs.update(overrides)
     return core.compute_turbine_performance({"inputs": inputs})
 
 
-@pytest.fixture(scope="module", params=BASELINE)
+@pytest.fixture(scope="module", params=GEOMETRY_REFERENCE)
 def reference(request):
     return request.param, solve(request.param)
 
@@ -51,9 +51,9 @@ def assert_reference(actual, expected):
         assert actual == expected
 
 
-def test_continuous_solver_matches_prechange_diagnostic(reference):
+def test_continuous_geometry_matches_reference(reference):
     case, result = reference
-    assert_reference(result, BASELINE[case]["continuous"])
+    assert_reference(result, GEOMETRY_REFERENCE[case]["continuous"])
     for stage in result["stages_performance"]:
         assert stage["geometry"] is stage["geometry_meanline"]
         assert stage["geometry_discrete"] is None
@@ -104,7 +104,7 @@ def test_integer_realization_preserves_original_geometry_and_performance(referen
     assert stage["losses"] == result["stages_performance"][0]["losses"]
     for row in ROWS:
         geometry = stage["geometry_discrete"][row]
-        assert_reference(geometry, BASELINE[case]["integer_geometry"][row])
+        assert_reference(geometry, GEOMETRY_REFERENCE[case]["integer_geometry"][row])
         assert type(geometry["blade_count_integer"]) is int
         assert geometry["blade_count"] == geometry["blade_count_integer"]
         assert geometry["blade_count_integer"] == np.ceil(geometry["blade_count_continuous"])
@@ -113,7 +113,7 @@ def test_integer_realization_preserves_original_geometry_and_performance(referen
 
 @pytest.mark.parametrize("turbine_type", ["axial", "radial"])
 def test_explicit_integer_choice_recomputes_all_dependent_fields(turbine_type):
-    blade = BASELINE["eps0"]["inputs"]["stages"][0]["blade_geometry"]["stator"]
+    blade = GEOMETRY_REFERENCE["eps0"]["inputs"]["stages"][0]["blade_geometry"]["stator"]
     geometry = core.compute_blade_row_geometry(turbine_type, .1, .14, .02, .03, 10, 60, .8, 0, blade)
     before = deepcopy(geometry)
     count = 23
@@ -141,11 +141,11 @@ def test_invalid_integer_choices_are_rejected(reference, count):
         core.realize_blade_row_geometry(geometry, "axial", blade_count=count)
 
 
-def test_physical_exports_match_prechange_bytes(reference):
+def test_physical_exports_match_reference_bytes(reference):
     case, result = reference
     before = deepcopy(result)
     files = build_turbogrid_files(result, span_sections=3, profile_points=80)
-    assert {name: hashlib.sha256(text.encode()).hexdigest() for name, text in files.items()} == BASELINE[case]["integer_export_sha256"]
+    assert {name: hashlib.sha256(text.encode()).hexdigest() for name, text in files.items()} == GEOMETRY_REFERENCE[case]["integer_export_sha256"]
     assert result == before
 
 
@@ -154,15 +154,15 @@ def test_meshing_and_assembly_use_integer_geometry_without_mutation(reference):
     before = deepcopy(result)
     for row in ROWS:
         geometry, _, _, _, count, _ = meshing._row_inputs(result, 0, row)
-        assert count == BASELINE[case]["integer_geometry"][row]["blade_count"]
-        assert_reference(geometry, BASELINE[case]["integer_geometry"][row])
+        assert count == GEOMETRY_REFERENCE[case]["integer_geometry"][row]["blade_count"]
+        assert_reference(geometry, GEOMETRY_REFERENCE[case]["integer_geometry"][row])
         # Exercise the actual profile transfer without requiring Gmsh/VTK.
         chord = geometry["chord_meridional"]
         angles = np.deg2rad([geometry["metal_angle_in"], geometry["metal_angle_out"]])
         _, sampled = meshing._boundary_splines(geometry, angles, chord, meshing._options({"profile_points": 60}, chord * 1000))
         assert np.isfinite(sampled).all()
     layout = build_assembly_layout(result, row_gaps=[.001], span_sections=3, profile_points=80)
-    assert [row["blade_count"] for row in layout["rows"]] == [BASELINE[case]["integer_geometry"][row]["blade_count"] for row in ROWS]
+    assert [row["blade_count"] for row in layout["rows"]] == [GEOMETRY_REFERENCE[case]["integer_geometry"][row]["blade_count"] for row in ROWS]
     assert result == before
 
 
@@ -207,7 +207,7 @@ def test_legacy_saved_geometry_still_works_and_is_not_resized():
 ])
 def test_no_performance_jump_at_integer_count_transitions(case, row, reaction, variable, root):
     def point(x):
-        inputs = deepcopy(BASELINE[case]["inputs"])
+        inputs = deepcopy(GEOMETRY_REFERENCE[case]["inputs"])
         inputs["stages"][0]["degree_reaction"] = reaction
         if variable == "blade_velocity_ratio":
             inputs[variable] = x
@@ -225,17 +225,6 @@ def test_no_performance_jump_at_integer_count_transitions(case, row, reaction, v
     assert deltas[1] / deltas[0] == pytest.approx(.1, rel=.01)
     assert deltas[2] / deltas[1] == pytest.approx(.1, rel=.01)
     assert deltas[-1] < 1e-6
-
-
-def test_independent_loss_correlation_discontinuity_is_unchanged():
-    root = .5299059266124758
-    efficiencies = []
-    for x in (root - 1e-7, root + 1e-7):
-        inputs = deepcopy(BASELINE["eps80"]["inputs"])
-        inputs["blade_velocity_ratio"] = x
-        inputs["stages"][0]["degree_reaction"] = .25
-        efficiencies.append(core.compute_turbine_performance({"inputs": inputs})["overall_performance"]["efficiency_ts"])
-    assert efficiencies[1] - efficiencies[0] == pytest.approx(-1.451909309135857e-5, abs=1e-11)
 
 
 def test_meanline_table_displays_fractional_counts(reference):

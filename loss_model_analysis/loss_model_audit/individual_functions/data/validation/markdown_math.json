@@ -1,0 +1,203 @@
+{
+  "passed": true,
+  "renderer": "Installed VS Code Markdown+Math, dollar delimiters",
+  "katex_version": "0.13.11",
+  "modules": "C:\\Users\\roagr\\.vscode\\extensions\\goessner.mdmath-2.7.4\\node_modules",
+  "excluded_directories": [],
+  "markdown_files": 27,
+  "inline_equations": 1325,
+  "display_equations": 166,
+  "local_links": 775,
+  "files": [
+    {
+      "file": "loss_model_analysis/ainley_mathieson_fitting/readme.md",
+      "inline_equations": 48,
+      "display_equations": 5,
+      "local_links": 33,
+      "sha256": "f50e7284aaecfb1ab95f0dd8255c81b55030c4cd2cab82f8b4877b35defc428b"
+    },
+    {
+      "file": "loss_model_analysis/ainley_mathieson_interpolation/readme.md",
+      "inline_equations": 77,
+      "display_equations": 7,
+      "local_links": 23,
+      "sha256": "124d3c3d64df96f42e25960ef0a0756b5833fed52d8b9681417321dbafbdc590"
+    },
+    {
+      "file": "loss_model_analysis/arianna_comparison/prompt.md",
+      "inline_equations": 3,
+      "display_equations": 0,
+      "local_links": 1,
+      "sha256": "2b3259336b6ce58bfd29bf151fe34b28445a8d1b5dc04f0f48c895503cfc50b4"
+    },
+    {
+      "file": "loss_model_analysis/arianna_comparison/readme.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 3,
+      "sha256": "2c8973fe6d4466b9d051ed2026357103632d8a58247c43a85d448a4142277874"
+    },
+    {
+      "file": "loss_model_analysis/kacker_okapuu_shock/readme.md",
+      "inline_equations": 23,
+      "display_equations": 6,
+      "local_links": 29,
+      "sha256": "a73cb9905c134d9d268df4d2bd85d1c998a2939039a424ac04a81e238dcde201"
+    },
+    {
+      "file": "loss_model_analysis/kacker_okapuu_trailing_edge/readme.md",
+      "inline_equations": 77,
+      "display_equations": 20,
+      "local_links": 34,
+      "sha256": "7ee8f365b63ee1a9ccb8270a8b9a65ed87f351ba1b5a44f022920ee8f78764bb"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/individual_functions/methodology.md",
+      "inline_equations": 7,
+      "display_equations": 1,
+      "local_links": 13,
+      "sha256": "04ec16e3ca3a29c5b07f3272841e78354fd36ca5840908fbcefb4bcf1a2dd6a3"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/individual_functions/readme.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 17,
+      "sha256": "792f9559b6144f5963078349755c08f1f89bd75d4d25e78552d16a4e016b3721"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/individual_functions/report/00_ko_safeguards_overview.md",
+      "inline_equations": 26,
+      "display_equations": 0,
+      "local_links": 8,
+      "sha256": "431e11068bba952272beea495e43cc18920dc9cbc8ad3813bb14f1690e1cb7ed"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/individual_functions/report/01_ko_profile.md",
+      "inline_equations": 392,
+      "display_equations": 54,
+      "local_links": 100,
+      "sha256": "fc536e84e8a78ac3f5b9e012ca8e38734b303119777b5116afc5ef032a0d29b4"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/individual_functions/report/02_ko_secondary.md",
+      "inline_equations": 239,
+      "display_equations": 28,
+      "local_links": 46,
+      "sha256": "20a0184121fbb20ba5c10ac887e4ea91ab317414740b2b37578e9141c8a62474"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/individual_functions/report/03_ko_trailing.md",
+      "inline_equations": 95,
+      "display_equations": 16,
+      "local_links": 31,
+      "sha256": "90e515eaeb6a3b4382972b5686bfd3483cd3b9d0ce3361604f4cbeebd9bb55a5"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/individual_functions/report/04_ko_clearance.md",
+      "inline_equations": 103,
+      "display_equations": 23,
+      "local_links": 26,
+      "sha256": "abb92d3f62a9998193c9f785e4b3a560780e31b74e344ea51d4e038aefcd8e3b"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/individual_functions/report/05_conversions.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 48,
+      "sha256": "fbcb1839ab1de11cad5633550c187f73f1ec2cfc008c8646124385f442be8ea0"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/individual_functions/report/06_shared_math.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 15,
+      "sha256": "12904f5ecb10be4265ee32957417aac3b78385aa2aa76804924d06c7bc19a9e7"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/individual_functions/report/07_moustapha_incidence.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 21,
+      "sha256": "250d780b7cb77c09a34b491cedd6a17dc4a196df216e6d8141dae8954031e13f"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/individual_functions/report/08_moustapha_secondary.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 16,
+      "sha256": "3da8a6db42be46f26a4d4fe8c79c889a5c9cfad278d680a96f3876fee00fc1a4"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/individual_functions/report/09_benner_secondary.md",
+      "inline_equations": 2,
+      "display_equations": 0,
+      "local_links": 22,
+      "sha256": "3c58a32b30924e1e62a98e65d6ca3cb1437b3f23ecabfee9e5c5b66799641eb1"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/individual_functions/report/10_benner_incidence.md",
+      "inline_equations": 1,
+      "display_equations": 0,
+      "local_links": 32,
+      "sha256": "daa1804efde2a230ea3aa39d9cb14fa46113af8820e5d54bd38e84ef5d8b6641"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/individual_functions/report/11_benner_penetration.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 29,
+      "sha256": "34f7080d0ba8f3908a6db8d26afd6404c2a79becbbe6589d15f6d19776ceadab"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/overall_stage/comparison.md",
+      "inline_equations": 42,
+      "display_equations": 0,
+      "local_links": 5,
+      "sha256": "7b79eedbd8fd1cb26c4a8ae6456b82a4e9d1c37569202bc3b98d816e117cf8d6"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/overall_stage/readme.md",
+      "inline_equations": 22,
+      "display_equations": 5,
+      "local_links": 16,
+      "sha256": "afb6574d5720c76b61f6fa5e321d81c7bd63c5697508516132ffe3ab7c64527b"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/overall_stage/sensitivity_benner/readme.md",
+      "inline_equations": 63,
+      "display_equations": 0,
+      "local_links": 64,
+      "sha256": "54401c7c18e51f55071cc4c054bd696ea6ff1574a0d3e4939a7eb49ff17e756a"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/overall_stage/sensitivity_isentropic/readme.md",
+      "inline_equations": 42,
+      "display_equations": 1,
+      "local_links": 64,
+      "sha256": "37c88987a605b74bad913cef1c535016670d0b4305b7f265ad47d2985acae701"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/overall_stage/sensitivity_kacker_okapuu/readme.md",
+      "inline_equations": 63,
+      "display_equations": 0,
+      "local_links": 64,
+      "sha256": "6a9bedf6330834b026ace3ecbacfb00be71bc990295c26ac95b2a07ed473b342"
+    },
+    {
+      "file": "loss_model_analysis/loss_model_audit/readme.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 6,
+      "sha256": "ff526ad0c843558f765a7bae7b9b27098f3e10a29c16a5c5b16fea3d1882ebf5"
+    },
+    {
+      "file": "loss_model_analysis/README.md",
+      "inline_equations": 0,
+      "display_equations": 0,
+      "local_links": 9,
+      "sha256": "f1438c4c58158389b0c8523dfbcc71f8f9ce1fa5ae017910affed473096c5704"
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,332 @@
+[
+  {
+    "group": "ko_profile_pitch_chord",
+    "mechanism": "ko_profile",
+    "path": "figures/ko_profile_pitch_chord.pdf"
+  },
+  {
+    "group": "ko_profile_exit_angle",
+    "mechanism": "ko_profile",
+    "path": "figures/ko_profile_exit_angle.pdf"
+  },
+  {
+    "group": "ko_profile_Ma_rel_in",
+    "mechanism": "ko_profile",
+    "path": "figures/ko_profile_ma_rel_in.pdf"
+  },
+  {
+    "group": "ko_profile_Ma_rel_out",
+    "mechanism": "ko_profile",
+    "path": "figures/ko_profile_ma_rel_out.pdf"
+  },
+  {
+    "group": "ko_profile_thickness_chord",
+    "mechanism": "ko_profile",
+    "path": "figures/ko_profile_thickness_chord.pdf"
+  },
+  {
+    "group": "ko_profile_hub_tip",
+    "mechanism": "ko_profile",
+    "path": "figures/ko_profile_hub_tip.pdf"
+  },
+  {
+    "group": "ko_secondary_aspect_ratio",
+    "mechanism": "ko_secondary",
+    "path": "figures/ko_secondary_aspect_ratio.pdf"
+  },
+  {
+    "group": "ko_secondary_incidence",
+    "mechanism": "ko_secondary",
+    "path": "figures/ko_secondary_incidence.pdf"
+  },
+  {
+    "group": "ko_secondary_exit_angle",
+    "mechanism": "ko_secondary",
+    "path": "figures/ko_secondary_exit_angle.pdf"
+  },
+  {
+    "group": "ko_secondary_Ma_rel_out",
+    "mechanism": "ko_secondary",
+    "path": "figures/ko_secondary_ma_rel_out.pdf"
+  },
+  {
+    "group": "ko_secondary_stagger",
+    "mechanism": "ko_secondary",
+    "path": "figures/ko_secondary_stagger.pdf"
+  },
+  {
+    "group": "ko_clearance_clearance",
+    "mechanism": "ko_clearance",
+    "path": "figures/ko_clearance_clearance.pdf"
+  },
+  {
+    "group": "ko_clearance_aspect_ratio",
+    "mechanism": "ko_clearance",
+    "path": "figures/ko_clearance_aspect_ratio.pdf"
+  },
+  {
+    "group": "ko_clearance_incidence",
+    "mechanism": "ko_clearance",
+    "path": "figures/ko_clearance_incidence.pdf"
+  },
+  {
+    "group": "ko_clearance_exit_angle",
+    "mechanism": "ko_clearance",
+    "path": "figures/ko_clearance_exit_angle.pdf"
+  },
+  {
+    "group": "ko_clearance_pitch_chord",
+    "mechanism": "ko_clearance",
+    "path": "figures/ko_clearance_pitch_chord.pdf"
+  },
+  {
+    "group": "ko_trailing_trailing_ratio",
+    "mechanism": "ko_trailing",
+    "path": "figures/ko_trailing_trailing_ratio.pdf"
+  },
+  {
+    "group": "ko_trailing_exit_angle",
+    "mechanism": "ko_trailing",
+    "path": "figures/ko_trailing_exit_angle.pdf"
+  },
+  {
+    "group": "ko_trailing_Ma_rel_out",
+    "mechanism": "ko_trailing",
+    "path": "figures/ko_trailing_ma_rel_out.pdf"
+  },
+  {
+    "group": "benner_secondary_aspect_ratio",
+    "mechanism": "benner_secondary",
+    "path": "figures/benner_secondary_aspect_ratio.pdf"
+  },
+  {
+    "group": "benner_secondary_incidence",
+    "mechanism": "benner_secondary",
+    "path": "figures/benner_secondary_incidence.pdf"
+  },
+  {
+    "group": "benner_secondary_exit_angle",
+    "mechanism": "benner_secondary",
+    "path": "figures/benner_secondary_exit_angle.pdf"
+  },
+  {
+    "group": "benner_secondary_delta_ref",
+    "mechanism": "benner_secondary",
+    "path": "figures/benner_secondary_delta_ref.pdf"
+  },
+  {
+    "group": "benner_secondary_stagger",
+    "mechanism": "benner_secondary",
+    "path": "figures/benner_secondary_stagger.pdf"
+  },
+  {
+    "group": "benner_penetration_aspect_ratio",
+    "mechanism": "benner_penetration",
+    "path": "figures/benner_penetration_aspect_ratio.pdf"
+  },
+  {
+    "group": "benner_penetration_pitch_chord",
+    "mechanism": "benner_penetration",
+    "path": "figures/benner_penetration_pitch_chord.pdf"
+  },
+  {
+    "group": "benner_penetration_incidence",
+    "mechanism": "benner_penetration",
+    "path": "figures/benner_penetration_incidence.pdf"
+  },
+  {
+    "group": "benner_penetration_exit_angle",
+    "mechanism": "benner_penetration",
+    "path": "figures/benner_penetration_exit_angle.pdf"
+  },
+  {
+    "group": "benner_penetration_delta_ref",
+    "mechanism": "benner_penetration",
+    "path": "figures/benner_penetration_delta_ref.pdf"
+  },
+  {
+    "group": "benner_penetration_Re_in",
+    "mechanism": "benner_penetration",
+    "path": "figures/benner_penetration_re_in.pdf"
+  },
+  {
+    "group": "benner_incidence_incidence",
+    "mechanism": "benner_incidence",
+    "path": "figures/benner_incidence_incidence.pdf"
+  },
+  {
+    "group": "benner_incidence_leading_edge_ratio",
+    "mechanism": "benner_incidence",
+    "path": "figures/benner_incidence_leading_edge_ratio.pdf"
+  },
+  {
+    "group": "benner_incidence_wedge",
+    "mechanism": "benner_incidence",
+    "path": "figures/benner_incidence_wedge.pdf"
+  },
+  {
+    "group": "benner_incidence_pitch_chord",
+    "mechanism": "benner_incidence",
+    "path": "figures/benner_incidence_pitch_chord.pdf"
+  },
+  {
+    "group": "benner_incidence_Ma_rel_out",
+    "mechanism": "benner_incidence",
+    "path": "figures/benner_incidence_ma_rel_out.pdf"
+  },
+  {
+    "group": "moustapha_incidence_incidence",
+    "mechanism": "moustapha_incidence",
+    "path": "figures/moustapha_incidence_incidence.pdf"
+  },
+  {
+    "group": "moustapha_incidence_leading_edge_ratio",
+    "mechanism": "moustapha_incidence",
+    "path": "figures/moustapha_incidence_leading_edge_ratio.pdf"
+  },
+  {
+    "group": "moustapha_incidence_pitch_chord",
+    "mechanism": "moustapha_incidence",
+    "path": "figures/moustapha_incidence_pitch_chord.pdf"
+  },
+  {
+    "group": "moustapha_incidence_Ma_rel_out",
+    "mechanism": "moustapha_incidence",
+    "path": "figures/moustapha_incidence_ma_rel_out.pdf"
+  },
+  {
+    "group": "moustapha_secondary_incidence",
+    "mechanism": "moustapha_secondary",
+    "path": "figures/moustapha_secondary_incidence.pdf"
+  },
+  {
+    "group": "moustapha_secondary_leading_edge_ratio",
+    "mechanism": "moustapha_secondary",
+    "path": "figures/moustapha_secondary_leading_edge_ratio.pdf"
+  },
+  {
+    "group": "penetration_cap",
+    "mechanism": "benner_penetration",
+    "path": "figures/penetration_cap.pdf"
+  },
+  {
+    "group": "incidence_chi",
+    "mechanism": "benner_incidence",
+    "path": "figures/incidence_chi.pdf"
+  },
+  {
+    "group": "loading_inlet",
+    "mechanism": "benner_penetration",
+    "path": "figures/loading_inlet.pdf"
+  },
+  {
+    "group": "incidence_chi_detail",
+    "mechanism": "benner_incidence",
+    "path": "figures/incidence_chi_detail.pdf"
+  },
+  {
+    "group": "hub_interpolation",
+    "mechanism": "ko_profile",
+    "path": "figures/hub_interpolation.pdf"
+  },
+  {
+    "group": "compressibility_mach",
+    "mechanism": "ko_profile",
+    "path": "figures/compressibility_mach.pdf"
+  },
+  {
+    "group": "conversion_loss_g1.1_M0.2",
+    "mechanism": "conversions",
+    "path": "figures/conversion_loss_g1.1_m0.2.pdf"
+  },
+  {
+    "group": "conversion_loss_g1.1_M0.7",
+    "mechanism": "conversions",
+    "path": "figures/conversion_loss_g1.1_m0.7.pdf"
+  },
+  {
+    "group": "conversion_loss_g1.1_M1.2",
+    "mechanism": "conversions",
+    "path": "figures/conversion_loss_g1.1_m1.2.pdf"
+  },
+  {
+    "group": "conversion_loss_g1.1_M2.0",
+    "mechanism": "conversions",
+    "path": "figures/conversion_loss_g1.1_m2.0.pdf"
+  },
+  {
+    "group": "conversion_loss_g1.33_M0.2",
+    "mechanism": "conversions",
+    "path": "figures/conversion_loss_g1.33_m0.2.pdf"
+  },
+  {
+    "group": "conversion_loss_g1.33_M0.7",
+    "mechanism": "conversions",
+    "path": "figures/conversion_loss_g1.33_m0.7.pdf"
+  },
+  {
+    "group": "conversion_loss_g1.33_M1.2",
+    "mechanism": "conversions",
+    "path": "figures/conversion_loss_g1.33_m1.2.pdf"
+  },
+  {
+    "group": "conversion_loss_g1.33_M2.0",
+    "mechanism": "conversions",
+    "path": "figures/conversion_loss_g1.33_m2.0.pdf"
+  },
+  {
+    "group": "conversion_loss_g1.4_M0.2",
+    "mechanism": "conversions",
+    "path": "figures/conversion_loss_g1.4_m0.2.pdf"
+  },
+  {
+    "group": "conversion_loss_g1.4_M0.7",
+    "mechanism": "conversions",
+    "path": "figures/conversion_loss_g1.4_m0.7.pdf"
+  },
+  {
+    "group": "conversion_loss_g1.4_M1.2",
+    "mechanism": "conversions",
+    "path": "figures/conversion_loss_g1.4_m1.2.pdf"
+  },
+  {
+    "group": "conversion_loss_g1.4_M2.0",
+    "mechanism": "conversions",
+    "path": "figures/conversion_loss_g1.4_m2.0.pdf"
+  },
+  {
+    "group": "conversion_mach_d0.001",
+    "mechanism": "conversions",
+    "path": "figures/conversion_mach_d0.001.pdf"
+  },
+  {
+    "group": "conversion_mach_d0.05",
+    "mechanism": "conversions",
+    "path": "figures/conversion_mach_d0.05.pdf"
+  },
+  {
+    "group": "conversion_mach_d0.3",
+    "mechanism": "conversions",
+    "path": "figures/conversion_mach_d0.3.pdf"
+  },
+  {
+    "group": "conversion_mach_d0.8",
+    "mechanism": "conversions",
+    "path": "figures/conversion_mach_d0.8.pdf"
+  },
+  {
+    "group": "conversion_gamma",
+    "mechanism": "conversions",
+    "path": "figures/conversion_gamma.pdf"
+  },
+  {
+    "group": "smooth_bounds",
+    "mechanism": "shared_math",
+    "path": "figures/smooth_bounds.pdf"
+  },
+  {
+    "group": "smooth_absolute",
+    "mechanism": "shared_math",
+    "path": "figures/smooth_absolute.pdf"
+  }
+]

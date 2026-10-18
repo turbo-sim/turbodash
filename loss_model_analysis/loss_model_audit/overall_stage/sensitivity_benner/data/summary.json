@@ -1,0 +1,483 @@
+{
+  "samples": 28920,
+  "valid": 25806,
+  "statuses": {
+    "zero_speed": 80,
+    "ok": 25806,
+    "no_ideal_turbine_work": 2183,
+    "no_real_velocity_triangle": 11,
+    "no_meridional_throughflow": 840
+  },
+  "groups": {
+    "speed_r0/stator_exit_angle": {
+      "samples": 1687,
+      "valid": 1246,
+      "statuses": {
+        "zero_speed": 7,
+        "ok": 1246,
+        "no_ideal_turbine_work": 434
+      },
+      "peak_ts": {
+        "eta_ts": 0.8153363582617756,
+        "eta_tt": 0.8470247471331054,
+        "coordinate": 0.535,
+        "parameter_value": 80.0
+      },
+      "efficiency_tt_range": [
+        -43.24744940285155,
+        0.8827069119530805
+      ],
+      "efficiency_ts_range": [
+        -0.2767252855178143,
+        0.8153363582617756
+      ]
+    },
+    "speed_r0/pitch_chord": {
+      "samples": 1687,
+      "valid": 1309,
+      "statuses": {
+        "zero_speed": 7,
+        "ok": 1309,
+        "no_ideal_turbine_work": 371
+      },
+      "peak_ts": {
+        "eta_ts": 0.7218279158772085,
+        "eta_tt": 0.8360914695575964,
+        "coordinate": 0.54,
+        "parameter_value": 0.9
+      },
+      "efficiency_tt_range": [
+        -15.778280591832695,
+        0.8682666212108718
+      ],
+      "efficiency_ts_range": [
+        -0.294956848757506,
+        0.7218279158772085
+      ]
+    },
+    "speed_r0/aspect_ratio": {
+      "samples": 1205,
+      "valid": 935,
+      "statuses": {
+        "zero_speed": 5,
+        "ok": 935,
+        "no_ideal_turbine_work": 265
+      },
+      "peak_ts": {
+        "eta_ts": 0.7270976232483403,
+        "eta_tt": 0.8329099624598877,
+        "coordinate": 0.52,
+        "parameter_value": 0.5
+      },
+      "efficiency_tt_range": [
+        -14.278286493451832,
+        0.8739361522654495
+      ],
+      "efficiency_ts_range": [
+        -0.26691618045792637,
+        0.7270976232483403
+      ]
+    },
+    "speed_r0/trailing_ratio": {
+      "samples": 1205,
+      "valid": 935,
+      "statuses": {
+        "zero_speed": 5,
+        "ok": 935,
+        "no_ideal_turbine_work": 265
+      },
+      "peak_ts": {
+        "eta_ts": 0.7649907884900617,
+        "eta_tt": 0.8860869169480611,
+        "coordinate": 0.54,
+        "parameter_value": 0.0
+      },
+      "efficiency_tt_range": [
+        -19.7588050027621,
+        0.9317291577630054
+      ],
+      "efficiency_ts_range": [
+        -0.3693681846325826,
+        0.7649907884900617
+      ]
+    },
+    "speed_r0/specific_speed": {
+      "samples": 1205,
+      "valid": 935,
+      "statuses": {
+        "zero_speed": 5,
+        "ok": 935,
+        "no_ideal_turbine_work": 265
+      },
+      "peak_ts": {
+        "eta_ts": 0.7590093132691443,
+        "eta_tt": 0.8631135449951971,
+        "coordinate": 0.5,
+        "parameter_value": 0.5
+      },
+      "efficiency_tt_range": [
+        -13.989229456395663,
+        0.8786928762792842
+      ],
+      "efficiency_ts_range": [
+        -0.26151259086747364,
+        0.7590093132691443
+      ]
+    },
+    "speed_r0/mass_flow": {
+      "samples": 1205,
+      "valid": 935,
+      "statuses": {
+        "zero_speed": 5,
+        "ok": 935,
+        "no_ideal_turbine_work": 265
+      },
+      "peak_ts": {
+        "eta_ts": 0.7426558543095666,
+        "eta_tt": 0.8527898187321735,
+        "coordinate": 0.525,
+        "parameter_value": 1000.0
+      },
+      "efficiency_tt_range": [
+        -13.952239626105442,
+        0.8812320836483241
+      ],
+      "efficiency_ts_range": [
+        -0.2608211084391458,
+        0.7426558543095666
+      ]
+    },
+    "speed_r0/isentropic_mach": {
+      "samples": 1446,
+      "valid": 1122,
+      "statuses": {
+        "zero_speed": 6,
+        "ok": 1122,
+        "no_ideal_turbine_work": 318
+      },
+      "peak_ts": {
+        "eta_ts": 0.7528140740511061,
+        "eta_tt": 0.8534303704079028,
+        "coordinate": 0.485,
+        "parameter_value": 2.0
+      },
+      "efficiency_tt_range": [
+        -17.806536698443917,
+        0.8841620178082463
+      ],
+      "efficiency_ts_range": [
+        -0.3328727690757768,
+        0.7528140740511061
+      ]
+    },
+    "speed_r05/stator_exit_angle": {
+      "samples": 1687,
+      "valid": 1680,
+      "statuses": {
+        "zero_speed": 7,
+        "ok": 1680
+      },
+      "peak_ts": {
+        "eta_ts": 0.8694870935463542,
+        "eta_tt": 0.8832972435179604,
+        "coordinate": 0.72,
+        "parameter_value": 80.0
+      },
+      "efficiency_tt_range": [
+        -15.924478573094726,
+        0.8980891387581724
+      ],
+      "efficiency_ts_range": [
+        -0.24126966291748947,
+        0.8694870935463542
+      ]
+    },
+    "speed_r05/pitch_chord": {
+      "samples": 1687,
+      "valid": 1680,
+      "statuses": {
+        "zero_speed": 7,
+        "ok": 1680
+      },
+      "peak_ts": {
+        "eta_ts": 0.8415325843806163,
+        "eta_tt": 0.8974897797439156,
+        "coordinate": 0.7,
+        "parameter_value": 0.725
+      },
+      "efficiency_tt_range": [
+        -14.833055007028257,
+        0.8980891387581724
+      ],
+      "efficiency_ts_range": [
+        -0.24395967891057627,
+        0.8415325843806163
+      ]
+    },
+    "speed_r05/aspect_ratio": {
+      "samples": 1205,
+      "valid": 1200,
+      "statuses": {
+        "zero_speed": 5,
+        "ok": 1200
+      },
+      "peak_ts": {
+        "eta_ts": 0.8467396053900124,
+        "eta_tt": 0.9030430384359536,
+        "coordinate": 0.7,
+        "parameter_value": 3.0
+      },
+      "efficiency_tt_range": [
+        -13.282696892661646,
+        0.9035298284364564
+      ],
+      "efficiency_ts_range": [
+        -0.21846089476947567,
+        0.8467396053900124
+      ]
+    },
+    "speed_r05/trailing_ratio": {
+      "samples": 1205,
+      "valid": 1200,
+      "statuses": {
+        "zero_speed": 5,
+        "ok": 1200
+      },
+      "peak_ts": {
+        "eta_ts": 0.8883696487708662,
+        "eta_tt": 0.9476132913228958,
+        "coordinate": 0.705,
+        "parameter_value": 0.0
+      },
+      "efficiency_tt_range": [
+        -18.510851688405445,
+        0.9497934890977503
+      ],
+      "efficiency_ts_range": [
+        -0.3044485058624099,
+        0.8883696487708662
+      ]
+    },
+    "speed_r05/specific_speed": {
+      "samples": 1205,
+      "valid": 1200,
+      "statuses": {
+        "zero_speed": 5,
+        "ok": 1200
+      },
+      "peak_ts": {
+        "eta_ts": 0.8415325843806163,
+        "eta_tt": 0.8974897797439156,
+        "coordinate": 0.7,
+        "parameter_value": 1.05
+      },
+      "efficiency_tt_range": [
+        -13.566944958495855,
+        0.8981066296368146
+      ],
+      "efficiency_ts_range": [
+        -0.2231359308182875,
+        0.8415325843806163
+      ]
+    },
+    "speed_r05/mass_flow": {
+      "samples": 1205,
+      "valid": 1200,
+      "statuses": {
+        "zero_speed": 5,
+        "ok": 1200
+      },
+      "peak_ts": {
+        "eta_ts": 0.8466139324582709,
+        "eta_tt": 0.9029090089593511,
+        "coordinate": 0.7,
+        "parameter_value": 1000.0
+      },
+      "efficiency_tt_range": [
+        -13.535519475421639,
+        0.9035927438227089
+      ],
+      "efficiency_ts_range": [
+        -0.22261907500154826,
+        0.8466139324582709
+      ]
+    },
+    "speed_r05/isentropic_mach": {
+      "samples": 1446,
+      "valid": 1440,
+      "statuses": {
+        "zero_speed": 6,
+        "ok": 1440
+      },
+      "peak_ts": {
+        "eta_ts": 0.8693919725589133,
+        "eta_tt": 0.927079524791436,
+        "coordinate": 0.695,
+        "parameter_value": 2.0
+      },
+      "efficiency_tt_range": [
+        -14.68824540645887,
+        0.9275500337936448
+      ],
+      "efficiency_ts_range": [
+        -0.24157799127836982,
+        0.8693919725589133
+      ]
+    },
+    "reaction/stator_exit_angle": {
+      "samples": 1687,
+      "valid": 1529,
+      "statuses": {
+        "no_real_velocity_triangle": 11,
+        "ok": 1529,
+        "no_meridional_throughflow": 147
+      },
+      "peak_ts": {
+        "eta_ts": 0.8553891157727175,
+        "eta_tt": 0.8739477014149812,
+        "coordinate": 0.305,
+        "parameter_value": 80.0
+      },
+      "efficiency_tt_range": [
+        0.2631257148937146,
+        0.8910479263009062
+      ],
+      "efficiency_ts_range": [
+        0.05994322030863524,
+        0.8553891157727175
+      ]
+    },
+    "reaction/pitch_chord": {
+      "samples": 1687,
+      "valid": 1540,
+      "statuses": {
+        "ok": 1540,
+        "no_meridional_throughflow": 147
+      },
+      "peak_ts": {
+        "eta_ts": 0.8278368758314381,
+        "eta_tt": 0.8904098800062874,
+        "coordinate": 0.49,
+        "parameter_value": 0.725
+      },
+      "efficiency_tt_range": [
+        0.6322919376799248,
+        0.8905414713810739
+      ],
+      "efficiency_ts_range": [
+        0.4549700142139118,
+        0.8278368758314381
+      ]
+    },
+    "reaction/aspect_ratio": {
+      "samples": 1205,
+      "valid": 1100,
+      "statuses": {
+        "ok": 1100,
+        "no_meridional_throughflow": 105
+      },
+      "peak_ts": {
+        "eta_ts": 0.8332540441699159,
+        "eta_tt": 0.8962034596634564,
+        "coordinate": 0.495,
+        "parameter_value": 3.0
+      },
+      "efficiency_tt_range": [
+        0.5983977018884061,
+        0.8962913271972817
+      ],
+      "efficiency_ts_range": [
+        0.43058118364235515,
+        0.8332540441699159
+      ]
+    },
+    "reaction/trailing_ratio": {
+      "samples": 1205,
+      "valid": 1100,
+      "statuses": {
+        "ok": 1100,
+        "no_meridional_throughflow": 105
+      },
+      "peak_ts": {
+        "eta_ts": 0.873649549735352,
+        "eta_tt": 0.939650703749338,
+        "coordinate": 0.495,
+        "parameter_value": 0.0
+      },
+      "efficiency_tt_range": [
+        0.5241517723397534,
+        0.9397680701694573
+      ],
+      "efficiency_ts_range": [
+        0.37715701418983344,
+        0.873649549735352
+      ]
+    },
+    "reaction/specific_speed": {
+      "samples": 1205,
+      "valid": 1100,
+      "statuses": {
+        "ok": 1100,
+        "no_meridional_throughflow": 105
+      },
+      "peak_ts": {
+        "eta_ts": 0.8278368758314381,
+        "eta_tt": 0.8904098800062874,
+        "coordinate": 0.49,
+        "parameter_value": 1.05
+      },
+      "efficiency_tt_range": [
+        0.649615280419841,
+        0.8905414713810739
+      ],
+      "efficiency_ts_range": [
+        0.4674351446749013,
+        0.8278368758314381
+      ]
+    },
+    "reaction/mass_flow": {
+      "samples": 1205,
+      "valid": 1100,
+      "statuses": {
+        "ok": 1100,
+        "no_meridional_throughflow": 105
+      },
+      "peak_ts": {
+        "eta_ts": 0.8336656744686535,
+        "eta_tt": 0.8967317897294194,
+        "coordinate": 0.485,
+        "parameter_value": 1000.0
+      },
+      "efficiency_tt_range": [
+        0.625615154976416,
+        0.8971514078122698
+      ],
+      "efficiency_ts_range": [
+        0.45016568928029804,
+        0.8336656744686535
+      ]
+    },
+    "reaction/isentropic_mach": {
+      "samples": 1446,
+      "valid": 1320,
+      "statuses": {
+        "ok": 1320,
+        "no_meridional_throughflow": 126
+      },
+      "peak_ts": {
+        "eta_ts": 0.8579469968050868,
+        "eta_tt": 0.9227541807633426,
+        "coordinate": 0.505,
+        "parameter_value": 2.0
+      },
+      "efficiency_tt_range": [
+        0.40366007943371146,
+        0.9229916437597078
+      ],
+      "efficiency_ts_range": [
+        0.2904563875216014,
+        0.8579469968050868
+      ]
+    }
+  }
+}

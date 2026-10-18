@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "counts": {
+    "tests": 95,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "xml_sha256": "0310258014b5fb91c4ed9d3350eb902bd8f72989733725d1dcc08364e2d0f5e5",
+  "test_command": "python -B -m pytest loss_model_analysis/loss_model_audit/individual_functions/tests loss_model_analysis/kacker_okapuu_trailing_edge/test_model.py -q",
+  "source_sha256": {
+    "turbodash/loss_models/loss_coefficient_conversion.py": "a9a8a5943bd91c352c4607fade51272e5ad60de02f8d14f4759e5407b02c1279",
+    "turbodash/loss_models/loss_model.py": "8fc6bc7d5e32bd060a0c836a6be110e49065ed618f5483c70df50d68d6f10975",
+    "turbodash/loss_models/loss_model_benner.py": "6a95683659c639508bf93d5a743d09a5a5998d4cbf5e4ce750fc484f9490bbcd",
+    "turbodash/loss_models/loss_model_kacker_okapuu.py": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51",
+    "turbodash/loss_models/loss_model_moustapha.py": "0748aa6c29528f98e0e6a12e61b9ed34f263f9f576f3664b9ebf322ef3098d23",
+    "turbodash/loss_models/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
+    "turbodash/loss_models/_blade_loading.py": "b5b4956b978eb10ed75ee40e0b0f4bfbb4e34e4e8ebf9edee85186f8277ab18a",
+    "turbodash/loss_models/_numerics.py": "09bb30e75bf4ec4a25a2cba06578f68bebe483db1aba79dafce8af185983532b",
+    "turbodash/loss_models/_trailing_edge.py": "bb922ddffcab0f786fb8a9f8dde21840cc6df41ba80ce7b461e5a4501bbe3d00",
+    "turbodash/loss_models/__init__.py": "fcc03d0e9ee610b36333efe8c19d8ad9f49f79c2d91e48654bd454103e3374b5",
+    "loss_model_analysis/loss_model_audit/individual_functions/tests/test_analytical_profile.py": "7ccaa61efe3b72ac6fbd2ce861cdd02e3c4170442e4dc89996309c33087b0867",
+    "loss_model_analysis/loss_model_audit/individual_functions/tests/test_differentiation.py": "f5d006742f7a6d0c975bfc8ca40d483ea0d71460a607040e7100699e3e349451",
+    "loss_model_analysis/loss_model_audit/individual_functions/tests/test_incidence_conversion_refinement.py": "3581817f89e02ad3f49ecf9cf2cd60e792ab85201dc3d2716bb9673cc89ef382",
+    "loss_model_analysis/loss_model_audit/individual_functions/tests/test_profile_angle_refinement.py": "2186f999e0714da9913002c876a396a2f5051c02a79cfdd8ece274653b81a09d",
+    "loss_model_analysis/loss_model_audit/individual_functions/tests/test_profile_review.py": "cc88737b115619e24a64ad20ac837ce3a8ac58963939f1dc77d74c36aef185e1",
+    "loss_model_analysis/loss_model_audit/individual_functions/tests/test_profile_secondary_refinements.py": "a2beba7de7a0e9c1e16d061c5c51797bb60c875e129cf6cfeb9338ab17daa56d",
+    "loss_model_analysis/loss_model_audit/individual_functions/tests/test_reynolds_blending.py": "f4d2a23a23e4e81b18b7978f66fb5aa284941f38d395d159f91bf6c3f7e21305",
+    "loss_model_analysis/kacker_okapuu_trailing_edge/test_model.py": "42d2ed90b2dfc4c1b2bcdfe259390376fb84024c3bf236c0a9397c1502c6f973",
+    "loss_model_analysis/kacker_okapuu_trailing_edge/model.py": "c907c3060fd3e498072394b17be626126ce446efdafead342b07f85e49a9a6d4"
+  }
+}

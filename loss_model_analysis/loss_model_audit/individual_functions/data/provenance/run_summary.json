@@ -1,0 +1,14 @@
+{
+  "level": "fundamental",
+  "initial_points": 200,
+  "studies": 78,
+  "comparison_figures": 66,
+  "status_counts": {
+    "candidate": {
+      "ok": 20824,
+      "nonfinite": 2153,
+      "exception": 0
+    }
+  },
+  "implementation": "current production source"
+}

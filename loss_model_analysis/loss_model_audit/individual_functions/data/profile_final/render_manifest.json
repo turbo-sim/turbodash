@@ -1,0 +1,21 @@
+{
+  "figures": 5,
+  "model_calls": 0,
+  "derivative_recalculations": 0,
+  "files": {
+    "ko_profile_final_geometry.pdf": "9ec07ab8872d460e57c53f07c66c4a118f3a448f4a9f575bcb068330ddd27f8c",
+    "ko_profile_final_mach_inlet.pdf": "0e2244d8680bf818d0a0d01430384b88a98ed7d27445ef76787c477b54e37555",
+    "ko_profile_final_mach_hub.pdf": "95471b138c86b35be34a31505353f019c75f161e0deb7add7267abd6f335d6cc",
+    "ko_profile_final_components.pdf": "0bb9e7fc9faed0d08735f61eaae74351534e315356c7c355f26da3d09cd45418",
+    "ko_profile_thickness_smoothness.pdf": "9d86d9684c22e80f8715676dc00ef505c6c1fe702e48b8a790334b9079470cde"
+  },
+  "script_sha256": "01f440940f0fcbca396c1a9f472a8a22693bf3138a5cdaf8e9586c608db946b4",
+  "data_sha256": {
+    "geometry_spacing": "bd220b758d778da652e75e2eb41381b54414d1fdf3bf6634ee749361354f8352",
+    "geometry_angle": "1e1334d07a926112b6eebc5954167239a2d635de7b7279a1d4e1d0bf9f7391f5",
+    "mach_inlet": "4e35c9f487e104ab41ab7e1dcb2f205488fb8b4a2310ba428f752ea23dda1efe",
+    "mach_hub": "6b7eb02991e7d059f6d60ec6bd00e95b2243d003a173328e621be02da8e5cd95",
+    "component_budget": "d012308413c12b8f692aabd6d0f51217f68e2eac8bbb0f713f759eb8274c73bb",
+    "thickness_factor": "9b71cbc6aa4677ba83d703e80e05c04161a3c5ea2177160db6d3f01d3abea9e1"
+  }
+}

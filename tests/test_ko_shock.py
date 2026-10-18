@@ -1,9 +1,7 @@
 """Approved shock correlation, production integration and complex-step gradients."""
-import importlib.util
-from pathlib import Path
 import numpy as np
 import pytest
-from turbodash.loss_models_new import loss_model_kacker_okapuu as ko
+from turbodash.loss_models import loss_model_kacker_okapuu as ko
 
 
 def inputs(mach=.6, ratio=.5, reynolds=5e5):
@@ -15,19 +13,17 @@ def inputs(mach=.6, ratio=.5, reynolds=5e5):
 
 
 @pytest.mark.parametrize("row", [0, 1])
-def test_matches_approved_standalone_components(row):
-    jax = pytest.importorskip("jax")
-    jax.config.update("jax_enable_x64", True)
-    path = Path(__file__).resolve().parents[1]/"improving_turbodash/kacker_okapuu_shock/shock_loss.py"
-    spec = importlib.util.spec_from_file_location("approved_shock", path)
-    approved = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(approved)
-    f, g = inputs(np.linspace(0, 1.2, 91)[None, :], np.array([.01, .15, .3, .5, .8, 1.])[:, None])
-    actual, expected = ko.get_shock_loss(f, g, row), approved.get_shock_loss(f, g, row)
-    assert actual.keys() == expected.keys()
-    for key in actual:
-        np.testing.assert_allclose(actual[key], expected[key], rtol=2e-12, atol=2e-14)
-    assert np.all((actual["Y_shock"] >= 0) & (actual["Y_shock"] <= .5))
+def test_chart_domain_matches_independent_ko_expression(row):
+    f, g = inputs(np.linspace(.5, 1.2, 91)[None, :], np.array([.5, .6, 1.])[:, None])
+    actual = ko.get_shock_loss(f, g, row)
+    amplitude,end = ko.HUB_FIT[row]
+    factor = 1+amplitude*np.maximum(end-g["hub_tip_ratio_in"],0)**2
+    expected_raw = .75*(factor*f["Ma_rel_in"]-.4)**1.75*g["hub_tip_ratio_in"]*.8
+    np.testing.assert_allclose(actual["f_hub"],np.broadcast_to(factor,actual["f_hub"].shape),rtol=2e-14)
+    np.testing.assert_allclose(actual["Y_shock_raw"],expected_raw,rtol=2e-14)
+    low = expected_raw <= .25
+    np.testing.assert_allclose(actual["Y_shock"][low], expected_raw[low], rtol=2e-14, atol=1e-16)
+    assert np.all((actual["Y_shock"] >= 0) & (actual["Y_shock"] <= .7))
     np.testing.assert_allclose(actual["Y_shock"], actual["Y_shock_mean_inlet"]*actual["head_ratio_effective"], rtol=2e-15)
 
 
@@ -71,10 +67,9 @@ def test_onset_c2_and_exact_zero(row):
     np.testing.assert_allclose(function(upper), (upper-.4)**1.75, rtol=2e-15)
     hub = lambda r: ko.get_hub_to_mean_mach_ratio(r, row)
     dhub = lambda r: np.imag(hub(r+1e-25j))/1e-25
-    assert abs(dhub(0.)) < 1e-20
-    np.testing.assert_allclose(dhub(.3-1e-7), dhub(.3+1e-7), atol=3e-6)
-    np.testing.assert_allclose((dhub(.3)-dhub(.3-1e-6))/1e-6,
-                               (dhub(.3+1e-6)-dhub(.3))/1e-6, atol=2e-3)
+    np.testing.assert_allclose(dhub(.5-1e-7), dhub(.5+1e-7), atol=3e-6)
+    np.testing.assert_allclose((dhub(.5)-dhub(.5-1e-6))/1e-6,
+                               (dhub(.5+1e-6)-dhub(.5))/1e-6, atol=2e-3)
 
 
 @pytest.mark.parametrize("row", [0, 1])
@@ -84,7 +79,7 @@ def test_complete_shock_complex_step_gradients(row):
         f, g = inputs(m, ratio)
         f.update(p_in=f["p0_rel_in"]-q1, p_out=f["p0_rel_out"]-q2)
         return ko.get_shock_loss(f, g, row)["Y_shock"]
-    for ratio in (.15, .3, .6):
+    for ratio in (-1., -.1, 0., .15, .3, .5, .6):
         x = np.array([.45/ko.get_hub_to_mean_mach_ratio(ratio, row), ratio, 4e4, 5e4])
         for i, h in enumerate((1e-6, 1e-6, 1., 1.)):
             imaginary = np.zeros(4, dtype=complex); imaginary[i] = 1e-25j
@@ -96,7 +91,7 @@ def test_complete_shock_complex_step_gradients(row):
 
 def test_invalid_domains_return_nan():
     for changes, ratio in (({"p_in":2.1e5}, .5), ({"p_out":1.8e5}, .5),
-                           ({"p_out":1.9e5}, .5), ({"Ma_rel_in":-.1}, .5), ({}, 0.), ({}, 1.1)):
+                           ({"p_out":1.9e5}, .5), ({"Ma_rel_in":-.1}, .5), ({}, np.nan), ({}, 1.1)):
         f, g = inputs(ratio=ratio)
         f.update(changes)
         assert np.isnan(ko.get_shock_loss(f, g, 0)["Y_shock"])
@@ -108,9 +103,9 @@ def test_upper_continuation_preserves_low_losses_and_has_c2_join():
     np.testing.assert_array_equal(ko.continue_shock_loss(low), low)
     values = ko.continue_shock_loss(np.r_[low, np.geomspace(.250001, 1e100, 101)])
     assert np.all(np.isfinite(values)) and np.all(np.diff(values) >= 0)
-    assert np.all((values >= 0) & (values <= .5))
-    np.testing.assert_allclose(ko.continue_shock_loss(np.array([.5, 1., 5.])),
-                               [.5-.25/3, .5-.25/13, .5-.25/381], rtol=2e-15)
+    assert np.all((values >= 0) & (values <= .7))
+    np.testing.assert_allclose(ko.continue_shock_loss(np.array([.7, 1.6, 8.8])),
+                               [.7-.45/3, .7-.45/13, .7-.45/381], rtol=2e-15)
     derivative = lambda y: np.imag(ko.continue_shock_loss(y+1e-25j))/1e-25
     h = 1e-7
     np.testing.assert_allclose([derivative(.25-h), derivative(.25), derivative(.25+h)], 1., atol=1e-10)
@@ -125,9 +120,9 @@ def test_complete_shock_is_bounded_for_small_exit_heads(row):
     f["p_out"] = f["p0_rel_out"]-np.geomspace(1e-8, 1e5, 151)
     result = ko.get_shock_loss(f, g, row)
     assert np.all(np.isfinite(result["Y_shock"]))
-    assert np.all((result["Y_shock"] >= 0) & (result["Y_shock"] <= .5))
+    assert np.all((result["Y_shock"] >= 0) & (result["Y_shock"] <= .7))
     assert np.all(np.diff(result["Y_shock"]) <= 1e-15)
-    np.testing.assert_allclose(result["Y_shock"][0], .5, atol=1e-12)
+    np.testing.assert_allclose(result["Y_shock"][0], .7, atol=1e-12)
     np.testing.assert_allclose(result["Y_shock_raw"], result["Y_shock_mean_inlet"]*result["head_ratio"])
     np.testing.assert_allclose(result["Y_shock"], result["Y_shock_mean_inlet"]*result["head_ratio_effective"])
     assert np.all(result["head_ratio_effective"] <= result["head_ratio"]*(1+1e-14))
@@ -146,3 +141,24 @@ def test_complete_upper_branch_pressure_derivatives(row):
         finite = (function(q2-2*h)-8*function(q2-h)+8*function(q2+h)-function(q2+2*h))/(12*h)
         np.testing.assert_allclose(exact, finite, rtol=3e-7, atol=1e-13)
         assert exact < 0
+
+
+@pytest.mark.parametrize("row", [0, 1])
+def test_signed_geometry_uses_one_coordinate_for_mach_and_span(row):
+    ratios = np.array([-1e100, -1., -.1, 0., .1, .3, .5, .8, 1.])
+    f, g = inputs(.8, ratios)
+    ko.validate_shock_inputs(f, g, row)
+    result = ko.get_shock_loss(f, g, row)
+    effective = result["effective_hub_tip_ratio"]
+    assert np.isfinite(result["Y_shock"]).all()
+    assert np.all(result["Y_shock"] > 0)
+    np.testing.assert_array_equal(result["hub_tip_ratio"], ratios)
+    np.testing.assert_allclose(effective[:1], .3, atol=1e-15)
+    np.testing.assert_allclose(effective[ratios == 0], .3+.2/(1+2.5+2.5**2), rtol=1e-15)
+    np.testing.assert_array_equal(effective[ratios >= .5], ratios[ratios >= .5])
+    np.testing.assert_allclose(result["Y_shock_mean_inlet"], result["Y_shock_hub"]*effective)
+    # Independent unrounded chart formula at low ratios catches double mapping.
+    amplitude, end = ko.HUB_FIT[row]
+    np.testing.assert_allclose(result["f_hub"][:6], 1+amplitude*(end-effective[:6])**2)
+    map_slope = lambda q: np.imag(ko.effective_hub_tip_ratio(q+1e-25j))/1e-25
+    np.testing.assert_allclose([map_slope(.5-1e-6),map_slope(.5),map_slope(.5+1e-6)],1.,atol=1e-9)

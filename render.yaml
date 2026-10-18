@@ -4,5 +4,5 @@ services:
     env: python
     plan: free
     autoDeploy: true
-    buildCommand: "poetry install --no-root --without dev -E mesh"
+    buildCommand: "poetry install --no-root --without dev"
     startCommand: "gunicorn turbodash.app_turbine:server"

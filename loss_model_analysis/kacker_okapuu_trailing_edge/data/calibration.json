@@ -1,0 +1,47 @@
+{
+  "figure": 14,
+  "printed_page": 116,
+  "pdf_page": 6,
+  "render_dpi": 300,
+  "crop_box": [
+    260,
+    145,
+    1250,
+    770
+  ],
+  "x_ticks_pixels": [
+    219.0,
+    387.0,
+    560.0,
+    730.0,
+    899.0
+  ],
+  "x_ticks_values": [
+    0.0,
+    0.1,
+    0.2,
+    0.30000000000000004,
+    0.4
+  ],
+  "y_ticks_pixels": [
+    530.5,
+    359.5,
+    197.0,
+    36.5
+  ],
+  "y_ticks_values": [
+    0.0,
+    0.05,
+    0.1,
+    0.15
+  ],
+  "axis_map": "Piecewise linear through printed ticks, after measured scan-skew correction",
+  "vertical_axis_skew_pixels": 3,
+  "horizontal_axis_skew_pixels": 1,
+  "source_pdf_sha256": "c6e2e9913e8a5c42462abf1ef08161b7e33ff5184b0d720d51cd93d704d191fe",
+  "source_pixels_sha256": "dba845ee5a963f3b22223e3f3fecdd37278b25538212bf7d46774fc14df1c57a",
+  "digitizer_sha256": "9ff83767fe5d7794012fecc3f4c3b1f760b193f714f0c842031d13622d62d9fe",
+  "points": 42,
+  "uncertainty": "Stroke/axis/scan reading uncertainty; not experimental scatter. Letter-contact points use the lower edge minus a two-pixel half-width with larger uncertainty.",
+  "excluded": "Merged origin below approximately t/o=0.05. Zero loss at zero thickness is an imposed physical endpoint, not a fabricated measured point. Existing source table values are not digitization input."
+}

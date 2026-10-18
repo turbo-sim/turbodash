@@ -1,14 +1,18 @@
+"""Production blade-row loss model selection and comparison residuals.
+
+Plain names select Kacker--Okapuu, Moustapha, Benner, isentropic or custom
+losses. Lengths use consistent units, chord is true chord and height is full
+blade height. Angles are degrees from the meridional direction. The models
+use NumPy; the backend seam does not imply a JIT guarantee.
+"""
+
 from . import loss_model_benner as br
 from . import loss_model_kacker_okapuu as ko
 from . import loss_model_moustapha as mo
-# import jax
-
-# import jax.numpy as jnp
-import numpy as jnp
+from ._backend import jnp
 
 LOSS_MODELS = ["kacker_okapuu", "moustapha", "benner", "isentropic", "custom"]
 LOSS_COEFFICIENTS = ["stagnation_pressure", "kinetic_energy"]
-
 KEYS_LOSSES = [
     "loss_definition",
     "loss_error",
@@ -22,62 +26,82 @@ KEYS_LOSSES = [
 
 
 def _normalize_loss_options(loss_model_options):
-    """
+    r"""
     Accept string or dict; return a dict with defaults.
     """
     if isinstance(loss_model_options, str):
         opts = {"model": loss_model_options}
     elif isinstance(loss_model_options, dict):
-        opts = dict(loss_model_options)  # shallow copy
+        opts = dict(loss_model_options)
     else:
         raise ValueError(
             f"loss_model_options must be str or dict, got {type(loss_model_options).__name__}"
         )
-
-    # Defaults
     opts.setdefault("loss_coefficient", "stagnation_pressure")
     opts.setdefault("inlet_displacement_thickness_height_ratio", 0.011)
     opts.setdefault("tuning_factors", {})
-
-    # Custom model must have a value
     if opts["model"] == "custom" and "custom_value" not in opts:
         raise ValueError(
             "custom loss model requires 'custom_value' in loss_model_options"
         )
-
-    # Validate loss coefficient
     if opts["loss_coefficient"] not in LOSS_COEFFICIENTS:
         raise ValueError(
-            f"Invalid loss_coefficient '{opts['loss_coefficient']}'. "
-            f"Available: {', '.join(LOSS_COEFFICIENTS)}"
+            f"Invalid loss_coefficient '{opts['loss_coefficient']}'. Available: {', '.join(LOSS_COEFFICIENTS)}"
         )
-
     return opts
 
 
 def evaluate_loss_model(loss_model_options, input_parameters):
-    """
-    Calculate loss coefficient based on the selected loss model.
+    r"""
+    Evaluate one blade-row loss model and its comparison residual.
 
-    `loss_model_options` may be a string (e.g. 'benner') or a dict like:
-      {"model": "benner", "loss_coefficient": "stagnation_pressure",
-       "inlet_displacement_thickness_height_ratio": 0.011, "tuning_factors": {...}}
+    Select Kacker--Okapuu, Moustapha, Benner, isentropic or a prescribed
+    custom coefficient. The correlation components are returned together
+    with a comparison definition and residual:
+
+    .. math::
+
+        Y_\mathrm{definition}
+          =\frac{p_{0,\mathrm{rel,is}}-p_{0,\mathrm{rel,out}}}
+                 {p_{0,\mathrm{rel,out}}-p_\mathrm{out}},
+        \qquad
+        \zeta_\mathrm{definition}
+          =\frac{h_\mathrm{out}-h_\mathrm{is}}{W_\mathrm{out}^2/2},
+        \qquad
+        e_\mathrm{loss}=C_\mathrm{definition}-C_\mathrm{total}.
+
+    Parameters
+    ----------
+    loss_model_options : str or dict
+        Model name or mapping containing ``model``, ``loss_coefficient``,
+        optional reference inlet displacement-thickness ratio and optional
+        ``tuning_factors``. A custom model also requires ``custom_value``.
+    input_parameters : dict
+        Row-frame ``flow`` values and ``geometry``. Normalized options are
+        supplied to the component model under the ``loss_model`` key.
+
+    Returns
+    -------
+    dict
+        Component coefficients, ``loss_total``, ``loss_definition`` and
+        ``loss_error``. Benner additionally returns penetration diagnostics.
+
+    Notes
+    -----
+    ``loss_coefficient`` selects the comparison definition; it does not
+    convert the returned empirical component coefficients. Tuning factors
+    multiply named outputs after assembly without rebuilding the stored
+    total or diagnostics. These conventions apply to all model selections.
     """
-    # Normalize options and inject into input_parameters so model code can read it
     opts = _normalize_loss_options(loss_model_options)
     model = opts["model"]
-
-    # Ensure input_parameters has the options under the expected key
-    input_parameters = dict(input_parameters)  # shallow copy
+    input_parameters = dict(input_parameters)
     input_parameters["loss_model"] = opts
-
-    # Function mappings
     model_funcs = {
         "kacker_okapuu": ko.compute_losses,
         "moustapha": mo.compute_losses,
         "benner": br.compute_losses,
     }
-
     if model in model_funcs:
         loss_dict = model_funcs[model](input_parameters)
     elif model == "isentropic":
@@ -105,81 +129,34 @@ def evaluate_loss_model(loss_model_options, input_parameters):
         raise ValueError(
             f"Invalid loss model '{model}'. Available: {', '.join(LOSS_MODELS)}"
         )
-
-    # Apply tuning factors if any
     tuning = {
         f"loss_{k}": jnp.asarray(v, dtype=jnp.float64)
         for k, v in opts.get("tuning_factors", {}).items()
     }
     apply_tuning_factors(loss_dict, tuning)
-
-    # Compute loss coefficient definition
     loss_coeff = opts["loss_coefficient"]
     if loss_coeff == "stagnation_pressure":
         p0rel_in = input_parameters["flow"]["p0_rel_in"]
         p0_rel_is = input_parameters["flow"]["p0_rel_is"]
         p0rel_out = input_parameters["flow"]["p0_rel_out"]
         p_out = input_parameters["flow"]["p_out"]
-        # definition using isentropic reference:
         Y_definition = (p0_rel_is - p0rel_out) / (p0rel_out - p_out)
     elif loss_coeff == "kinetic_energy":
         w = input_parameters["flow"]["w_out"]
         h = input_parameters["flow"]["h_out"]
         h_is = input_parameters["flow"]["h_is"]
-
-        # jax.debug.print(
-        #     "Loss model (kinetic_energy):\n"
-        #     "  w = {w}\n"
-        #     "  h = {h}\n"
-        #     "  h_is = {h_is}\n"
-        #     "  numerator (h - h_is) = {num}\n"
-        #     "  denominator (0.5*w^2) = {den}\n",
-        #     w=w,
-        #     h=h,
-        #     h_is=h_is,
-        #     num=(h - h_is),
-        #     den=(0.5 * w**2),)
-
         Y_definition = (h - h_is) / (0.5 * w**2)
     else:
-        # guarded above, but keep safety
         raise ValueError(
-            f"Invalid loss coefficient '{loss_coeff}'. "
-            f"Available: {', '.join(LOSS_COEFFICIENTS)}"
+            f"Invalid loss coefficient '{loss_coeff}'. Available: {', '.join(LOSS_COEFFICIENTS)}"
         )
-
-    # Loss error vs. model sum
-    #  TODO clipping trick to prevent residual blow up in the first iteration
-    # Y_definition = jnp.clip(Y_definition, 0.0, 1.0)
-
-    # jax.debug.print(
-    #     " Y_def={Y_def},  Y_total={Y_total}\n",
-    #     Y_def=Y_definition,
-    #     Y_total=loss_dict["loss_total"],
-    # )
-
-    # jax.debug.print(
-    #     " Loss components:\n"
-    #     "  profile={loss_profile}\n"
-    #     "  incidence={loss_incidence}\n"
-    #     "  trailing={loss_trailing}\n"
-    #     "  secondary={loss_secondary}\n"
-    #     "  clearance={loss_clearance}\n",
-    #     loss_profile=loss_dict["loss_profile"],
-    #     loss_incidence=loss_dict["loss_incidence"],
-    #     loss_trailing=loss_dict["loss_trailing"],
-    #     loss_secondary=loss_dict["loss_secondary"],
-    #     loss_clearance=loss_dict["loss_clearance"],
-    # )
-
     loss_dict["loss_definition"] = Y_definition
     loss_dict["loss_error"] = Y_definition - loss_dict["loss_total"]
-
     return loss_dict
 
 
 def apply_tuning_factors(loss_dict, tuning_factors):
-    """
+    r"""
     Multiply components by provided tuning factors (keys like 'loss_profile', ...).
     """
     for key, factor in tuning_factors.items():

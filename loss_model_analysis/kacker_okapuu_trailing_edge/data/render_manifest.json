@@ -1,0 +1,54 @@
+{
+  "figures": 6,
+  "model_calls": 0,
+  "derivative_recalculations": 0,
+  "files": {
+    "digitization_overlay.pdf": "8e3d63d6a4614ed322e630cae4126630c315c42749cf9ff0c50fa1a846d01e24",
+    "reference_fit.pdf": "c832d7c9998dfc065837b12cd8c16fbf6e7531aa44159bf81dc384b06d5a018a",
+    "reference_continuation.pdf": "54fd8a9551a3c57249a3ebc4cea5011509d89534ac94d1cb804bff13a1b77592",
+    "z_interpolation.pdf": "e34b15ef600bff14b4352428163dc4472378b6025a4a6fafccf4416d4782ac77",
+    "thickness_sensitivity.pdf": "80f4d994a6e873a0500286fb2b985379c5d1257418487fb67cd593b9c3f6299b",
+    "mach_sensitivity.pdf": "8a005669580261cc114d1b707ea063007b3461fd3f4e8d68c41bd4617a983411"
+  },
+  "data_sha256": {
+    "digitized_points.csv": "f1bbfb09fc02a0bf2f63225111f99ccb0607c8b87848e3ae163704123954f19e",
+    "fit_residuals.csv": "818cad71d0cfc245b7453af68cb9be0a67f4e6a20879cdcc3bbde7fb9046a4be",
+    "join_checks.csv": "aa9d855f2384586cde92508207a8d2ac6f2711b8d0d04959d572e0573965ef65",
+    "mach_sensitivity.csv": "b5a806d5b4efb6980c6c0d9ad034ddb9702ddcdfb3f5776ecaa6b9209d1f4f31",
+    "references.csv": "f42cc8b70083fa056a3356fea53015173b9c0636170dd75e1a493b5b84f21e68",
+    "thickness_sensitivity.csv": "9c5c272da918b1a3060e255e70144e3177082166766f04173530209320a05c21",
+    "z_sensitivity.csv": "c90f30e0a83ef2f53ec011901ee18a4f205b029dbd15bbbc0c98f76a3dc2e9f2"
+  },
+  "code_sha256": {
+    "digitize.py": "9ff83767fe5d7794012fecc3f4c3b1f760b193f714f0c842031d13622d62d9fe",
+    "fit.py": "681899a896268a5e084829ae3c99c454b9882d21edc43b003ffc47dae2351bf3",
+    "fit_constants.py": "5b7fcdbd58c776ad973515cf54fdbbbbc9421e03ea4cb1ddbbf2be02f7dbf161",
+    "model.py": "c907c3060fd3e498072394b17be626126ce446efdafead342b07f85e49a9a6d4",
+    "report.py": "9744a3d9c11292097d3bda40aea74310c729916ad2c040fcf9fa9adb1c44c6f7",
+    "run.py": "f9a88bca37421d87edefb6eb51d0ab1d0179dde617e0aebedec19d2cf5ed1f39",
+    "test_model.py": "42d2ed90b2dfc4c1b2bcdfe259390376fb84024c3bf236c0a9397c1502c6f973"
+  },
+  "validated_code_sha256": {
+    "digitize.py": "9ff83767fe5d7794012fecc3f4c3b1f760b193f714f0c842031d13622d62d9fe",
+    "fit.py": "681899a896268a5e084829ae3c99c454b9882d21edc43b003ffc47dae2351bf3",
+    "fit_constants.py": "5b7fcdbd58c776ad973515cf54fdbbbbc9421e03ea4cb1ddbbf2be02f7dbf161",
+    "model.py": "c907c3060fd3e498072394b17be626126ce446efdafead342b07f85e49a9a6d4",
+    "report.py": "9744a3d9c11292097d3bda40aea74310c729916ad2c040fcf9fa9adb1c44c6f7",
+    "run.py": "f9a88bca37421d87edefb6eb51d0ab1d0179dde617e0aebedec19d2cf5ed1f39",
+    "test_model.py": "42d2ed90b2dfc4c1b2bcdfe259390376fb84024c3bf236c0a9397c1502c6f973"
+  },
+  "comparison_source_sha256": {
+    "turbodash/loss_models/__init__.py": "fcc03d0e9ee610b36333efe8c19d8ad9f49f79c2d91e48654bd454103e3374b5",
+    "turbodash/loss_models/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
+    "turbodash/loss_models/_blade_loading.py": "b5b4956b978eb10ed75ee40e0b0f4bfbb4e34e4e8ebf9edee85186f8277ab18a",
+    "turbodash/loss_models/_numerics.py": "09bb30e75bf4ec4a25a2cba06578f68bebe483db1aba79dafce8af185983532b",
+    "turbodash/loss_models/_trailing_edge.py": "bb922ddffcab0f786fb8a9f8dde21840cc6df41ba80ce7b461e5a4501bbe3d00",
+    "turbodash/loss_models/loss_coefficient_conversion.py": "a9a8a5943bd91c352c4607fade51272e5ad60de02f8d14f4759e5407b02c1279",
+    "turbodash/loss_models/loss_model.py": "8fc6bc7d5e32bd060a0c836a6be110e49065ed618f5483c70df50d68d6f10975",
+    "turbodash/loss_models/loss_model_benner.py": "6a95683659c639508bf93d5a743d09a5a5998d4cbf5e4ce750fc484f9490bbcd",
+    "turbodash/loss_models/loss_model_kacker_okapuu.py": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51",
+    "turbodash/loss_models/loss_model_moustapha.py": "0748aa6c29528f98e0e6a12e61b9ed34f263f9f576f3664b9ebf322ef3098d23",
+    "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772"
+  },
+  "comparison_source_matches_worktree": true
+}

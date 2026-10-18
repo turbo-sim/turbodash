@@ -11,6 +11,7 @@ packages = [{ include = "turbodash" }]
 
 [tool.poetry.scripts]
 turbodash = "turbodash.app_turbine:main"
+turbodash-experimental = "turbodash.app_experimental:main"
 turbodash-stage = "turbodash.app:main"
 
 [tool.poetry.dependencies]

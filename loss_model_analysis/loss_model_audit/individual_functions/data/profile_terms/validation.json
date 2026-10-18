@@ -1,0 +1,390 @@
+{
+  "passed": true,
+  "reference_curves": 34,
+  "angle_range": [
+    -20,
+    80
+  ],
+  "spacing_range": [
+    0,
+    2.0
+  ],
+  "angle_display": "Signed physical angle beta; unsigned family input is the smooth magnitude of the production effective outlet angle and bounded tangent angle, with fixed positive design direction.",
+  "zero_spacing_value": 0.5,
+  "zero_spacing_slope": 0.0,
+  "derivative_checks": [
+    {
+      "family": "nozzle",
+      "direction": "angle",
+      "fixed": 0.0,
+      "max_derivative_error": 6.570555175457639e-19
+    },
+    {
+      "family": "nozzle",
+      "direction": "angle",
+      "fixed": 0.3,
+      "max_derivative_error": 3.1174929716708266e-13
+    },
+    {
+      "family": "nozzle",
+      "direction": "angle",
+      "fixed": 0.45,
+      "max_derivative_error": 1.9495863257112944e-13
+    },
+    {
+      "family": "nozzle",
+      "direction": "angle",
+      "fixed": 0.55,
+      "max_derivative_error": 2.6363416658070626e-13
+    },
+    {
+      "family": "nozzle",
+      "direction": "angle",
+      "fixed": 0.65,
+      "max_derivative_error": 2.600055587498318e-13
+    },
+    {
+      "family": "nozzle",
+      "direction": "angle",
+      "fixed": 0.75,
+      "max_derivative_error": 3.9858220890476304e-13
+    },
+    {
+      "family": "nozzle",
+      "direction": "angle",
+      "fixed": 1.5,
+      "max_derivative_error": 1.1584179795964822e-12
+    },
+    {
+      "family": "nozzle",
+      "direction": "angle",
+      "fixed": 2.0,
+      "max_derivative_error": 2.100934010096367e-12
+    },
+    {
+      "family": "nozzle",
+      "direction": "spacing",
+      "fixed": 0.0,
+      "max_derivative_error": 8.70683525278082e-11
+    },
+    {
+      "family": "nozzle",
+      "direction": "spacing",
+      "fixed": 20.0,
+      "max_derivative_error": 7.525535750119161e-11
+    },
+    {
+      "family": "nozzle",
+      "direction": "spacing",
+      "fixed": 40.0,
+      "max_derivative_error": 7.040634741883878e-11
+    },
+    {
+      "family": "nozzle",
+      "direction": "spacing",
+      "fixed": 50.0,
+      "max_derivative_error": 8.623324276868516e-11
+    },
+    {
+      "family": "nozzle",
+      "direction": "spacing",
+      "fixed": 60.0,
+      "max_derivative_error": 9.021405844578112e-11
+    },
+    {
+      "family": "nozzle",
+      "direction": "spacing",
+      "fixed": 65.0,
+      "max_derivative_error": 1.0520828652715863e-10
+    },
+    {
+      "family": "nozzle",
+      "direction": "spacing",
+      "fixed": 70.0,
+      "max_derivative_error": 8.72422134534645e-11
+    },
+    {
+      "family": "nozzle",
+      "direction": "spacing",
+      "fixed": 75.0,
+      "max_derivative_error": 8.663469941438962e-11
+    },
+    {
+      "family": "nozzle",
+      "direction": "spacing",
+      "fixed": 80.0,
+      "max_derivative_error": 1.2397027848720654e-10
+    },
+    {
+      "family": "impulse",
+      "direction": "angle",
+      "fixed": 0.0,
+      "max_derivative_error": 1.4710863670995196e-18
+    },
+    {
+      "family": "impulse",
+      "direction": "angle",
+      "fixed": 0.3,
+      "max_derivative_error": 4.878705946176343e-13
+    },
+    {
+      "family": "impulse",
+      "direction": "angle",
+      "fixed": 0.45,
+      "max_derivative_error": 6.990991986699502e-13
+    },
+    {
+      "family": "impulse",
+      "direction": "angle",
+      "fixed": 0.55,
+      "max_derivative_error": 1.174816320614891e-12
+    },
+    {
+      "family": "impulse",
+      "direction": "angle",
+      "fixed": 0.65,
+      "max_derivative_error": 1.7469567459293955e-12
+    },
+    {
+      "family": "impulse",
+      "direction": "angle",
+      "fixed": 0.75,
+      "max_derivative_error": 2.1504846514641685e-12
+    },
+    {
+      "family": "impulse",
+      "direction": "angle",
+      "fixed": 1.5,
+      "max_derivative_error": 3.4428120077034663e-12
+    },
+    {
+      "family": "impulse",
+      "direction": "angle",
+      "fixed": 2.0,
+      "max_derivative_error": 2.038761520717358e-12
+    },
+    {
+      "family": "impulse",
+      "direction": "spacing",
+      "fixed": 0.0,
+      "max_derivative_error": 9.378453569297562e-11
+    },
+    {
+      "family": "impulse",
+      "direction": "spacing",
+      "fixed": 20.0,
+      "max_derivative_error": 6.259748275283528e-11
+    },
+    {
+      "family": "impulse",
+      "direction": "spacing",
+      "fixed": 40.0,
+      "max_derivative_error": 1.0277645401401969e-10
+    },
+    {
+      "family": "impulse",
+      "direction": "spacing",
+      "fixed": 50.0,
+      "max_derivative_error": 6.402955943229927e-11
+    },
+    {
+      "family": "impulse",
+      "direction": "spacing",
+      "fixed": 60.0,
+      "max_derivative_error": 9.189470018267087e-11
+    },
+    {
+      "family": "impulse",
+      "direction": "spacing",
+      "fixed": 65.0,
+      "max_derivative_error": 8.651523941693995e-11
+    },
+    {
+      "family": "impulse",
+      "direction": "spacing",
+      "fixed": 70.0,
+      "max_derivative_error": 7.002587398829974e-11
+    },
+    {
+      "family": "impulse",
+      "direction": "spacing",
+      "fixed": 75.0,
+      "max_derivative_error": 9.646586307532345e-11
+    },
+    {
+      "family": "impulse",
+      "direction": "spacing",
+      "fixed": 80.0,
+      "max_derivative_error": 6.917200146006053e-11
+    }
+  ],
+  "shock_max_derivative_error": 6.235278959820789e-09,
+  "raw_compressibility_checks": [
+    {
+      "fixed": 0.0,
+      "max_derivative_error": 0.0,
+      "minimum": 1.0,
+      "negative_samples": 0,
+      "undefined_derivative_samples": 0
+    },
+    {
+      "fixed": 0.3,
+      "max_derivative_error": 1.0499520697315745e-10,
+      "minimum": 0.859375,
+      "negative_samples": 0,
+      "undefined_derivative_samples": 1
+    },
+    {
+      "fixed": 0.6,
+      "max_derivative_error": 2.470783577734892e-10,
+      "minimum": 0.4375000000000001,
+      "negative_samples": 0,
+      "undefined_derivative_samples": 1
+    },
+    {
+      "fixed": 0.9,
+      "max_derivative_error": 4.93509233479017e-10,
+      "minimum": -0.2656249999999998,
+      "negative_samples": 928,
+      "undefined_derivative_samples": 1
+    },
+    {
+      "fixed": 1.2,
+      "max_derivative_error": 7.498783816117793e-10,
+      "minimum": -1.2499999999999996,
+      "negative_samples": 2683,
+      "undefined_derivative_samples": 1
+    },
+    {
+      "fixed": 1.5,
+      "max_derivative_error": 1.2217853395668499e-09,
+      "minimum": -2.515624999999999,
+      "negative_samples": 3567,
+      "undefined_derivative_samples": 1
+    }
+  ],
+  "raw_compressibility_definition": "Original K1 corner at 0.2 with its straight line extended above Mach one; unbounded squared-ratio K2; no Kp limiter or smoothing.",
+  "raw_compressibility_kink": 0.2,
+  "raw_compressibility_zero_mach_limit": 1.0,
+  "compressibility_checks": [
+    {
+      "term": "K1",
+      "fixed": 0.0,
+      "max_derivative_error": 1.7909584926201205e-10
+    },
+    {
+      "term": "K2",
+      "fixed": 1.0,
+      "max_derivative_error": 2.1217338996848412e-10
+    },
+    {
+      "term": "Kp",
+      "fixed": 0.0,
+      "max_derivative_error": 0.0
+    },
+    {
+      "term": "Kp",
+      "fixed": 0.3,
+      "max_derivative_error": 2.3886204125744825e-10
+    },
+    {
+      "term": "Kp",
+      "fixed": 0.6,
+      "max_derivative_error": 2.4747059956808926e-10
+    },
+    {
+      "term": "Kp",
+      "fixed": 0.9,
+      "max_derivative_error": 2.3356161449328283e-10
+    },
+    {
+      "term": "Kp",
+      "fixed": 1.2,
+      "max_derivative_error": 2.203448534743302e-10
+    },
+    {
+      "term": "Kp",
+      "fixed": 1.5,
+      "max_derivative_error": 1.750123934662895e-10
+    }
+  ],
+  "compressibility_range": [
+    0,
+    2.0
+  ],
+  "k1_low_transition": [
+    0.15,
+    0.25
+  ],
+  "k1_tail_start": 0.9,
+  "k2_saturation_start": 0.8,
+  "kp_transition_start": 0.6,
+  "kp_asymptote": 0.4,
+  "kp_physical_minimum": 0.4153846153846154,
+  "kp_minimum_slope": 0.04142011834319527,
+  "kp_continuation_checks": {
+    "max_derivative_error": 1.17353682327348e-10,
+    "join_value": 0.6,
+    "join_slope": 1.0,
+    "one_sided_join_curvatures": [
+      7.499967313862044e-05,
+      0.0
+    ],
+    "strictly_increasing": true,
+    "matches_identity_above_transition": true
+  },
+  "production_sources_unchanged": true,
+  "production_sources": {
+    "turbodash/__init__.py": "4c7737a35da6c41e775164eabe7db6fe91180dd5cdc9b0449c548a99a29454aa",
+    "turbodash/app.py": "f22a099a5fc3b38f2d15c420322f79a603e3bc62cbb72941a1611d321aeb8605",
+    "turbodash/app_experimental.py": "da7eed86b47ebfcd67306aec84c10457d37c87aacadd075fcdec8d57a933793f",
+    "turbodash/app_lite.py": "3577ca78a96d79d75d34de6c54f14f34da40df07ce097468048658e89c40ad80",
+    "turbodash/app_meshing.py": "edd160c2a7e7106303fb75b3381c87265587a92d873d92f8e88ce8ead7f4ad89",
+    "turbodash/app_turbine.py": "0a0880c27f13adcca2515246a674adfc2c7d6ee976aebb0e4f25f7b5a89fe6fd",
+    "turbodash/app_turbogrid.py": "7856d4d4cc65415b9ab62ac7405a52a7f66e5a46d391143714038be5121d7f7f",
+    "turbodash/core_stage.py": "e0126d1fbd61f41fd13ce23f42189daf3f9e0772f7c8c2518a038c97b8d134ba",
+    "turbodash/core_turbine.py": "a9c3706955a1350c3d4d105a3779bed43201a440ffb1ebf2fd0a6641023857eb",
+    "turbodash/excel_interface_stage.py": "18089b9b1b6d3089fc4b12c4d33587db25a81f35dd5b9a85875a7ef636affe83",
+    "turbodash/excel_interface_turbine.py": "6d14d5361590f9945da41ed033702ba7e2988e492373a01706af161e33488a15",
+    "turbodash/export_turbogrid.py": "4dff7818d5742b561a6a991c2178781b3acf772d1db31c14bb5bfbaecb52c7df",
+    "turbodash/export_turbogrid_assembly.py": "86f9bcb58b0d946555667cec04a5d1dd9a5e4f123ef06f6e58754c4913b92ee0",
+    "turbodash/geom_blade.py": "b386a1fa3b4d848cdcf3a2f994927c7eb99cb4ce4db697fcb99e986c2a1b20d8",
+    "turbodash/graphics.py": "2e8e2a8afca76df900d272d03bca44754e98eef6a69a5e89072253fc7732de4a",
+    "turbodash/loss_models/__init__.py": "fcc03d0e9ee610b36333efe8c19d8ad9f49f79c2d91e48654bd454103e3374b5",
+    "turbodash/loss_models/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
+    "turbodash/loss_models/_blade_loading.py": "b5b4956b978eb10ed75ee40e0b0f4bfbb4e34e4e8ebf9edee85186f8277ab18a",
+    "turbodash/loss_models/_numerics.py": "09bb30e75bf4ec4a25a2cba06578f68bebe483db1aba79dafce8af185983532b",
+    "turbodash/loss_models/_trailing_edge.py": "bb922ddffcab0f786fb8a9f8dde21840cc6df41ba80ce7b461e5a4501bbe3d00",
+    "turbodash/loss_models/loss_coefficient_conversion.py": "a9a8a5943bd91c352c4607fade51272e5ad60de02f8d14f4759e5407b02c1279",
+    "turbodash/loss_models/loss_model.py": "8fc6bc7d5e32bd060a0c836a6be110e49065ed618f5483c70df50d68d6f10975",
+    "turbodash/loss_models/loss_model_benner.py": "6a95683659c639508bf93d5a743d09a5a5998d4cbf5e4ce750fc484f9490bbcd",
+    "turbodash/loss_models/loss_model_kacker_okapuu.py": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51",
+    "turbodash/loss_models/loss_model_moustapha.py": "0748aa6c29528f98e0e6a12e61b9ed34f263f9f576f3664b9ebf322ef3098d23",
+    "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
+    "turbodash/mesh_jobs.py": "7c25d0d21557ecf7cec876846bbc09d1a1486db97808076ba5ee1f95f219bf85",
+    "turbodash/meshing.py": "6b059111bfef2221a67ef1ebc6d00ef24096f30844c110a1df9f38f00634c070",
+    "turbodash/plotting_mesh.py": "5f42be0552677596f4b1c2e70839c322eeaec65948b429501bbc1519dabd82fe",
+    "turbodash/plotting_mpl.py": "af77f23594d8111f6ce4333e28f7ec7de190bd7513d5b51ebff0680de79ce937",
+    "turbodash/plotting_plotly_stage.py": "c9e160298bf696a6d4befb015f5d71ec27d4dabf4bc3d107f0fcc5898cabd738",
+    "turbodash/plotting_plotly_turbine.py": "d7b7c56ae4f626934642e09a56f104472ac6f010139cd75d102b4d272084a3b8",
+    "turbodash/reporting_utils.py": "cccc32cff5e44396ec0ded04815470e37d680c0a4d43af339d65b329f47d0db8",
+    "turbodash/turbogrid_assembly.py": "74a983c0f9c9754fe718807ed658da3da4dbab7168170709571d1a7da493344d",
+    "turbodash/visualization_vtk.py": "0afa55e95720e9fe6ff652222b154c8e5d9f80bdad916e15cd0f6daed3a4191d",
+    "turbodash/vtk_assets.py": "af1c3d7e9a0e1b3f9e2f1749c7daf743cb0f0f4eacfdf7064ac7699d1c8cbeb1"
+  },
+  "data_sha256": {
+    "reference_angle": "7fefe830c592011d491b6c6ac38f7039f848efe03072994c7854134f4fcf67dd",
+    "reference_spacing": "eca918ebcd55796c3c0ebda7b7ea78806435dd9629cb505b304f997a30576f92",
+    "raw_compressibility": "b5a5a5627e1aa15f7dd91fc5b285cb30041b14846ce3cdc32477848358844387",
+    "compressibility": "58881936fbeec26474a67e753da6ce12324d0f50443acd04b654fc27b6724642",
+    "kp_continuation": "e8bbcf3153196e729f97f79716ccbe5b78d3b05df52aa30609f9af10a966e43e"
+  },
+  "script_sha256": "7de59e4b3f5c2c8738e5b5ca338af7b522c7c992defb59200074c88a64e4ba38",
+  "derivative_methods": {
+    "reference": "complex-step h=1e-25, checked by five-point real differences",
+    "raw_compressibility": "analytical, checked by five-point real differences h=1e-6 away from the Mach 0.2 kink",
+    "compressibility": "complex-step h=1e-25, checked by five-point real differences h=1e-6",
+    "other": "five-point real differences, h=1e-5"
+  },
+  "note": "Direct reference helpers on a diagnostic domain; no minimum outlet angle. Calculations do not mutate production sources."
+}

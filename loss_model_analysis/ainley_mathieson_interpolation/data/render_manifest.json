@@ -1,0 +1,22 @@
+{
+  "figures": 4,
+  "formats": [
+    "pdf"
+  ],
+  "model_calls": 0,
+  "derivative_recalculations": 0,
+  "data_hashes": {
+    "vary_alpha2.csv": "adff3b330b9be037a67a2d01e603824937c3ac8e7d4bfcbbbfe3a4f7adb7229a",
+    "vary_pitch_chord.csv": "55aab1cecbe0f9849af41ce8d7c9b73c9acaf4347f0ea1e51cd0758a3f76cc15",
+    "vary_thickness.csv": "d82086adaac40a0ab1a7dc5e036ddcefc70e5945b9549f45d02ed1e1e7e726c6",
+    "thickness_z_zero_zoom.csv": "42fc9b624af7e1c15a686f85a83b9f76ab2ffd5fc8661d0f8055d61d6bd2b041",
+    "thickness_z_zero_limits.csv": "402e0064a7486ceaeeeb45f8dac2638b00917761dfbb07caffc9b06ec9a74dd1"
+  },
+  "figure_hashes": {
+    "blend_alpha2.pdf": "e46c949883bbcc87750767202051c28dfe7cb2e594e027bae0fbf6e6d925bd27",
+    "blend_pitch_chord.pdf": "9ac0bd4fede3ec6af791ec10b09a38fe3b7e48ce497f141f943e2fa033f2149e",
+    "thickness_z.pdf": "283f738dca45b70fc51ac720bfcfbd6b22997fa6e26a6474262f602b3c095b27",
+    "thickness_z_zero_zoom.pdf": "7dc3eff0b5ecd40dfde5fd0ca0eeeebd7702966b415b31a75d5fda954240a0db"
+  },
+  "renderer_sha256": "be51d41668d66f1fa230cc5c6582a84c08b2a3caabb70fe71f384a485a60c08f"
+}

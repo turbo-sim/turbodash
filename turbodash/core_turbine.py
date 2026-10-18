@@ -314,13 +314,16 @@ def compute_loss_coefficient(
 ):
     """
     Pack the {flow, geometry, loss_model} dict for one blade row and evaluate
-    the loss model. All thermodynamic/kinematic quantities are supplied by the
+    the current model from ``turbodash.loss_models``. Model names are
+    ``benner``, ``kacker_okapuu``, ``moustapha`` and ``isentropic``; each
+    empirical model uses the shared revised KO components. All
+    thermodynamic/kinematic quantities are supplied by the
     caller (compute_stage_performance), so this function does no EOS work.
  
     Under isentropic reconstruction the isentropic exit relative stagnation
     pressure equals the actual one, so p0_rel_is defaults to p0_rel_out.
     """
-    from .loss_model_dispatch import evaluate_loss_model
+    from .loss_models.loss_model import evaluate_loss_model
  
     if p0_rel_is is None:
         p0_rel_is = p0_rel_out
@@ -347,6 +350,12 @@ def compute_loss_coefficient(
  
     geometry = dict(geom)
     geometry["cascade_type"] = cascade_type
+    if loss_model == "moustapha":
+        # Moustapha uses the unsigned throat-based gauging angle. Derive it
+        # from the supplied geometry, including the radial opening correction.
+        geometry["gauging_angle"] = np.rad2deg(
+            np.arccos(np.clip(geometry["A_throat"] / geometry["A_out"], 0., 1.))
+        )
  
     loss_model = {
         "model": loss_model,

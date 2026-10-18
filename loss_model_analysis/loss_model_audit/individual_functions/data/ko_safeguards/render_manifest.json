@@ -1,0 +1,22 @@
+{
+  "figures": 3,
+  "source_sha256": {
+    "turbodash/loss_models/loss_model_kacker_okapuu.py": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51",
+    "turbodash/loss_models/_numerics.py": "09bb30e75bf4ec4a25a2cba06578f68bebe483db1aba79dafce8af185983532b",
+    "turbodash/loss_models/_trailing_edge.py": "bb922ddffcab0f786fb8a9f8dde21840cc6df41ba80ce7b461e5a4501bbe3d00",
+    "turbodash/loss_models/_blade_loading.py": "b5b4956b978eb10ed75ee40e0b0f4bfbb4e34e4e8ebf9edee85186f8277ab18a",
+    "turbodash/loss_models/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff"
+  },
+  "files": {
+    "ko_safeguard_profile_z.pdf": "7754315d43124949a0d93f6cbd7304e4245308800a7122397b0833cd39477aa3",
+    "ko_safeguard_reference_order.pdf": "80ecb0652afdb6c384942042c4340fe6a5579cf02fa5bf3ca07dc981bf82fd06",
+    "ko_safeguard_reynolds.pdf": "a3a937d60fe79082a58a2b5a1c65c0e5699cd3b683307439aeac504d71f93b1d"
+  },
+  "data_sha256": {
+    "profile_z": "cf8209c2a62032efada5ccb30f93cf570671eec4f0cadcb84bb222850a378d93",
+    "reference_order": "64ed605125cc0af30119d43a9892798c48440c0c30fb787148f95190db894c12",
+    "reynolds": "1f4263a11d9c2018b4af39b50eaad53a57833b24efde3ec676e1065293b7c2f9",
+    "axial_angle": "9283e2684be1feb116486048b0de303ccb6bc1a3dac1cea55023832c5ff94fdb"
+  },
+  "model_calls": 0
+}

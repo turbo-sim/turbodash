@@ -1,11 +1,10 @@
 """Production Figure 14 data agreement, C2 joins, domains and assembly."""
 import csv
-import json
 import numpy as np
 import pytest
 from pathlib import Path
-BASE = Path(__file__).resolve().parents[1]/"improving_turbodash/kackec_okapuu_trailing_edge"
-from turbodash.loss_models_new._trailing_edge import (reference_loss, energy_loss, pressure_loss, trailing_loss,
+POINTS = Path(__file__).parent / "fixtures/ko_trailing_edge_points.csv"
+from turbodash.loss_models._trailing_edge import (reference_loss, energy_loss, pressure_loss, trailing_loss,
                    effective_mach, COEFFICIENTS, REFERENCE_CEILINGS)
 
 
@@ -25,16 +24,17 @@ def assert_c2(function, join, h=1e-6, atol=2e-4):
 
 @pytest.mark.parametrize('family', ['nozzle', 'impulse'])
 def test_digitized_and_held_out_accuracy(family):
-    with (BASE/'data/digitized_points.csv').open(encoding='utf-8') as stream:
+    with POINTS.open(encoding='utf-8') as stream:
         rows = [r for r in csv.DictReader(stream) if r['family'] == family]
     x = np.array([float(r['thickness_opening']) for r in rows])
     y = np.array([float(r['energy_loss']) for r in rows])
     sigma = np.array([float(r['sigma_energy']) for r in rows])
-    assert np.all(abs(reference_loss(x, family)-y) < sigma)
-    results = json.loads((BASE/'data/fit_parameters.json').read_text(encoding='utf-8'))
-    candidate = next(r for r in results['candidate_fits'] if r['family'] == family and r['degree'] == 3)
-    assert candidate['holdout_points'] == 5
-    assert candidate['holdout_maximum_error'] < .001
+    errors = abs(reference_loss(x, family)-y)
+    assert len(rows) == 21
+    assert np.all(errors < sigma)
+    held_out = np.array([r['holdout'] == '1' for r in rows])
+    assert held_out.sum() == 5
+    assert np.max(errors[held_out]) < .001
 
 
 @pytest.mark.parametrize('family', ['nozzle', 'impulse'])
@@ -127,23 +127,15 @@ def test_full_loss_extreme_grid_and_domain():
     assert np.isnan(pressure_loss(.3, 5., 1.4, continue_mach=False))
 
 
-def test_source_matches_study_on_64640_combinations():
-    from improving_turbodash.kackec_okapuu_trailing_edge.model import trailing_loss as studied
-    x = np.r_[0., np.geomspace(1e-10, 1e6, 201)][:, None, None, None]
-    z = np.array([-1e6, -2., -1., -.05, 0., .05, .5, 1., 2., 1e6])[None, :, None, None]
-    m = np.array([0., 1e-8, .1, .9, 1., 2., 10., 1e6])[None, None, :, None]
-    g = np.array([1+1e-8, 1.1, 1.4, 5/3])[None, None, None, :]
-    np.testing.assert_array_equal(trailing_loss(x, z, m, g), studied(x, z, m, g))
-
-
 def production_inputs(x=.2, z=.5, m=.7, gamma=1.4, beta=60.):
     return (dict(beta_out=beta, Ma_rel_out=m, gamma_out=gamma),
             dict(opening=.01, trailing_edge_thickness=.01*np.asarray(x),
-                 leading_edge_angle=-np.asarray(beta)*z))
+                 leading_edge_angle=-np.asarray(beta)*z,
+                 metal_angle_out=beta))
 
 
 def test_wrapper_geometry_scaling_and_signed_angles():
-    from turbodash.loss_models_new import loss_model_kacker_okapuu as ko
+    from turbodash.loss_models import loss_model_kacker_okapuu as ko
     x = np.linspace(0, 1.2, 121)[:, None]
     z = np.linspace(-2, 2, 81)[None, :]
     flow, geometry = production_inputs(x, z)
@@ -165,29 +157,59 @@ def test_wrapper_geometry_scaling_and_signed_angles():
                                   ko.get_trailing_edge_loss(flow, geometry))
 
 
-def test_wrapper_invalid_domain_and_axial_angle_ambiguity():
-    from turbodash.loss_models_new import loss_model_kacker_okapuu as ko
+def test_wrapper_invalid_domain_and_axial_angle_continuation():
+    from turbodash.loss_models import loss_model_kacker_okapuu as ko
     f, g = production_inputs()
     with np.errstate(all='raise'):
         for key, value in [('opening', 0.), ('opening', -.01), ('opening', np.inf),
                            ('trailing_edge_thickness', -.01), ('leading_edge_angle', np.nan)]:
             assert np.isnan(ko.get_trailing_edge_loss(f, dict(g, **{key: value})))
-        for key, value in [('beta_out', 0.), ('beta_out', np.inf), ('Ma_rel_out', -.1),
+        for key, value in [('beta_out', np.inf), ('Ma_rel_out', -.1),
                            ('Ma_rel_out', np.inf), ('gamma_out', 1.), ('gamma_out', 2.)]:
             assert np.isnan(ko.get_trailing_edge_loss(dict(f, **{key: value}), g))
         for bad in (np.nan, np.inf, -np.inf):
             assert np.isnan(trailing_loss(bad, .5, .7, 1.4))
             assert np.isnan(trailing_loss(.2, bad, .7, 1.4))
-    # No unique finite-z assignment is invented when both angles are zero.
+    # An axial case with theta=0 is still exactly the nozzle reference.
     f, g = production_inputs(beta=0.)
-    assert np.isnan(ko.get_trailing_edge_loss(f, g))
+    np.testing.assert_allclose(ko.get_trailing_edge_loss(f, g), trailing_loss(.2, 0., .7, 1.4), rtol=2e-15)
+    g['leading_edge_angle'] = -30.
+    points = np.array([-1e-7, 0., 1e-7])
+    fn = lambda angle: ko.get_trailing_edge_loss(dict(f, beta_out=angle), g)
+    assert np.all(np.isfinite(fn(points)))
+    # Fixed nonzero theta stays on its original large-positive-z branch.
+    np.testing.assert_allclose(fn(0.), trailing_loss(.2, 9., .7, 1.4), rtol=2e-15)
+    np.testing.assert_allclose(fn(points), fn(0.)+slope(fn, 0.)*points, atol=1e-11)
+    np.testing.assert_allclose(slope(fn, points), slope(fn, 0.), atol=1e-5)
     # Prescribed z remains well defined through the lower-level function.
     assert np.isfinite(trailing_loss(.2, .5, .7, 1.4))
 
 
+@pytest.mark.parametrize('theta', [-30., 30.])
+@pytest.mark.parametrize('direction', [-1., 1.])
+def test_trailing_preserves_blend_branch_across_zero_exit(theta, direction):
+    from turbodash.loss_models import loss_model_kacker_okapuu as ko
+    flow, geometry = production_inputs()
+    geometry.update(leading_edge_angle=theta, metal_angle_out=60*direction)
+    fn = lambda beta: ko.get_trailing_edge_loss(dict(flow, beta_out=beta), geometry)
+    beta = np.array([-1e-4, 0., 1e-4])
+    z = ko.get_cascade_angle_ratio(theta, beta, direction)
+    assert np.all(np.sign(z) == np.sign(-theta/direction))
+    values = fn(beta)
+    np.testing.assert_allclose(values, trailing_loss(.2, z, .7, 1.4), rtol=2e-15)
+    assert np.all(np.isfinite(values)) and np.all(values > 0)
+    gradients = slope(fn, beta)
+    assert np.all(np.isfinite(gradients))
+    h = 1e-4
+    finite = (fn(-2*h)-8*fn(-h)+8*fn(h)-fn(2*h))/(12*h)
+    np.testing.assert_allclose(gradients[1], finite, rtol=2e-6, atol=1e-11)
+    np.testing.assert_allclose(gradients[[0, 2]], gradients[1], atol=2e-6)
+    assert not np.isclose(values[1], trailing_loss(.2, 0., .7, 1.4), rtol=.01)
+
+
 @pytest.mark.parametrize('variable', ['opening', 'thickness', 'metal_angle', 'exit_angle', 'Mach', 'gamma'])
 def test_production_wrapper_independent_gradients(variable):
-    from turbodash.loss_models_new import loss_model_kacker_okapuu as ko
+    from turbodash.loss_models import loss_model_kacker_okapuu as ko
     flow, geometry = production_inputs()
     section, key = {'opening': ('g', 'opening'), 'thickness': ('g', 'trailing_edge_thickness'),
                     'metal_angle': ('g', 'leading_edge_angle'), 'exit_angle': ('f', 'beta_out'),
@@ -204,21 +226,17 @@ def test_production_wrapper_independent_gradients(variable):
 
 @pytest.mark.parametrize('model', ['ko', 'mo', 'be'])
 @pytest.mark.parametrize('row', [0, 1])
-def test_complete_assembly_inherits_trailing(model, row):
-    import sys
-    from turbodash.loss_models_new import loss_model_kacker_okapuu as ko
-    from turbodash.loss_models_new import loss_model_moustapha as mo
-    from turbodash.loss_models_new import loss_model_benner as be
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]/
-                         'improving_turbodash/loss_model_audit/1_individual_functions/scripts'))
-    from cases import manufactured
-    case = manufactured()
+def test_complete_assembly_inherits_trailing(model, row, blade_row_case):
+    from turbodash.loss_models import loss_model_kacker_okapuu as ko
+    from turbodash.loss_models import loss_model_moustapha as mo
+    from turbodash.loss_models import loss_model_benner as be
+    case = blade_row_case
     f, g = case['flow'], case['geometry']
-    functions = {'ko': lambda geom: ko._compute_losses_jit(f, geom, row),
-                 'mo': lambda geom: mo._compute_losses_moustapha_jit(f, geom, row, g['leading_edge_angle']),
-                 'be': lambda geom: be._compute_losses_benner_jit(f, geom, row, .011, g['leading_edge_angle'])}
-    actual = functions[model](g)
-    zero = functions[model](dict(g, trailing_edge_thickness=0.))
+    compute = {'ko': ko.compute_losses, 'mo': mo.compute_losses, 'be': be.compute_losses}[model]
+    def evaluate(geometry):
+        return compute(dict(case, geometry=dict(geometry, cascade_type=('stator', 'rotor')[row])))
+    actual = evaluate(g)
+    zero = evaluate(dict(g, trailing_edge_thickness=0.))
     expected = ko.get_trailing_edge_loss(f, g)
     if model == 'be':
         np.testing.assert_allclose(actual['diagnostics']['trailing_loss_unweighted'], expected, rtol=1e-15)

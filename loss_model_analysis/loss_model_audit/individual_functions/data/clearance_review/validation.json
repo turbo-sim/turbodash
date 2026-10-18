@@ -1,0 +1,172 @@
+{
+  "passed": true,
+  "curves": 33,
+  "independent_paper_cases": 4000,
+  "outlet_angle_sweep": {
+    "minimum": -20.0,
+    "maximum": 80.0,
+    "samples": 9009,
+    "negative_angle_reflection_checked": true,
+    "origin_values_and_slopes_checked": true
+  },
+  "extreme_angle_geometry": {
+    "AR": 2.0,
+    "chord": 0.05,
+    "height": 0.1,
+    "effective_gap": 0.001,
+    "gap_height": 0.01,
+    "gap_chord": 0.02,
+    "loss_per_loading": 0.008749336604304409
+  },
+  "unchanged_paper_cases": 3372,
+  "stress_cases": 36504,
+  "max_stress_loss": 1050791.1322819896,
+  "max_paper_absolute_error": 5.329070518200751e-15,
+  "max_finite_difference_absolute_error": 1.5318590840252e-10,
+  "p": 0.78,
+  "delta": 0.001,
+  "polynomial_coefficients": [
+    1.3542,
+    -0.48839999999999995,
+    0.13419999999999999
+  ],
+  "zero_gap_slope": 6.189888263764637,
+  "reference": {
+    "AR": 2.0,
+    "gap_height": 0.01,
+    "prior_linear": 0.011393045312008614,
+    "current": 0.053881939666408495
+  },
+  "archived_reference_sha256": "f67dd5302cf059727278358c5c5139b476b50f6e78e479a64575c78eb4ee5848",
+  "checks": [
+    "C2 endpoint constraints",
+    "zero-gap value and finite right slope",
+    "positive increasing concave gap factor",
+    "exact original law outside patch",
+    "complete production derivatives",
+    "zero turning",
+    "stator zero",
+    "4000 paper comparisons: exact outside continuation, bounded below inside",
+    "finite loss and geometry derivatives at joint zero height/gap",
+    "physical near-grazing loading; nonphysical angles recorded as NaN"
+  ],
+  "source_hashes": {
+    "turbodash/loss_models/loss_model_kacker_okapuu.py": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51",
+    "turbodash/loss_models/_blade_loading.py": "b5b4956b978eb10ed75ee40e0b0f4bfbb4e34e4e8ebf9edee85186f8277ab18a",
+    "turbodash/loss_models/_numerics.py": "09bb30e75bf4ec4a25a2cba06578f68bebe483db1aba79dafce8af185983532b",
+    "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772"
+  },
+  "imported_sources": {
+    "turbodash.core_stage": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\core_stage.py",
+      "relative_path": "turbodash/core_stage.py",
+      "sha256": "e0126d1fbd61f41fd13ce23f42189daf3f9e0772f7c8c2518a038c97b8d134ba"
+    },
+    "turbodash.graphics": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\graphics.py",
+      "relative_path": "turbodash/graphics.py",
+      "sha256": "2e8e2a8afca76df900d272d03bca44754e98eef6a69a5e89072253fc7732de4a"
+    },
+    "turbodash.core_turbine": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\core_turbine.py",
+      "relative_path": "turbodash/core_turbine.py",
+      "sha256": "a9c3706955a1350c3d4d105a3779bed43201a440ffb1ebf2fd0a6641023857eb"
+    },
+    "turbodash.geom_blade": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\geom_blade.py",
+      "relative_path": "turbodash/geom_blade.py",
+      "sha256": "b386a1fa3b4d848cdcf3a2f994927c7eb99cb4ce4db697fcb99e986c2a1b20d8"
+    },
+    "turbodash.plotting_mpl": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\plotting_mpl.py",
+      "relative_path": "turbodash/plotting_mpl.py",
+      "sha256": "af77f23594d8111f6ce4333e28f7ec7de190bd7513d5b51ebff0680de79ce937"
+    },
+    "turbodash.plotting_plotly_stage": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\plotting_plotly_stage.py",
+      "relative_path": "turbodash/plotting_plotly_stage.py",
+      "sha256": "c9e160298bf696a6d4befb015f5d71ec27d4dabf4bc3d107f0fcc5898cabd738"
+    },
+    "turbodash.plotting_plotly_turbine": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\plotting_plotly_turbine.py",
+      "relative_path": "turbodash/plotting_plotly_turbine.py",
+      "sha256": "d7b7c56ae4f626934642e09a56f104472ac6f010139cd75d102b4d272084a3b8"
+    },
+    "turbodash.reporting_utils": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\reporting_utils.py",
+      "relative_path": "turbodash/reporting_utils.py",
+      "sha256": "cccc32cff5e44396ec0ded04815470e37d680c0a4d43af339d65b329f47d0db8"
+    },
+    "turbodash": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\__init__.py",
+      "relative_path": "turbodash/__init__.py",
+      "sha256": "4c7737a35da6c41e775164eabe7db6fe91180dd5cdc9b0449c548a99a29454aa"
+    },
+    "turbodash.loss_models": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\__init__.py",
+      "relative_path": "turbodash/loss_models/__init__.py",
+      "sha256": "fcc03d0e9ee610b36333efe8c19d8ad9f49f79c2d91e48654bd454103e3374b5"
+    },
+    "turbodash.loss_models._backend": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\_backend.py",
+      "relative_path": "turbodash/loss_models/_backend.py",
+      "sha256": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff"
+    },
+    "turbodash.math": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\math.py",
+      "relative_path": "turbodash/math.py",
+      "sha256": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772"
+    },
+    "turbodash.loss_models._numerics": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\_numerics.py",
+      "relative_path": "turbodash/loss_models/_numerics.py",
+      "sha256": "09bb30e75bf4ec4a25a2cba06578f68bebe483db1aba79dafce8af185983532b"
+    },
+    "turbodash.loss_models._trailing_edge": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\_trailing_edge.py",
+      "relative_path": "turbodash/loss_models/_trailing_edge.py",
+      "sha256": "bb922ddffcab0f786fb8a9f8dde21840cc6df41ba80ce7b461e5a4501bbe3d00"
+    },
+    "turbodash.loss_models._blade_loading": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\_blade_loading.py",
+      "relative_path": "turbodash/loss_models/_blade_loading.py",
+      "sha256": "b5b4956b978eb10ed75ee40e0b0f4bfbb4e34e4e8ebf9edee85186f8277ab18a"
+    },
+    "turbodash.loss_models.loss_model_kacker_okapuu": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model_kacker_okapuu.py",
+      "relative_path": "turbodash/loss_models/loss_model_kacker_okapuu.py",
+      "sha256": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51"
+    },
+    "turbodash.loss_models.loss_coefficient_conversion": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_coefficient_conversion.py",
+      "relative_path": "turbodash/loss_models/loss_coefficient_conversion.py",
+      "sha256": "a9a8a5943bd91c352c4607fade51272e5ad60de02f8d14f4759e5407b02c1279"
+    },
+    "turbodash.loss_models.loss_model_benner": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model_benner.py",
+      "relative_path": "turbodash/loss_models/loss_model_benner.py",
+      "sha256": "6a95683659c639508bf93d5a743d09a5a5998d4cbf5e4ce750fc484f9490bbcd"
+    },
+    "turbodash.loss_models.loss_model_moustapha": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model_moustapha.py",
+      "relative_path": "turbodash/loss_models/loss_model_moustapha.py",
+      "sha256": "0748aa6c29528f98e0e6a12e61b9ed34f263f9f576f3664b9ebf322ef3098d23"
+    },
+    "turbodash.loss_models.loss_model": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model.py",
+      "relative_path": "turbodash/loss_models/loss_model.py",
+      "sha256": "8fc6bc7d5e32bd060a0c836a6be110e49065ed618f5483c70df50d68d6f10975"
+    }
+  },
+  "script_sha256": "2de1828dd54665aaef66e81d73bae1990b3be38174e871c9a2a0929c51511e22",
+  "paper_sha256": "1f00fe0bfaf2d93a36a6aa1a1baf2729f46cc1fa90eac98cc189dd281fd62886",
+  "data_sha256": {
+    "gap_factor": "babffdc33ff2093d02e8b498d4edd7ad71662d7bbcd1df1acc91bbfea7184c75",
+    "gap_sensitivity": "2509deda923eabfa3831f3b6777b265821fc831e8fb925df8056bc185506c461",
+    "angle_sensitivity": "66c86b10b9070ca020569aebe29387ea2aa9d54e999262ca5658e150d44b99d8",
+    "aspect_factor": "fbe74f001d5fab7bcd927332f2477b1387a8efe0107a127583c6d3fc4d9c1cc2",
+    "aspect_sensitivity": "5c15924b32cb74cfb08cf716f60236545c8ed1f3ecaeaedd26a3ec827a762d7f",
+    "loading_sensitivity": "e5e66a078e1bf839864ade9799aab32cceeda7b326e611e2b5e1918a25651fb8",
+    "revision_comparison": "3bc3fe506b45dd3574bb28eb193a7855100e61c68ea82ea19966cd509417ee91"
+  }
+}

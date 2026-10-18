@@ -1,0 +1,428 @@
+{
+  "kacker_okapuu": {
+    "speed_r0/stator_exit_angle": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 405,
+      "negative_eta_tt": 226
+    },
+    "speed_r05/stator_exit_angle": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 471,
+      "negative_eta_tt": 151
+    },
+    "reaction/stator_exit_angle": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 94,
+      "negative_eta_tt": 0
+    },
+    "speed_r0/pitch_chord": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 420,
+      "negative_eta_tt": 203
+    },
+    "speed_r05/pitch_chord": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 490,
+      "negative_eta_tt": 142
+    },
+    "reaction/pitch_chord": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 77,
+      "negative_eta_tt": 0
+    },
+    "speed_r0/aspect_ratio": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 300,
+      "negative_eta_tt": 142
+    },
+    "speed_r05/aspect_ratio": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 350,
+      "negative_eta_tt": 99
+    },
+    "reaction/aspect_ratio": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 55,
+      "negative_eta_tt": 0
+    },
+    "speed_r0/trailing_ratio": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 300,
+      "negative_eta_tt": 153
+    },
+    "speed_r05/trailing_ratio": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 350,
+      "negative_eta_tt": 105
+    },
+    "reaction/trailing_ratio": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 55,
+      "negative_eta_tt": 0
+    },
+    "speed_r0/specific_speed": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 293,
+      "negative_eta_tt": 141
+    },
+    "speed_r05/specific_speed": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 343,
+      "negative_eta_tt": 97
+    },
+    "reaction/specific_speed": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 222,
+      "negative_eta_tt": 0
+    },
+    "speed_r0/mass_flow": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 300,
+      "negative_eta_tt": 146
+    },
+    "speed_r05/mass_flow": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 350,
+      "negative_eta_tt": 104
+    },
+    "reaction/mass_flow": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 55,
+      "negative_eta_tt": 0
+    },
+    "speed_r0/isentropic_mach": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 360,
+      "negative_eta_tt": 171
+    },
+    "speed_r05/isentropic_mach": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 420,
+      "negative_eta_tt": 117
+    },
+    "reaction/isentropic_mach": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 66,
+      "negative_eta_tt": 0
+    }
+  },
+  "benner": {
+    "speed_r0/stator_exit_angle": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 405,
+      "negative_eta_tt": 163
+    },
+    "speed_r05/stator_exit_angle": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 471,
+      "negative_eta_tt": 111
+    },
+    "reaction/stator_exit_angle": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 94,
+      "negative_eta_tt": 0
+    },
+    "speed_r0/pitch_chord": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 420,
+      "negative_eta_tt": 136
+    },
+    "speed_r05/pitch_chord": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 490,
+      "negative_eta_tt": 101
+    },
+    "reaction/pitch_chord": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 77,
+      "negative_eta_tt": 0
+    },
+    "speed_r0/aspect_ratio": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 300,
+      "negative_eta_tt": 94
+    },
+    "speed_r05/aspect_ratio": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 350,
+      "negative_eta_tt": 70
+    },
+    "reaction/aspect_ratio": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 55,
+      "negative_eta_tt": 0
+    },
+    "speed_r0/trailing_ratio": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 300,
+      "negative_eta_tt": 103
+    },
+    "speed_r05/trailing_ratio": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 350,
+      "negative_eta_tt": 75
+    },
+    "reaction/trailing_ratio": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 55,
+      "negative_eta_tt": 0
+    },
+    "speed_r0/specific_speed": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 293,
+      "negative_eta_tt": 96
+    },
+    "speed_r05/specific_speed": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 343,
+      "negative_eta_tt": 69
+    },
+    "reaction/specific_speed": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 222,
+      "negative_eta_tt": 0
+    },
+    "speed_r0/mass_flow": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 300,
+      "negative_eta_tt": 97
+    },
+    "speed_r05/mass_flow": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 350,
+      "negative_eta_tt": 73
+    },
+    "reaction/mass_flow": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 55,
+      "negative_eta_tt": 0
+    },
+    "speed_r0/isentropic_mach": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 360,
+      "negative_eta_tt": 108
+    },
+    "speed_r05/isentropic_mach": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 420,
+      "negative_eta_tt": 79
+    },
+    "reaction/isentropic_mach": {
+      "verdict": "Review",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 66,
+      "negative_eta_tt": 0
+    }
+  },
+  "isentropic": {
+    "speed_r0/stator_exit_angle": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 405,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.6694157292708643,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "speed_r05/stator_exit_angle": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 471,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.2667665668214839,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "reaction/stator_exit_angle": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 94,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.6726851754349082,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "speed_r0/pitch_chord": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 420,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.0,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "speed_r05/pitch_chord": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 490,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.0,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "reaction/pitch_chord": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 77,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.0,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "speed_r0/aspect_ratio": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 300,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.0,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "speed_r05/aspect_ratio": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 350,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.0,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "reaction/aspect_ratio": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 55,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.0,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "speed_r0/trailing_ratio": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 300,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.0,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "speed_r05/trailing_ratio": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 350,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.0,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "reaction/trailing_ratio": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 55,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.0,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "speed_r0/specific_speed": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 293,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.0,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "speed_r05/specific_speed": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 343,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.0,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "reaction/specific_speed": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 222,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.0,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "speed_r0/mass_flow": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 300,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.0,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "speed_r05/mass_flow": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 350,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.0,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "reaction/mass_flow": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 55,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 0.0,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "speed_r0/isentropic_mach": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 360,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 7.771561172376096e-16,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "speed_r05/isentropic_mach": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.6,
+      "negative_hub": 420,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 6.661338147750939e-16,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    },
+    "reaction/isentropic_mach": {
+      "verdict": "Consistent",
+      "comparison_coordinate": 0.5,
+      "negative_hub": 66,
+      "eta_tt_exactly_one": true,
+      "maximum_parameter_eta_ts_spread": 2.220446049250313e-16,
+      "maximum_exit_energy_identity_error": 1.1102230246251565e-16
+    }
+  }
+}

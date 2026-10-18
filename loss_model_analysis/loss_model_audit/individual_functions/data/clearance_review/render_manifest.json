@@ -1,0 +1,22 @@
+{
+  "figures": 5,
+  "model_calls": 0,
+  "derivative_recalculations": 0,
+  "files": {
+    "ko_clearance_gap_factor.pdf": "61b6023b0529e91d8f5c09a58cbc5cd86014aac13e73245602e70b8cfcc08a8e",
+    "ko_clearance_gap_review.pdf": "219e0a2d8af1600fb220d42b803f5e3f071e3628cccd9886686bb567a18b71cc",
+    "ko_clearance_angle_review.pdf": "4d6ec81e46cee0f28e38c0723495ee75fc9354330a46cdd63662ccca3c34ee88",
+    "ko_clearance_ar_review.pdf": "77e6567f540e4f23a01012ce0c79b3b7bd65d8d069aa87151e33487f2640e03c",
+    "ko_clearance_loading_review.pdf": "e9f65257fa7685394877b1e810b439395a6b479a9036d97a98bd7b472389abfe"
+  },
+  "script_sha256": "2de1828dd54665aaef66e81d73bae1990b3be38174e871c9a2a0929c51511e22",
+  "data_sha256": {
+    "gap_factor": "babffdc33ff2093d02e8b498d4edd7ad71662d7bbcd1df1acc91bbfea7184c75",
+    "gap_sensitivity": "2509deda923eabfa3831f3b6777b265821fc831e8fb925df8056bc185506c461",
+    "angle_sensitivity": "66c86b10b9070ca020569aebe29387ea2aa9d54e999262ca5658e150d44b99d8",
+    "aspect_factor": "fbe74f001d5fab7bcd927332f2477b1387a8efe0107a127583c6d3fc4d9c1cc2",
+    "aspect_sensitivity": "5c15924b32cb74cfb08cf716f60236545c8ed1f3ecaeaedd26a3ec827a762d7f",
+    "loading_sensitivity": "e5e66a078e1bf839864ade9799aab32cceeda7b326e611e2b5e1918a25651fb8",
+    "revision_comparison": "3bc3fe506b45dd3574bb28eb193a7855100e61c68ea82ea19966cd509417ee91"
+  }
+}

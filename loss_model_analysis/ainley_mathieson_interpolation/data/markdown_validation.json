@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "renderer": "Installed VS Code Markdown+Math, dollar delimiters",
+  "katex_version": "0.13.11",
+  "modules": "C:\\Users\\roagr\\.vscode\\extensions\\goessner.mdmath-2.7.4\\node_modules",
+  "excluded_directories": [],
+  "files": [
+    {
+      "file": "loss_model_analysis/ainley_mathieson_interpolation/readme.md",
+      "inline_equations": 77,
+      "display_equations": 7,
+      "local_links": 23,
+      "sha256": "124d3c3d64df96f42e25960ef0a0756b5833fed52d8b9681417321dbafbdc590"
+    }
+  ],
+  "errors": [],
+  "markdown_files": 1,
+  "inline_equations": 77,
+  "display_equations": 7,
+  "local_links": 23
+}

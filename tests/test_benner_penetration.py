@@ -11,7 +11,7 @@ from turbodash import core_turbine as core
 from turbodash.loss_models import loss_model_benner as benner
 
 
-BASELINE = json.loads((Path(__file__).parent / "fixtures/continuous_geometry_baseline.json").read_text())
+GEOMETRY_REFERENCE = json.loads((Path(__file__).parent / "fixtures/meanline_geometry_reference.json").read_text())
 COMPONENTS = ("profile", "trailing", "incidence", "secondary", "clearance")
 
 
@@ -56,7 +56,7 @@ def test_invalid_transition_width_is_rejected(width):
 
 @pytest.fixture
 def high_penetration_inputs():
-    inputs = deepcopy(BASELINE["eps80"]["inputs"])
+    inputs = deepcopy(GEOMETRY_REFERENCE["eps80"]["inputs"])
     inputs["stages"][0]["degree_reaction"] = .75
     inputs["blade_velocity_ratio"] = .85
     return inputs
@@ -81,19 +81,9 @@ def test_common_primary_weight_raw_diagnostics_and_untouched_secondary(high_pene
     assert losses["loss_secondary"] == benner.get_secondary_loss(flow, stage["geometry_meanline"]["rotor"], diag["inlet_displacement_thickness_height_ratio"])
 
 
-@pytest.mark.parametrize("case", ["eps0", "eps80"])
-def test_selected_design_loss_coefficients_remain_exactly_unchanged(case):
-    result = core.compute_turbine_performance({"inputs": deepcopy(BASELINE[case]["inputs"])})
-    for row in ("stator", "rotor"):
-        losses = result["stages_performance"][0]["losses"][row]
-        assert losses["diagnostics"]["penetration_raw_ratio"] < .45
-        for name in COMPONENTS + ("total",):
-            assert losses[f"loss_{name}"] == BASELINE[case]["continuous"]["stages_performance"][0]["losses"][row][f"loss_{name}"]
-
-
 @pytest.mark.parametrize("key,value", [("height", 0), ("chord", -1), ("pitch", np.inf), ("meridional_chord", np.nan)])
 def test_invalid_geometry_is_rejected(key, value):
-    geometry = dict(BASELINE["eps0"]["continuous"]["stages_performance"][0]["geometry"]["rotor"])
+    geometry = dict(GEOMETRY_REFERENCE["eps0"]["continuous"]["stages_performance"][0]["geometry"]["rotor"])
     geometry[key] = value
     with pytest.raises(ValueError):
         benner.get_penetration_depth({"beta_in": 40., "beta_out": -60.}, geometry, .01)
@@ -101,13 +91,13 @@ def test_invalid_geometry_is_rejected(key, value):
 
 @pytest.mark.parametrize("angle", [-90, 90, 100, np.nan, np.inf])
 def test_invalid_angles_are_rejected(angle):
-    geometry = BASELINE["eps0"]["continuous"]["stages_performance"][0]["geometry"]["rotor"]
+    geometry = GEOMETRY_REFERENCE["eps0"]["continuous"]["stages_performance"][0]["geometry"]["rotor"]
     with pytest.raises(ValueError, match="flow angles"):
         benner.get_penetration_depth({"beta_in": angle, "beta_out": -60.}, geometry, .01)
 
 
 def test_zero_loading_and_zero_boundary_layer_have_zero_raw_penetration():
-    geometry = BASELINE["eps0"]["continuous"]["stages_performance"][0]["geometry"]["rotor"]
+    geometry = GEOMETRY_REFERENCE["eps0"]["continuous"]["stages_performance"][0]["geometry"]["rotor"]
     assert benner.get_penetration_depth({"beta_in": 0., "beta_out": 0.}, geometry, 0.) == 0.
 
 
@@ -125,19 +115,19 @@ def test_invalid_reference_boundary_layer_is_rejected_before_correlations(delta)
 
 @pytest.mark.parametrize("delta", [-1, np.nan, np.inf])
 def test_invalid_boundary_layer_is_not_hidden_by_the_limiter(delta):
-    geometry = BASELINE["eps0"]["continuous"]["stages_performance"][0]["geometry"]["rotor"]
+    geometry = GEOMETRY_REFERENCE["eps0"]["continuous"]["stages_performance"][0]["geometry"]["rotor"]
     with pytest.raises(ValueError, match="displacement-thickness"):
         benner.get_penetration_depth({"beta_in": 40., "beta_out": -60.}, geometry, delta)
 
 
 def test_nonfinite_derived_aspect_ratio_is_rejected_even_if_raw_formula_would_be_zero():
-    geometry = dict(BASELINE["eps0"]["continuous"]["stages_performance"][0]["geometry"]["rotor"])
+    geometry = dict(GEOMETRY_REFERENCE["eps0"]["continuous"]["stages_performance"][0]["geometry"]["rotor"])
     geometry.update(height=1e308, chord=1e-308)
     with pytest.raises(ValueError, match="aspect ratio"):
         benner.get_penetration_depth({"beta_in": 40., "beta_out": -60.}, geometry, 0.)
 
 
 def test_extreme_finite_boundary_layer_is_rejected_when_its_raw_prediction_overflows():
-    geometry = BASELINE["eps0"]["continuous"]["stages_performance"][0]["geometry"]["rotor"]
+    geometry = GEOMETRY_REFERENCE["eps0"]["continuous"]["stages_performance"][0]["geometry"]["rotor"]
     with pytest.raises(ValueError, match="Raw penetration"):
         benner.get_penetration_depth({"beta_in": 40., "beta_out": -60.}, geometry, 1e308)

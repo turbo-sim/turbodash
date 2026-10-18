@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "renderer": "Installed VS Code Markdown+Math, dollar delimiters",
+  "katex_version": "0.13.11",
+  "modules": "C:\\Users\\roagr\\.vscode\\extensions\\goessner.mdmath-2.7.4\\node_modules",
+  "excluded_directories": [],
+  "files": [
+    {
+      "file": "loss_model_analysis/loss_model_audit/individual_functions/report/04_ko_clearance.md",
+      "inline_equations": 103,
+      "display_equations": 23,
+      "local_links": 26,
+      "sha256": "abb92d3f62a9998193c9f785e4b3a560780e31b74e344ea51d4e038aefcd8e3b"
+    }
+  ],
+  "errors": [],
+  "markdown_files": 1,
+  "inline_equations": 103,
+  "display_equations": 23,
+  "local_links": 26
+}

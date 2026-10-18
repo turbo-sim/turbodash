@@ -1,9 +1,9 @@
-﻿"""Secondary aspect-factor continuation, physical limits and assembly."""
+"""Secondary aspect-factor continuation, physical limits and assembly."""
 
 import numpy as np
 import pytest
 
-from turbodash.loss_models_new import loss_model_kacker_okapuu as ko
+from turbodash.loss_models import loss_model_kacker_okapuu as ko
 
 
 def inputs(ar, alpha1=40., alpha2=60., mach_in=.6, mach_out=.8, row=0):
@@ -248,3 +248,74 @@ def test_complete_secondary_loss_is_invariant_to_common_length_units():
         for key in ("height", "chord", "meridional_chord"):
             converted[key] = geometry[key]*scale
         np.testing.assert_allclose(ko.get_secondary_loss(flow, converted, 0), baseline, rtol=5e-15)
+
+
+def test_secondary_aspect_factor_has_finite_zero_endpoint_and_derivative():
+    fn = ko.get_secondary_aspect_ratio_factor
+    ar = np.r_[0., np.geomspace(1e-12, 5., 501)]
+    with np.errstate(all='raise'):
+        values = fn(ar)
+        slopes = complex_slope(fn, ar)
+    assert values[0] == 1.
+    assert np.all(np.isfinite(values)) and np.all(np.isfinite(slopes))
+    assert np.all((values > 0) & (values <= 1))
+    assert np.all(np.diff(values) <= 0) and np.all(slopes <= 1e-45)
+    assert abs(slopes[0]) < 1e-45
+    h = 1e-6
+    finite = (-3*fn(0.)+4*fn(h)-fn(2*h))/(2*h)
+    np.testing.assert_allclose(slopes[0], finite, atol=2e-9)
+
+
+@pytest.mark.parametrize('kp', [.4, .6, 1.])
+def test_secondary_compressibility_geometry_matches_ratio_and_zero_height_limit(kp):
+    fn = ko.get_secondary_compressibility_factor_from_geometry
+    height = np.r_[0., np.geomspace(1e-10, 10., 501)]
+    chord = .04
+    with np.errstate(all='raise'):
+        values = fn(kp, chord, height)
+        slopes = complex_slope(lambda h: fn(kp, chord, h), height)
+    assert values[0] == kp and slopes[0] == 0.
+    assert np.all(np.isfinite(values)) and np.all(np.isfinite(slopes))
+    assert np.all((values >= kp) & (values <= 1.))
+    np.testing.assert_allclose(values[1:], ko.get_secondary_compressibility_factor(kp, chord/height[1:]), rtol=3e-15)
+    for scale in (1e-3, 1e3):
+        np.testing.assert_allclose(fn(kp, chord*scale, height*scale), values, rtol=3e-15)
+    assert np.isnan(fn(kp, 0., 0.))
+
+
+@pytest.mark.parametrize('row', [0, 1])
+def test_complete_secondary_zero_height_endpoint_and_joint_angle_regularization(row):
+    def loss(ar):
+        flow, geometry = inputs(ar, row=row)
+        return ko.get_secondary_loss(flow, geometry, row)
+    ar = np.r_[0., np.geomspace(1e-10, 5., 101)]
+    with np.errstate(all='raise'):
+        values, derivatives = loss(ar), complex_slope(loss, ar)
+    assert np.all(np.isfinite(values)) and np.all(np.isfinite(derivatives))
+    assert np.all(values > 0) and abs(derivatives[0]) < 1e-45
+    np.testing.assert_allclose(values[:4], values[0], rtol=2e-15)
+    angle = np.array([-89.9, -89., -85., -80., 0., 80., 85., 89., 89.9])
+    bi, bo = angle[:, None], angle[None, :]
+    flow, geometry = inputs(0., row=row)
+    flow.update(beta_in=bi, beta_out=bo)
+    geometry['leading_edge_angle'] = bi
+    with np.errstate(all='raise'):
+        values = ko.get_secondary_loss(flow, geometry, row)
+        derivatives = complex_slope(lambda v: ko.get_secondary_loss(dict(flow, beta_out=v), geometry, row), bo)
+    assert np.all(np.isfinite(values)) and np.all(values >= 0)
+    assert np.all(np.isfinite(derivatives))
+    np.testing.assert_array_equal(np.diag(values), 0.)
+    for b in (-120., -90., 90., 120.):
+        assert np.isnan(ko.get_secondary_loss(dict(flow, beta_in=b, beta_out=0.),
+                                             dict(geometry, leading_edge_angle=0.), row))
+
+
+@pytest.mark.parametrize('angle', [80., 85., 88.])
+def test_secondary_extreme_angle_gradients_are_continuous_and_finite(angle):
+    flow, geometry = inputs(.2)
+    def loss(a):
+        f = dict(flow, beta_in=-a/2, beta_out=a)
+        return ko.get_secondary_loss(f, dict(geometry, leading_edge_angle=-a/2), 0)
+    h = 1e-3
+    finite = (loss(angle-2*h)-8*loss(angle-h)+8*loss(angle+h)-loss(angle+2*h))/(12*h)
+    np.testing.assert_allclose(complex_slope(loss, angle), finite, atol=1e-9, rtol=2e-6)

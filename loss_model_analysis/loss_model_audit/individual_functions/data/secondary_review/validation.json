@@ -1,0 +1,733 @@
+{
+  "passed": true,
+  "curves": 48,
+  "crossed_conditions": 4000,
+  "independent_paper_cases": 3330,
+  "independent_paper_cases_above_loading_32": 438,
+  "max_paper_error": 4.973799150320701e-13,
+  "max_continued_paper_error": 2.7000623958883807e-13,
+  "crossed_min_Ys": 2.3729967330656305e-07,
+  "crossed_max_Ys": 69.55994286465422,
+  "low_aspect_ratio": {
+    "AR": 0.01,
+    "cases": 2016,
+    "min_Ys": 0.007467525899684592,
+    "max_Ys": 79.13050551119166,
+    "max_Ys_without_aspect_continuation": 5122.377672370966,
+    "f_AR": 0.9999980489116324
+  },
+  "continuation": {
+    "onset": 0.8,
+    "asymptote": 1.0,
+    "target": "f_AR",
+    "onset_AR": 0.92616937811858,
+    "final_loss_cap": false,
+    "factor_chain_rule_checked": true
+  },
+  "compressibility_continuation": {
+    "onset": 0.8,
+    "asymptote": 1.0,
+    "target": "K3",
+    "separate_Ks_floor": false,
+    "convex_bounds_checked": true,
+    "chain_rule_checked": true
+  },
+  "plotted_AR": [
+    0.2,
+    5.0
+  ],
+  "endpoint_AR": [
+    0.0,
+    1.2
+  ],
+  "zero_height_checked": true,
+  "extreme_angle_cases": 2916,
+  "extreme_angle_max_Ys": 398775873.15984297,
+  "shared_loading": true,
+  "physical_turning": true,
+  "physical_projection": true,
+  "mean_secant_onset_degrees": 80.0,
+  "mean_secant_limit_degrees": 87.5,
+  "angle_domain": "strictly -90 < beta, theta < 90 degrees",
+  "separate_loading_continuation": false,
+  "no_final_loss_cap": {
+    "AR": 0.2,
+    "inlet_angle": 80.0,
+    "outlet_angle": 60.0,
+    "M1": 0.0,
+    "M2": 0.0,
+    "Ys": 13.95601615895002
+  },
+  "angle_sweep": {
+    "AR": 2.0,
+    "alpha2_deg": [
+      -20.0,
+      80.0
+    ],
+    "z": [
+      -1.0,
+      -0.75,
+      -0.5,
+      -0.25,
+      0.0,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "beta_in": "-z*alpha2",
+    "theta_in": "-z*alpha2",
+    "derivative": "total derivative in degrees at fixed z",
+    "path_chain_rule_checked": true,
+    "zero_turning_checked": true,
+    "zero_angle_values_and_slopes_checked": true,
+    "negative_angle_reflection_checked": true
+  },
+  "source_hashes": {
+    "turbodash/loss_models/loss_model_kacker_okapuu.py": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51",
+    "turbodash/loss_models/_blade_loading.py": "b5b4956b978eb10ed75ee40e0b0f4bfbb4e34e4e8ebf9edee85186f8277ab18a",
+    "turbodash/loss_models/_numerics.py": "09bb30e75bf4ec4a25a2cba06578f68bebe483db1aba79dafce8af185983532b",
+    "turbodash/loss_models/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
+    "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772"
+  },
+  "imported_sources": {
+    "turbodash.core_stage": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\core_stage.py",
+      "relative_path": "turbodash/core_stage.py",
+      "sha256": "e0126d1fbd61f41fd13ce23f42189daf3f9e0772f7c8c2518a038c97b8d134ba"
+    },
+    "turbodash.graphics": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\graphics.py",
+      "relative_path": "turbodash/graphics.py",
+      "sha256": "2e8e2a8afca76df900d272d03bca44754e98eef6a69a5e89072253fc7732de4a"
+    },
+    "turbodash.core_turbine": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\core_turbine.py",
+      "relative_path": "turbodash/core_turbine.py",
+      "sha256": "a9c3706955a1350c3d4d105a3779bed43201a440ffb1ebf2fd0a6641023857eb"
+    },
+    "turbodash.geom_blade": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\geom_blade.py",
+      "relative_path": "turbodash/geom_blade.py",
+      "sha256": "b386a1fa3b4d848cdcf3a2f994927c7eb99cb4ce4db697fcb99e986c2a1b20d8"
+    },
+    "turbodash.plotting_mpl": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\plotting_mpl.py",
+      "relative_path": "turbodash/plotting_mpl.py",
+      "sha256": "af77f23594d8111f6ce4333e28f7ec7de190bd7513d5b51ebff0680de79ce937"
+    },
+    "turbodash.plotting_plotly_stage": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\plotting_plotly_stage.py",
+      "relative_path": "turbodash/plotting_plotly_stage.py",
+      "sha256": "c9e160298bf696a6d4befb015f5d71ec27d4dabf4bc3d107f0fcc5898cabd738"
+    },
+    "turbodash.plotting_plotly_turbine": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\plotting_plotly_turbine.py",
+      "relative_path": "turbodash/plotting_plotly_turbine.py",
+      "sha256": "d7b7c56ae4f626934642e09a56f104472ac6f010139cd75d102b4d272084a3b8"
+    },
+    "turbodash.reporting_utils": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\reporting_utils.py",
+      "relative_path": "turbodash/reporting_utils.py",
+      "sha256": "cccc32cff5e44396ec0ded04815470e37d680c0a4d43af339d65b329f47d0db8"
+    },
+    "turbodash": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\__init__.py",
+      "relative_path": "turbodash/__init__.py",
+      "sha256": "4c7737a35da6c41e775164eabe7db6fe91180dd5cdc9b0449c548a99a29454aa"
+    },
+    "turbodash.loss_models": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\__init__.py",
+      "relative_path": "turbodash/loss_models/__init__.py",
+      "sha256": "fcc03d0e9ee610b36333efe8c19d8ad9f49f79c2d91e48654bd454103e3374b5"
+    },
+    "turbodash.loss_models._backend": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\_backend.py",
+      "relative_path": "turbodash/loss_models/_backend.py",
+      "sha256": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff"
+    },
+    "turbodash.math": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\math.py",
+      "relative_path": "turbodash/math.py",
+      "sha256": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772"
+    },
+    "turbodash.loss_models._numerics": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\_numerics.py",
+      "relative_path": "turbodash/loss_models/_numerics.py",
+      "sha256": "09bb30e75bf4ec4a25a2cba06578f68bebe483db1aba79dafce8af185983532b"
+    },
+    "turbodash.loss_models._trailing_edge": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\_trailing_edge.py",
+      "relative_path": "turbodash/loss_models/_trailing_edge.py",
+      "sha256": "bb922ddffcab0f786fb8a9f8dde21840cc6df41ba80ce7b461e5a4501bbe3d00"
+    },
+    "turbodash.loss_models._blade_loading": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\_blade_loading.py",
+      "relative_path": "turbodash/loss_models/_blade_loading.py",
+      "sha256": "b5b4956b978eb10ed75ee40e0b0f4bfbb4e34e4e8ebf9edee85186f8277ab18a"
+    },
+    "turbodash.loss_models.loss_model_kacker_okapuu": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model_kacker_okapuu.py",
+      "relative_path": "turbodash/loss_models/loss_model_kacker_okapuu.py",
+      "sha256": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51"
+    },
+    "turbodash.loss_models.loss_coefficient_conversion": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_coefficient_conversion.py",
+      "relative_path": "turbodash/loss_models/loss_coefficient_conversion.py",
+      "sha256": "a9a8a5943bd91c352c4607fade51272e5ad60de02f8d14f4759e5407b02c1279"
+    },
+    "turbodash.loss_models.loss_model_benner": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model_benner.py",
+      "relative_path": "turbodash/loss_models/loss_model_benner.py",
+      "sha256": "6a95683659c639508bf93d5a743d09a5a5998d4cbf5e4ce750fc484f9490bbcd"
+    },
+    "turbodash.loss_models.loss_model_moustapha": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model_moustapha.py",
+      "relative_path": "turbodash/loss_models/loss_model_moustapha.py",
+      "sha256": "0748aa6c29528f98e0e6a12e61b9ed34f263f9f576f3664b9ebf322ef3098d23"
+    },
+    "turbodash.loss_models.loss_model": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model.py",
+      "relative_path": "turbodash/loss_models/loss_model.py",
+      "sha256": "8fc6bc7d5e32bd060a0c836a6be110e49065ed618f5483c70df50d68d6f10975"
+    }
+  },
+  "script_sha256": "7b19e311dcaba8b19ddf27f600f9fe281ae60db5e60581e420fe26c7acbf8c0c",
+  "data_sha256": {
+    "factor": "e701f72543d09a495fc5dfd6a7e5e2472487ad770f2aee53b898d96571e4a422",
+    "geometry_ar": "24dd7b7f284982c2a385bc2b483528504debfb536ab2cab1a74d9894e13ae9dc",
+    "geometry_angle": "e3ce3d9c98f115425e66e2aa399b2765f2225ff9ef492f0feeb9242ce5e87f46",
+    "compressibility_ar": "08a98b1a54dca04ff0df7b92da9b4f8d65f8d3797cf0a7f3730d9882410de535",
+    "mach_out": "388677bf9b30ff5eb002b4d85a9349983b473d456024937b08ccb6e585331026",
+    "mach_in": "196fa7c6732ce2b52a578dd51b7d90444a144ae77b6ec3cca7759f7b2c492c68",
+    "robustness_angle": "de2d45d9f94e2164cbfc82b30f2ef9a387456685c2eea63e851aa544ef5bb207",
+    "robustness_ar": "a007fe2c765d76902a2cbc6293b646340a6d05cd15705f88e1bafb6ef1c2915b"
+  },
+  "checks": [
+    {
+      "table": "geometry_ar",
+      "group": 0.0,
+      "fixed": 20.0,
+      "samples": 2770,
+      "min_Ys": 0.003582465133110529,
+      "max_Ys": 0.01789158739107513,
+      "max_derivative_error": 4.387133017980105e-12,
+      "max_scaled_derivative_error": 4.344812522294518e-12
+    },
+    {
+      "table": "geometry_ar",
+      "group": 0.0,
+      "fixed": 30.0,
+      "samples": 2770,
+      "min_Ys": 0.007225524756029834,
+      "max_Ys": 0.03608579646011479,
+      "max_derivative_error": 8.38251213233776e-12,
+      "max_scaled_derivative_error": 8.361321207756496e-12
+    },
+    {
+      "table": "geometry_ar",
+      "group": 0.0,
+      "fixed": 40.0,
+      "samples": 2770,
+      "min_Ys": 0.011005616917063105,
+      "max_Ys": 0.05496437496193051,
+      "max_derivative_error": 1.4521098733177862e-11,
+      "max_scaled_derivative_error": 1.4452915365118705e-11
+    },
+    {
+      "table": "geometry_ar",
+      "group": 0.0,
+      "fixed": 50.0,
+      "samples": 2770,
+      "min_Ys": 0.014079066484540778,
+      "max_Ys": 0.07031383112840099,
+      "max_derivative_error": 1.762639513513964e-11,
+      "max_scaled_derivative_error": 1.7400271334186855e-11
+    },
+    {
+      "table": "geometry_ar",
+      "group": 0.0,
+      "fixed": 60.0,
+      "samples": 2770,
+      "min_Ys": 0.01590625688212032,
+      "max_Ys": 0.0794392058253608,
+      "max_derivative_error": 1.569751620356108e-11,
+      "max_scaled_derivative_error": 1.5313638697663538e-11
+    },
+    {
+      "table": "geometry_ar",
+      "group": 0.0,
+      "fixed": 70.0,
+      "samples": 2770,
+      "min_Ys": 0.01645418198182448,
+      "max_Ys": 0.08217565947972164,
+      "max_derivative_error": 1.5562683086667306e-11,
+      "max_scaled_derivative_error": 1.5356445460994973e-11
+    },
+    {
+      "table": "geometry_ar",
+      "group": 0.0,
+      "fixed": 80.0,
+      "samples": 2770,
+      "min_Ys": 0.016236622919957883,
+      "max_Ys": 0.081089123582378,
+      "max_derivative_error": 1.7846314703806598e-11,
+      "max_scaled_derivative_error": 1.7669439387708605e-11
+    },
+    {
+      "table": "geometry_ar",
+      "group": 40.0,
+      "fixed": 20.0,
+      "samples": 2770,
+      "min_Ys": 0.05166836022616899,
+      "max_Ys": 0.258042701880368,
+      "max_derivative_error": 5.391592033943127e-11,
+      "max_scaled_derivative_error": 5.173417957002239e-11
+    },
+    {
+      "table": "geometry_ar",
+      "group": 40.0,
+      "fixed": 30.0,
+      "samples": 2770,
+      "min_Ys": 0.05501054006243634,
+      "max_Ys": 0.2747342537574819,
+      "max_derivative_error": 5.838395045199007e-11,
+      "max_scaled_derivative_error": 5.587515335211966e-11
+    },
+    {
+      "table": "geometry_ar",
+      "group": 40.0,
+      "fixed": 40.0,
+      "samples": 2770,
+      "min_Ys": 0.0529922896625751,
+      "max_Ys": 0.2646546850626048,
+      "max_derivative_error": 6.129789731357249e-11,
+      "max_scaled_derivative_error": 6.042267257927077e-11
+    },
+    {
+      "table": "geometry_ar",
+      "group": 40.0,
+      "fixed": 50.0,
+      "samples": 2770,
+      "min_Ys": 0.046555590335583555,
+      "max_Ys": 0.2325084493729494,
+      "max_derivative_error": 4.574293027692633e-11,
+      "max_scaled_derivative_error": 4.406837392833256e-11
+    },
+    {
+      "table": "geometry_ar",
+      "group": 40.0,
+      "fixed": 60.0,
+      "samples": 2770,
+      "min_Ys": 0.03787912717597132,
+      "max_Ys": 0.18917636012778194,
+      "max_derivative_error": 4.8584396922235484e-11,
+      "max_scaled_derivative_error": 4.712734886920554e-11
+    },
+    {
+      "table": "geometry_ar",
+      "group": 40.0,
+      "fixed": 70.0,
+      "samples": 2770,
+      "min_Ys": 0.029774876002445362,
+      "max_Ys": 0.14870201837627797,
+      "max_derivative_error": 3.647390722782973e-11,
+      "max_scaled_derivative_error": 3.5785890099448926e-11
+    },
+    {
+      "table": "geometry_ar",
+      "group": 40.0,
+      "fixed": 80.0,
+      "samples": 2770,
+      "min_Ys": 0.024290465731961912,
+      "max_Ys": 0.12131171533160706,
+      "max_derivative_error": 3.4487260269777664e-11,
+      "max_scaled_derivative_error": 3.309712198302454e-11
+    },
+    {
+      "table": "geometry_angle",
+      "group": 2.0,
+      "fixed": -1.0,
+      "samples": 2001,
+      "min_Ys": 0.0,
+      "max_Ys": 0.0,
+      "max_derivative_error": 0.0,
+      "max_scaled_derivative_error": 0.0
+    },
+    {
+      "table": "geometry_angle",
+      "group": 2.0,
+      "fixed": -0.75,
+      "samples": 2001,
+      "min_Ys": 0.0,
+      "max_Ys": 0.04691699351160507,
+      "max_derivative_error": 2.6840118669269053e-13,
+      "max_scaled_derivative_error": 2.6767959791779025e-13
+    },
+    {
+      "table": "geometry_angle",
+      "group": 2.0,
+      "fixed": -0.5,
+      "samples": 2001,
+      "min_Ys": 0.0,
+      "max_Ys": 0.04092379247991582,
+      "max_derivative_error": 3.3472248410493233e-13,
+      "max_scaled_derivative_error": 3.3436086987678917e-13
+    },
+    {
+      "table": "geometry_angle",
+      "group": 2.0,
+      "fixed": -0.25,
+      "samples": 2001,
+      "min_Ys": 0.0,
+      "max_Ys": 0.03756977380350529,
+      "max_derivative_error": 1.6820995551308782e-13,
+      "max_scaled_derivative_error": 1.6812740902133796e-13
+    },
+    {
+      "table": "geometry_angle",
+      "group": 2.0,
+      "fixed": 0.0,
+      "samples": 2001,
+      "min_Ys": 0.0,
+      "max_Ys": 0.03864205894780186,
+      "max_derivative_error": 1.1916829285515962e-13,
+      "max_scaled_derivative_error": 1.1915891425574045e-13
+    },
+    {
+      "table": "geometry_angle",
+      "group": 2.0,
+      "fixed": 0.25,
+      "samples": 2001,
+      "min_Ys": 0.0,
+      "max_Ys": 0.048309854547824514,
+      "max_derivative_error": 2.029969582999138e-13,
+      "max_scaled_derivative_error": 2.0299360706581868e-13
+    },
+    {
+      "table": "geometry_angle",
+      "group": 2.0,
+      "fixed": 0.5,
+      "samples": 2001,
+      "min_Ys": 0.0,
+      "max_Ys": 0.0671201298488656,
+      "max_derivative_error": 4.71092728628747e-13,
+      "max_scaled_derivative_error": 4.708682151299979e-13
+    },
+    {
+      "table": "geometry_angle",
+      "group": 2.0,
+      "fixed": 0.75,
+      "samples": 2001,
+      "min_Ys": 0.0,
+      "max_Ys": 0.10580135204879265,
+      "max_derivative_error": 1.0012975691642279e-12,
+      "max_scaled_derivative_error": 1.0005744424089003e-12
+    },
+    {
+      "table": "geometry_angle",
+      "group": 2.0,
+      "fixed": 1.0,
+      "samples": 2001,
+      "min_Ys": 0.0,
+      "max_Ys": 0.29210323207868544,
+      "max_derivative_error": 8.642062759856017e-13,
+      "max_scaled_derivative_error": 8.620215810375482e-13
+    },
+    {
+      "table": "compressibility_ar",
+      "group": 0.6,
+      "fixed": 0.8,
+      "samples": 2770,
+      "min_Ys": 0.03755969883854921,
+      "max_Ys": 0.11509244721593496,
+      "max_derivative_error": 2.914034985534997e-11,
+      "max_scaled_derivative_error": 2.889525666447663e-11
+    },
+    {
+      "table": "mach_out",
+      "group": 0.5,
+      "fixed": 0.0,
+      "samples": 1202,
+      "min_Ys": 0.1863823708333186,
+      "max_Ys": 0.1863823708333186,
+      "max_derivative_error": 4.625929269271485e-12,
+      "max_scaled_derivative_error": 4.625929269271485e-12
+    },
+    {
+      "table": "mach_in",
+      "group": 0.5,
+      "fixed": 0.0,
+      "samples": 1001,
+      "min_Ys": 0.1863823708333186,
+      "max_Ys": 0.1863823708333186,
+      "max_derivative_error": 4.625929269271485e-12,
+      "max_scaled_derivative_error": 4.625929269271485e-12
+    },
+    {
+      "table": "mach_out",
+      "group": 0.5,
+      "fixed": 0.3,
+      "samples": 1204,
+      "min_Ys": 0.16029425700882938,
+      "max_Ys": 0.1863823708333186,
+      "max_derivative_error": 6.167819033287003e-11,
+      "max_scaled_derivative_error": 5.9732019844851e-11
+    },
+    {
+      "table": "mach_in",
+      "group": 0.5,
+      "fixed": 0.3,
+      "samples": 1001,
+      "min_Ys": 0.163193847791797,
+      "max_Ys": 0.1863823708333186,
+      "max_derivative_error": 5.0528471115820984e-11,
+      "max_scaled_derivative_error": 5.052810920359418e-11
+    },
+    {
+      "table": "mach_out",
+      "group": 0.5,
+      "fixed": 0.6,
+      "samples": 1204,
+      "min_Ys": 0.10127896023453341,
+      "max_Ys": 0.1863823708333186,
+      "max_derivative_error": 5.6494045552746286e-11,
+      "max_scaled_derivative_error": 5.3365941010352555e-11
+    },
+    {
+      "table": "mach_in",
+      "group": 0.5,
+      "fixed": 0.6,
+      "samples": 1001,
+      "min_Ys": 0.09631966984344809,
+      "max_Ys": 0.1863823708333186,
+      "max_derivative_error": 4.744789977584318e-11,
+      "max_scaled_derivative_error": 4.613665848818861e-11
+    },
+    {
+      "table": "mach_out",
+      "group": 0.5,
+      "fixed": 0.9,
+      "samples": 1202,
+      "min_Ys": 0.08055101086701186,
+      "max_Ys": 0.1863823708333186,
+      "max_derivative_error": 5.787242907118184e-11,
+      "max_scaled_derivative_error": 4.7594504972498885e-11
+    },
+    {
+      "table": "mach_in",
+      "group": 0.5,
+      "fixed": 0.9,
+      "samples": 1002,
+      "min_Ys": 0.07924649198611468,
+      "max_Ys": 0.1863823708333186,
+      "max_derivative_error": 4.8438308919429574e-11,
+      "max_scaled_derivative_error": 4.344484616973741e-11
+    },
+    {
+      "table": "mach_out",
+      "group": 0.5,
+      "fixed": 1.2,
+      "samples": 1204,
+      "min_Ys": 0.0785311551256853,
+      "max_Ys": 0.1863823708333186,
+      "max_derivative_error": 4.8098275362562504e-11,
+      "max_scaled_derivative_error": 4.2856849026042345e-11
+    },
+    {
+      "table": "mach_in",
+      "group": 0.5,
+      "fixed": 1.2,
+      "samples": 1001,
+      "min_Ys": 0.07820717711196012,
+      "max_Ys": 0.1863823708333186,
+      "max_derivative_error": 4.58249271861888e-11,
+      "max_scaled_derivative_error": 4.071477756073531e-11
+    },
+    {
+      "table": "mach_out",
+      "group": 0.5,
+      "fixed": 1.5,
+      "samples": 1203,
+      "min_Ys": 0.07818515899224839,
+      "max_Ys": 0.1863823708333186,
+      "max_derivative_error": 7.576402005771143e-11,
+      "max_scaled_derivative_error": 7.050109507880633e-11
+    },
+    {
+      "table": "mach_in",
+      "group": 0.5,
+      "fixed": 1.5,
+      "samples": 1002,
+      "min_Ys": 0.07897442117413017,
+      "max_Ys": 0.1863823708333186,
+      "max_derivative_error": 6.903304317074088e-11,
+      "max_scaled_derivative_error": 6.46922222392992e-11
+    },
+    {
+      "table": "mach_out",
+      "group": 2.0,
+      "fixed": 0.0,
+      "samples": 1202,
+      "min_Ys": 0.08895199986566919,
+      "max_Ys": 0.08895199986566919,
+      "max_derivative_error": 3.469446951953614e-12,
+      "max_scaled_derivative_error": 3.469446951953614e-12
+    },
+    {
+      "table": "mach_in",
+      "group": 2.0,
+      "fixed": 0.0,
+      "samples": 1001,
+      "min_Ys": 0.08895199986566919,
+      "max_Ys": 0.08895199986566919,
+      "max_derivative_error": 3.469446951953614e-12,
+      "max_scaled_derivative_error": 3.469446951953614e-12
+    },
+    {
+      "table": "mach_out",
+      "group": 2.0,
+      "fixed": 0.3,
+      "samples": 1204,
+      "min_Ys": 0.08738839049303049,
+      "max_Ys": 0.08895199986566919,
+      "max_derivative_error": 2.7644291369921525e-11,
+      "max_scaled_derivative_error": 2.729209563327838e-11
+    },
+    {
+      "table": "mach_in",
+      "group": 2.0,
+      "fixed": 0.3,
+      "samples": 1001,
+      "min_Ys": 0.08756217949730909,
+      "max_Ys": 0.08895199986566919,
+      "max_derivative_error": 2.4927361390314484e-11,
+      "max_scaled_derivative_error": 2.480903959928976e-11
+    },
+    {
+      "table": "mach_out",
+      "group": 2.0,
+      "fixed": 0.6,
+      "samples": 1204,
+      "min_Ys": 0.08385126735004866,
+      "max_Ys": 0.08895199986566919,
+      "max_derivative_error": 2.8710895640104983e-11,
+      "max_scaled_derivative_error": 2.8602352617228396e-11
+    },
+    {
+      "table": "mach_in",
+      "group": 2.0,
+      "fixed": 0.6,
+      "samples": 1001,
+      "min_Ys": 0.08355402880726603,
+      "max_Ys": 0.08895199986566919,
+      "max_derivative_error": 2.7408603466401666e-11,
+      "max_scaled_derivative_error": 2.7408308309659665e-11
+    },
+    {
+      "table": "mach_out",
+      "group": 2.0,
+      "fixed": 0.9,
+      "samples": 1202,
+      "min_Ys": 0.08260892318807964,
+      "max_Ys": 0.08895199986566919,
+      "max_derivative_error": 3.3424381318258867e-11,
+      "max_scaled_derivative_error": 3.32758258139009e-11
+    },
+    {
+      "table": "mach_in",
+      "group": 2.0,
+      "fixed": 0.9,
+      "samples": 1002,
+      "min_Ys": 0.0825307359353454,
+      "max_Ys": 0.08895199986566919,
+      "max_derivative_error": 3.2842326080917417e-11,
+      "max_scaled_derivative_error": 3.2643396234473055e-11
+    },
+    {
+      "table": "mach_out",
+      "group": 2.0,
+      "fixed": 1.2,
+      "samples": 1204,
+      "min_Ys": 0.08248786171963603,
+      "max_Ys": 0.08895199986566919,
+      "max_derivative_error": 3.227369153174786e-11,
+      "max_scaled_derivative_error": 3.2120367130352194e-11
+    },
+    {
+      "table": "mach_in",
+      "group": 2.0,
+      "fixed": 1.2,
+      "samples": 1001,
+      "min_Ys": 0.08246844387048842,
+      "max_Ys": 0.08895199986566919,
+      "max_derivative_error": 3.9363909701273236e-11,
+      "max_scaled_derivative_error": 3.920518317702314e-11
+    },
+    {
+      "table": "mach_out",
+      "group": 2.0,
+      "fixed": 1.5,
+      "samples": 1203,
+      "min_Ys": 0.08246712419906332,
+      "max_Ys": 0.08895199986566919,
+      "max_derivative_error": 2.638826235702805e-11,
+      "max_scaled_derivative_error": 2.6386344535756296e-11
+    },
+    {
+      "table": "mach_in",
+      "group": 2.0,
+      "fixed": 1.5,
+      "samples": 1002,
+      "min_Ys": 0.08251442918068684,
+      "max_Ys": 0.08895199986566919,
+      "max_derivative_error": 3.1111658388427443e-11,
+      "max_scaled_derivative_error": 3.092343326609805e-11
+    }
+  ],
+  "aspect_joins": [
+    {
+      "aspect_ratio": 0.92616937811858,
+      "slope_left": -0.733530875614008,
+      "slope_right": -0.7335306782962903,
+      "curvature_left": 1.6446526585056631,
+      "curvature_right": 1.6446533579461686
+    },
+    {
+      "aspect_ratio": 1.5,
+      "slope_left": -0.2480258923004408,
+      "slope_right": -0.248025894735715,
+      "curvature_left": 0.44855232861351624,
+      "curvature_right": 0.4485523730224372
+    },
+    {
+      "aspect_ratio": 2.5,
+      "slope_left": -0.16000000862687047,
+      "slope_right": -0.15999999948973498,
+      "curvature_left": 0.1280000105907675,
+      "curvature_right": 0.1280000161418826
+    }
+  ],
+  "reference": {
+    "b_over_c": 0.7071067811865476,
+    "Kp_at_M1_06_M2_08": 0.5783583714347921,
+    "K3_continuation_below_AR": 0.7905694150420949,
+    "aspect_factor_at_two": 0.46966235231574205,
+    "published_factor_at_two": 0.5
+  },
+  "supersonic_not_frozen": [
+    {
+      "M2": 1.0,
+      "Ys": 0.0851159448714622
+    },
+    {
+      "M2": 1.5,
+      "Ys": 0.08717813149625497
+    },
+    {
+      "M2": 2.0,
+      "Ys": 0.08795223038409629
+    }
+  ],
+  "paper_sha256": "1f00fe0bfaf2d93a36a6aa1a1baf2729f46cc1fa90eac98cc189dd281fd62886"
+}

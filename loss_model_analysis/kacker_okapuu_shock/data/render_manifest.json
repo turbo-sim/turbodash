@@ -1,0 +1,18 @@
+{
+  "figures": 8,
+  "figure_sha256": {
+    "01_efficiency.pdf": "377e49d527fc60de11705a743cc820e853f7eac06991b2652c1e263b353933ac",
+    "02_geometry.pdf": "2c969b38fa0a0a4f369e50568cea623cc8c45abf2c2342e7e6d2b0b697d65b0b",
+    "04_profile_and_shock.pdf": "a0cd7c32b077ac8cb0881a23c7a4964fc1465b6478a65b16b210603be81976cc",
+    "05_efficiency_budget.pdf": "c384d3a0841502bd564fb9de2800508cf0842b43f7129f7bdc9464d6fe85bf33",
+    "06_low_speed_limit.pdf": "6789a9983560674e0c10e6ab97d7e7c78d172669c64f237738f92dcc460119b7",
+    "07_reynolds_correction.pdf": "27a147d94db3ec2cd02e36afc31e762b642bab9aab057734cef6044986b3afb5",
+    "03_shock_components.pdf": "77b2595df017c284980e98d561c6265be623dbc8a83226b6414daefe4ba7ac78",
+    "08_hub_mach_fit.pdf": "b69cbcfcb033d98b7b0e1f75050fd5e5cc44094d1271e0f009290e1251e02779"
+  },
+  "report_sha256": "a73cb9905c134d9d268df4d2bd85d1c998a2939039a424ac04a81e238dcde201",
+  "report_script_sha256": "56b9ce104b4a41ed39aa3b11ac78d4c093b7082c2f7bbb7d21ed8b582fdaac69",
+  "data_sha256": "cda8daed6e41ddb32d283cfb9266607c7dd5b6b1978deb58361d972cc26f1fd4",
+  "sources_match_worktree": true,
+  "checked_links": 29
+}

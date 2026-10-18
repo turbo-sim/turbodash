@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "source_sha256": {
+    "turbodash/loss_models/loss_model_kacker_okapuu.py": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51",
+    "turbodash/loss_models/_numerics.py": "09bb30e75bf4ec4a25a2cba06578f68bebe483db1aba79dafce8af185983532b",
+    "turbodash/loss_models/_trailing_edge.py": "bb922ddffcab0f786fb8a9f8dde21840cc6df41ba80ce7b461e5a4501bbe3d00",
+    "turbodash/loss_models/_blade_loading.py": "b5b4956b978eb10ed75ee40e0b0f4bfbb4e34e4e8ebf9edee85186f8277ab18a",
+    "turbodash/loss_models/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff"
+  },
+  "script_sha256": "b28a84733dae5681ba6d20e4778417bc2f62b4806726a92bf4c41b1a24a1b865",
+  "csv_sha256": {
+    "profile_z": "cf8209c2a62032efada5ccb30f93cf570671eec4f0cadcb84bb222850a378d93",
+    "reference_order": "64ed605125cc0af30119d43a9892798c48440c0c30fb787148f95190db894c12",
+    "reynolds": "1f4263a11d9c2018b4af39b50eaad53a57833b24efde3ec676e1065293b7c2f9",
+    "axial_angle": "9283e2684be1feb116486048b0de303ccb6bc1a3dac1cea55023832c5ff94fdb"
+  },
+  "checked_samples": 41878,
+  "plotted_samples": 12618,
+  "reversed_reference_checks": [
+    {
+      "reaction": 0.027,
+      "impulse": 0.102,
+      "large_z_limit": 0.12239999999999998
+    },
+    {
+      "reaction": 0.102,
+      "impulse": 0.027,
+      "large_z_limit": 0.0216
+    },
+    {
+      "reaction": 0.04,
+      "impulse": 0.04,
+      "large_z_limit": 0.04
+    }
+  ],
+  "finite_zero_outlet_angle": true,
+  "negative_Re_supported": true,
+  "Re_asymptote": 1000.0,
+  "factor_Re_asymptote": 8.325532074018732,
+  "supplied_parameters": {
+    "M1": 0.2,
+    "M2": 0.5,
+    "gamma": 1.4,
+    "Re": 500000.0,
+    "hub_tip": 0.8,
+    "x_te": 0.2
+  },
+  "production_functions_only": true
+}

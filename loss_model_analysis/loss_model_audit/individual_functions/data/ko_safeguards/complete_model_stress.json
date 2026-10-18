@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "seed": 20261019,
+  "cases": 20000,
+  "zero_outlet_and_height_cases": 100,
+  "ranges": {
+    "angles": [
+      -89.9,
+      89.9
+    ],
+    "Re": [
+      -1000000.0,
+      2000000.0
+    ],
+    "aspect_ratio": [
+      0,
+      5
+    ],
+    "Mach_in": [
+      0,
+      2
+    ],
+    "Mach_out": [
+      0,
+      3
+    ]
+  },
+  "maxima": {
+    "loss_profile": 10.478119370609736,
+    "loss_incidence": 0.0,
+    "loss_trailing": 0.8750141207347653,
+    "loss_secondary": 14481570.51000131,
+    "loss_clearance": 812246.1213213219,
+    "loss_total": 14670919.32498383
+  },
+  "warning_messages": [],
+  "script_sha256": "7b5ef41840b5c217756b01cf470e42817f8a3d0584808c333f37168684511e28",
+  "source_sha256": {
+    "turbodash/loss_models/__init__.py": "fcc03d0e9ee610b36333efe8c19d8ad9f49f79c2d91e48654bd454103e3374b5",
+    "turbodash/loss_models/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
+    "turbodash/loss_models/_blade_loading.py": "b5b4956b978eb10ed75ee40e0b0f4bfbb4e34e4e8ebf9edee85186f8277ab18a",
+    "turbodash/loss_models/_numerics.py": "09bb30e75bf4ec4a25a2cba06578f68bebe483db1aba79dafce8af185983532b",
+    "turbodash/loss_models/_trailing_edge.py": "bb922ddffcab0f786fb8a9f8dde21840cc6df41ba80ce7b461e5a4501bbe3d00",
+    "turbodash/loss_models/loss_coefficient_conversion.py": "a9a8a5943bd91c352c4607fade51272e5ad60de02f8d14f4759e5407b02c1279",
+    "turbodash/loss_models/loss_model.py": "8fc6bc7d5e32bd060a0c836a6be110e49065ed618f5483c70df50d68d6f10975",
+    "turbodash/loss_models/loss_model_benner.py": "6a95683659c639508bf93d5a743d09a5a5998d4cbf5e4ce750fc484f9490bbcd",
+    "turbodash/loss_models/loss_model_kacker_okapuu.py": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51",
+    "turbodash/loss_models/loss_model_moustapha.py": "0748aa6c29528f98e0e6a12e61b9ed34f263f9f576f3664b9ebf322ef3098d23"
+  }
+}

@@ -1,0 +1,272 @@
+{
+  "created_utc": "2026-10-18T20:07:55.456217+00:00",
+  "python": "3.13.2",
+  "executable": "C:\\Users\\roagr\\AppData\\Local\\pypoetry\\Cache\\virtualenvs\\turbomachinery-special-course-fbPpiFVa-py3.13\\Scripts\\python.exe",
+  "numpy": "2.5.2",
+  "coolprop": "7.2.0",
+  "source_sha256": {
+    "turbodash/core_turbine.py": "a9c3706955a1350c3d4d105a3779bed43201a440ffb1ebf2fd0a6641023857eb",
+    "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
+    "turbodash/loss_models/__init__.py": "fcc03d0e9ee610b36333efe8c19d8ad9f49f79c2d91e48654bd454103e3374b5",
+    "turbodash/loss_models/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
+    "turbodash/loss_models/_blade_loading.py": "b5b4956b978eb10ed75ee40e0b0f4bfbb4e34e4e8ebf9edee85186f8277ab18a",
+    "turbodash/loss_models/_numerics.py": "09bb30e75bf4ec4a25a2cba06578f68bebe483db1aba79dafce8af185983532b",
+    "turbodash/loss_models/_trailing_edge.py": "bb922ddffcab0f786fb8a9f8dde21840cc6df41ba80ce7b461e5a4501bbe3d00",
+    "turbodash/loss_models/loss_coefficient_conversion.py": "a9a8a5943bd91c352c4607fade51272e5ad60de02f8d14f4759e5407b02c1279",
+    "turbodash/loss_models/loss_model.py": "8fc6bc7d5e32bd060a0c836a6be110e49065ed618f5483c70df50d68d6f10975",
+    "turbodash/loss_models/loss_model_benner.py": "6a95683659c639508bf93d5a743d09a5a5998d4cbf5e4ce750fc484f9490bbcd",
+    "turbodash/loss_models/loss_model_kacker_okapuu.py": "78501de01faf345ae4d7bdc7ac156ce4696fe8d5ef9b62dcaaa9ae02b4d52c51",
+    "turbodash/loss_models/loss_model_moustapha.py": "0748aa6c29528f98e0e6a12e61b9ed34f263f9f576f3664b9ebf322ef3098d23"
+  },
+  "study_sha256": "05501d1cd7f37432b52caac7ec853296e200ca0b2e12da73742a97357189df17",
+  "fixed": {
+    "inlet_total_pressure": 5000000.0,
+    "inlet_total_temperature": 600.0,
+    "inlet_angle": 0.0,
+    "meridional_velocity_ratios": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "radius_ratios": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "maximum_thickness_chord": 0.3,
+    "leading_edge_radius_maximum_thickness": 0.05,
+    "leading_edge_wedge_angle": 30.0,
+    "trailing_edge_wedge_angle": 5.0,
+    "rotor_clearance_height": 0.01,
+    "stator_clearance_height": 0.0,
+    "inlet_displacement_thickness_height": 0.011,
+    "reaction_range": [
+      -0.1,
+      1.1
+    ],
+    "speed_range": [
+      0.0,
+      1.2
+    ],
+    "speed_baseline": 0.6,
+    "gas": "HEOS::Air",
+    "row_geometry": "continuous blade count, true-chord ratios"
+  },
+  "parameters": {
+    "stator_exit_angle": {
+      "name": "Stator exit angle",
+      "symbol": "$\\alpha_2$",
+      "unit": "deg",
+      "baseline": 70.0,
+      "values": [
+        50.0,
+        55.0,
+        60.0,
+        65.0,
+        70.0,
+        75.0,
+        80.0
+      ]
+    },
+    "pitch_chord": {
+      "name": "Pitch / true chord",
+      "symbol": "$s/c$",
+      "unit": "",
+      "baseline": 0.725,
+      "values": [
+        0.25,
+        0.4,
+        0.55,
+        0.725,
+        0.9,
+        1.05,
+        1.2
+      ]
+    },
+    "aspect_ratio": {
+      "name": "Blade aspect ratio",
+      "symbol": "$H/c$",
+      "unit": "",
+      "baseline": 1.75,
+      "values": [
+        0.5,
+        1.0,
+        1.75,
+        2.5,
+        3.0
+      ]
+    },
+    "trailing_ratio": {
+      "name": "Trailing-edge thickness / opening",
+      "symbol": "$\\hat{t}_{\\mathrm{TE}}$",
+      "unit": "",
+      "baseline": 0.2,
+      "values": [
+        0.0,
+        0.1,
+        0.2,
+        0.3,
+        0.4
+      ]
+    },
+    "specific_speed": {
+      "name": "Specific speed",
+      "symbol": "$\\Omega_s$",
+      "unit": "",
+      "baseline": 1.05,
+      "values": [
+        0.1,
+        0.5,
+        1.05,
+        1.5,
+        2.0
+      ]
+    },
+    "mass_flow": {
+      "name": "Mass flow",
+      "symbol": "$\\dot{m}$",
+      "unit": "kg/s",
+      "log": true,
+      "baseline": 10.0,
+      "values": [
+        0.1,
+        1.0,
+        10.0,
+        100.0,
+        1000.0
+      ]
+    },
+    "isentropic_mach": {
+      "name": "Isentropic expansion Mach number",
+      "symbol": "$M_{\\mathrm{is}}$",
+      "unit": "",
+      "baseline": 1.15,
+      "values": [
+        0.3,
+        0.6,
+        0.9,
+        1.15,
+        1.5,
+        2.0
+      ]
+    }
+  },
+  "sweeps": {
+    "speed_r0": {
+      "name": "Blade velocity ratio \u00b7 R = 0",
+      "axis": "blade_velocity_ratio",
+      "fixed_reaction": 0.0
+    },
+    "speed_r05": {
+      "name": "Blade velocity ratio \u00b7 R = 0.5",
+      "axis": "blade_velocity_ratio",
+      "fixed_reaction": 0.5
+    },
+    "reaction": {
+      "name": "Degree of reaction \u00b7 U/c0 = 0.6",
+      "axis": "reaction",
+      "fixed_speed": 0.6
+    }
+  },
+  "models": [
+    "kacker_okapuu",
+    "benner",
+    "isentropic"
+  ],
+  "points": 241,
+  "unique_designs": 24514,
+  "elapsed_seconds": 48.17212510000536,
+  "sample_counts": {
+    "kacker_okapuu": 28920,
+    "benner": 28920,
+    "isentropic": 28920
+  },
+  "model_cases": "All seven sensitivities and all three sweeps per model",
+  "expansion_boundaries": {
+    "0.3": {
+      "h": 722046.9061815878,
+      "s": 3469.4771418362207,
+      "p": 4693901.409286764,
+      "T": 589.6651160034005,
+      "density": 27.24264627988826,
+      "sound_speed": 494.11397933725226,
+      "viscosity": 3.0811541292622914e-05,
+      "gamma": 1.3908580744815835,
+      "delta_h": 10986.688105942798,
+      "spouting": 148.23419380117934,
+      "mach": 0.3
+    },
+    "0.6": {
+      "h": 691437.1068004074,
+      "s": 3469.4771418362207,
+      "p": 3911038.9440179802,
+      "T": 560.6862711104661,
+      "density": 23.949004559917345,
+      "sound_speed": 480.7198738878057,
+      "viscosity": 2.9712589947541593e-05,
+      "gamma": 1.3936315766975726,
+      "delta_h": 41596.48748712323,
+      "spouting": 288.4319243326689,
+      "mach": 0.6
+    },
+    "0.9": {
+      "h": 647026.9799212323,
+      "s": 3469.4771418362225,
+      "p": 2945908.293989904,
+      "T": 518.1788199547577,
+      "density": 19.599394538599228,
+      "sound_speed": 460.82752823695995,
+      "viscosity": 2.8063662776280437e-05,
+      "gamma": 1.3974418594795512,
+      "delta_h": 86006.61436629831,
+      "spouting": 414.7447754132614,
+      "mach": 0.9
+    },
+    "1.15": {
+      "h": 604383.9108144913,
+      "s": 3469.4771418362225,
+      "p": 2190804.124207833,
+      "T": 476.8852736428795,
+      "density": 15.891136758359814,
+      "sound_speed": 441.0842174866047,
+      "viscosity": 2.641331265387356e-05,
+      "gamma": 1.4007217959131737,
+      "delta_h": 128649.6834730393,
+      "spouting": 507.2468501095681,
+      "mach": 1.15
+    },
+    "1.5": {
+      "h": 542841.6654791895,
+      "s": 3469.477141836223,
+      "p": 1358096.222875386,
+      "T": 416.5765648904444,
+      "density": 11.32115174704877,
+      "sound_speed": 411.1684475663002,
+      "viscosity": 2.390017051643793e-05,
+      "gamma": 1.4044789690245822,
+      "delta_h": 190191.92880834115,
+      "spouting": 616.7526713494497,
+      "mach": 1.5
+    },
+    "2.0": {
+      "h": 461683.98923597863,
+      "s": 3469.4771418362247,
+      "p": 639534.6243276022,
+      "T": 336.07084353692716,
+      "density": 6.6313758841606445,
+      "sound_speed": 368.34060667510687,
+      "viscosity": 2.03061935844453e-05,
+      "gamma": 1.4071086150078043,
+      "delta_h": 271349.605051552,
+      "spouting": 736.6812133501871,
+      "mach": 2.0
+    }
+  },
+  "data_sha256": {
+    "isentropic.csv.gz": "f65d5f0d6f6abe53caf86fe7759ff79c9113c7780d6ff0d60c7537197cff286c"
+  },
+  "source_unchanged": true,
+  "model": "isentropic",
+  "common_provenance": "../../data/provenance.json"
+}

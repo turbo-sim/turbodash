@@ -1,0 +1,22 @@
+{
+  "figures": 4,
+  "formats": [
+    "pdf"
+  ],
+  "model_calls": 0,
+  "derivative_recalculations": 0,
+  "data_hashes": {
+    "vary_alpha2.csv": "adff3b330b9be037a67a2d01e603824937c3ac8e7d4bfcbbbfe3a4f7adb7229a",
+    "vary_pitch_chord.csv": "55aab1cecbe0f9849af41ce8d7c9b73c9acaf4347f0ea1e51cd0758a3f76cc15",
+    "vary_thickness.csv": "d82086adaac40a0ab1a7dc5e036ddcefc70e5945b9549f45d02ed1e1e7e726c6",
+    "thickness_z_zero_zoom.csv": "42fc9b624af7e1c15a686f85a83b9f76ab2ffd5fc8661d0f8055d61d6bd2b041",
+    "thickness_z_zero_limits.csv": "402e0064a7486ceaeeeb45f8dac2638b00917761dfbb07caffc9b06ec9a74dd1"
+  },
+  "figure_hashes": {
+    "ko_profile_blend_alpha2.pdf": "3548a518d0a8ae208dcaec5ad4e3e8c33d9e7785f9a5ae60c80e8a5ed33c007c",
+    "ko_profile_blend_pitch_chord.pdf": "3866cc98448f2dad8f6cc34f6e10902fc8316cefe7389e14b462e194f980b4d2",
+    "ko_profile_thickness_z.pdf": "a479e39059c5b9e323ddcb5160c2cf139f14bd5b559e485aec9d2833eac585df",
+    "ko_profile_thickness_z_zero_zoom.pdf": "04bc49a0bccb9569b24e2dfd9942fb53387149a930eb88da6e17c9f94219891e"
+  },
+  "renderer_sha256": "be51d41668d66f1fa230cc5c6582a84c08b2a3caabb70fe71f384a485a60c08f"
+}

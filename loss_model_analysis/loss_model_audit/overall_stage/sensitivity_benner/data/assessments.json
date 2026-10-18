@@ -1,0 +1,128 @@
+{
+  "speed_r0/stator_exit_angle": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 405,
+    "negative_eta_tt": 163
+  },
+  "speed_r05/stator_exit_angle": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 471,
+    "negative_eta_tt": 111
+  },
+  "reaction/stator_exit_angle": {
+    "verdict": "Review",
+    "comparison_coordinate": 0.5,
+    "negative_hub": 94,
+    "negative_eta_tt": 0
+  },
+  "speed_r0/pitch_chord": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 420,
+    "negative_eta_tt": 136
+  },
+  "speed_r05/pitch_chord": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 490,
+    "negative_eta_tt": 101
+  },
+  "reaction/pitch_chord": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.5,
+    "negative_hub": 77,
+    "negative_eta_tt": 0
+  },
+  "speed_r0/aspect_ratio": {
+    "verdict": "Review",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 300,
+    "negative_eta_tt": 94
+  },
+  "speed_r05/aspect_ratio": {
+    "verdict": "Review",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 350,
+    "negative_eta_tt": 70
+  },
+  "reaction/aspect_ratio": {
+    "verdict": "Review",
+    "comparison_coordinate": 0.5,
+    "negative_hub": 55,
+    "negative_eta_tt": 0
+  },
+  "speed_r0/trailing_ratio": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 300,
+    "negative_eta_tt": 103
+  },
+  "speed_r05/trailing_ratio": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 350,
+    "negative_eta_tt": 75
+  },
+  "reaction/trailing_ratio": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.5,
+    "negative_hub": 55,
+    "negative_eta_tt": 0
+  },
+  "speed_r0/specific_speed": {
+    "verdict": "Review",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 293,
+    "negative_eta_tt": 96
+  },
+  "speed_r05/specific_speed": {
+    "verdict": "Review",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 343,
+    "negative_eta_tt": 69
+  },
+  "reaction/specific_speed": {
+    "verdict": "Review",
+    "comparison_coordinate": 0.5,
+    "negative_hub": 222,
+    "negative_eta_tt": 0
+  },
+  "speed_r0/mass_flow": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 300,
+    "negative_eta_tt": 97
+  },
+  "speed_r05/mass_flow": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 350,
+    "negative_eta_tt": 73
+  },
+  "reaction/mass_flow": {
+    "verdict": "Consistent",
+    "comparison_coordinate": 0.5,
+    "negative_hub": 55,
+    "negative_eta_tt": 0
+  },
+  "speed_r0/isentropic_mach": {
+    "verdict": "Review",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 360,
+    "negative_eta_tt": 108
+  },
+  "speed_r05/isentropic_mach": {
+    "verdict": "Review",
+    "comparison_coordinate": 0.6,
+    "negative_hub": 420,
+    "negative_eta_tt": 79
+  },
+  "reaction/isentropic_mach": {
+    "verdict": "Review",
+    "comparison_coordinate": 0.5,
+    "negative_hub": 66,
+    "negative_eta_tt": 0
+  }
+}

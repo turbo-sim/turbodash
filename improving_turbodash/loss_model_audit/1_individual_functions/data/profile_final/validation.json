@@ -1,9 +1,10 @@
 {
   "passed": true,
   "production_sources": {
-    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "c03be22271d6d95f39da2df2ed68de7284ad12cf33b83c2fe47e3c27bf765f1f",
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "c3d88153360f75ec1e54e53a056d4ec7b41547b9d3e467e4847c66d7705afa08",
     "turbodash/loss_models_new/_numerics.py": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff",
     "turbodash/loss_models_new/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
+    "turbodash/loss_models_new/_blade_loading.py": "8be374f9be233a7027e39a552c8c424200a3f00d05706868d8c75968df1666a5",
     "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
     "turbodash/loss_model_dispatch.py": "39acd5c8b4961e5239b32c95edc33a2447bb558ed4158b1de4becd8efe447dbd"
   },
@@ -73,10 +74,20 @@
       "relative_path": "turbodash/loss_models_new/_numerics.py",
       "sha256": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff"
     },
+    "turbodash.loss_models_new._trailing_edge": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\_trailing_edge.py",
+      "relative_path": "turbodash/loss_models_new/_trailing_edge.py",
+      "sha256": "594970afedea411fbf4e1f6a86017ac46372f36b5f0452c78234940441630ce8"
+    },
+    "turbodash.loss_models_new._blade_loading": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\_blade_loading.py",
+      "relative_path": "turbodash/loss_models_new/_blade_loading.py",
+      "sha256": "8be374f9be233a7027e39a552c8c424200a3f00d05706868d8c75968df1666a5"
+    },
     "turbodash.loss_models_new.loss_model_kacker_okapuu": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model_kacker_okapuu.py",
       "relative_path": "turbodash/loss_models_new/loss_model_kacker_okapuu.py",
-      "sha256": "c03be22271d6d95f39da2df2ed68de7284ad12cf33b83c2fe47e3c27bf765f1f"
+      "sha256": "c3d88153360f75ec1e54e53a056d4ec7b41547b9d3e467e4847c66d7705afa08"
     },
     "turbodash.loss_models_new.loss_coefficient_conversion": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_coefficient_conversion.py",
@@ -86,12 +97,12 @@
     "turbodash.loss_models_new.loss_model_benner": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model_benner.py",
       "relative_path": "turbodash/loss_models_new/loss_model_benner.py",
-      "sha256": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba"
+      "sha256": "cac62576a82d6db189d94a5ee6f71f980b5e5de8dfe6d35d6ac2e3cdd22a1659"
     },
     "turbodash.loss_models_new.loss_model_moustapha": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model_moustapha.py",
       "relative_path": "turbodash/loss_models_new/loss_model_moustapha.py",
-      "sha256": "923339d879bb7edf952112296b605073d9c5f466e541ea04b3ce10f3f8e1f489"
+      "sha256": "556caad2121e18a57d4f5a6af3161fba8d421f957ac0779148fdec2e4efed4b8"
     },
     "turbodash.loss_models_new.loss_model": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model.py",
@@ -99,17 +110,17 @@
       "sha256": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11"
     }
   },
-  "script_sha256": "e13b90f55493c65acbfb8c0f61032752b410bec83c950f96b019868dd864cff0",
+  "script_sha256": "6cc184e84fac8f8d88f17295b637f6b74a0e8063f94c1a132a5fd6e9563044c8",
   "data_sha256": {
-    "geometry_spacing": "2c69021b160e19099b8e36d7842cd7b2b27e8fcebed870de91f971532452c4a6",
-    "geometry_angle": "0b9a66406ec53e345f806d5fee7fc433ffa8a45856c632edb70ed8fdaf3c15cd",
-    "mach_inlet": "e56caa039ac292980bb7645e012240f3a98dbe06568a1ab6a68197292b8964b5",
-    "mach_hub": "94f210a103e37c1c6c4ab9a7523e9ce27c49acfa624b33aa56376015b30e9df7",
-    "component_budget": "ae6bf5f38d21f60a6b7425e8a6037a186c29b47bca80a0f1e08f2cccc6f07bbb",
-    "thickness_factor": "7e35459ed241fe8c94742bd575790d0c6be2da1e5f0323c1e31a2eaa72999861"
+    "geometry_spacing": "bd220b758d778da652e75e2eb41381b54414d1fdf3bf6634ee749361354f8352",
+    "geometry_angle": "1e1334d07a926112b6eebc5954167239a2d635de7b7279a1d4e1d0bf9f7391f5",
+    "mach_inlet": "4e35c9f487e104ab41ab7e1dcb2f205488fb8b4a2310ba428f752ea23dda1efe",
+    "mach_hub": "6b7eb02991e7d059f6d60ec6bd00e95b2243d003a173328e621be02da8e5cd95",
+    "component_budget": "d012308413c12b8f692aabd6d0f51217f68e2eac8bbb0f713f759eb8274c73bb",
+    "thickness_factor": "9b71cbc6aa4677ba83d703e80e05c04161a3c5ea2177160db6d3f01d3abea9e1"
   },
   "total_function": "turbodash.loss_models_new.loss_model_kacker_okapuu.get_profile_loss",
-  "model_selection": "kacker_okapuu_new (unsuffixed names select the preserved baseline)",
+  "model_selection": "current Kacker-Okapuu production helper",
   "curves": 38,
   "derivative_checks": [
     {
@@ -146,7 +157,7 @@
       "samples": 761,
       "minimum": 0.03657492757014712,
       "maximum": 0.09754061409669859,
-      "max_derivative_error": 2.278223443230587e-11
+      "max_derivative_error": 2.7826171922207266e-11
     },
     {
       "table": "geometry_spacing",
@@ -170,55 +181,55 @@
       "table": "geometry_angle",
       "row": 0,
       "fixed": 0.3,
-      "samples": 791,
-      "minimum": 0.03478644960106921,
-      "maximum": 0.05631870902973119,
-      "max_derivative_error": 1.415669339567549e-13
+      "samples": 1001,
+      "minimum": 0.0482877595178248,
+      "maximum": 0.059840123608236734,
+      "max_derivative_error": 2.0280451580242942e-13
     },
     {
       "table": "geometry_angle",
       "row": 0,
       "fixed": 0.5,
-      "samples": 791,
-      "minimum": 0.03179579258282736,
-      "maximum": 0.0529103900821505,
-      "max_derivative_error": 1.131807321474998e-13
+      "samples": 1001,
+      "minimum": 0.04061283122335437,
+      "maximum": 0.04953124359397332,
+      "max_derivative_error": 1.5630990154568564e-13
     },
     {
       "table": "geometry_angle",
       "row": 0,
       "fixed": 0.7,
-      "samples": 791,
-      "minimum": 0.031406935331536386,
-      "maximum": 0.05813734552131677,
-      "max_derivative_error": 2.1754863535616842e-13
+      "samples": 1001,
+      "minimum": 0.035856674385738065,
+      "maximum": 0.05086337849086914,
+      "max_derivative_error": 1.9306409769492827e-13
     },
     {
       "table": "geometry_angle",
       "row": 0,
       "fixed": 1.0,
-      "samples": 791,
-      "minimum": 0.031995756268186716,
-      "maximum": 0.07361175874491505,
-      "max_derivative_error": 2.311701177704073e-13
+      "samples": 1001,
+      "minimum": 0.03652341100594146,
+      "maximum": 0.06342376211334706,
+      "max_derivative_error": 3.0346255022739577e-13
     },
     {
       "table": "geometry_angle",
       "row": 0,
       "fixed": 1.5,
-      "samples": 791,
-      "minimum": 0.036897748348349545,
-      "maximum": 0.10759421679627709,
-      "max_derivative_error": 3.1015814916379725e-13
+      "samples": 1001,
+      "minimum": 0.05552035771486629,
+      "maximum": 0.09739896326136081,
+      "max_derivative_error": 4.573277520569796e-13
     },
     {
       "table": "geometry_angle",
       "row": 0,
       "fixed": 2.0,
-      "samples": 791,
-      "minimum": 0.04383509742114612,
-      "maximum": 0.1514524341912438,
-      "max_derivative_error": 3.3783262645692425e-13
+      "samples": 1001,
+      "minimum": 0.06703184478976067,
+      "maximum": 0.1460674761796687,
+      "max_derivative_error": 4.474350577543529e-13
     },
     {
       "table": "mach_inlet",
@@ -244,8 +255,8 @@
       "fixed": 0.6,
       "samples": 1208,
       "minimum": 0.033131632121444536,
-      "maximum": 0.484965325340044,
-      "max_derivative_error": 8.611666935109952e-10
+      "maximum": 0.6676756098415626,
+      "max_derivative_error": 1.070823429927259e-09
     },
     {
       "table": "mach_inlet",
@@ -253,44 +264,53 @@
       "fixed": 0.9,
       "samples": 1207,
       "minimum": 0.09880478014546076,
-      "maximum": 0.48498384791269494,
-      "max_derivative_error": 2.1750079515214793e-10
+      "maximum": 0.6677828325455899,
+      "max_derivative_error": 3.1137514788781573e-10
     },
     {
       "table": "mach_inlet",
       "row": 0,
       "fixed": 1.2,
       "samples": 1208,
-      "minimum": 0.2679751067292654,
-      "maximum": 0.4849840386068297,
-      "max_derivative_error": 8.98819213501767e-11
+      "minimum": 0.2680956806368302,
+      "maximum": 0.6677839437578389,
+      "max_derivative_error": 2.1246382431172606e-10
     },
     {
       "table": "mach_inlet",
       "row": 0,
       "fixed": 1.5,
       "samples": 1208,
-      "minimum": 0.41653066438707476,
-      "maximum": 0.4849840540404562,
-      "max_derivative_error": 9.553362116145048e-11
+      "minimum": 0.4772376005309249,
+      "maximum": 0.6677840337425485,
+      "max_derivative_error": 1.316242121806449e-10
+    },
+    {
+      "table": "mach_hub",
+      "row": 0,
+      "fixed": -0.5,
+      "samples": 1208,
+      "minimum": 0.06521608437918346,
+      "maximum": 0.6677795192723741,
+      "max_derivative_error": 4.281894838698008e-10
+    },
+    {
+      "table": "mach_hub",
+      "row": 0,
+      "fixed": 0.0,
+      "samples": 1208,
+      "minimum": 0.06400787690339022,
+      "maximum": 0.6677792301603257,
+      "max_derivative_error": 3.8224157172805917e-10
     },
     {
       "table": "mach_hub",
       "row": 0,
       "fixed": 0.2,
       "samples": 1208,
-      "minimum": 0.06795235702903756,
-      "maximum": 0.4849833760525364,
-      "max_derivative_error": 2.345548200111125e-10
-    },
-    {
-      "table": "mach_hub",
-      "row": 0,
-      "fixed": 0.3,
-      "samples": 1208,
-      "minimum": 0.06573994368415194,
-      "maximum": 0.4849832989649013,
-      "max_derivative_error": 2.2909696362205523e-10
+      "minimum": 0.062007828151835295,
+      "maximum": 0.6677786870303041,
+      "max_derivative_error": 4.0313441473927014e-10
     },
     {
       "table": "mach_hub",
@@ -298,26 +318,17 @@
       "fixed": 0.5,
       "samples": 1208,
       "minimum": 0.04630936840048558,
-      "maximum": 0.48498121828879237,
-      "max_derivative_error": 4.432278988275584e-10
+      "maximum": 0.6677675425933229,
+      "max_derivative_error": 5.522449164629961e-10
     },
     {
       "table": "mach_hub",
       "row": 0,
-      "fixed": 0.7,
+      "fixed": 0.8,
       "samples": 1208,
-      "minimum": 0.03445883373361417,
-      "maximum": 0.4849691773681842,
-      "max_derivative_error": 8.261102912854312e-10
-    },
-    {
-      "table": "mach_hub",
-      "row": 0,
-      "fixed": 0.9,
-      "samples": 1208,
-      "minimum": 0.03447549139220562,
-      "maximum": 0.4849692230535119,
-      "max_derivative_error": 7.791594036632432e-10
+      "minimum": 0.033131632121444536,
+      "maximum": 0.6676756098415626,
+      "max_derivative_error": 1.070823429927259e-09
     },
     {
       "table": "mach_hub",
@@ -325,8 +336,8 @@
       "fixed": 1.0,
       "samples": 1208,
       "minimum": 0.03560268806826669,
-      "maximum": 0.48497205130456894,
-      "max_derivative_error": 7.271565571898009e-10
+      "maximum": 0.6677144442077393,
+      "max_derivative_error": 1.1152350154475243e-09
     },
     {
       "table": "component_budget",
@@ -334,8 +345,8 @@
       "fixed": 0.6,
       "samples": 1207,
       "minimum": 0.04630936840048558,
-      "maximum": 0.48498121828879237,
-      "max_derivative_error": 4.432278988275584e-10
+      "maximum": 0.6677675425933229,
+      "max_derivative_error": 5.522449164629961e-10
     },
     {
       "table": "mach_inlet",
@@ -361,8 +372,8 @@
       "fixed": 0.6,
       "samples": 1208,
       "minimum": 0.0398277036594365,
-      "maximum": 0.4849780661160717,
-      "max_derivative_error": 3.7421243881397004e-10
+      "maximum": 0.6677492564162177,
+      "max_derivative_error": 8.772458315320364e-10
     },
     {
       "table": "mach_inlet",
@@ -370,44 +381,53 @@
       "fixed": 0.9,
       "samples": 1207,
       "minimum": 0.13221754159532634,
-      "maximum": 0.48498395639809244,
-      "max_derivative_error": 1.4767931322268169e-10
+      "maximum": 0.6677834646071317,
+      "max_derivative_error": 2.0808743617095615e-10
     },
     {
       "table": "mach_inlet",
       "row": 1,
       "fixed": 1.2,
       "samples": 1208,
-      "minimum": 0.3426538383226528,
-      "maximum": 0.48498404761784425,
-      "max_derivative_error": 1.0550757728426674e-10
+      "minimum": 0.35197382099409,
+      "maximum": 0.6677839962939014,
+      "max_derivative_error": 1.390070281104272e-10
     },
     {
       "table": "mach_inlet",
       "row": 1,
       "fixed": 1.5,
       "samples": 1208,
-      "minimum": 0.4407875873423675,
-      "maximum": 0.48498405584815,
-      "max_derivative_error": 7.942608376554361e-11
+      "minimum": 0.5388636953498751,
+      "maximum": 0.6677840442835037,
+      "max_derivative_error": 1.78678405404753e-10
+    },
+    {
+      "table": "mach_hub",
+      "row": 1,
+      "fixed": -0.5,
+      "samples": 1208,
+      "minimum": 0.15219036431116245,
+      "maximum": 0.6677836118056256,
+      "max_derivative_error": 2.295881262881494e-10
+    },
+    {
+      "table": "mach_hub",
+      "row": 1,
+      "fixed": 0.0,
+      "samples": 1208,
+      "minimum": 0.14927015077857864,
+      "maximum": 0.6677835904949365,
+      "max_derivative_error": 2.741035176612172e-10
     },
     {
       "table": "mach_hub",
       "row": 1,
       "fixed": 0.2,
       "samples": 1208,
-      "minimum": 0.15413287737977568,
-      "maximum": 0.4849839839525511,
-      "max_derivative_error": 1.187571707639279e-10
-    },
-    {
-      "table": "mach_hub",
-      "row": 1,
-      "fixed": 0.3,
-      "samples": 1208,
-      "minimum": 0.15341587299377007,
-      "maximum": 0.48498398311735524,
-      "max_derivative_error": 1.282883244080324e-10
+      "minimum": 0.1442066870619977,
+      "maximum": 0.6677835497484502,
+      "max_derivative_error": 2.8119728767705965e-10
     },
     {
       "table": "mach_hub",
@@ -415,26 +435,17 @@
       "fixed": 0.5,
       "samples": 1208,
       "minimum": 0.09776883567410861,
-      "maximum": 0.4849838228680383,
-      "max_derivative_error": 1.8164947324095237e-10
+      "maximum": 0.6677826866584068,
+      "max_derivative_error": 2.295268419771901e-10
     },
     {
       "table": "mach_hub",
       "row": 1,
-      "fixed": 0.7,
+      "fixed": 0.8,
       "samples": 1208,
-      "minimum": 0.051227501982017254,
-      "maximum": 0.4849822004853125,
-      "max_derivative_error": 3.3831359935732053e-10
-    },
-    {
-      "table": "mach_hub",
-      "row": 1,
-      "fixed": 0.9,
-      "samples": 1208,
-      "minimum": 0.03519614815129221,
-      "maximum": 0.4849710960700073,
-      "max_derivative_error": 7.356337761166287e-10
+      "minimum": 0.0398277036594365,
+      "maximum": 0.6677492564162177,
+      "max_derivative_error": 8.772458315320364e-10
     },
     {
       "table": "mach_hub",
@@ -442,8 +453,8 @@
       "fixed": 1.0,
       "samples": 1208,
       "minimum": 0.03560268806826669,
-      "maximum": 0.48497205130456894,
-      "max_derivative_error": 7.271565571898009e-10
+      "maximum": 0.6677144442077393,
+      "max_derivative_error": 1.1152350154475243e-09
     },
     {
       "table": "component_budget",
@@ -451,8 +462,8 @@
       "fixed": 0.6,
       "samples": 1207,
       "minimum": 0.09776883567410861,
-      "maximum": 0.4849838228680383,
-      "max_derivative_error": 1.8164947324095237e-10
+      "maximum": 0.6677826866584068,
+      "max_derivative_error": 2.295268419771901e-10
     }
   ],
   "thickness_checks": [
@@ -472,7 +483,7 @@
           "curvature": 1.793114051388637
         }
       ],
-      "max_slope_error": 8.429379416696747e-11,
+      "max_slope_error": 8.933431772106815e-11,
       "max_curvature_error": 2.5833912786765723e-09
     },
     {
@@ -511,7 +522,7 @@
         }
       ],
       "max_slope_error": 1.3260365028244792e-10,
-      "max_curvature_error": 1.1247536235714506e-09
+      "max_curvature_error": 1.1247500708577718e-09
     },
     {
       "tau": 0.2,
@@ -567,7 +578,7 @@
           "curvature": 0.4973961528209614
         }
       ],
-      "max_slope_error": 3.580622465193528e-10,
+      "max_slope_error": 5.872839992093759e-10,
       "max_curvature_error": 2.698989476357383e-09
     }
   ],
@@ -575,8 +586,8 @@
   "full_profile_shock_isolation_verified": true,
   "crossed_conditions": 4000,
   "crossed_minima": [
-    0.005925857113047599,
-    0.006765691689543745
+    0.004307157913506525,
+    0.004307157913506525
   ],
   "defaults": {
     "z": 0.5,
@@ -589,14 +600,17 @@
     "angle": 60.0
   },
   "pressure_prescription": "gamma=1.4; equal row-frame p0=200 kPa; static pressures follow each Mach; Re prescribed independently",
-  "derivative_definition": "Total derivative along the stated sweep; angle sweep holds z fixed by varying inlet metal angle; Mach sweep includes static-pressure changes",
-  "note": "No production edits or function substitutions. Figures include downstream KO/Reynolds factors and continued shock loss. Exact zero outlet Mach/angle are excluded.",
-  "calculation_script_sha256": "6dc9e5fe90bbde333f6d0da0bdaffed1e672951b782bf54a2a250512a29d2a63",
-  "presentation_revision": {
-    "description": "Clarify total profile, profile without shock and shock legend labels; update component-panel title.",
-    "previous_script_sha256": "6dc9e5fe90bbde333f6d0da0bdaffed1e672951b782bf54a2a250512a29d2a63",
-    "render_script_sha256": "e13b90f55493c65acbfb8c0f61032752b410bec83c950f96b019868dd864cff0",
-    "outside_render_ast_sha256": "7793ed5a77d152e17a9d434860529c348fcaa1d743af80d9922ba1579d4f1fba",
-    "numerical_data_unchanged": true
-  }
+  "derivative_definition": "Total derivative along the stated sweep; angle sweep fixes inlet metal angle -30 degrees and outlet metal angle +60 degrees; Mach sweep includes static-pressure changes",
+  "angle_path": {
+    "physical_outlet_range": [
+      -20.0,
+      80.0
+    ],
+    "inlet_metal_deg": -30.0,
+    "outlet_metal_deg": 60.0,
+    "design_direction": 1.0,
+    "baseline_z_at_60": 0.5,
+    "low_angle_onset_deg": 10.0
+  },
+  "note": "No production edits or function substitutions. Figures include downstream KO/Reynolds factors and continued shock loss. Exact zero outlet angle is included; zero outlet Mach is excluded."
 }

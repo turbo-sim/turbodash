@@ -2,7 +2,7 @@
 
 [Previous: Benner: incidence loss](10_benner_incidence.md) · [Section index](../readme.md)
 
-Comparison recorded on 2026-10-17: **previous implementation (baseline)** versus **revised implementation (candidate)**. These are individual-function results; [return to the audit overview](../../readme.md) for stage-level evidence.
+These plots evaluate the current production implementation. [Audit overview](../../readme.md).
 
 ## Functions and dependencies
 
@@ -12,11 +12,11 @@ Comparison recorded on 2026-10-17: **previous implementation (baseline)** versus
 
 The existing effective-penetration limiter already has smooth joins at raw ratios 0.45/0.55 and enforces maximum penetration 0.5. The prior profile kink was inherited from KO rather than caused by this cap.
 
-## Implemented changes
+## Implemented formulation
 
 No penetration, loading or weighting equation changed. Fundamental plots expose raw penetration, effective penetration and primary-loss weight. Exact array parity and source-level function checks retain this successful C2 cap.
 
-## Baseline versus candidate
+## Current values and derivatives
 
 ![penetration_cap: values and d/dx](../figures/penetration_cap.png)
 
@@ -24,18 +24,14 @@ No penetration, loading or weighting equation changed. Fundamental plots expose 
 
 ![loading_inlet: values and d/dx](../figures/loading_inlet.png)
 
-Solid: preserved baseline; dashed: revised candidate. Both use the same inputs, 200 base points and shared adaptive refinement. Right panels are d/dx, including logarithmic x axes. NaN value gaps remain explicit; omitted close derivative support does not delete value records.
-
 ## Quantitative checks
 
 Shrinking one-sided probes below use h=1e-5×max(1,|join|). The full h sequence is retained; the smallest h alone is not a continuity test.
 
 | Feature | Version | Extrapolated value jump | Right minus left slope |
 |---|---|---:|---:|
-| penetration_cap_0.45 | baseline | 5.9996e-13 | -6.9994e-08 |
-| penetration_cap_0.45 | candidate | 5.9996e-13 | -6.9994e-08 |
-| penetration_cap_0.55 | baseline | -5.9996e-13 | -6.9994e-08 |
-| penetration_cap_0.55 | candidate | -5.9996e-13 | -6.9994e-08 |
+| penetration_cap_0.45 | current | 5.9996e-13 | -6.9994e-08 |
+| penetration_cap_0.55 | current | -5.9996e-13 | -6.9994e-08 |
 
 8 fundamental sweeps for this mechanism. [Value/gradient data and manifest](../data/sweep_manifest.json), [first-derivative convergence](../data/provenance/fundamental_join_intervals.csv), [second-derivative convergence](../data/provenance/fundamental_curvature_intervals.csv). C2 claims additionally use endpoint regression tests; C1 table interpolation and retained C1 branches are explicitly distinguished.
 
@@ -45,14 +41,14 @@ The sum-of-absolute-tangents loading convention can retain loading for equal sam
 
 ## All sweeps for this mechanism
 
-Every figure contains the previous and revised curves; links below cover all saved sweeps, including those not embedded above. CSV files are gzip-compressed.
+Every figure contains current-source values and derivatives; links below cover all saved sweeps, including those not embedded above. CSV files are gzip-compressed.
 
 | Parameter / case | Range | Comparison figure | Numerical data |
 |---|---|---|---|
 | Aspect ratio H/c | 0.05 to 10 (log axis) | [Open](../figures/benner_penetration_aspect_ratio.png) | [stator](../data/sweeps/fundamental_benner_penetration_aspect_ratio__stator.csv.gz) |
 | Pitch/chord ratio | 0.05 to 5 | [Open](../figures/benner_penetration_pitch_chord.png) | [stator](../data/sweeps/fundamental_benner_penetration_pitch_chord__stator.csv.gz) |
 | Incidence | -30 to 30 | [Open](../figures/benner_penetration_incidence.png) | [stator](../data/sweeps/fundamental_benner_penetration_incidence__stator.csv.gz) |
-| Exit flow angle | 30 to 80 | [Open](../figures/benner_penetration_exit_angle.png) | [stator](../data/sweeps/fundamental_benner_penetration_exit_angle__stator.csv.gz) |
+| Signed exit angle in design direction | -20 to 80 | [Open](../figures/benner_penetration_exit_angle.png) | [stator](../data/sweeps/fundamental_benner_penetration_exit_angle__stator.csv.gz) |
 | Reference boundary-layer thickness | 0 to 0.15 | [Open](../figures/benner_penetration_delta_ref.png) | [stator](../data/sweeps/fundamental_benner_penetration_delta_ref__stator.csv.gz) |
 | Inlet Reynolds number | 10000 to 1e+07 (log axis) | [Open](../figures/benner_penetration_re_in.png) | [stator](../data/sweeps/fundamental_benner_penetration_re_in__stator.csv.gz) |
 | Raw penetration ratio · penetration cap | 0 to 0.9 | [Open](../figures/penetration_cap.png) | [prescribed reference](../data/sweeps/fundamental_penetration_cap.csv.gz) |

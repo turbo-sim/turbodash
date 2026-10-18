@@ -20,7 +20,7 @@ from turbodash import math
 assert Path(ko.__file__).resolve().is_relative_to(REPO)
 TABLES = ("vary_alpha2", "vary_pitch_chord", "vary_thickness")
 ZOOM_TABLES = ("thickness_z_zero_zoom", "thickness_z_zero_limits")
-Z_GRID = np.unique(np.r_[np.linspace(-1.2, 1.2, 1201), -1., 0., 1.])
+Z_GRID = np.unique(np.r_[np.linspace(-1.2, 2., 1601), -1., 0., 1.])
 ZOOM_GRID = np.unique(np.r_[np.linspace(-.1, .1, 1001), 0., .025, .05])
 THICKNESS_VALUES = (.05, .15, .2, .25, .4)
 SETTINGS = dict(Re_out=5e5, Ma_rel_in=.2, Ma_rel_out=.5,
@@ -42,7 +42,7 @@ def source_hashes():
 
 
 def reference_values(alpha2, pitch_chord):
-    angle = math.smooth_abs(np.asarray(alpha2))
+    angle = math.smooth_abs(ko.get_blade_angle(np.asarray(alpha2)))
     return angle, ko.nozzle_blades(pitch_chord, angle), ko.impulse_blades(pitch_chord, angle)
 
 
@@ -54,7 +54,8 @@ def inputs(z, alpha2, pitch_chord, thickness=.2):
                 p_out=1.2e5, beta_in=theta, beta_out=np.asarray(alpha2))
     geom = dict(chord=.05, pitch=.05*pitch_chord,
                 maximum_thickness=.05*np.asarray(thickness),
-                leading_edge_angle=theta, hub_tip_ratio_in=.8)
+                leading_edge_angle=theta, hub_tip_ratio_in=.8,
+                metal_angle_out=np.where(np.real(alpha2) < 0, -60., 60.))
     return flow, geom
 
 
@@ -107,7 +108,7 @@ def calculate():
             writer.writerows(rows)
     write_json(DATA / "summary.json", dict(
         policy="Production get_profile_loss_blend; no runtime overrides",
-        z_range=[-1.2, 1.2], thickness_values=THICKNESS_VALUES, settings=SETTINGS,
+        z_range=[-1.2, 2.], thickness_values=THICKNESS_VALUES, settings=SETTINGS,
         zero_turning_fraction=.9, asymptotic_fraction=.8,
         first_two_ordinates="blended_reference_before_all_KO_corrections",
         third_ordinate="final_KO_profile_loss", third_coordinate="z",
@@ -133,8 +134,11 @@ def thickness_reference(z, thickness):
     q = np.clip(z/.05, 0., 1.)
     weight = 10*q**3-15*q**4+6*q**5
     weight_slope = 30*q**2*(1-q)**2/.05
-    power = (thickness/.2)**np.maximum(0, z)
-    power_slope = np.where(z > 0, power*np.log(thickness/.2), 0.)
+    excess = np.maximum(0., z-1)
+    exponent = np.where(z > 1, 1+excess/np.sqrt(1+excess**2), np.maximum(0, z))
+    exponent_slope = np.where(z > 1, (1+excess**2)**(-1.5), np.where(z > 0, 1., 0.))
+    power = (thickness/.2)**exponent
+    power_slope = power*np.log(thickness/.2)*exponent_slope
     factor = np.where(z >= .05, power, 1+weight*(power-1))
     slope = np.where(z >= .05, power_slope, weight_slope*(power-1)+weight*power_slope)
     return factor, slope
@@ -204,7 +208,9 @@ def verify():
             r, i = selected[0]["reaction_reference"], selected[0]["impulse_reference"]
             b = np.array([v["blended_reference"] for v in selected])
             y = np.array([v["profile_loss"] for v in selected])
-            expected = np.where(z < 0, r*(1-.2*z*z/(1+z*z)), r+(i-r)*z*z)
+            v = (i-r)*(z*z-1)/(.2*i)
+            upper = i+.2*i*v/np.sqrt(1+v*v)
+            expected = np.where(z < 0, r*(1-.2*z*z/(1+z*z)), np.where(z <= 1, r+(i-r)*z*z, upper))
             np.testing.assert_allclose(b, expected, rtol=2e-14, atol=1e-16)
             np.testing.assert_allclose(y, .914*(2/3)*.94*expected*thickness_reference(z, t)[0],
                                        rtol=2e-14, atol=1e-16)
@@ -215,7 +221,7 @@ def verify():
             curves += 1
     angles = np.linspace(40, 70, 31)[None, :, None]
     spacing = np.linspace(.3, 1.1, 81)[None, None, :]
-    z = np.linspace(-1.2, 1.2, 241)[:, None, None]
+    z = np.linspace(-1.2, 2., 321)[:, None, None]
     _, r, i = reference_values(angles, spacing)
     blend = ko.get_profile_loss_blend(z, r, i)
     assert np.isfinite(blend).all() and np.all(blend > 0)

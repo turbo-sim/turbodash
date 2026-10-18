@@ -21,9 +21,7 @@ function markdownFiles(directory) {
     return e.isDirectory() ? markdownFiles(filename) : e.name.endsWith(".md") ? [filename] : [];
   });
 }
-const filenames = [...markdownFiles(audit),
-  path.join(repo, "improving_turbodash/ainley_mathieson_fitting/readme.md"),
-  path.join(repo, "improving_turbodash/ainley_mathieson_interpolation/readme.md")];
+const filenames = markdownFiles(path.join(repo, "improving_turbodash"));
 const files = [], errors = [];
 for (const filename of filenames) {
   const source = fs.readFileSync(filename, "utf8");

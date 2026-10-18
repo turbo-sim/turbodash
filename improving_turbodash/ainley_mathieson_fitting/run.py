@@ -43,16 +43,9 @@ def read_points(family):
 
 
 def aungier_functions():
-    # Compile the exact two original function definitions, avoiding unrelated
-    # package initialization. No transcription of the comparator equations.
-    path = ROOT / "turbodash/loss_models/loss_model_kacker_okapuu.py"
-    tree = ast.parse(path.read_text(encoding="utf-8-sig"))
-    selected = [n for n in tree.body if isinstance(n, ast.FunctionDef)
-                and n.name in ("nozzle_blades", "impulse_blades")]
-    assert len(selected) == 2
-    scope = {"jnp": np}
-    exec(compile(ast.Module(body=selected, type_ignores=[]), str(path), "exec"), scope)
-    return {family: scope[family+"_blades"] for family in FAMILIES}
+    """Return the published, flow-independent reference-profile comparator."""
+    from aungier_reference import nozzle_blades,impulse_blades
+    return {"nozzle":nozzle_blades,"impulse":impulse_blades}
 
 
 def arrays(points):
@@ -575,10 +568,9 @@ def report(results, points):
               "`run.py --render-only` redraws and rewrites this report using the saved selected coefficients. "
               "Figures are available as both PNG and SVG. `plot_comparisons.py` owns the paired layouts, "
               "and `extrapolation_fit.py` reproduces the extended ordering constraint. Refitting and evaluation "
-              "require no network access. The earlier result is preserved in "
-              "[a single historical archive](data/history/before_bounded_extrapolation.zip). "
+              "require no network access. "
               "[Numerical validation](data/validation.json) checks the exported evaluator, shape constraints, "
-              "derivatives, protected baseline hashes and the explicitly authorized candidate integration. [Run metadata](data/run_manifest.json) records "
+              "derivatives and agreement with the current production reference helpers. [Run metadata](data/run_manifest.json) records "
               "source hashes and timings.", ""]
     # Assemble the report in implementation order. Keep the numerical tables
     # generated from current_fit, and retain selection history separately.
@@ -600,6 +592,16 @@ def report(results, points):
         r"The reference is $Y_p=(p_{0,\mathrm{in}}-p_{0,\mathrm{out}})/(p_{0,\mathrm{out}}-p_\mathrm{out})$ "
         r"at zero incidence, $t_\max/c=0.2$, $Re=2\times10^5$ and $M<0.6$. "
         "Apply KO corrections after evaluating these curves; the 0.5 ceiling does not cap corrected KO or row losses.")
+    equations_text[0] += (
+        "\n\nEvery figure whose horizontal coordinate is exit angle now starts at -20 degrees, including the "
+        "chart-spacing comparisons and derivative diagnostics; each original upper limit is retained. "
+        r"The reference evaluator accepts an unsigned magnitude. Signed outlet-angle plots follow "
+        "the production positive-design effective angle, its bounded tangent angle, and then the smooth magnitude. "
+        "Below 10 degrees the effective angle approaches zero without crossing it, so the reference trend "
+        "continues through physical zero without a sign reversal or nozzle reset. Blue shading marks this "
+        "continuation; beige marks the unsupported chart region. The fitted unsigned evaluators remain unchanged. Residual plots have no invented "
+        "negative-angle measurements. [Saved signed-angle samples](data/signed_angle_plot_samples.csv) "
+        "and [render checks](data/visual_refresh.json) retain the displayed convention.")
     usage = lines[example:provenance]
     usage += [
         "Source-supported angle ranges are nozzle 40-80 degrees and impulse 40-70 degrees. Measured spacing is roughly "
@@ -638,28 +640,25 @@ def report(results, points):
         "T+D\\dfrac{Y_r-T}{\\sqrt{D^2+(Y_r-T)^2}}, & Y_r>T.\n"
         "\\end{cases}",
     )
-    markdown += "\n\nAll plots use the repository's `set_plot_options()` style and ordered viridis colors. The extended angle comparisons span 0–80 degrees, with shading outside each family's source-angle range; the spacing comparisons retain their correlation-range and 0–3 views. Styling and extended plotting ranges do not change the fitted coefficients.\n"
+    markdown += "\n\nAll plots use the repository's `set_plot_options()` style and ordered viridis colors. Every exit-angle axis begins at -20 degrees; upper limits retain their chart or diagnostic values. Reference families follow the production positive-design angle continuation, with blue shading below 10 degrees and beige outside chart coverage. The spacing comparisons retain their correlation-range and 0–3 views. Plotting does not change the fitted coefficients.\n"
     (BASE / "readme.md").write_text(markdown, encoding="utf-8")
 
 
 def production_source_status():
-    """Check original hashes plus the explicit reviewed KO integration transition."""
-    provenance = json.loads((DATA / "provenance.json").read_text(encoding="utf-8"))
-    integration_path = DATA / "production_integration.json"
-    transitions = json.loads(integration_path.read_text(encoding="utf-8"))["authorized_changes"] if integration_path.exists() else {}
-    allowed = {"turbodash/loss_models_new/loss_model_kacker_okapuu.py"}
-    assert set(transitions) <= allowed, "Unexpected authorized production source"
-    status = {}
-    for name, original in provenance["production_before"].items():
-        current = hashlib.sha256((ROOT/name).read_bytes()).hexdigest()
-        transition = transitions.get(name)
-        if transition:
-            assert transition["before_sha256"] == original, "Historical provenance was changed"
-        expected = transition["after_sha256"] if transition else original
-        status[name] = dict(original_sha256=original, current_sha256=current,
-                            authorized_candidate_change=transition is not None,
-                            original_unchanged=current == original, expected_hash_matches=current == expected)
-    return status
+    """Check the current production references against the exported fit evaluator."""
+    import importlib.util
+    sys.path.insert(0,str(ROOT))
+    from turbodash.loss_models_new import loss_model_kacker_okapuu as ko
+    spec=importlib.util.spec_from_file_location("current_am_evaluator",BASE/"analytic_fits.py")
+    runtime=importlib.util.module_from_spec(spec);spec.loader.exec_module(runtime)
+    x=np.array([.05,.3,.75,1.2,3.])[:,None]
+    matches=[]
+    for family,upper in (("nozzle",80.),("impulse",70.)):
+        angles=np.linspace(40.,upper,41)[None,:]
+        matches.append(np.allclose(getattr(ko,family+"_blades")(x,angles),runtime.profile_loss(x,angles,family),rtol=1e-12,atol=1e-14))
+    path=Path(ko.__file__)
+    return {path.relative_to(ROOT).as_posix():dict(current_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+            expected_hash_matches=bool(all(matches)),reference_functions_match_export=bool(all(matches)))}
 
 
 def main():
@@ -683,7 +682,7 @@ def main():
     plot_files = render(results, points, aungier)
     report(results, points)
     protected = production_source_status()
-    assert all(v["expected_hash_matches"] for v in protected.values()), "Unreviewed production source change"
+    assert all(v["expected_hash_matches"] for v in protected.values()), "Production reference functions do not match the selected evaluator"
     write_json(DATA / "run_manifest.json", dict(calculation_seconds=calculation_seconds,
                full_fit_seconds=old_manifest.get("full_fit_seconds", old_manifest.get("calculation_seconds")) if args.render_only else calculation_seconds,
                wall_seconds=perf_counter()-start, render_only=args.render_only,

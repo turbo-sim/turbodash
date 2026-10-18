@@ -2,7 +2,7 @@
 
 [Previous: trailing-edge loss](03_ko_trailing.md) · [Section index](../readme.md) · [Next: coefficient conversions](05_conversions.md)
 
-This review follows the current `get_tip_clearance_loss` in [the new KO source](../../../../turbodash/loss_models_new/loss_model_kacker_okapuu.py). It retains the published clearance exponent and the small zero-gap patch, and now continues the loading and inverse aspect ratio smoothly instead of clipping angles or dividing by zero height. All plotted loss values come from that production function. The original model in `turbodash/loss_models` is preserved.
+This review follows the current `get_tip_clearance_loss` in [the current KO source](../../../../turbodash/loss_models_new/loss_model_kacker_okapuu.py). It retains the published clearance exponent and the small zero-gap patch, and now continues the loading and inverse aspect ratio smoothly instead of clipping angles or dividing by zero height. All plotted loss values come from that production function. The original model in `turbodash/loss_models` is preserved.
 
 ## 1. Published correlation and implemented loading
 
@@ -45,13 +45,13 @@ $$
 
 A smooth cap on this expression alone is insufficient: the tangents are singular at $90^\circ$, and combinations of singular terms can produce undefined arithmetic before the cap is evaluated. We therefore make two changes: continue the tangent coordinates before their poles, then continue excessive loading toward a finite limit. The input angles are never clipped.
 
-First, define an odd continued tangent $T$. It equals the original tangent through $a=80^\circ$. Outside that interval it follows a quadratic matching the tangent's value, first derivative and second derivative:
+First, define an odd continued tangent $T$. It equals the original tangent through $a=80^\circ$. Outside that interval it follows a rational continuation matching the tangent's value, first derivative and second derivative:
 
 $$
 T(\beta)=
 \begin{cases}
 \tan\beta,&|\beta|\le a,\\
-\operatorname{sgn}(\beta)\left[t_0+t_1d+\frac12t_2d^2\right],
+\operatorname{sgn}(\beta)\left[L-\dfrac{D}{1+Ad+Bd^2}\right],
 &|\beta|>a,\quad d=|\beta|-a,
 \end{cases}
 $$
@@ -62,7 +62,12 @@ t_1=\frac{\pi}{180}(1+t_0^2),\qquad
 t_2=2\left(\frac{\pi}{180}\right)^2t_0(1+t_0^2).
 $$
 
-The degree conversion is included in $t_1$ and $t_2$. This coordinate increases smoothly beyond $80^\circ$, has no pole at $90^\circ$, and does not wrap periodically when an optimizer produces an excessive angle. It is an extrapolation of the correlation, not a model of reversed flow.
+$$
+L=\tan85^\circ,\qquad D=L-t_0,\qquad
+A=\frac{t_1}{D},\qquad B=A^2+\frac{t_2}{2D}.
+$$
+
+The degree conversion is included in $t_1$ and $t_2$. This coordinate increases smoothly beyond $80^\circ$ and approaches $\pm\tan85^\circ$. It has no tangent pole or periodic wrap. Unlike an unbounded polynomial continuation, it also keeps the continued angular coordinates finite. The same tangent, cosine and loading helpers are used in secondary loss; all loading calculations therefore share one convention. The join and asymptote are numerical choices, not a model of reversed flow.
 
 With $U=T(\beta_{\mathrm{in}})$ and $V=T(\beta_{\mathrm{out}})$, form
 
@@ -90,9 +95,9 @@ $$
 C'(Z_0)=\frac{1+2t}{(1+t+t^2)^2}>0.
 $$
 
-Thus the loading remains between zero and 32, without a hard switch or a finite interval of constant capped loading. Floating-point arithmetic can round very large arguments to the limit. The code uses a scaled numerator/denominator form to avoid constructing a huge intermediate $Z_0$.
+Thus loading remains between zero and 32, without a hard switch or a finite interval of constant capped loading. The tangent coordinates are bounded before $Z_0$ is formed, keeping that intermediate finite as well. The rational loading tail uses reciprocal arithmetic. Floating-point arithmetic can round very small tail variations away.
 
-**Why 16 and 32`** Symmetric impulse turning has $Z_{\mathrm{KO}}=16\sin^2\alpha_2$, so starting at 16 preserves that entire loading range. The limit of 32 allows a further factor of two for other angle combinations while suppressing runaway extrapolation. These limits and the $80^\circ$ tangent join are explicit numerical choices, not measured KO thresholds. The original expression is recovered when both angles lie within $\pm80^\circ$ and $Z_{\mathrm{KO}}\le16$.
+**Why 16 and 32?** Symmetric impulse turning has $Z_{\mathrm{KO}}=16\sin^2\alpha_2$, so starting at 16 preserves that entire loading range. The bound of 32 allows a further factor of two for other angle combinations while suppressing runaway extrapolation. These bounds and the $80^\circ$ tangent join are explicit numerical choices, not measured KO thresholds. The original expression is recovered when both angles lie within $\pm80^\circ$ and $Z_{\mathrm{KO}}\le16$.
 
 Equal inlet and outlet angles still give exactly zero loading. Reversing both angle signs leaves the result unchanged. All new joins are $C^2$: values and the first two derivatives are continuous.
 
@@ -136,7 +141,7 @@ Y_{\mathrm{cl}}=0.37\,Z\,G(\mathrm{AR})\,F(x),
 \qquad x=k'/c.
 $$
 
-Only positive chord is required in a denominator. Height and clearance may reach zero in this component's mathematical continuation. Zero height is not a physically admissible turbine geometry, and other loss components need not accept it. There is no separate cap on the final clearance coefficient.
+Only positive chord is required in a denominator. Height and clearance may reach zero in this component's mathematical continuation. The secondary-loss component now also evaluates its zero-height limit directly, as documented in [the secondary note](02_ko_secondary.md#23-evaluating-the-zero-height-endpoint-without-division-by-zero). Zero height is not a physically admissible turbine geometry. There is no separate cap on the final clearance coefficient.
 
 ## 2. Finite derivatives at zero clearance
 
@@ -205,7 +210,7 @@ We hold $c=0.05$ m, $\alpha_2=\beta_{\mathrm{out}}=60^\circ$ and $z=0.5$, giving
 
 ![Rotor clearance loss versus effective gap/height for different aspect ratios, with first derivatives](../figures/ko_clearance_gap_review.png)
 
-[PDF](../figures/ko_clearance_gap_review.pdf) ` [CSV](../data/clearance_review/gap_sensitivity.csv)
+[PDF](../figures/ko_clearance_gap_review.pdf) | [CSV](../data/clearance_review/gap_sensitivity.csv)
 
 Every loss curve starts at zero and increases smoothly. Circles mark the end of each small-gap patch, $g=0.001/\mathrm{AR}$. They indicate recovery of the gap power law; the aspect-ratio continuation still applies below $\mathrm{AR}=1$.
 
@@ -224,7 +229,7 @@ $$
 
 ![Clearance aspect factor and complete loss at fixed gap/chord, including zero aspect ratio](../figures/ko_clearance_ar_review.png)
 
-[PDF](../figures/ko_clearance_ar_review.pdf) ` [Factor CSV](../data/clearance_review/aspect_factor.csv) ` [Loss CSV](../data/clearance_review/aspect_sensitivity.csv)
+[PDF](../figures/ko_clearance_ar_review.pdf) | [Factor CSV](../data/clearance_review/aspect_factor.csv) | [Loss CSV](../data/clearance_review/aspect_sensitivity.csv)
 
 The beige region marks the numerical continuation. The original inverse factor and its slope diverge beyond the displayed limits; the implemented curves remain finite and have continuous first derivatives at the join.
 
@@ -238,7 +243,7 @@ The product $Z\,G(\mathrm{AR})\,F(k'/c)$ therefore also has finite derivatives a
 
 ## 4. Outlet-angle sensitivity at fixed gap and aspect ratio
 
-For this plot we fix $c=0.05$ m, $\mathrm{AR}=2$, $H=0.10$ m and $g=0.01$, corresponding to $k'=1$ mm. The gap factor is outside its endpoint patch. Outlet angle runs from $0^\circ$ to $80^\circ$ and each curve specifies an inlet-angle ratio:
+For this plot we fix $c=0.05$ m, $\mathrm{AR}=2$, $H=0.10$ m and $g=0.01$, corresponding to $k'=1$ mm. The gap factor is outside its endpoint patch. Signed outlet angle runs from $-20^\circ$ to $80^\circ$ and each curve specifies an inlet-angle ratio:
 
 $$
 \beta_{\mathrm{out}}=\alpha_2,\qquad
@@ -261,17 +266,17 @@ Derivatives are per degree and include the change in both flow angles. The inlet
 
 ![Rotor clearance loss versus outlet angle at fixed aspect ratio and effective gap, with curves for different z](../figures/ko_clearance_angle_review.png)
 
-[PDF](../figures/ko_clearance_angle_review.pdf) ` [CSV](../data/clearance_review/angle_sensitivity.csv)
+[PDF](../figures/ko_clearance_angle_review.pdf) | [CSV](../data/clearance_review/angle_sensitivity.csv)
 
 The $z=-1$ curve has equal inlet/outlet angles and therefore zero loading and loss throughout. At $z=0$ the inlet flow is axial; $z=1$ has equal-and-opposite angles, giving symmetric impulse turning. Negative-$z$ curves have same-sign flow angles and are dashed to identify these diagnostic extensions.
 
-All curves begin with zero loss and zero angle derivative at $\alpha_2=0$. **This behavior is implemented in the source function, not only in the plotting script.** The function takes $\beta_{\mathrm{in}}$ and $\beta_{\mathrm{out}}$ directly and never evaluates $z=-\beta_{\mathrm{in}}/\beta_{\mathrm{out}}$. The script constructs $\beta_{\mathrm{in}}=-z\alpha_2$, which gives both angles zero at the origin without forming $0/0$. Direct calls with both angles zero likewise give zero loss and zero partial angle derivatives.
+All curves pass through zero loss and zero angle derivative at $\alpha_2=0$. **This behavior is implemented in the source function, not only in the plotting script.** The function takes $\beta_{\mathrm{in}}$ and $\beta_{\mathrm{out}}$ directly and never evaluates $z=-\beta_{\mathrm{in}}/\beta_{\mathrm{out}}$. The script constructs $\beta_{\mathrm{in}}=-z\alpha_2$, which gives both angles zero at the origin without forming $0/0$. Direct calls with both angles zero likewise give zero loss and zero partial angle derivatives.
 
-Within this figure's interval, symmetric impulse loading remains exactly $Z=16\sin^2\alpha_2$. The new loading and tangent continuations are inactive for these plotted paths through $80^\circ$.
+The negative-angle interval is shaded beige and represents diagnostic trial angles. The script retains $\beta_{\mathrm{in}}=-z\alpha_2$ there, so all prescribed angles reverse together. Loss mirrors the positive-angle result and its total angle derivative changes sign; both properties are verified numerically. This parameterized path is distinct from holding inlet metal angle fixed in the profile/trailing-edge continuations. Within this figure's interval, symmetric impulse loading remains exactly $Z=16\sin^2\alpha_2$. The new loading and tangent continuations are inactive for these plotted paths through $80^\circ$.
 
 ### 4.1 Extreme-angle continuation: clearance loss and loading
 
-The additional figure extends the outlet-angle paths to $120^\circ$ and also sweeps inlet-angle magnitude at several fixed outlet angles. **The left column shows the complete rotor clearance loss coefficient $Y_{\mathrm{cl}}$; the right column shows the corresponding loading $Z$.** Loss values are evaluated directly with the production clearance function. Derivative panels are omitted.
+The additional figure extends the outlet-angle paths from $-20^\circ$ to $120^\circ$ and also sweeps inlet-angle magnitude at several fixed outlet angles. **The left column shows the complete rotor clearance loss coefficient $Y_{\mathrm{cl}}$; the right column shows the corresponding loading $Z$.** Loss values are evaluated directly with the production clearance function. Derivative panels are omitted.
 
 Both rows hold $\mathrm{AR}=2$, $c=0.05$ m and $g=k'/H=0.01$, so $H=0.10$ m, $k'=1$ mm and $x=k'/c=0.02$. The gap and aspect factors are outside their continuation regions. Therefore,
 
@@ -284,19 +289,19 @@ This fixed multiplier explains why the two columns have the same curve shapes bu
 
 ![Complete rotor clearance loss in the left column and loading in the right column for extreme inlet and outlet angles](../figures/ko_clearance_loading_review.png)
 
-[PDF](../figures/ko_clearance_loading_review.pdf) ? [CSV](../data/clearance_review/loading_sensitivity.csv)
+[PDF](../figures/ko_clearance_loading_review.pdf) | [CSV](../data/clearance_review/loading_sensitivity.csv)
 
-The top row uses $\beta_{\mathrm{out}}=\alpha_2$ and $\beta_{\mathrm{in}}=-z\alpha_2$, with $z=0,0.5,1$. The bottom row varies inlet-angle magnitude while fixing the outlet angle at $20^\circ$, $40^\circ$, $60^\circ$ or $80^\circ$.
+The top row uses $\beta_{\mathrm{out}}=\alpha_2$ and $\beta_{\mathrm{in}}=-z\alpha_2$, with $z=0,0.5,1$. The bottom row retains inlet-angle magnitude from $0^\circ$ to $120^\circ$ while fixing the outlet angle at $20^\circ$, $40^\circ$, $60^\circ$ or $80^\circ$.
 
-Solid curves show the implemented loss and loading. Dashed curves show the original KO expressions only up to $89^\circ$; some leave the panels as the original loading grows. Beige marks the tangent continuation beyond $80^\circ$. The loading continuation can already be active below that angle if $Z_0>16$. Vertical dotted lines mark $90^\circ$.
+Solid curves show the implemented loss and loading. Dashed curves show the original KO expressions only up to $89^\circ$; some leave the panels as the original loading grows. Beige marks negative trial outlet angles in the top row and tangent continuation beyond $80^\circ$ in both rows. The loading continuation can already be active below that angle if $Z_0>16$. Vertical dotted lines mark $90^\circ$.
 
-Horizontal dotted lines show the corresponding limits: $Z=32$ on the right and $Y_{\mathrm{cl}}=32C_{\mathrm{geom}}$ on the left. The symmetric-impulse path instead approaches $Z=16$ and $Y_{\mathrm{cl}}=16C_{\mathrm{geom}}$, because its continued tangents remain equal and opposite. Equal-angle, zero-turning paths remain exactly zero even for extreme angles.
+Horizontal dotted lines show upper bounds: $Z=32$ on the right and $Y_{\mathrm{cl}}=32C_{\mathrm{geom}}$ on the left. Because the tangent coordinate itself has a finite asymptote, each path generally approaches a value below those bounds. On the symmetric-impulse path the continued tangents remain equal and opposite, giving $Z=16T^2/(1+T^2)\to16\sin^2(85^\circ)\simeq15.8785$. Its loss approaches that loading times $C_{\mathrm{geom}}$. Equal-angle, zero-turning paths remain exactly zero even for extreme angles.
 
 The small dip before the sharp rise in the fixed-$80^\circ$ outlet case appears in both columns: it comes from the changing mean-flow/loading geometry. Both the loading and the resulting clearance coefficient remain smooth through the angle continuation and approach finite limits.
 
 ## 5. Verification, integration and reproduction
 
-The targeted run passed **66 tests**: 26 clearance tests, 31 secondary tests and nine existing refinement tests. Clearance checks cover the zero-gap patch, the new aspect-ratio and loading joins, finite derivatives at zero height and at the joint zero-gap/height endpoint, angle reflection, zero turning, array broadcasting, length-unit invariance and invalid inputs.
+Clearance checks cover the zero-gap patch, the aspect-ratio and loading joins, finite derivatives at zero height and at the joint zero-gap/height endpoint, angle reflection, zero turning, array broadcasting, length-unit invariance and invalid inputs. The current focused script evaluates the actual production function and verifies its assembly, including the shared bounded tangent helper.
 
 An independent evaluation of equation (20) was compared against 4,000 angle/geometry combinations. Of these, 2,822 lie outside all modified regions and match the paper to a maximum absolute error of $2.78\times10^{-16}$. In the other cases within $\pm80^\circ$, the continued result stays nonnegative and no larger than the original correlation. The maximum absolute discrepancy between complex-step and independent finite-difference derivatives in the plotted gap/angle checks is $1.54\times10^{-10}$.
 
@@ -314,6 +319,4 @@ python -B improving_turbodash/loss_model_audit/1_individual_functions/scripts/cl
 
 Use `--render-only` to redraw saved data without model evaluations. The script checks source and data hashes before rendering and uses the repository's `set_plot_options()` styling with ordered viridis colors and linear aspect-ratio axes.
 
-[Generator](../scripts/clearance_review.py) ` [Tests](../../../../tests/test_ko_clearance.py) ` [Numerical validation](../data/clearance_review/validation.json) ` [Figure provenance](../data/clearance_review/render_manifest.json)
-
-[All individual functions](../readme.md) ` [Methods and historical audit reproduction](../methodology.md)
+[Generator](../scripts/clearance_review.py) | [Tests](../../../../tests/test_ko_clearance.py) | [Numerical validation](../data/clearance_review/validation.json) | [Figure provenance](../data/clearance_review/render_manifest.json)

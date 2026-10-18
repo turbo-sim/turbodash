@@ -1,8 +1,8 @@
 # Shared numerical helpers
 
-[Previous: Candidate coefficient conversions](05_conversions.md) · [Section index](../readme.md) · [Next: Moustapha: incidence loss](07_moustapha_incidence.md)
+[Previous: Current coefficient conversions](05_conversions.md) · [Section index](../readme.md) · [Next: Moustapha: incidence loss](07_moustapha_incidence.md)
 
-Comparison recorded on 2026-10-17: **previous implementation (baseline)** versus **revised implementation (candidate)**. These are individual-function results; [return to the audit overview](../../readme.md) for stage-level evidence.
+These plots evaluate the current production implementation. [Audit overview](../../readme.md).
 
 ## Functions and dependencies
 
@@ -10,19 +10,17 @@ Comparison recorded on 2026-10-17: **previous implementation (baseline)** versus
 
 ## Observed behavior
 
-The shared Boltzmann min/max are smooth weighted averages rather than strict bounds, and they can shift reference values. Changing them globally would silently change the baseline.
+The shared Boltzmann min/max are smooth weighted averages rather than strict bounds, and they can shift reference values. Changing them globally would affect the other correlations that use them.
 
-## Implemented changes
+## Implemented formulation
 
 `turbodash/math.py` is byte-for-byte preserved. A small candidate-only `_numerics.py` supplies a compact C2 positive-part envelope, strict min/max, quintic Hermite joins and C1 shape-preserving cubic tables. It is not a copied math module. Only justified caller sites use it.
 
-## Baseline versus candidate
+## Current values and derivatives
 
 ![smooth_bounds: values and d/dx](../figures/smooth_bounds.png)
 
 ![smooth_absolute: values and d/dx](../figures/smooth_absolute.png)
-
-Solid: preserved baseline; dashed: revised candidate. Both use the same inputs, 200 base points and shared adaptive refinement. Right panels are d/dx, including logarithmic x axes. NaN value gaps remain explicit; omitted close derivative support does not delete value records.
 
 ## Quantitative checks
 
@@ -34,7 +32,7 @@ Array operations retain the limited backend seam, with no new JIT/AD guarantee. 
 
 ## All sweeps for this mechanism
 
-Every figure contains the previous and revised curves; links below cover all saved sweeps, including those not embedded above. CSV files are gzip-compressed.
+Every figure contains current-source values and derivatives; links below cover all saved sweeps, including those not embedded above. CSV files are gzip-compressed.
 
 | Parameter / case | Range | Comparison figure | Numerical data |
 |---|---|---|---|

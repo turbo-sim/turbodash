@@ -1,8 +1,7 @@
 {
   "base_points": 200,
-  "paired_points": 526,
+  "paired_points": 927,
   "versions": [
-    "baseline",
     "candidate"
   ],
   "transition_factor": 1.5,
@@ -16,16 +15,23 @@
       1500000.0
     ]
   ],
-  "max_absolute_relative_change_vs_baseline": 0.030876986432815334,
   "profile_factor_matches_production": true,
-  "calculation_seconds": 0.27736390000063693,
-  "note": "Baseline/candidate factors are extracted from production profile calls normalized at Re=500000. Numerical derivatives are d/dRe; logarithmic slope is Re/f times that derivative. Baseline branches are differentiated separately and corner derivatives remain undefined.",
-  "source_sha256": "4295e119d25fc43579ec79059484913ed0af83822088eaf2bd50af41f3fa5395",
-  "script_sha256": "f899aec9328dcebc45b2c25d14feceb4981ac4ea390d2a139246c119b95c1d24",
+  "calculation_seconds": 0.3527137000055518,
+  "high_continuation_start": 10000000.0,
+  "high_reynolds_asymptote": 50000000.0,
+  "factor_asymptote": 0.45730505192732634,
+  "stress_cases": 1001,
+  "nonzero_limit_verified": true,
+  "max_high_re_derivative_error": 2.4619542007538273e-19,
+  "note": "Factors come from the current production profile normalized at Re=500000. Complex-step slopes are checked against independent real differences; logarithmic slope includes the effective-coordinate chain rule.",
+  "source_sha256": "c3d88153360f75ec1e54e53a056d4ec7b41547b9d3e467e4847c66d7705afa08",
+  "script_sha256": "321f5c01b077e0131bbf744b425ba3afe52b0753983d1ed4fa1e676cc8fb594c",
+  "data_sha256": "1501ff6bec1357fb98a7e5d5c328254690f93ba8467f816df6adbb9ac94fc761",
   "data_files": [
     "data/reynolds_review/samples.csv"
   ],
   "figures": [
-    "figures/reynolds_transitions.png"
+    "figures/reynolds_transitions.png",
+    "figures/reynolds_transitions.pdf"
   ]
 }

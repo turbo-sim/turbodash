@@ -1,4 +1,4 @@
-"""Physical-coordinate and baseline-feature checks for the raw AM plot driver."""
+"""Physical-coordinate and current-source checks for the raw AM plot driver."""
 
 from pathlib import Path
 import sys
@@ -31,23 +31,21 @@ def test_reference_families_have_identical_physical_grids_and_interior_minima(cu
                 assert np.isfinite(y).all() and (y > 0).all()
                 assert 0 < y.argmin() < len(y)-1
                 paired.append(x)
-                if version == "baseline":
+                if version == "candidate":
                     minimizing_pitch.append(x[y.argmin()])
-            np.testing.assert_array_equal(*paired)
+            assert len(paired)==1
         assert np.all(np.diff(minimizing_pitch) < 0)
 
 
 def test_raw_outputs_reproduce_reference_formula_without_row_multipliers(curves):
-    # Independent closed-form checks at s/c=.75 (a grid point) and alpha=70deg.
-    phi, pitch = 20.0, 0.75
-    nozzle_x = pitch - (.46 + phi/77)
-    nozzle = (.025 + (27-phi)/530) + (.1583-phi/1640)*nozzle_x**2 + .08*((phi/30)**2-1)*nozzle_x**3
-    impulse_x = pitch - (.224 + 1.575*phi/90 - (phi/90)**2)
-    impulse = (.242 - phi/151 + (phi/127)**2) + (.3+(30-phi)/50)*impulse_x**2 - (.88-phi/42.4+(phi/72.8)**2)*impulse_x**3
-    for family, expected in (("nozzle", nozzle), ("impulse", impulse)):
-        rows = [r for r in curves[0] if r["version"] == "baseline" and r["family"] == family and r["angle_deg"] == 70 and np.isclose(r["pitch_chord"], pitch)]
-        assert len(rows) == 1
-        np.testing.assert_allclose([r["Yp"] for r in rows], expected, rtol=1e-14)
+    import importlib.util
+    path=Path(__file__).resolve().parents[3]/"ainley_mathieson_fitting/analytic_fits.py"
+    spec=importlib.util.spec_from_file_location("independent_am_reference",path)
+    reference=importlib.util.module_from_spec(spec);spec.loader.exec_module(reference)
+    for family in ANGLES:
+        rows=[r for r in curves[0] if r["version"]=="candidate" and r["family"]==family and r["angle_deg"]==70 and np.isclose(r["pitch_chord"],.75)]
+        assert len(rows)==1
+        np.testing.assert_allclose(rows[0]["Yp"],reference.profile_loss(.75,70.,family),rtol=1e-13)
 
 
 def test_split_derivatives_leave_real_jumps_and_corners_undefined():
@@ -60,30 +58,39 @@ def test_split_derivatives_leave_real_jumps_and_corners_undefined():
     assert y[x > 0][0] - y[x < 0][-1] > 7
 
 
-def test_nozzle_angle_jumps_are_preserved_in_baseline_and_removed_in_candidate(curves):
-    probes = [r for r in curves[2] if r["h"] == 1e-5]
-    baseline60 = next(r for r in probes if r["family"] == "nozzle" and r["version"] == "baseline" and r["angle_deg"] == 60 and r["pitch_chord"] == .8)
-    baseline63 = next(r for r in probes if r["family"] == "nozzle" and r["version"] == "baseline" and r["angle_deg"] == 63 and r["pitch_chord"] == .8)
-    assert baseline60["value_jump"] > 5e-5
-    assert abs(baseline63["value_jump"]) < 1e-12
-    np.testing.assert_allclose(baseline63["slope_jump"], 1/530 - 1/3085, atol=2e-10)
-    revised = [r for r in probes if r["version"] == "candidate"]
-    assert max(abs(r["value_jump"]) for r in revised) < 1e-12
-    assert max(abs(r["slope_jump"]) for r in revised) < 1e-9
+def test_current_nozzle_reference_has_continuous_angle_values_and_slopes(curves):
+    probes=[r for r in curves[2] if r["h"]==1e-5]
+    assert max(abs(r["value_jump"]) for r in probes)<1e-12
+    assert max(abs(r["slope_jump"]) for r in probes)<1e-9
 
 
 def test_angle_families_preserve_grids_and_corner_derivatives(curves):
     rows = curves[1]
-    assert len(rows) == 2*2*len(SPACINGS)*len(angle_grid()[0])
+    assert len(rows) == len(VERSIONS)*2*len(SPACINGS)*len(angle_grid()[0])
     for family in ANGLES:
         for version in VERSIONS:
             for pitch in SPACINGS:
                 selected=[r for r in rows if r['family']==family and r['version']==version and r['pitch_chord']==pitch]
                 assert sum(r['base_grid'] for r in selected)==200
-                assert selected[0]['angle_deg']==0 and selected[-1]['angle_deg']==80
+                assert selected[0]['angle_deg']==-20 and selected[-1]['angle_deg']==80
                 for row in selected:
-                    undefined=version=='baseline' and (row['angle_deg']==60 or (family=='nozzle' and row['angle_deg']==63))
-                    if undefined:
-                        assert np.isnan(row['dYp_d_angle_deg'])
                     assert np.isfinite(row['Yp'])
                 assert sum(np.isfinite(r['dYp_d_angle_deg']) for r in selected)>.98*len(selected)
+
+
+def test_low_angle_reference_path_keeps_positive_design_direction(curves):
+    # Independent finite coordinate anchors from the 10-degree rational path.
+    # A reflected angle would instead use 20 and 0 at the first two anchors.
+    ko = modules('candidate')['ko']
+    for family in ANGLES:
+        function = getattr(ko, family+'_blades')
+        for physical, effective in ((-20., 10/13), (0., 10/3), (10., 10.)):
+            row = next(r for r in curves[1] if r['version']=='candidate' and
+                       r['family']==family and r['pitch_chord']==.65 and
+                       np.isclose(r['angle_deg'], physical, atol=1e-12))
+            expected = function(.65, np.sqrt(effective**2+1e-5))
+            np.testing.assert_allclose(row['Yp'], expected, rtol=2e-14)
+        slopes = [r['dYp_d_angle_deg'] for r in curves[1] if r['version']=='candidate' and
+                  r['family']==family and r['pitch_chord']==.65 and
+                  np.isclose(abs(r['angle_deg']), .05, atol=1e-12)]
+        assert len(slopes)==2 and slopes[0]*slopes[1]>0

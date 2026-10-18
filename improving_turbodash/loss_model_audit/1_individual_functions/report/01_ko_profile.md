@@ -7,7 +7,7 @@ The [current KO implementation](../../../../turbodash/loss_models_new/loss_model
 $$
 Y_p=0.914\,f_{\mathrm{Re}}
 \left[\frac{2}{3}Y_{p,\mathrm{ref}}(z)\,F_t\,K_p+Y_{p,\mathrm{shock}}\right],
-\qquad z=-\frac{\theta_{\mathrm{in}}}{\alpha_2}.
+\qquad z=-\frac{\theta_{\mathrm{in}}}{\alpha_c}.
 $$
 
 Here $\theta_{\mathrm{in}}$ is the inlet metal angle and $\alpha_2$ is the signed outlet flow angle from axial, both in degrees. All loss coefficients use $Y$ with subscripts identifying their role:
@@ -35,10 +35,24 @@ The sections follow the calculation: reaction and impulse references, their blen
 Set $x=s/c$, using true chord. KO evaluates $Y_{p,\mathrm{reaction}}(x,\alpha)$ and $Y_{p,\mathrm{impulse}}(x,\alpha)$ at the smooth outlet-angle magnitude
 
 $$
-\alpha=\sqrt{\alpha_2^2+10^{-5}}.
+\beta_e=\arctan_{\mathrm{deg}}T(\alpha_c),
+\qquad \alpha=\sqrt{\beta_e^2+10^{-5}}.
 $$
 
-There is no minimum outlet angle. Low-angle inputs use the analytical extrapolation directly. The signed physical $\alpha_2$ still defines $z=-\theta_{\mathrm{in}}/\alpha_2$, so the full profile function requires $\alpha_2\ne0$, even though the reference surfaces can be evaluated at zero.
+There is no hard minimum outlet angle. The continued outlet angle $\alpha_c$ preserves the blade row's fixed design direction; below $10^\circ$ in that direction it approaches zero gradually, as described in Section 2.4. The reference fit is evaluated at this same angle. Above $80^\circ$ in magnitude, the shared tangent continuation gives a reference angle approaching $85^\circ$. These safeguards keep extreme solver iterates finite without an angle clipping switch.
+
+Here $T$ is the shared odd tangent continuation: it equals $\tan\beta$ for $|\beta|\le80^\circ$. Above that magnitude, with $h=|\beta|-80^\circ$, $t_0=\tan80^\circ$, $D=\tan85^\circ-t_0$ and derivatives measured per degree,
+
+$$
+T(\beta)=\operatorname{sign}(\beta)
+\left[\tan85^\circ-\frac{D}{1+ah+bh^2}\right],
+\qquad
+a=\frac{\tan'(80^\circ)}{D},
+\qquad
+b=a^2+\frac{\tan''(80^\circ)}{2D}.
+$$
+
+The positive coefficients give a monotone, bounded tail whose value, slope and curvature meet the tangent at $80^\circ$. Inactive raw tangents are not evaluated near their $90^\circ$ poles. These two angles are numerical continuation settings, not new calibration data.
 
 Both families have the same analytical form, with different fixed coefficients:
 
@@ -107,26 +121,29 @@ Here the fit parameters in $N$ belong to family $j$. This is the same bounded ex
 At fixed spacing, the plotted quantities are
 
 $$
-Y_{p,j}(\alpha;x_k),\qquad
-\left.\frac{\partial Y_{p,j}}{\partial\alpha}\right|_{x_k},
+\alpha=\sqrt{\left[\arctan_{\mathrm{deg}}T(\alpha_c(\alpha_2))\right]^2+10^{-5}},\qquad
+Y_{p,j}(\alpha(\alpha_2);x_k),\qquad
+\left.\frac{dY_{p,j}}{d\alpha_2}\right|_{x_k},
 \qquad j\in\{\mathrm{reaction},\mathrm{impulse}\}.
 $$
 
-First, restrict the angles and fixed spacings to chart coverage:
+The reference helpers take an unsigned angle magnitude. These family slices evaluate that magnitude along the same positive-design outlet-angle continuation as the production profile function: first form $\alpha_c$ from Section 2.4, then apply the bounded tangent angle and smooth magnitude above. The physical signed angle remains on the horizontal axis. Negative trial angles continue the low-angle trend without reflecting the angle or resetting the reference. This isolates the two reference families before blending and downstream corrections; the complete profile is shown in Section 7.2.
 
-![Reaction and impulse angle slices inside chart coverage](../figures/ko_reference_angle_correlation.png)
+First, retain fixed spacings inside chart coverage and extend the angle axis from $-20^\circ$ to the family's original chart upper limit:
+
+![Reaction and impulse angle slices at chart spacings, with a shaded signed-angle extension](../figures/ko_reference_angle_correlation.png)
 
 [PDF](../figures/ko_reference_angle_correlation.pdf)
 
-Then extend to $0^\circ\le\alpha\le80^\circ$, including spacings outside chart coverage:
+Then use the same $-20^\circ$ lower limit and $80^\circ$ upper limit for both families, including spacings outside chart coverage:
 
 ![Extended reaction and impulse angle slices with extrapolation shading](../figures/ko_reference_angle.png)
 
 [PDF](../figures/ko_reference_angle.pdf) · [CSV for both variants](../data/profile_terms/reference_angle.csv)
 
-Rows are reaction/nozzle and impulse; columns are coefficient and first derivative. The correlation-range curves use $s/c=0.45,0.55,0.65,0.75$. The extended view uses $s/c=0,0.3,0.45,0.75,1.5,2$. Derivatives are per degree, computed by complex step and checked with independent real finite differences. At zero spacing, the coefficient is exactly 0.5 with zero angle derivative.
+Rows are reaction/nozzle and impulse; columns are coefficient and first derivative with respect to physical signed outlet angle. The chart-spacing curves use $s/c=0.45,0.55,0.65,0.75$. The extended view uses $s/c=0,0.3,0.45,0.75,1.5,2$. Derivatives include the full angle-continuation chain rule, are per degree, and are checked with independent real finite differences. Physical zero does not impose a slope reversal. At zero spacing, the coefficient is exactly 0.5 with zero angle derivative everywhere.
 
-Beige shading marks angles outside each family's overall chart envelope. Dashed segments also identify spacing-dependent extrapolation outside the envelope between measured trace endpoints; a curve can be dashed even in an unshaded angle interval. Smooth crossings and negative slopes are retained.
+Blue shading marks the production continuation below $10^\circ$. Beige shading marks angles outside each family's overall chart envelope. Dashed segments also identify spacing-dependent extrapolation outside the envelope between measured trace endpoints; a curve can be dashed even in an unshaded angle interval. Smooth crossings and negative slopes of the reference surface are retained.
 
 ### 1.2 Spacing slices: correlation range and extended range
 
@@ -161,25 +178,30 @@ All figures use the repository's `set_plot_options()` styling. Ordered curve fam
 
 ## 2. Interpolation and extrapolation between the references
 
-At fixed spacing and outlet angle, the source helper `get_profile_loss_blend` evaluates the reference coefficient before thickness and the remaining KO corrections. The reference arguments $(x,\alpha)$ are suppressed below:
+At fixed spacing and outlet angle, the source helper evaluates the reference coefficient before thickness and the remaining KO corrections. Write $R=Y_{p,\mathrm{reaction}}$ and $I=Y_{p,\mathrm{impulse}}$, and define the bounded odd continuation $A(v)=v/\sqrt{1+v^2}$. The reference arguments $(x,\alpha)$ are suppressed below:
 
 $$
 Y_{p,\mathrm{ref}}(z)=
 \begin{cases}
-Y_{p,\mathrm{reaction}}\left(0.8+\dfrac{0.2}{1+z^2}\right),&z<0,\\[5pt]
-(1-z^2)Y_{p,\mathrm{reaction}}+z^2Y_{p,\mathrm{impulse}},&z\ge0.
+R\left(0.8+\dfrac{0.2}{1+z^2}\right),&z<0,\\[5pt]
+(1-z^2)R+z^2I,&0\le z\le1,\\[5pt]
+I+0.2I\,A\left(\dfrac{(I-R)(z^2-1)}{0.2I}\right),&z>1.
 \end{cases}
 $$
 
-The same quadratic applies for every admissible $z\ge0$: it interpolates between the two references on $0\le z\le1$ and extrapolates above one. For $z>1$, the implementation requires $Y_{p,\mathrm{impulse}}\ge Y_{p,\mathrm{reaction}}$ and raises `ValueError` otherwise. This is an input-domain restriction, not another loss formula.
+The original quadratic is retained on $0\le z\le1$. Above one, its excess relative to the impulse reference is compressed gradually. The value, slope and curvature match the quadratic at $z=1$, because $A(0)=0$, $A'(0)=1$ and $A''(0)=0$. There is no finite-$z$ constant branch.
+
+This formula supports either reference ordering. If $I>R$, the reference increases toward $1.2I$; if extrapolated reference surfaces give $I<R$, it decreases toward $0.8I$. When $I=R$, it remains equal to $I$. Evaluation remains finite when crossing $z=1$ for either ordering.
 
 At fixed $Y_{p,\mathrm{reaction}}$ and $Y_{p,\mathrm{impulse}}$, the derivative is
 
 $$
 \frac{\partial Y_{p,\mathrm{ref}}}{\partial z}=
 \begin{cases}
--\dfrac{0.4Y_{p,\mathrm{reaction}}z}{(1+z^2)^2},&z<0,\\[5pt]
-2z\left(Y_{p,\mathrm{impulse}}-Y_{p,\mathrm{reaction}}\right),&z\ge0.
+-\dfrac{0.4Rz}{(1+z^2)^2},&z<0,\\[5pt]
+2z(I-R),&0\le z\le1,\\[5pt]
+\dfrac{2z(I-R)}{(1+v^2)^{3/2}},
+\quad v=\dfrac{(I-R)(z^2-1)}{0.2I},&z>1.
 \end{cases}
 $$
 
@@ -189,11 +211,11 @@ $$
 | $z=0$ | Axial-entry reaction reference; $Y_{p,\mathrm{ref}}=Y_{p,\mathrm{reaction}}$ |
 | $z=1$ | Impulse reference; $Y_{p,\mathrm{ref}}=Y_{p,\mathrm{impulse}}$ |
 
-The negative tail approaches $0.8Y_{p,\mathrm{reaction}}$ gradually, with nonzero slope at every finite negative $z$. The first derivatives meet at zero, so $Y_{p,\mathrm{ref}}$ is $C^1$; the one-sided curvatures $-0.4Y_{p,\mathrm{reaction}}$ and $2(Y_{p,\mathrm{impulse}}-Y_{p,\mathrm{reaction}})$ generally differ. At $z=1$, the same quadratic continues without a join in its derivatives.
+The negative tail approaches $0.8R$ gradually, with nonzero slope at every finite negative $z$. The first derivatives meet at zero, so $Y_{p,\mathrm{ref}}$ is $C^1$; the one-sided curvatures $-0.4R$ and $2(I-R)$ generally differ. The new join at $z=1$ matches through the second derivative. The 20% upper-extrapolation allowance is a numerical choice rather than an AM calibration.
 
 ### 2.1 Varying outlet angle at fixed spacing
 
-The curves show $Y_{p,\mathrm{ref}}(z,\alpha_2)$ at $s/c=0.7$, for $-1.2\le z\le1.2$.
+The curves show $Y_{p,\mathrm{ref}}(z,\alpha_2)$ at $s/c=0.7$, for $-1.2\le z\le2$.
 
 ![Reference blend versus z for different outlet angles](../figures/ko_profile_blend_alpha2.png)
 
@@ -207,7 +229,40 @@ The curves show $Y_{p,\mathrm{ref}}(z,s/c)$ at $\alpha_2=60^\circ$.
 
 [PDF](../figures/ko_profile_blend_pitch_chord.pdf) · [CSV](../data/profile_interpolation/vary_pitch_chord.csv)
 
-Both ordinates contain only $Y_{p,\mathrm{ref}}$, before KO corrections. Beige shading marks $z<0$ and $z>1$, outside the reference interpolation interval. The 90% zero-turning value and 80% asymptote are engineering assumptions, not additional AM measurements. On $0\le z\le1$, the quadratic is a convex combination and stays positive for positive references. The wide-spacing reference plots above can enter $Y_{p,\mathrm{impulse}}<Y_{p,\mathrm{reaction}}$, so the entire reference plotting rectangle is not an admissible upper-extrapolation domain. Reverse turning at $z<-1$ remains unvalidated.
+Both ordinates contain only $Y_{p,\mathrm{ref}}$, before KO corrections. Beige shading marks $z<0$ and $z>1$, outside the reference interpolation interval. The 90% zero-turning value, 80% negative-tail limit and 20% positive-tail allowance are engineering assumptions, not additional AM measurements. On $0\le z\le1$, the quadratic is a convex combination and stays positive for positive references. Reverse turning at $z<-1$ remains unvalidated.
+
+### 2.3 Checking large extrapolation and reversed reference ordering
+
+The next figure extends the familiar range to $z=2$. Its left panel shows the bounded reference; its right panel calls the complete production profile function for several maximum thickness ratios. Dotted horizontal lines show their large-$z$ limits. Both the blend and the thickness exponent are continued, so their product has a finite large-$z$ limit.
+
+![Production reference and complete profile losses approach finite limits at large z](../figures/ko_safeguard_profile_z.png)
+
+[PDF](../figures/ko_safeguard_profile_z.pdf) · [CSV](../data/ko_safeguards/profile_z.csv)
+
+The following comparison also exercises a low-angle case where $I<R$. The continued curve bends in the same direction as the incoming quadratic but remains positive and bounded. The dashed quadratic shows the former unbounded prediction and may leave the plotted range.
+
+![The profile continuation supports both impulse-reference orderings](../figures/ko_safeguard_reference_order.png)
+
+[PDF](../figures/ko_safeguard_reference_order.pdf) · [CSV](../data/ko_safeguards/reference_order.csv)
+
+### 2.4 A finite coordinate through zero outlet angle
+
+The raw ratio $-\theta_{\mathrm{in}}/\alpha_2$ changes sign when outlet flow crosses zero with a fixed nonzero inlet metal angle. That would switch between two different extrapolation tails. Instead, the source continues the outlet angle from the blade row's design direction. Let $d=+1$ or $-1$ identify that fixed direction, $a=10^\circ$, $b=d\alpha_2$ and $t=(a-b)/a$. The effective angle is
+
+$$
+\alpha_c=
+\begin{cases}
+\alpha_2,&b\ge a,\\[4pt]
+\dfrac{da}{1+t+t^2},&b<a,
+\end{cases}
+\qquad z=-\frac{\theta_{\mathrm{in}}}{\alpha_c}.
+$$
+
+Above the join, the physical angle is unchanged. Below it, the effective magnitude decreases gradually toward zero while retaining sign $d$; it never reaches zero at a finite supplied outlet angle. The value, slope and curvature match the identity at $b=10^\circ$. At physical axial exit, $\alpha_c=da/3$ and $z=-3\theta_{\mathrm{in}}/(da)$, which is generally nonzero. There is no forced nozzle-reference reset, nor a reversal of the angle coordinate's sign as flow crosses zero.
+
+The sign of the fixed outlet metal angle, `geometry["metal_angle_out"]`, supplies $d$; no separate direction input is needed. Zero or an absent metal angle selects $d=+1$ for standalone calls. This direction comes from geometry and must not follow the current trial flow-angle sign. Both the profile reference angle and its blend/thickness coordinate use the same continued outlet angle. The trailing-edge wrapper shares this coordinate, while lower-level helpers that receive a prescribed $z$ retain that supplied coordinate.
+
+This is a numerical continuation for extreme solver iterates, not calibration of reverse outlet flow. Large $|z|$ is handled by the bounded reference and thickness continuations above. The implementation forms its reciprocal algebraically within the continued branch, avoiding division by the physical zero angle.
 
 ## 3. Thickness correction and final profile loss
 
@@ -222,15 +277,24 @@ $$
 The implemented thickness factor is
 
 $$
+E(z)=
+\begin{cases}
+z,&0\le z\le1,\\
+1+A(z-1),&z>1,
+\end{cases}
+\qquad A(v)=\frac{v}{\sqrt{1+v^2}}.
+$$
+
+$$
 F_t(\tau,z)=
 \begin{cases}
 1,&z\le0,\\[4pt]
 1+S(q)\left[\left(\dfrac{\tau}{0.2}\right)^z-1\right],&0<z<\delta,\\[6pt]
-\left(\dfrac{\tau}{0.2}\right)^z,&z\ge\delta.
+\left(\dfrac{\tau}{0.2}\right)^{E(z)},&z\ge\delta.
 \end{cases}
 $$
 
-This blends the unit thickness factor with the original power law at the current $z$. Since $0\le S\le1$, the factor stays positive and between those two values. At the center, $S(0.5)=0.5$. The reference interpolation $Y_{p,\mathrm{ref}}$ is unchanged; only the onset of its thickness correction is smoothed.
+This blends the unit thickness factor with the original power law at the current $z$. Since $0\le S\le1$, the factor stays positive and between those two values. At the center, $S(0.5)=0.5$. Above $z=1$, the exponent approaches two instead of increasing indefinitely. This preserves the original interpolation interval, matches its value, slope and curvature at one, and prevents an exponential blow-up in $z$ when $\tau>0.2$. For each fixed positive thickness, the limiting factor is $(\tau/0.2)^2$. This limits extrapolation in $z$; it does not impose an absolute bound for arbitrarily large thickness.
 
 The derivative is
 
@@ -242,10 +306,12 @@ $$
 \left[\left(\dfrac{\tau}{0.2}\right)^z-1\right]
 +S(q)\left(\dfrac{\tau}{0.2}\right)^z
 \ln\left(\dfrac{\tau}{0.2}\right),&0<z<\delta,\\[7pt]
-\left(\dfrac{\tau}{0.2}\right)^z
-\ln\left(\dfrac{\tau}{0.2}\right),&z\ge\delta.
+\left(\dfrac{\tau}{0.2}\right)^{E(z)}
+\ln\left(\dfrac{\tau}{0.2}\right)E'(z),&z\ge\delta,
 \end{cases}
 $$
+
+Here $E'(z)=1$ through $z=1$, and $E'(z)=[1+(z-1)^2]^{-3/2}$ above one.
 
 The smoothstep satisfies $S(0)=0$, $S(1)=1$ and $S'(0)=S'(1)=S''(0)=S''(1)=0$. Consequently, $F_t$ matches the value, first derivative and second derivative of both outer laws: it is $C^2$ at $z=0$ and $z=0.05$. For $\tau=0.2$, it is identically one. The width 0.05 is a numerical modeling choice rather than an additional AM calibration.
 
@@ -255,7 +321,7 @@ $$
 Y_p(\tau,z)=0.5727733333\,Y_{p,\mathrm{ref}}(z)F_t(\tau,z).
 $$
 
-The horizontal coordinate is $-1.2\le z\le1.2$. Separate curves use $\tau=0.05,\ 0.15,\ 0.20,\ 0.25,\ 0.40$.
+The horizontal coordinate is $-1.2\le z\le2$. Separate curves use $\tau=0.05,\ 0.15,\ 0.20,\ 0.25,\ 0.40$.
 
 ![Final KO profile loss versus z for different maximum thickness-to-chord ratios](../figures/ko_profile_thickness_z.png)
 
@@ -264,8 +330,6 @@ The horizontal coordinate is $-1.2\le z\le1.2$. Separate curves use $\tau=0.05,\
 All five thickness curves coincide for $z\le0$ because $F_t=1$ there. This shared branch rises gradually with $z$, reaching 90%, 96% and 100% of the corrected reaction reference at $z=-1,-0.5,0$. All first derivatives now tend to zero from both sides of $z=0$. Across the blue band, thickness dependence develops gradually; at $z=0.05$ the original power law and its first two derivatives are recovered.
 
 The full profile is $C^1$ at zero for every positive thickness. It remains generally not $C^2$ there because $Y_{p,\mathrm{ref}}$ retains its curvature change. At the upper transition boundary, $z=0.05$, the complete plotted coefficient matches through its second derivative.
-
-The [preservation check](../data/validation/thickness_transition_preservation.json) compares all 6,010 thickness-family samples with the preceding results. Only 96 values change, all strictly inside $0<z<0.05$; values outside the band are exactly preserved.
 
 Beige shading marks $z<0$ and $z>1$, outside the reference interpolation interval. The blue band marks numerical thickness smoothing, not extrapolation. Dashed curves identify $\tau=0.05$ and $0.40$, outside the original impulse/nearly-impulse thickness-relation interval of approximately 0.15?0.25; see the [fit study and source report](../../../ainley_mathieson_fitting/readme.md). These ranges are diagnostic. The thickness interval does not establish calibration for reaction or negative-$z$ cases, and coincident negative-$z$ curves describe the implementation rather than physical thickness independence.
 
@@ -283,7 +347,7 @@ The plotted derivatives use complex step on the full production function, includ
 
 ### 3.2 Thickness-factor smoothness on its own
 
-The next figure calls `get_profile_thickness_factor` directly, before multiplying by any reference loss or flow correction. The columns show $F_t$, $\partial F_t/\partial z$ and $\partial^2F_t/\partial z^2$. The upper row covers $-1.2\le z\le1.2$; the lower row resolves both joins on $-0.01\le z\le0.06$. Six curves use $t_{\max}/c=0.05,0.10,0.15,0.20,0.25,0.40$.
+The next figure calls `get_profile_thickness_factor` directly, before multiplying by any reference loss or flow correction. The columns show $F_t$, $\partial F_t/\partial z$ and $\partial^2F_t/\partial z^2$. The upper row covers $-1.2\le z\le2$; the lower row resolves both joins on $-0.01\le z\le0.06$. Six curves use $t_{\max}/c=0.05,0.10,0.15,0.20,0.25,0.40$.
 
 ![Production thickness factor with its first derivative and curvature, over the full range and near both joins](../figures/ko_profile_thickness_smoothness.png)
 
@@ -308,30 +372,57 @@ v,&v\ge w.
 \end{cases}
 $$
 
-Its value and first two derivatives match at the boundaries. The Reynolds factor is
+Its value and first two derivatives match at the boundaries. The Reynolds factor uses a continued positive coordinate:
+
+$$
+\mathrm{Re}_{\mathrm{eff}}=
+\begin{cases}
+1000+\dfrac{9000}{1+\dfrac{10^4-\mathrm{Re}}{9000}
+ +\left(\dfrac{10^4-\mathrm{Re}}{9000}\right)^2},&\mathrm{Re}<10^4,\\[8pt]
+\mathrm{Re},&10^4\le\mathrm{Re}\le10^7,\\[5pt]
+5\times10^7-\dfrac{4\times10^7}{1+\dfrac{\mathrm{Re}-10^7}{4\times10^7}
+ +\left(\dfrac{\mathrm{Re}-10^7}{4\times10^7}\right)^2},&\mathrm{Re}>10^7.
+\end{cases}
+$$
 
 $$
 f_{\mathrm{Re}}=
 \exp\left[
-0.4P_w\left(-\ln\frac{Re}{2\times10^5}\right)
--0.2P_w\left(\ln\frac{Re}{10^6}\right)
+0.4P_w\left(-\ln\frac{\mathrm{Re}_{\mathrm{eff}}}{2\times10^5}\right)
+-0.2P_w\left(\ln\frac{\mathrm{Re}_{\mathrm{eff}}}{10^6}\right)
 \right],
 \qquad w=\ln(1.5).
 $$
 
-For interpreting the derivative panels, its logarithmic sensitivity is
+For positive supplied Reynolds numbers, the plotted logarithmic sensitivity includes the coordinate's chain rule:
 
 $$
 \frac{d\ln f_{\mathrm{Re}}}{d\ln Re}
-=-0.4P'_w\left(-\ln\frac{Re}{2\times10^5}\right)
--0.2P'_w\left(\ln\frac{Re}{10^6}\right).
+=\frac{\mathrm{Re}}{\mathrm{Re}_{\mathrm{eff}}}
+ \frac{d\mathrm{Re}_{\mathrm{eff}}}{d\mathrm{Re}}
+ \left[-0.4P'_w\left(-\ln\frac{\mathrm{Re}_{\mathrm{eff}}}{2\times10^5}\right)
+-0.2P'_w\left(\ln\frac{\mathrm{Re}_{\mathrm{eff}}}{10^6}\right)\right].
 $$
 
-![Reynolds correction and logarithmic derivative across both transitions](../figures/reynolds_transitions.png)
+![Reynolds correction and logarithmic sensitivity through the original transitions and high-Re continuation](../figures/reynolds_transitions.png)
 
-[CSV](../data/reynolds_review/samples.csv)
+[PDF](../figures/reynolds_transitions.pdf) · [CSV](../data/reynolds_review/samples.csv)
 
-The blue transition bands are 133,333–300,000 and 666,667–1,500,000. They indicate numerical smoothing, not extrapolation. The factor is positive and nonincreasing, retaining the outer power laws and central unit plateau. Values and their first two derivatives match at each band boundary; the plotted derivative is dimensionless logarithmic sensitivity.
+**High-Reynolds limit.** Above $10^7$, the effective Reynolds coordinate approaches $5\times10^7$, giving
+
+$$
+\lim_{\mathrm{Re}\to\infty}f_{\mathrm{Re}}
+=\left(\frac{5\times10^7}{10^6}\right)^{-0.2}
+=50^{-0.2}=0.457305052.
+$$
+
+This is the empirical high-Re power-law value at fifty million, not a hard clipping threshold at that input. The continued correction approaches the limit gradually, and its logarithmic sensitivity tends to zero. Both the reference-profile and additive shock contributions retain this nonzero multiplier. The $10^7$ join and $5\times10^7$ effective limit are explicit extrapolation choices. [Validation](../data/reynolds_review/summary.json) checks the complete-profile normalization, derivatives and 1,001 large-Re cases through $10^{100}$. The [shock study comparison](../../../kacker_okapuu_shock/readme.md#5-complete-profile-and-shock-loss) shows the resulting nonzero stator and rotor profiles at low blade speed.
+
+**Very small and negative solver iterates.** Below $\mathrm{Re}=10^4$, the positive coordinate approaches 1000 gradually. Its value, slope and curvature match the identity at the threshold, so the low-Re power law remains unchanged above it. The factor is finite at zero and for every finite negative trial Reynolds number, and approaches $200^{0.4}=8.325532$. Negative Reynolds is only a numerical continuation, not a physical calibration of reversed flow. The effective-coordinate slope supplies the ordinary chain rule below the threshold; a logarithmic sensitivity to the supplied Reynolds number is not defined at zero or for negative inputs.
+
+![Finite effective Reynolds coordinate and complete correction for low and negative solver iterates](../figures/ko_safeguard_reynolds.png)
+
+[PDF](../figures/ko_safeguard_reynolds.pdf) · [CSV](../data/ko_safeguards/reynolds.csv)
 
 ## 5. Compressibility correction
 
@@ -528,7 +619,6 @@ $$
 
 At zero outlet Mach, the helper returns $K_p=1$. A zero slope can still arise from a stationary point or from the underlying factors, and a small nonzero slope can still be difficult for an optimizer to resolve. The continuation preserves the sign of the sensitivity entering it and never removes it by setting its own slope to zero.
 
-
 ## 6. Hub Mach ratio and inlet shock term
 
 The production helper `get_shock_loss(flow_parameters, geometry, cascade_type_id)` evaluates the complete inlet shock term and returns its intermediate components. `get_profile_loss` calls it once and adds the returned `Y_shock` before applying the outer multiplier $0.914f_{\mathrm{Re}}$. The reference-profile factors $2/3$, $K_p$ and the thickness correction do not multiply the shock contribution.
@@ -552,23 +642,24 @@ Here $P_w$ is the compact $C^2$ positive-part function defined in Section 4. For
 | Stator / nozzle | 4.348048474772493 | 0.8084516270970612 |
 | Rotor | 5.946253981890890 | 0.9468539887756984 |
 
-Below $r_h/r_t=0.3$, a continued coordinate gradually flattens the correction. With $r_0=0.3$ and $v=(r_h/r_t)/r_0$,
+Below $r_h/r_t=0.5$, the positive coordinate continues toward 0.3:
 
 $$
 \left(\frac{r_h}{r_t}\right)_{\mathrm{eff}}=
 \begin{cases}
-r_0\left(\dfrac12+v^3-\dfrac12v^4\right),&0\le r_h/r_t<r_0,\\[5pt]
-\dfrac{r_h}{r_t},&r_h/r_t\ge r_0.
+0.30+\dfrac{0.20}{1+\dfrac{0.50-r_h/r_t}{0.20}
+ +\left(\dfrac{0.50-r_h/r_t}{0.20}\right)^2},&r_h/r_t<0.50,\\[6pt]
+\dfrac{r_h}{r_t},&r_h/r_t\ge0.50.
 \end{cases}
 $$
 
-The value and first two derivatives match at 0.3. At zero ratio the correction has zero slope and curvature, with finite limits of approximately 2.88513 for stators and 4.77573 for rotors. Only the hub fit uses this effective coordinate; span weighting uses the physical ratio.
+Value, slope and curvature match at 0.50. The coordinate is positive and monotone, approaching 0.30 as the raw ratio tends to negative infinity. At raw ratio zero it is 0.320513; at raw ratio $-1$ it is 0.303089. The limit 0.30 is therefore not reached at zero hub radius. Both the hub-Mach fit and the shock span weight use this same coordinate, applied once. Raw geometry, including negative hub radii, is retained. See the [shock study](../../../kacker_okapuu_shock/readme.md) for the turbine-speed comparison.
 
 ![Integrated hub Mach correction and its first derivative for stator and rotor](../figures/ko_shock_hub_factor.png)
 
 [PDF](../figures/ko_shock_hub_factor.pdf) · [CSV](../data/profile_shock/hub_factor.csv)
 
-Rows show stator and rotor; columns show the value and first derivative. Beige shading marks extrapolation below the digitized chart range, $r_h/r_t=0.5$. The dotted line at 0.3 marks the start of flattening. The zero-ratio endpoint illustrates the factor's mathematical limit; the complete physical shock calculation requires a positive ratio.
+Rows show stator and rotor; columns show the value and first derivative. Beige shading marks extrapolation below the digitized chart range, $r_h/r_t=0.5$. The dotted line marks the continuation join and the solid vertical line marks zero hub radius. Finite zero and negative ratios are accepted by the continued shock calculation; this does not change the signed geometry.
 
 ### 6.2 Smooth onset and complete shock coefficient
 
@@ -590,17 +681,17 @@ $$
 The raw exit-normalized coefficient is
 
 $$
-Y_{p,\mathrm{shock,raw}}=0.75\,\Phi(M_{1,\mathrm{hub}})\frac{r_h}{r_t}\frac{q_1}{q_2},
+Y_{p,\mathrm{shock,raw}}=0.75\,\Phi(M_{1,\mathrm{hub}})\left(\frac{r_h}{r_t}\right)_{\mathrm{eff}}\frac{q_1}{q_2},
 \qquad
 q_1=p_{0,\mathrm{rel,in}}-p_{\mathrm{in}},\quad
 q_2=p_{0,\mathrm{rel,out}}-p_{\mathrm{out}}.
 $$
 
-The inlet head uses the actual inlet total pressure, replacing the former `p0_rel_is` reference. For finite physical states with $M_1\ge0$, $0<r_h/r_t\le1$, positive pressures, $q_1\ge0$ and $q_2>0$, every factor is nonnegative. No maximum operator or output floor is needed. Invalid states return `NaN`; `validate_shock_inputs` supplies descriptive errors when called at an input boundary.
+The inlet head uses the actual inlet row-frame total pressure. For finite correlation inputs with $M_1\ge0$, $r_h/r_t\le1$ (including zero and negative ratios), positive pressures, $q_1\ge0$ and $q_2>0$, every factor is nonnegative. No maximum operator or output floor is needed. Invalid states return `NaN`; `validate_shock_inputs` supplies descriptive errors when called at an input boundary.
 
 The pressure-head ratio can become large when the exit head is small. We therefore continue the **exit-normalized shock coefficient**, rather than imposing a universal cap on the head ratio alone: a fixed ratio cap would not bound the loss for every hub shock strength. The raw coefficient remains available as `Y_shock_raw`.
 
-Let $y=Y_{p,\mathrm{shock,raw}}$, $y_s=0.25$, $y_\infty=0.5$, $d=y_\infty-y_s=0.25$ and $t=(y-y_s)/d$. The returned coefficient is
+Let $y=Y_{p,\mathrm{shock,raw}}$, $y_s=0.25$, $y_\infty=0.7$, $d=y_\infty-y_s=0.45$ and $t=(y-y_s)/d$. The returned coefficient is
 
 $$
 Y_{p,\mathrm{shock}}=\mathcal C(y),\qquad
@@ -621,17 +712,17 @@ $$
 \end{cases}
 $$
 
-At the join, value, slope and curvature agree: they are 0.25, 1 and 0. The continuation is $C^2$, monotonic, and no steeper than the raw response. It leaves losses through 0.25 exactly unchanged, then approaches 0.5 without a hard plateau. Very large values can round to 0.5 in floating-point arithmetic. The bound applies before the outer multiplier $0.914f_{\mathrm{Re}}$, and does not bound the complete profile loss.
+At the join, value, slope and curvature agree: they are 0.25, 1 and 0. The continuation is $C^2$, monotonic, and no steeper than the raw response. It leaves losses through 0.25 exactly unchanged, then approaches 0.7 without a hard plateau. Very large values can round to 0.7 in floating-point arithmetic. The bound applies before the outer multiplier $0.914f_{\mathrm{Re}}$, and does not bound the complete profile loss.
 
 | Raw $Y_{p,\mathrm{shock,raw}}$ | Returned $Y_{p,\mathrm{shock}}$ |
 |---:|---:|
 | 0.10 | 0.100000 |
 | 0.25 | 0.250000 |
-| 0.50 | 0.416667 |
-| 1.00 | 0.480769 |
-| 5.00 | 0.499344 |
+| 0.50 | 0.458609 |
+| 1.00 | 0.617347 |
+| 5.00 | 0.696341 |
 
-The 0.25 transition onset and 0.5 asymptote are engineering choices to control excessive pressure-head amplification; they are not empirical KO coefficients. The onset leaves ordinary small shock losses unchanged and gives a transition width equal to the remaining distance to the asymptote. This safeguard deliberately modifies the paper's normalization for large raw coefficients, regardless of whether they arise from the head ratio, hub shock strength, or both.
+The 0.25 transition onset and 0.7 asymptote are engineering choices to control excessive pressure-head amplification; they are not empirical KO coefficients. The onset leaves ordinary small shock losses unchanged and gives a transition width equal to the remaining distance to the asymptote. This safeguard deliberately modifies the paper's normalization for large raw coefficients, regardless of whether they arise from the head ratio, hub shock strength, or both.
 
 The physical pressures and `head_ratio` remain unchanged. For diagnosis the helper also returns an effective ratio,
 
@@ -646,7 +737,7 @@ Y_{p,\mathrm{shock}}=Y_{p,\mathrm{shock,mean,inlet}}
 \left(\frac{q_1}{q_2}\right)_{\mathrm{eff}},
 $$
 
-where $Y_{p,\mathrm{shock,mean,inlet}}=0.75\,\Phi(M_{1,\mathrm{hub}})(r_h/r_t)$. No pressure epsilon or hard minimum/maximum is used. A zero or negative exit head remains outside the valid domain.
+where $Y_{p,\mathrm{shock,mean,inlet}}=0.75\,\Phi(M_{1,\mathrm{hub}})(r_h/r_t)_{\mathrm{eff}}$. No pressure epsilon or hard minimum/maximum is used. A zero or negative exit head remains outside the valid domain.
 
 ![Shock onset and continuous first derivative in the production helper](../figures/ko_shock_onset.png)
 
@@ -665,13 +756,15 @@ $$
 
 These are component diagnostics, not solved turbine operating points. Every plotted loss and its components come from the production helper; derivatives include pressure-head changes implied by this prescription. All shock ordinates exclude the outer multiplier $0.914f_{\mathrm{Re}}$.
 
-The first sweep fixes $M_2=0.6$ and varies $0.01\le r_h/r_t\le1$, with separate curves for $M_1=0.2,0.4,0.6,0.8$.
+The first sweep fixes $M_2=0.6$ and varies $-1\le r_h/r_t\le1$, with separate curves for $M_1=0.2,0.4,0.6,0.8$.
 
 ![Shock loss versus inlet hub/tip ratio for different inlet Mach numbers](../figures/ko_shock_hub_tip.png)
 
 [PDF](../figures/ko_shock_hub_tip.pdf) · [CSV](../data/profile_shock/hub_tip.csv)
 
-Reducing the hub/tip ratio increases the hub Mach correction, but also reduces the span weight. Their competition can produce an interior maximum: the complete loss need not vary monotonically with hub/tip ratio. Because the correction stays finite, the loss approaches zero with the span weight as the ratio tends to zero at fixed pressure heads and inlet Mach. This limiting behavior is a consequence of the chosen continuation and is not validated by the paper below 0.5.
+**Purpose and assessment.** This sweep tests the combined hub-Mach and span-weight response using the positive continued coordinate in both factors, while retaining signed raw hub ratios.
+
+For $M_1=0.8$ the production helper retains finite shock loss through zero and negative raw hub ratios. The same positive coordinate weights the hub shock and evaluates the hub-Mach fit. The derivative panels expose the combined response, including the pressure-head prescription. The 0.3 coordinate asymptote and 0.7 shock asymptote bound this extrapolation; they are numerical modeling choices rather than additional chart calibration. See the [shock study](../../../kacker_okapuu_shock/readme.md) for the stage-level profile and efficiency response.
 
 Beige shading marks $r_h/r_t<0.5$. Solid portions lie within both the Figure 6 ratio range and the Figure 7 displayed hub-Mach range, $M_{1,\mathrm{hub}}\le1.2$. Dashed portions exceed either range. These styles describe coverage, not a switch in the formula.
 
@@ -690,15 +783,13 @@ $$
 
 [PDF](../figures/ko_shock_exit_mach.pdf) · [CSV](../data/profile_shock/exit_mach.csv)
 
-Increasing $M_2$ increases the exit pressure head and decreases the normalized coefficient; the hub shock strength itself is unchanged. The positive continuation slope preserves this trend while attenuating its magnitude for raw losses above 0.25. Both columns now use **linear axes**, and the loss panel spans 0 to 0.5 with a small margin. The dotted horizontal line marks the 0.5 asymptote.
+Increasing $M_2$ increases the exit pressure head and decreases the normalized coefficient; the hub shock strength itself is unchanged. The positive continuation slope preserves this trend while attenuating its magnitude for raw losses above 0.25. Both columns now use **linear axes**, and the loss panel spans 0 to 0.7 with a small margin. The dotted horizontal line marks the 0.7 asymptote.
 
-For a fixed active inlet shock, the returned coefficient approaches 0.5 as the exit head tends to zero; the associated slope with respect to $M_2$ tends to zero under this pressure prescription. If the shock is inactive, it remains exactly zero. The raw coefficient can still diverge and is retained in the CSV for diagnosis. Exactly zero exit head remains invalid because the original normalization is undefined; the continuation is evaluated on the positive-head domain.
+For a fixed active inlet shock, the returned coefficient approaches 0.7 as the exit head tends to zero; the associated slope with respect to $M_2$ tends to zero under this pressure prescription. If the shock is inactive, it remains exactly zero. The raw coefficient can still diverge and is retained in the CSV for diagnosis. Exactly zero exit head remains invalid because the original normalization is undefined; the continuation is evaluated on the positive-head domain.
 
 Beige shading identifies the diagnostic supersonic outlet extension, $M_2>1$. Curves are dashed there or when $M_{1,\mathrm{hub}}>1.2$; solid portions satisfy both indicated limits. Smoothness and nonnegativity are numerical properties, not evidence of aerodynamic accuracy in those extended ranges.
 
 ## 7. Complete profile-loss function
-
-The analytical AM fits, reaction/impulse interpolation, thickness factor, Reynolds correction, compressibility factors and shock helper are all called inside the production `get_profile_loss` in [the new KO source](../../../../turbodash/loss_models_new/loss_model_kacker_okapuu.py). TurboDash selects this source with `kacker_okapuu_new`; the unsuffixed `kacker_okapuu` selects the preserved baseline. The new Moustapha and Benner models also call this KO profile function, with their own subsequent model operations.
 
 The complete return value can be split into two additive contributions:
 
@@ -714,7 +805,7 @@ Y_{p,\mathrm{shock\ contribution}}
 =0.914 f_{\mathrm{Re}}Y_{p,\mathrm{shock}}.
 $$
 
-Here $Y_{p,\mathrm{shock}}$ includes its upper continuation. The shock term is additive: it is not multiplied by $F_t$, $K_p$ or $2/3$. The complete coefficient has no overall 0.5 cap. As described above, the source sets the separate outlet-supersonic multiplier to one; the plots include the implemented inlet shock rather than an additional outlet shock model.
+Here $Y_{p,\mathrm{shock}}$ includes its upper continuation. The shock term is additive: it is not multiplied by $F_t$, $K_p$ or $2/3$. The complete coefficient has no overall 0.7 cap. As described above, the source sets the separate outlet-supersonic multiplier to one; the plots include the implemented inlet shock rather than an additional outlet shock model.
 
 Every solid or dashed loss curve below is a direct call to `get_profile_loss`, including all downstream factors. The scripts also assemble the two contributions separately and verify that their sum and their derivatives agree with the returned value.
 
@@ -726,7 +817,8 @@ Unless a quantity is swept, the plots use the following inputs:
 |---|---:|
 | Outlet flow-angle magnitude $\alpha_2$ | $60^\circ$ |
 | Pitch / true chord $s/c$ | 0.7 |
-| Reference-blend coordinate $z=-\theta_{\mathrm{in}}/\alpha_2$ | 0.5 |
+| Baseline reference-blend coordinate $z=-\theta_{\mathrm{in}}/\alpha_c$ | 0.5 |
+| Outlet metal angle, fixing design direction | $+60^\circ$ |
 | Maximum thickness / true chord $t_{\max}/c$ | 0.2 |
 | Chord Reynolds number $Re$ | 500,000 |
 | Inlet / outlet row-frame Mach $M_1,M_2$ | 0.6, 0.8 |
@@ -745,17 +837,19 @@ The plotted outlet Mach interval is $0.02\le M_2\le2$. Exactly zero is excluded 
 
 ### 7.2 Complete loss versus spacing and outlet angle
 
-The upper row sweeps $0.1\le s/c\le2$ for six fixed outlet angles. The lower row sweeps $1^\circ\le\alpha_2\le80^\circ$ for six fixed spacings. Values are on the left and first derivatives on the right. This figure uses the stator hub fit; the following Mach figures show both blade rows.
+The upper row sweeps $0.1\le s/c\le2$ for six fixed outlet angles, retaining $z=0.5$. The lower row now extends the physical outlet-angle range to $-20^\circ\le\alpha_2\le80^\circ$ for the same six fixed spacings. It holds inlet metal angle at $-30^\circ$ and outlet metal angle at $+60^\circ$. Values remain on the left and first derivatives on the right, preserving the existing figure layout. This figure uses the stator hub fit; the following Mach figures show both blade rows.
 
 ![Complete production profile loss versus spacing and outlet angle, with first derivatives](../figures/ko_profile_final_geometry.png)
 
 [PDF](../figures/ko_profile_final_geometry.pdf) · [Spacing CSV](../data/profile_final/geometry_spacing.csv) · [Angle CSV](../data/profile_final/geometry_angle.csv)
 
-The spacing minima survive the downstream corrections. In this controlled geometry sweep, the thickness, Reynolds and compressibility factors are constant, and the shock contribution is an additive constant. They therefore change the loss scale and offset without moving the spacing minimum of the reference blend.
+The spacing minima survive the downstream corrections. In the upper-row spacing sweep, the thickness, Reynolds and compressibility factors are constant, and the shock contribution is an additive constant. They therefore change the loss scale and offset without moving the spacing minimum of the reference blend.
 
-The angle sweep holds $z=0.5$: the inlet metal angle changes as $\theta_{\mathrm{in}}=-0.5\alpha_2$. Its derivative is the sensitivity along this path, not the angle derivative of a blade with fixed inlet geometry. No minimum outlet angle is applied. The lowest plotted angle is one degree because $z$ is undefined at exactly zero outlet angle.
+The lower-row angle sweep now holds the blade geometry fixed. Its implemented coordinate varies as $z=30^\circ/\alpha_c$, equalling the baseline $z=0.5$ at outlet angle $60^\circ$. Holding $z$ fixed instead would require changing inlet metal angle along the sweep and would hide the upper-extrapolation safeguard. The new path exposes that safeguard as $z$ exceeds one at low outlet angles. Its derivative is the physical outlet-angle sensitivity with inlet geometry fixed.
 
-Beige shading marks values outside the combined AM reference-chart envelope. Dashed portions identify points outside either contributing family's individual trace-endpoint envelope. Because this is a blend of two references, both must have chart coverage for a segment to be solid. Smooth low-angle or wide-spacing curves remain extrapolations, and their ordering need not follow trends calibrated within the original charts.
+Below $10^\circ$, the effective outlet angle decreases gradually without changing design direction, and the reference blend approaches its bounded large-$z$ continuation. The complete profile remains finite through physical zero and negative trial outlet angles. There is no forced nozzle-reference reset at zero. The thickness ratio is 0.2 here, so its factor is exactly one; Section 3 separately checks other thicknesses.
+
+Blue shading marks the numerical continuation below $10^\circ$; the solid vertical line marks physical zero and the dotted line marks the continuation onset. Beige shading and dashed curve segments retain the AM chart-coverage conventions. Both contributing references must have chart coverage for a segment to be solid. Smooth low-angle, negative-angle and wide-spacing curves remain extrapolations, and their ordering need not follow trends calibrated within the original charts.
 
 ### 7.3 Complete loss versus outlet Mach at different inlet Mach numbers
 
@@ -769,13 +863,13 @@ At zero inlet Mach the inlet pressure head and shock term vanish, while $K_p=1$;
 
 ### 7.4 Complete loss versus outlet Mach at different hub/tip ratios
 
-This figure fixes $M_1=0.6$ and varies $r_h/r_t=0.2,0.3,0.5,0.7,0.9,1.0$. The remaining inputs and pressure prescription are the same.
+This figure fixes $M_1=0.6$ and varies $r_h/r_t=-0.5,0,0.2,0.5,0.8,1.0$. The remaining inputs and pressure prescription are the same.
 
 ![Complete production profile loss versus outlet Mach at different hub-to-tip ratios, for stator and rotor](../figures/ko_profile_final_mach_hub.png)
 
 [PDF](../figures/ko_profile_final_mach_hub.pdf) · [CSV](../data/profile_final/mach_hub.csv)
 
-Only the shock term depends on the hub/tip ratio in this sweep. Changing that ratio alters both the hub Mach correction and the span weight in the shock expression, so the curves need not be ordered monotonically by radius ratio. The two blade rows can differ because their hub-Mach fits differ. Ratios below 0.5 are shown for diagnostic continuation and are dashed throughout.
+Only the shock term depends on the hub/tip ratio in this sweep. Changing that ratio alters both the hub Mach correction and the span weight in the shock expression, so the curves need not be ordered monotonically by radius ratio. The two blade rows can differ because their hub-Mach fits differ. Ratios below 0.5, including negative and zero hub ratios, are retained for diagnostic continuation and are dashed throughout. No geometry filter removes those curves.
 
 ### 7.5 Component budget: checking the integration
 
@@ -793,41 +887,22 @@ The legend identifies the three curves explicitly:
 
 At every sample, total profile loss equals profile loss without shock plus shock loss. The right panels show the corresponding derivatives, which satisfy the same sum. At small outlet Mach, the shock continuation controls the total trend. Where that term decreases, the profile loss without shock becomes easier to see. This plot catches integration mistakes that component-factor plots alone would miss, such as applying $K_p$ to the shock term or applying the Reynolds factor to only one contribution.
 
-Together with the full-loss thickness/blend sweep in Section 3 and the Reynolds sweep in Section 4, these figures cover the main dependencies of the returned coefficient. [Current-source validation](../data/profile_final/validation.json) checks all 38 complete-function curves against independent real differences, the value and derivative budgets, both blade rows, 4,000 combined input cases, and additional blend/thickness/Reynolds combinations. All plotted full losses and combined diagnostic cases are finite and positive. The validation does not assert global $C^2$ smoothness: the reference blend retains its documented curvature change at $z=0$.
+Together with the full-loss thickness/blend sweep in Section 3 and the Reynolds sweep in Section 4, these figures cover the main dependencies of the returned coefficient. [Current-source validation](../data/profile_final/validation.json) checks all 38 complete-function curves against independent real differences, the value and derivative budgets, both blade rows, 4,000 combined input cases including raw hub/tip ratios from $-1$ to 1 and Reynolds numbers from $10^4$ to $10^{12}$, and additional blend/thickness/Reynolds combinations. All plotted full losses and combined diagnostic cases are finite and positive. The validation does not assert global $C^2$ smoothness: the reference blend retains its documented curvature change at $z=0$.
 
 ## Reproduction and checks
 
-Run the term diagnostics from this section:
+All diagnostics use the production source and the current shock/Reynolds formulation. The shock coordinate joins at 0.5 and tends to 0.3; shock loss tends to 0.7; the high-Reynolds multiplier tends to 0.457305052.
 
-    python -B scripts/profile_terms.py
-    python -B scripts/profile_terms.py --render-only
+From the repository root:
 
-To reproduce the four complete-profile figures and the dedicated thickness-factor figure:
+```powershell
+python -B improving_turbodash/loss_model_audit/1_individual_functions/scripts/run.py
+python -B improving_turbodash/loss_model_audit/1_individual_functions/scripts/render_saved.py
+python -B improving_turbodash/kacker_okapuu_shock/study.py
+```
 
-    python -B scripts/profile_final_review.py
-    python -B scripts/profile_final_review.py --render-only
+Focused calculations are available through [reynolds_review.py](../scripts/reynolds_review.py), [shock_review.py](../scripts/shock_review.py), [profile_terms.py](../scripts/profile_terms.py) and [profile_final_review.py](../scripts/profile_final_review.py). Their `--render-only` options use saved values and derivatives.
 
-[profile_final_review.py](../scripts/profile_final_review.py) calls the current production entry point and saves all values, derivatives and component budgets under [data/profile_final](../data/profile_final/validation.json). The render-only command makes no model calls or derivative recalculations. Source and data hashes identify the exact evaluated revision; the new plots do not change production equations or refresh the earlier full-audit reference tables.
+[Reynolds checks](../data/reynolds_review/summary.json) verify the complete-profile multiplier, derivatives and nonzero high-Re limit. [Shock checks](../data/profile_shock/validation.json) verify component assembly, finite nonnegative losses and derivatives, including signed hub ratios. [Complete-profile checks](../data/profile_final/validation.json) cover both rows, additive component/derivative budgets, 38 slices and 4,000 crossed conditions. [Numerical verification](../data/validation/reproduction.json) checks current data grids and links. [Equation and link checks](../data/validation/markdown_math.json) identify the reviewed documents.
 
-The [current 72-test integration run](../data/profile_final/integration_tests.xml) passes the profile interpolation, compressibility, shock and profile/secondary refinement tests against this production source. The separate numerical checks in [final validation](../data/profile_final/validation.json) cover the full-function slices, additive derivative budget, combined input cases and thickness-factor curvature plotted here.
-
-To regenerate only the four shock figures and their saved components:
-
-    python -B scripts/shock_review.py
-    python -B scripts/shock_review.py --render-only
-
-[shock_review.py](../scripts/shock_review.py) evaluates the production helper directly. [Shock validation](../data/profile_shock/validation.json) records source/data hashes, the 0 to 0.5 bound, raw/effective component assembly, 18 sensitivity curves checked against independent finite differences, and isolation of the shock contribution inside the complete profile calculation. The [targeted integration run](../data/profile_shock/integration_tests.xml) covers shock, profile interpolation, compressibility and profile/secondary refinements. It includes agreement with every component of the approved study implementation, both blade rows, several Reynolds numbers, smooth joins and complex-step gradients. The [snapshot before shock integration](../data/history/before_shock_integration.zip) preserves the previous source and individual-function evidence.
-
-[profile_terms.py](../scripts/profile_terms.py) saves values and derivatives separately from plotting. [Term validation](../data/profile_terms/validation.json) checks 34 reference slices, positive bounded values, exact zero-spacing limits, complex-step slopes against real finite differences, compressibility bounds and the isolated shock term. [plot_style.py](../../../plot_style.py) calls the repository's set_plot_options() and supplies the common colormap and coverage shading.
-
-The [interpolation diagnostics](../data/validation/profile_interpolation.json) cover 13 main blend/thickness curves, five close-up curves with one-sided slope checks, and 605,151 positive grid points. The [standalone note](../../../ainley_mathieson_interpolation/readme.md) describes the same implemented policy. Moustapha and Benner inherit the updated KO profile function.
-
-The preceding full-audit validation passed [78 audit/stage-geometry tests](../data/validation/analytical_integration_tests.xml) and [85 repository tests](../data/validation/repository_model_tests.xml). These cover value/slope/curvature matching at the wider factor joins, monotonicity, tail slopes, $K_2$ below the squared ratio, the rational $K_p$ continuation, reference reconstruction, low-angle sensitivity and sign symmetry. The focused shock integration run above provides additional evidence for the shock implementation.
-
-The [snapshot before widening the compressibility joins](../data/history/before_wider_compressibility_blends.zip) preserves the preceding source and results. The [reference review](../data/validation/reference_review.json) accepts eight changed tables after the complete rerun: six for compressibility and join probes, and two hub-related tables refreshed against shock helpers already present in the archived source. [Revision checks](../data/validation/profile_revision.json) confirm that only the executable compressibility-factor function changed after that snapshot, with all baseline values across 78 sweeps and all other production files preserved. Those references describe the preceding revision; all 91 remain enforced for explicit review in a complete rerun. The raw comparison, smooth curves and final-continuation table are checked separately in [term validation](../data/profile_terms/validation.json).
-
-[scripts/run.py](../scripts/run.py) regenerates calculations and [render_saved.py](../scripts/render_saved.py) redraws saved evidence without model calls. [verify_markdown.cjs](../scripts/verify_markdown.cjs) checks dollar-delimited equations with the installed VS Code renderer and verifies local links; [results](../data/validation/markdown_math.json) identify the reviewed documents.
-
-The earlier full-profile sensitivity figures were regenerated for [spacing](../figures/ko_profile_pitch_chord.png), [outlet angle](../figures/ko_profile_exit_angle.png), [inlet Mach](../figures/ko_profile_ma_rel_in.png), [outlet Mach](../figures/ko_profile_ma_rel_out.png) and [hub/tip ratio](../figures/ko_profile_hub_tip.png). Those broad individual-function sweeps predate the upper shock continuation. The [stage/turbine results](../../2_stage_turbine/readme.md) have now been recalculated with that continuation, including all 26 main sweeps and the direct-KO checks. Their [rerun validation](../../2_stage_turbine/data/rerun_validation.json) records the comparison and current source hashes; Section 6 above supplies the focused shock diagnostics.
-
-[Numerical reproduction](../data/validation/reproduction.json) · [Methods](../methodology.md) · [All individual functions](../readme.md)
+The [full KO stage report](../../2_stage_turbine/kacker_okapuu/readme.md) covers seven sensitivities. The [two Benner comparisons](../../2_stage_turbine/benner/readme.md) overlay dashed KO curves and solid Benner curves without hub-ratio boundary markers.

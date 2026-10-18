@@ -7,8 +7,8 @@ from common import BASE, REPO, imported_sources, modules, sha256, write_csv, wri
 
 DATA = BASE/'data/trailing_review'
 FIGURES = BASE/'figures'
-STUDY = REPO/'improving_turbodash/kackec_okapuu_trailing_edge'
-TABLES = ('references', 'fit_residuals', 'z_sensitivity', 'thickness_sensitivity',
+STUDY = REPO/'improving_turbodash/kacker_okapuu_trailing_edge'
+TABLES = ('references', 'fit_residuals', 'z_sensitivity', 'angle_sensitivity', 'thickness_sensitivity',
           'mach_sensitivity', 'join_checks')
 Z_VALUES = (-1., -.5, 0., .25, .5, .75, 1., 1.2)
 
@@ -16,6 +16,7 @@ Z_VALUES = (-1., -.5, 0., .25, .5, .75, 1., 1.2)
 def source_hashes():
     return {str(p.relative_to(REPO)).replace('\\', '/'): sha256(p) for p in (
         REPO/'turbodash/loss_models_new/_trailing_edge.py',
+        REPO/'turbodash/loss_models_new/_blade_loading.py',
         REPO/'turbodash/loss_models_new/loss_model_kacker_okapuu.py',
         REPO/'turbodash/loss_models_new/_backend.py',
         REPO/'turbodash/loss_models_new/loss_coefficient_conversion.py')}
@@ -28,7 +29,7 @@ def slope(fn, x):
 def calculate():
     ko = modules('candidate')['ko']
     te = ko.trailing_edge
-    from improving_turbodash.kackec_okapuu_trailing_edge import model as studied
+    from improving_turbodash.kacker_okapuu_trailing_edge import model as studied
     from turbodash.loss_models_new.loss_coefficient_conversion import convert_kinetic_energy_to_stagnation_pressure_loss
     before = source_hashes()
 
@@ -76,6 +77,34 @@ def calculate():
                     for t, e, v, de, dv, r in zip(z, energy_fn(z), values,
                                                  slope(energy_fn, z), slope(loss_fn, z), raw))
     write_csv(DATA/'z_sensitivity.csv', rows)
+    # Keep the familiar blending figure and replace its final derivative panel
+    # with the complete loss across a signed physical outlet-angle sweep.
+    # Unlike prescribed-z tests, this exercises the direction-anchored wrapper.
+    angle_grid = np.unique(np.r_[np.linspace(-20, 80, 2001), 0., 10.])
+    rows = []
+    for x in (.05, .1, .2, .3, .4):
+        def angle_fn(beta):
+            return ko.get_trailing_edge_loss(
+                dict(beta_out=beta, Ma_rel_out=.7, gamma_out=1.4),
+                dict(opening=1., trailing_edge_thickness=x, leading_edge_angle=-30.,
+                     metal_angle_out=60.))
+        values = angle_fn(angle_grid)
+        derivatives = slope(angle_fn, angle_grid)
+        effective_z = ko.get_cascade_angle_ratio(-30., angle_grid, 1.)
+        assert np.isfinite(values).all() and np.all(values >= 0)
+        assert np.isfinite(derivatives).all()
+        np.testing.assert_allclose(values,
+            te.pressure_loss(te.energy_loss(x, effective_z), .7, 1.4), rtol=4e-15, atol=1e-16)
+        assert values[np.flatnonzero(angle_grid == 0.)[0]] > 0
+        h = 1e-4
+        for beta in (0., 10.):
+            np.testing.assert_allclose(angle_fn(beta-h), angle_fn(beta+h), rtol=0, atol=1e-5)
+            np.testing.assert_allclose(slope(angle_fn, beta-h), slope(angle_fn, beta+h),
+                rtol=0, atol=1e-6)
+        rows.extend(dict(fixed=x, x=float(beta), inlet_metal=-30., design_direction=1.,
+                         effective_z=float(z), value=float(value), derivative=float(derivative))
+                    for beta, z, value, derivative in zip(angle_grid, effective_z, values, derivatives))
+    write_csv(DATA/'angle_sensitivity.csv', rows)
     rows = []
     for z in Z_VALUES:
         x = np.unique(np.r_[np.linspace(0, 1.2, 1201), .4])
@@ -131,6 +160,9 @@ def calculate():
     result = dict(passed=True, fits=fits, stress_cases=int(actual.size),
         maximum_stress_loss=float(actual.max()), maximum_study_difference=float(abs(actual-expected).max()),
         conversion_cases=int(conversion.size), maximum_conversion_difference=float(abs(conversion-independent).max()),
+        signed_outlet_sweep=dict(minimum=-20., maximum=80., inlet_metal=-30.,
+            design_direction=1., continuation_threshold=10., samples=5*len(angle_grid),
+            finite_nonnegative=True, zero_and_join_continuity=True),
         source_hashes=before, imported_sources=imported_sources(), script_sha256=sha256(__file__),
         study_model_sha256=sha256(STUDY/'model.py'),
         digitized_points_sha256=sha256(STUDY/'data/digitized_points.csv'),
@@ -219,27 +251,35 @@ def render():
                'Each rational tail matches value, slope and curvature of its fitted cubic.', handles, 2)
 
         rows = read('z_sensitivity')
+        angle_rows = read('angle_sensitivity')
         fig, axes = plt.subplots(2, 2, figsize=(12, 9))
         handles = []
         for fixed, color in zip((.05, .1, .2, .3, .4), colors(5)):
             selected = [r for r in rows if r['fixed'] == fixed]
-            for ax, key in zip(axes.flat, ('energy', 'd_energy', 'value', 'derivative')):
+            for ax, key in zip((axes[0, 0], axes[0, 1], axes[1, 0]), ('energy', 'd_energy', 'value')):
                 ax.plot(*xy(selected, key), color=color)
+            selected_angles = [r for r in angle_rows if r['fixed'] == fixed]
+            axes[1, 1].plot(*xy(selected_angles, 'value'), color=color)
             if fixed == .4:
                 axes[0, 0].plot(*xy(selected, 'raw_energy'), color='.5', ls='--', lw=1)
             handles.append(Line2D([], [], color=color, label=rf'$t_{{\mathrm{{TE}}}}/o={fixed:g}$'))
-        for ax in axes.flat:
+        for ax in (axes[0, 0], axes[0, 1], axes[1, 0]):
             ax.set(xlim=(-2, 2), xlabel=r'Angle coordinate $z=-\theta_{\mathrm{in}}/\beta_{\mathrm{out}}$')
             ax.axvspan(-2, 0, color='#d8d3c8', alpha=.4, zorder=0)
             ax.axvspan(1, 2, color='#d8d3c8', alpha=.4, zorder=0)
         axes[0, 0].set(ylabel=r'$\Delta\phi^2_{\mathrm{TE}}$', title='Blended energy increment')
         axes[0, 1].set(ylabel=r'$d(\Delta\phi^2_{\mathrm{TE}})/dz$', title='Energy-increment derivative')
         axes[1, 0].set(ylabel=r'Pressure loss $Y_{\mathrm{TE}}$', title='Complete production trailing-edge loss')
-        axes[1, 1].set(ylabel=r'$dY_{\mathrm{TE}}/dz$', title='Complete pressure-loss derivative')
+        axes[1, 1].set(xlim=(-20, 80), xlabel=r'Signed physical outlet angle $\beta_{\mathrm{out}}$ (degrees)',
+            ylabel=r'Pressure loss $Y_{\mathrm{TE}}$', title=r'Complete loss through zero outlet angle; $\theta_{\mathrm{in}}=-30^\circ$')
+        axes[1, 1].axvspan(-20, 10, color='#d8d3c8', alpha=.4, zorder=0)
+        axes[1, 1].axvline(0, color='.5', ls=':', lw=.8)
+        axes[1, 1].axvline(10, color='.5', ls=':', lw=.8)
         fig.suptitle('KO trailing edge: nozzle/impulse interpolation and bounded extrapolation', y=.99)
         finish(fig, 'ko_trailing_blending_review',
-               'Outlet Mach = 0.7; gamma = 1.4. z = 0: nozzle; z = 1: impulse. Beige: outside those two references.\n'
-               'Gray dashed: raw signed-square energy blend for x = 0.4, which can become negative.', handles)
+               'Outlet Mach = 0.7; gamma = 1.4. Three z panels retain z = -2 to 2; beige: outside nozzle/impulse references.\n'
+               'Bottom right: fixed inlet metal = -30 deg, design direction +1. Beige: physical outlet angle below 10 deg.\n'
+               'Dotted: zero and 10 deg. Gray dashed: raw signed-square energy blend for x = 0.4.', handles)
 
         rows = read('thickness_sensitivity')
         fig, axes = plt.subplots(1, 2, figsize=(12, 6.2))

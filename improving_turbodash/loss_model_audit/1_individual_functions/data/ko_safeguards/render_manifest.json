@@ -1,0 +1,25 @@
+{
+  "figures": 3,
+  "source_sha256": {
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "c3d88153360f75ec1e54e53a056d4ec7b41547b9d3e467e4847c66d7705afa08",
+    "turbodash/loss_models_new/_numerics.py": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff",
+    "turbodash/loss_models_new/_trailing_edge.py": "594970afedea411fbf4e1f6a86017ac46372f36b5f0452c78234940441630ce8",
+    "turbodash/loss_models_new/_blade_loading.py": "8be374f9be233a7027e39a552c8c424200a3f00d05706868d8c75968df1666a5",
+    "turbodash/loss_models_new/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff"
+  },
+  "files": {
+    "ko_safeguard_profile_z.png": "13747815f9be1e0aba56ffc9b639032e885d481e076ccb240a0212c3ac16e2fe",
+    "ko_safeguard_profile_z.pdf": "83c77e1506ad340c4e101a6fdb752e9e1c5e4f87ac805b93e8b7dc8691ffaadd",
+    "ko_safeguard_reference_order.png": "1e3b69059f260290f1852fd8399b29a5acb6aa31367828e06621bc2fc8605639",
+    "ko_safeguard_reference_order.pdf": "2c852d43fd74be7ffa36d8963f0a508f83140dfe983a31fb0d65d87b76bc3b70",
+    "ko_safeguard_reynolds.png": "4f88619af78766c0a263bc10d78de8c943b41c611ca27c6b23620a3a02e9c91e",
+    "ko_safeguard_reynolds.pdf": "89c27ee310043f0a710ff1d7c96d600fc67911b107629bf673a70b982807fdfb"
+  },
+  "data_sha256": {
+    "profile_z": "cf8209c2a62032efada5ccb30f93cf570671eec4f0cadcb84bb222850a378d93",
+    "reference_order": "64ed605125cc0af30119d43a9892798c48440c0c30fb787148f95190db894c12",
+    "reynolds": "1f4263a11d9c2018b4af39b50eaad53a57833b24efde3ec676e1065293b7c2f9",
+    "axial_angle": "9283e2684be1feb116486048b0de303ccb6bc1a3dac1cea55023832c5ff94fdb"
+  },
+  "model_calls": 0
+}

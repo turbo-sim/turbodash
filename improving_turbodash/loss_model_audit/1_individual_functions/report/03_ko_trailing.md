@@ -1,8 +1,8 @@
-# Kacker`Okapuu: trailing-edge loss
+# Kacker–Okapuu: trailing-edge loss
 
-[Previous: secondary loss](02_ko_secondary.md) ` [Section index](../readme.md) ` [Next: clearance loss](04_ko_clearance.md)
+[Previous: secondary loss](02_ko_secondary.md) ? [Section index](../readme.md) ? [Next: clearance loss](04_ko_clearance.md)
 
-The new loss model now implements the [Figure 14 fitting and continuation study](../../../kackec_okapuu_trailing_edge/readme.md). The calculation uses fitted nozzle and impulse energy-loss curves, bounded interpolation/extrapolation in the angle coordinate $z$, and the paper's Mach-dependent energy-to-pressure conversion. All sensitivity curves below are evaluated through the production functions.
+The new loss model now implements the [Figure 14 fitting and continuation study](../../../kacker_okapuu_trailing_edge/readme.md). The calculation uses fitted nozzle and impulse energy-loss curves, bounded interpolation/extrapolation in the angle coordinate $z$, and the paper's Mach-dependent energy-to-pressure conversion. All sensitivity curves below are evaluated through the production functions.
 
 The public entry point is [get_trailing_edge_loss](../../../../turbodash/loss_models_new/loss_model_kacker_okapuu.py). Its analytical helpers and fixed coefficients are in [_trailing_edge.py](../../../../turbodash/loss_models_new/_trailing_edge.py). Production does not import the study or read any fit files at runtime.
 
@@ -35,7 +35,7 @@ The study digitized 21 points per family from the supplied scan. The maximum abs
 
 ![Production reference fits and residuals against the digitized Figure 14 points](../figures/ko_trailing_reference_fit.png)
 
-[PDF](../figures/ko_trailing_reference_fit.pdf) ` [Residual CSV](../data/trailing_review/fit_residuals.csv) ` [Digitization overlay](../../../kackec_okapuu_trailing_edge/figures/digitization_overlay.png) ` [Digitized points](../../../kackec_okapuu_trailing_edge/data/digitized_points.csv)
+[PDF](../figures/ko_trailing_reference_fit.pdf) ? [Residual CSV](../data/trailing_review/fit_residuals.csv) ? [Digitization overlay](../../../kacker_okapuu_trailing_edge/figures/digitization_overlay.png) ? [Digitized points](../../../kacker_okapuu_trailing_edge/data/digitized_points.csv)
 
 The curves rise smoothly throughout the chart interval. Error bars show assigned reading uncertainty. The unresolved strokes close to the origin were excluded from digitization; the origin is a physical constraint on the fit.
 
@@ -65,19 +65,31 @@ For the fitted curves, $D_j,A_j,B_j$ are positive. Each continuation therefore i
 
 ![Bounded production reference continuations and thickness derivatives](../figures/ko_trailing_reference_continuation.png)
 
-[PDF](../figures/ko_trailing_reference_continuation.pdf) ` [CSV](../data/trailing_review/references.csv)
+[PDF](../figures/ko_trailing_reference_continuation.pdf) ? [CSV](../data/trailing_review/references.csv)
 
 Beige marks extrapolation beyond the chart; dotted lines show the chosen asymptotes. The limits are numerical modeling choices, approximately 1.8 times the respective chart-end values. They are not fits to additional KO measurements, and do not establish physical feasibility at large blockage. There is no finite-thickness constant tail. The reciprocal implementation avoids constructing very large squared extrapolation coordinates.
 
-## 3. Nozzle`impulse interpolation and bounded angle extrapolation
+## 3. Nozzle–impulse interpolation and bounded angle extrapolation
 
 Using signed row-frame angles, the source forms
 
 $$
-z=-\frac{\theta_{\mathrm{in}}}{\beta_{\mathrm{out}}},
+z=-\frac{\theta_{\mathrm{in}}}{\beta_c},
 $$
 
-where $\theta_{\mathrm{in}}$ is inlet metal angle and $\beta_{\mathrm{out}}$ is outlet flow angle. Thus $z=0$ selects the nozzle reference and $z=1$ selects the impulse reference. The inlet flow angle does not enter this coordinate.
+where $\theta_{\mathrm{in}}$ is inlet metal angle and $\beta_{\mathrm{out}}$ is outlet flow angle. To retain the row's design direction through extreme low-angle iterates, let $d=\pm1$ be that fixed direction, $a=10^\circ$, $b=d\beta_{\mathrm{out}}$ and $t=(a-b)/a$. The shared continuation is
+
+$$
+\beta_c=
+\begin{cases}
+\beta_{\mathrm{out}},&b\ge a,\\[4pt]
+\dfrac{da}{1+t+t^2},&b<a.
+\end{cases}
+$$
+
+For flow at least ten degrees in the design direction, this gives the original $z=-\theta_{\mathrm{in}}/\beta_{\mathrm{out}}$. Below that point, the effective angle stays in the design direction and decreases gradually toward zero, without reaching it for a finite trial flow angle. Its value, slope and curvature match the physical angle at the join. At physical zero, $\beta_c=da/3$: the source does not force $z=0$ or reset the loss to the nozzle reference.
+
+The sign of the fixed outlet metal angle, `geometry["metal_angle_out"]`, supplies $d$; no separate direction input is needed. Zero or an absent metal angle selects $d=+1$ for standalone calls. The reference stays tied to geometry as the trial flow crosses zero. This is a chosen solver continuation rather than new reverse-flow calibration. The inlet flow angle does not enter this coordinate. Helpers that receive a prescribed $z$ directly do not alter that supplied coordinate.
 
 The paper's signed equation (17) is $d=R+(I-R)z|z|$. On $0\le z\le1$, it reduces to $(1-z^2)R+z^2I$. The signed square is only $C^1$ at zero. We replace it in the small interval $|z|<w=0.05$ by
 
@@ -113,11 +125,15 @@ $$
 
 Both outer joins match value, slope and curvature. The 20% allowances and the small signed-square smoothing interval are numerical choices. In particular, the profile-loss negative-$z$ reduction cannot simply be copied here, because the trailing-edge references have the opposite ordering.
 
-![Blended energy increments and complete production pressure losses versus angle coordinate, with derivatives](../figures/ko_trailing_blending_review.png)
+![Blended energy increments and complete pressure losses versus angle coordinate, with a physical outlet-angle sweep through zero in the existing lower-right panel](../figures/ko_trailing_blending_review.png)
 
-[PDF](../figures/ko_trailing_blending_review.pdf) ` [CSV](../data/trailing_review/z_sensitivity.csv)
+[PDF](../figures/ko_trailing_blending_review.pdf) | [Angle-coordinate CSV](../data/trailing_review/z_sensitivity.csv) | [Physical-angle CSV](../data/trailing_review/angle_sensitivity.csv)
 
-The top row shows the energy increment; the bottom shows the resulting complete trailing-edge pressure loss at $M_2=0.7$, $\gamma=1.4$. Values are on the left and derivatives on the right. Beige identifies extrapolation outside $0\le z\le1$. The gray dashed energy curve shows why unrestricted signed-square extrapolation is unsuitable: it eventually becomes negative for $z>1$.
+The existing four-panel figure shows the interpolation and the low-angle safeguard together, at $M_2=0.7$, $\gamma=1.4$. The top row retains energy increment versus $z$ and its derivative; the lower-left panel retains the complete pressure loss versus $z$. These three panels keep the familiar range $-2\le z\le2$, with beige shading outside $0\le z\le1$. The gray dashed energy curve shows why unrestricted signed-square extrapolation is unsuitable: it eventually becomes negative for $z>1$.
+
+The lower-right panel now shows the complete production $Y_{\mathrm{TE}}$ against the **physical outlet flow angle**, extending the horizontal axis through zero from $-20^\circ$ to $80^\circ$. The inlet metal angle is fixed at $-30^\circ$ and the design outlet direction is $+1$. It uses the same five thickness/opening curves as the other panels. Beige shading marks $\beta_{\mathrm{out}}<10^\circ$, where the direction-anchored continuation is active; dotted lines identify zero and the $10^\circ$ join.
+
+Bounding extrapolation in $z$ alone would not remove the different one-sided limits of a signed ratio at zero outlet angle. The continued effective angle handles that coordinate issue as well: these complete-function curves stay finite and continuous through physical zero and reversed trial angles while retaining the incoming positive-$z$ trend. They do not return to the nozzle value at zero. This is a solver continuation, not a calibration for reversed flow.
 
 ## 4. Mach-dependent energy-to-pressure conversion
 
@@ -166,7 +182,7 @@ so the gas conversion remains away from its singularity. No separate pressure-lo
 
 ![Complete production trailing-edge pressure losses and Mach derivatives for different thickness and gas ratios](../figures/ko_trailing_mach_review.png)
 
-[PDF](../figures/ko_trailing_mach_review.pdf) ` [CSV](../data/trailing_review/mach_sensitivity.csv)
+[PDF](../figures/ko_trailing_mach_review.pdf) ? [CSV](../data/trailing_review/mach_sensitivity.csv)
 
 The top row varies thickness/opening at $\gamma=1.4$; the bottom varies $\gamma$ at $x=0.2$. All curves use $z=0.5$. Blue identifies the upper-subsonic modification, and beige identifies supersonic extrapolation. The gray dashed comparator retains equation (18) without Mach continuation at $x=0.2$.
 
@@ -183,7 +199,7 @@ where $\mathcal{P}$ is the conversion in Section 4. The following figure fixes $
 
 ![Complete production trailing-edge loss versus thickness/opening for different angle coordinates, with derivatives](../figures/ko_trailing_thickness_review.png)
 
-[PDF](../figures/ko_trailing_thickness_review.pdf) ` [CSV](../data/trailing_review/thickness_sensitivity.csv)
+[PDF](../figures/ko_trailing_thickness_review.pdf) ? [CSV](../data/trailing_review/thickness_sensitivity.csv)
 
 Loss starts exactly at zero and rises monotonically toward a finite limit. The first thickness derivative is finite and positive at the zero-thickness boundary, and joins continuously at $x=0.4$. These are right derivatives at zero; negative thickness remains invalid.
 
@@ -191,13 +207,11 @@ Only thickness/opening, $z$, outlet Mach and $\gamma$ enter this component. Ther
 
 ## 6. Source integration, limits and verification
 
-The public function reads `trailing_edge_thickness`, `opening` and `leading_edge_angle` from geometry, and `beta_out`, `Ma_rel_out` and `gamma_out` from flow. It returns NaN for negative/nonfinite thickness, nonpositive/nonfinite opening, nonfinite metal/exit angles, zero exit angle, negative/nonfinite Mach, or a gas ratio outside the stated domain.
+The public function reads `trailing_edge_thickness`, `opening` and `leading_edge_angle` from geometry, and `beta_out`, `Ma_rel_out` and `gamma_out` from flow. The optional geometry direction fields above select the low-angle continuation. It returns NaN for negative/nonfinite thickness, nonpositive/nonfinite opening, nonfinite metal/exit angles, negative/nonfinite Mach, or a gas ratio outside the stated domain. Zero outlet angle is supported by the shared effective-angle continuation.
 
-**Zero outlet angle requires a prescribed angle path.** There is no unique value of $z=-\theta_{\mathrm{in}}/\beta_{\mathrm{out}}$ at the joint angle origin. The public wrapper protects the division and returns NaN there. A study with a prescribed finite $z$ can evaluate `trailing_edge.trailing_loss(x, z, Mach, gamma)` directly; it must not silently assign a nozzle value to an undefined ratio. At zero thickness and valid angle/Mach/gas inputs, the coefficient is exactly zero.
+The physical-angle panel of the existing blending figure in Section 3 checks the zero-angle safeguard through the complete production trailing-edge function. It holds inlet metal angle and design outlet direction fixed while crossing zero and the $10^\circ$ join. At zero thickness and valid angle/Mach/gas inputs, the trailing-edge coefficient is exactly zero.
 
-New KO and Moustapha call the revised helper directly. Benner calls the same helper and then applies its existing primary-loss penetration weight to the trailing-edge contribution. Integration tests verify both the unweighted helper and the resulting weighted contribution to the total. No runtime dependency on the study directory has been introduced.
-
-**32 dedicated trailing-edge tests passed**, and the combined KO/refinement run passed **161 tests**. Checks cover digitized/held-out agreement, $C^2$ joins, positive and bounded continuations, zero thickness/Mach, the $\gamma\to1$ limit, invalid inputs, length units, signed-angle reflection, broadcasting, independent real/complex-step gradients and integration through all three models.
+New KO and Moustapha call the production helper directly. Benner calls the same helper and then applies its existing primary-loss penetration weight to the trailing-edge contribution. Integration tests verify both the unweighted helper and the resulting weighted contribution to the total. No runtime dependency on the study directory has been introduced.
 
 The production wrapper matches the study over **64,640 combinations** extending to thickness ratio, $|z|$ and Mach of $10^6$. All valid values are finite and nonnegative, with maximum $Y_{\mathrm{TE}}=0.916756$ in that grid. An independent comparison with the repository's unrestricted energy-to-pressure converter covers **5,084 cases**, with maximum absolute difference $3.33\times10^{-16}$.
 
@@ -214,6 +228,4 @@ python -B -m pytest tests/test_ko_trailing.py -q -p no:cacheprovider
 
 Add `--render-only` to redraw the saved values without model evaluations. The generator checks source and CSV hashes and uses the repository's `set_plot_options()` styling with viridis colors and shaded extrapolation regions. It is also included in the individual-audit calculation/render/verification entry points.
 
-[Generator](../scripts/trailing_review.py) ` [Tests](../../../../tests/test_ko_trailing.py) ` [Figure provenance](../data/trailing_review/render_manifest.json) ` [Implementation before integration](../data/trailing_review/before_integration.json)
-
-[All individual functions](../readme.md) ` [Methods and historical audit reproduction](../methodology.md)
+[Generator](../scripts/trailing_review.py) ? [Tests](../../../../tests/test_ko_trailing.py) ? [Figure provenance](../data/trailing_review/render_manifest.json) ? [Implementation before integration](../data/trailing_review/before_integration.json)

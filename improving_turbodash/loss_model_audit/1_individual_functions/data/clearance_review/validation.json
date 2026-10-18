@@ -2,6 +2,13 @@
   "passed": true,
   "curves": 33,
   "independent_paper_cases": 4000,
+  "outlet_angle_sweep": {
+    "minimum": -20.0,
+    "maximum": 80.0,
+    "samples": 9009,
+    "negative_angle_reflection_checked": true,
+    "origin_values_and_slopes_checked": true
+  },
   "extreme_angle_geometry": {
     "AR": 2.0,
     "chord": 0.05,
@@ -13,8 +20,8 @@
   },
   "unchanged_paper_cases": 2822,
   "stress_cases": 44376,
-  "max_stress_loss": 1.1199150853509643,
-  "max_paper_absolute_error": 2.7755575615628914e-16,
+  "max_stress_loss": 1.1198994147765104,
+  "max_paper_absolute_error": 2.220446049250313e-16,
   "max_finite_difference_absolute_error": 1.5318590840252e-10,
   "p": 0.78,
   "delta": 0.001,
@@ -44,7 +51,8 @@
     "finite loading through 90 degrees and extreme angles"
   ],
   "source_hashes": {
-    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "7371be7ea3393975fd0ca93c6d741674b6255d1bba2f67094c4963a5db9963aa",
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "c3d88153360f75ec1e54e53a056d4ec7b41547b9d3e467e4847c66d7705afa08",
+    "turbodash/loss_models_new/_blade_loading.py": "8be374f9be233a7027e39a552c8c424200a3f00d05706868d8c75968df1666a5",
     "turbodash/loss_models_new/_numerics.py": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff",
     "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772"
   },
@@ -114,10 +122,20 @@
       "relative_path": "turbodash/loss_models_new/_numerics.py",
       "sha256": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff"
     },
+    "turbodash.loss_models_new._trailing_edge": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\_trailing_edge.py",
+      "relative_path": "turbodash/loss_models_new/_trailing_edge.py",
+      "sha256": "594970afedea411fbf4e1f6a86017ac46372f36b5f0452c78234940441630ce8"
+    },
+    "turbodash.loss_models_new._blade_loading": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\_blade_loading.py",
+      "relative_path": "turbodash/loss_models_new/_blade_loading.py",
+      "sha256": "8be374f9be233a7027e39a552c8c424200a3f00d05706868d8c75968df1666a5"
+    },
     "turbodash.loss_models_new.loss_model_kacker_okapuu": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model_kacker_okapuu.py",
       "relative_path": "turbodash/loss_models_new/loss_model_kacker_okapuu.py",
-      "sha256": "7371be7ea3393975fd0ca93c6d741674b6255d1bba2f67094c4963a5db9963aa"
+      "sha256": "c3d88153360f75ec1e54e53a056d4ec7b41547b9d3e467e4847c66d7705afa08"
     },
     "turbodash.loss_models_new.loss_coefficient_conversion": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_coefficient_conversion.py",
@@ -127,12 +145,12 @@
     "turbodash.loss_models_new.loss_model_benner": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model_benner.py",
       "relative_path": "turbodash/loss_models_new/loss_model_benner.py",
-      "sha256": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba"
+      "sha256": "cac62576a82d6db189d94a5ee6f71f980b5e5de8dfe6d35d6ac2e3cdd22a1659"
     },
     "turbodash.loss_models_new.loss_model_moustapha": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model_moustapha.py",
       "relative_path": "turbodash/loss_models_new/loss_model_moustapha.py",
-      "sha256": "923339d879bb7edf952112296b605073d9c5f466e541ea04b3ce10f3f8e1f489"
+      "sha256": "556caad2121e18a57d4f5a6af3161fba8d421f957ac0779148fdec2e4efed4b8"
     },
     "turbodash.loss_models_new.loss_model": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model.py",
@@ -140,15 +158,15 @@
       "sha256": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11"
     }
   },
-  "script_sha256": "5162f5851e35d9f4b8787e6e07234c53d11598d980b367cf04bff86ef21e2113",
+  "script_sha256": "2d44f5a06083bfe25efed24fda74ed5f80c4f4df068bfacfd36e056433851c6f",
   "paper_sha256": "1f00fe0bfaf2d93a36a6aa1a1baf2729f46cc1fa90eac98cc189dd281fd62886",
   "data_sha256": {
     "gap_factor": "babffdc33ff2093d02e8b498d4edd7ad71662d7bbcd1df1acc91bbfea7184c75",
     "gap_sensitivity": "2509deda923eabfa3831f3b6777b265821fc831e8fb925df8056bc185506c461",
-    "angle_sensitivity": "fe99d37502874014b4d255a8208964480b77ecf0d7c47d00e9be44a24476b555",
+    "angle_sensitivity": "edad1c226f957d1e515e04b1a0151ae60742fb18dd3acadb5a2b1ab8f29d8d8e",
     "aspect_factor": "fbe74f001d5fab7bcd927332f2477b1387a8efe0107a127583c6d3fc4d9c1cc2",
     "aspect_sensitivity": "5c15924b32cb74cfb08cf716f60236545c8ed1f3ecaeaedd26a3ec827a762d7f",
-    "loading_sensitivity": "037ee92969d0e48bc1080f89a2d8362627fefa1923f85eff0d5ad17c26dd947c",
+    "loading_sensitivity": "7d4c26a156f2ca18e1c8272e1c4985ae77617839d8f5ee9b44b12d7308db3cb8",
     "revision_comparison": "3bc3fe506b45dd3574bb28eb193a7855100e61c68ea82ea19966cd509417ee91"
   }
 }

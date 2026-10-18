@@ -1,8 +1,8 @@
-# Candidate coefficient conversions
+# Current coefficient conversions
 
 [Previous: Kacker–Okapuu: tip-clearance loss](04_ko_clearance.md) · [Section index](../readme.md) · [Next: Shared numerical helpers](06_shared_math.md)
 
-Comparison recorded on 2026-10-17: **previous implementation (baseline)** versus **revised implementation (candidate)**. These are individual-function results; [return to the audit overview](../../readme.md) for stage-level evidence.
+These plots evaluate the current production implementation. [Audit overview](../../readme.md).
 
 ## Functions and dependencies
 
@@ -10,13 +10,12 @@ Comparison recorded on 2026-10-17: **previous implementation (baseline)** versus
 
 ## Observed behavior
 
-The baseline ignores limit_output=False, hard-caps Y at 1, shifts Mach with a guard and loses precision near Mach 0. Its apparent finite/capped curves can hide raw invalid states.
 
-## Implemented changes
+## Implemented formulation
 
-Candidate gas identities use `log1p`/`expm1` and analytic Mach 0 limits: inverse d/(1-d), forward Y/(1+Y). `limit_output=False` now bypasses both Mach and Y guards. `limit_output=True` retains the intentional 0.95 singular-Mach guard with a compact relative 2% transition and a C2 Y cap over 0.98–1.02. The artificial 1e-4 loss offset in the Mach guard is removed using safe inactive operands. Nonfinite/invalid inputs return NaN. Raw identity, guarded value before cap, effective Mach and domain margin are recorded. Round trips use the unrestricted mode.
+Current gas identities use `log1p`/`expm1` and analytic Mach 0 limits: inverse d/(1-d), forward Y/(1+Y). `limit_output=False` now bypasses both Mach and Y guards. `limit_output=True` retains the intentional 0.95 singular-Mach guard with a compact relative 2% transition and a C2 Y cap over 0.98–1.02. The artificial 1e-4 loss offset in the Mach guard is removed using safe inactive operands. Nonfinite/invalid inputs return NaN. Raw identity, guarded value before cap, effective Mach and domain margin are recorded. Round trips use the unrestricted mode.
 
-## Baseline versus candidate
+## Current values and derivatives
 
 ![conversion_loss_g1.33_M0.7: values and d/dx](../figures/conversion_loss_g1.33_m0.7.png)
 
@@ -25,8 +24,6 @@ Candidate gas identities use `log1p`/`expm1` and analytic Mach 0 limits: inverse
 ![conversion_mach_d0.8: values and d/dx](../figures/conversion_mach_d0.8.png)
 
 ![conversion_gamma: values and d/dx](../figures/conversion_gamma.png)
-
-Solid: preserved baseline; dashed: revised candidate. Both use the same inputs, 200 base points and shared adaptive refinement. Right panels are d/dx, including logarithmic x axes. NaN value gaps remain explicit; omitted close derivative support does not delete value records.
 
 ## Quantitative checks
 
@@ -42,7 +39,7 @@ Physical total losses require nonnegative coefficients, gamma > 1 and admissible
 
 ## All sweeps for this mechanism
 
-Every figure contains the previous and revised curves; links below cover all saved sweeps, including those not embedded above. CSV files are gzip-compressed.
+Every figure contains current-source values and derivatives; links below cover all saved sweeps, including those not embedded above. CSV files are gzip-compressed.
 
 | Parameter / case | Range | Comparison figure | Numerical data |
 |---|---|---|---|

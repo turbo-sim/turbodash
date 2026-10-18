@@ -24,12 +24,14 @@
     "turbodash/loss_models/loss_model_moustapha.py": "9918fc36bf9e3ed59d65256332d21780f0baff6ade302e8ee49c342e31b1d762",
     "turbodash/loss_models_new/__init__.py": "5b9d3bc6706ab907bf8314428b244132feb46cf2754de33ba2e0d8f7676593a3",
     "turbodash/loss_models_new/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
+    "turbodash/loss_models_new/_blade_loading.py": "8be374f9be233a7027e39a552c8c424200a3f00d05706868d8c75968df1666a5",
     "turbodash/loss_models_new/_numerics.py": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff",
+    "turbodash/loss_models_new/_trailing_edge.py": "594970afedea411fbf4e1f6a86017ac46372f36b5f0452c78234940441630ce8",
     "turbodash/loss_models_new/loss_coefficient_conversion.py": "eab232ff2304b104726b2b3af4a87c96c65f302903e807ea9dd3dc2db827ae98",
     "turbodash/loss_models_new/loss_model.py": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11",
-    "turbodash/loss_models_new/loss_model_benner.py": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba",
-    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "4295e119d25fc43579ec79059484913ed0af83822088eaf2bd50af41f3fa5395",
-    "turbodash/loss_models_new/loss_model_moustapha.py": "923339d879bb7edf952112296b605073d9c5f466e541ea04b3ce10f3f8e1f489",
+    "turbodash/loss_models_new/loss_model_benner.py": "cac62576a82d6db189d94a5ee6f71f980b5e5de8dfe6d35d6ac2e3cdd22a1659",
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "c3d88153360f75ec1e54e53a056d4ec7b41547b9d3e467e4847c66d7705afa08",
+    "turbodash/loss_models_new/loss_model_moustapha.py": "556caad2121e18a57d4f5a6af3161fba8d421f957ac0779148fdec2e4efed4b8",
     "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
     "turbodash/mesh_jobs.py": "7c25d0d21557ecf7cec876846bbc09d1a1486db97808076ba5ee1f95f219bf85",
     "turbodash/meshing.py": "6b059111bfef2221a67ef1ebc6d00ef24096f30844c110a1df9f38f00634c070",
@@ -43,12 +45,12 @@
     "turbodash/vtk_assets.py": "af1c3d7e9a0e1b3f9e2f1749c7daf743cb0f0f4eacfdf7064ac7699d1c8cbeb1"
   },
   "production_unchanged_during_calculation": true,
-  "calculation_script_sha256": "ab1374a9104228962cc7f79560cffd3c9959bf17dd1e89f39edbb5eb5e9ce0fe",
+  "calculation_script_sha256": "71f4212af9463d9fe27a352fd49092c97ca5132dd75fe0fff4df06f1ca3039aa",
   "data_hashes": {
-    "vary_alpha2.csv": "4ece9037bdb8f2f921838efa84301cc81363f785f64fe7f2de2465da5f6c75f7",
-    "vary_pitch_chord.csv": "4baa8846f590be00a945058df3be132fecca7d3ec196cd5e9123b3c7e92122a9",
-    "vary_thickness.csv": "8585c705d4582ecf37a725228fa55937c6ec62a4854c89dac6d5855fda3a3078",
-    "thickness_z_zero_zoom.csv": "f9ac875546f4c7d18a283a7de220fcf8cde59c497cf4677c20cae30c5f252a8f",
-    "thickness_z_zero_limits.csv": "cc94b796ff64220da8b662e2ac8064f752636e2f11f191249877eacec4f06e13"
+    "vary_alpha2.csv": "adff3b330b9be037a67a2d01e603824937c3ac8e7d4bfcbbbfe3a4f7adb7229a",
+    "vary_pitch_chord.csv": "55aab1cecbe0f9849af41ce8d7c9b73c9acaf4347f0ea1e51cd0758a3f76cc15",
+    "vary_thickness.csv": "d82086adaac40a0ab1a7dc5e036ddcefc70e5945b9549f45d02ed1e1e7e726c6",
+    "thickness_z_zero_zoom.csv": "42fc9b624af7e1c15a686f85a83b9f76ab2ffd5fc8661d0f8055d61d6bd2b041",
+    "thickness_z_zero_limits.csv": "402e0064a7486ceaeeeb45f8dac2638b00917761dfbb07caffc9b06ec9a74dd1"
   }
 }

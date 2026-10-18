@@ -1,28 +1,97 @@
 {
-  "production_sources": {
-    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "c03be22271d6d95f39da2df2ed68de7284ad12cf33b83c2fe47e3c27bf765f1f",
-    "turbodash/core_turbine.py": "7bfb9ca303ddba914c126519ede33c6603c40970a6d9c52e3f49abd6fd24054d"
+  "created_utc": "2026-10-18T18:05:45.354967+00:00",
+  "source_sha256": {
+    "turbodash/core_turbine.py": "7bfb9ca303ddba914c126519ede33c6603c40970a6d9c52e3f49abd6fd24054d",
+    "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
+    "turbodash/loss_models_new/__init__.py": "5b9d3bc6706ab907bf8314428b244132feb46cf2754de33ba2e0d8f7676593a3",
+    "turbodash/loss_models_new/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
+    "turbodash/loss_models_new/_blade_loading.py": "8be374f9be233a7027e39a552c8c424200a3f00d05706868d8c75968df1666a5",
+    "turbodash/loss_models_new/_numerics.py": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff",
+    "turbodash/loss_models_new/_trailing_edge.py": "594970afedea411fbf4e1f6a86017ac46372f36b5f0452c78234940441630ce8",
+    "turbodash/loss_models_new/loss_coefficient_conversion.py": "eab232ff2304b104726b2b3af4a87c96c65f302903e807ea9dd3dc2db827ae98",
+    "turbodash/loss_models_new/loss_model.py": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11",
+    "turbodash/loss_models_new/loss_model_benner.py": "cac62576a82d6db189d94a5ee6f71f980b5e5de8dfe6d35d6ac2e3cdd22a1659",
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "c3d88153360f75ec1e54e53a056d4ec7b41547b9d3e467e4847c66d7705afa08",
+    "turbodash/loss_models_new/loss_model_moustapha.py": "556caad2121e18a57d4f5a6af3161fba8d421f957ac0779148fdec2e4efed4b8",
+    "improving_turbodash/loss_model_audit/2_stage_turbine/study.py": "98d3d13f7bbfae7531f21d51d921867e1200d221d2dd751f183c46a53d557874"
   },
-  "production_sources_unchanged": true,
-  "source_pdf_sha256": "c6e2e9913e8a5c42462abf1ef08161b7e33ff5184b0d720d51cd93d704d191fe",
-  "source_figure_sha256": "329d64f24b0be9288069287d71ca1a0c0f024c3dd7721168463a5182c31b30c9",
-  "script_hashes": {
-    "digitize.py": "9aa02d115fba3da128b3487aea9d1c270ca3a63746ffe48293de01682c8882f2",
-    "model.py": "1cb0c29d2f280c4347d851a24d809c03c69f11336a3ba3ae5a5ff7de988934d8",
-    "render_source.py": "8276352b2a43bf3deb5c9a282024f8aa97718b0ccc7ed9de7ae167b2828e996f",
-    "run.py": "0d2a160fe315330b7f5c2a6dd5c9402dfb03753b1eed9e2399c436732ac804af",
-    "sensitivity.py": "83ff2027ed08acefae69c14af6944d65611e0e40ab82246b793bd92a71a04be6",
-    "shock_loss.py": "ec262b7c9a24170cc1251e03407ff35c0ea4dc8138e81a116330f3546b77fc74",
-    "test_shock_loss.py": "4d9d0223213c779bbbc29d77c15c9f0afe1610ae0b3bc0c816190ab8f3021d1d"
+  "study_sha256": "311837f6dd23675badbff9ac2347795f4610cb33de3b3522230805495ace6c1d",
+  "baseline": {
+    "stator_exit_angle": 70.0,
+    "pitch_chord": 0.725,
+    "aspect_ratio": 1.75,
+    "trailing_ratio": 0.2,
+    "specific_speed": 1.05,
+    "mass_flow": 10.0,
+    "isentropic_mach": 1.15,
+    "reaction": 0.0
   },
-  "data_hashes": {
-    "digitized_points.csv": "cc4f3cd8963c8bd6d7af46bbb727f00e443ee00c4e2886bcbb18b308236d9a5f",
-    "hub_factor.csv": "ace7aaf86c7a00a331bfd31008e0af63961c8db996c1d4157942baee83200b03",
-    "shock_sweeps.csv": "d68ae6691cdc6542960b5b5adc0d10315f5fe40893a3b1b0f87374fac7fe32fd",
-    "shock_onset_zoom.csv": "5f8d785224bbff24e0bfdb1011a6a7a80a6606db8eafa599980c2e3dc9b2af03",
-    "calibration.json": "201dcb1b2dfa52594b9552994b8098f8829c5c318acf2c0e08cadd7f5ac4f69a",
-    "fit_parameters.json": "1fccf396185b9c521d44a3e55bc2c3c6b1de0c4b10fd42188e172506f543c099",
-    "pressure_convention.json": "2065edc49626aed72ef46ec7ce819f743c44d4d9b9cb9ef964df73ea2c48cfe6",
-    "summary.json": "5bdb8f31eda28d4469564ea12567665d4b35d2741a3929e26c751c0fdd0a9db5"
-  }
+  "fixed": {
+    "inlet_total_pressure": 5000000.0,
+    "inlet_total_temperature": 600.0,
+    "inlet_angle": 0.0,
+    "meridional_velocity_ratios": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "radius_ratios": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "maximum_thickness_chord": 0.3,
+    "leading_edge_radius_maximum_thickness": 0.05,
+    "leading_edge_wedge_angle": 30.0,
+    "trailing_edge_wedge_angle": 5.0,
+    "rotor_clearance_height": 0.01,
+    "stator_clearance_height": 0.0,
+    "inlet_displacement_thickness_height": 0.011,
+    "reaction_range": [
+      -0.1,
+      1.1
+    ],
+    "speed_range": [
+      0.0,
+      1.2
+    ],
+    "speed_baseline": 0.6,
+    "gas": "HEOS::Air",
+    "row_geometry": "continuous blade count, true-chord ratios"
+  },
+  "model": "kacker_okapuu",
+  "specific_speeds": [
+    0.1,
+    0.5,
+    1.05,
+    1.5,
+    2.0
+  ],
+  "variants": {
+    "current": "Kacker-Okapuu"
+  },
+  "samples": 2215,
+  "speeds_per_curve": 443,
+  "elapsed_seconds": 7.924588399997447,
+  "speed_range": [
+    1e-05,
+    0.9
+  ],
+  "python": "3.13.2 (tags/v3.13.2:4f8bb39, Feb  4 2025, 15:23:48) [MSC v.1942 64 bit (AMD64)]",
+  "executable": "C:\\Users\\roagr\\AppData\\Local\\pypoetry\\Cache\\virtualenvs\\turbomachinery-special-course-fbPpiFVa-py3.13\\Scripts\\python.exe",
+  "numpy": "2.5.2",
+  "data_sha256": "1a39e72342ee8a5c79a5db2fb59bc30973437e9b9f68a5c05a435b3ba84a52dc",
+  "component_sha256": "08756e61d85a8c95e0f4e9f4b1194d02c638150b980c7cb13f6c04a3874bc1db",
+  "calibration_sha256": "c7e75a7752843aa20134cad29c95fe316e1545b6507d2da4fbe400df643ca831",
+  "reynolds_continuation": {
+    "start": 10000000.0,
+    "effective_limit": 50000000.0,
+    "factor_limit": 0.45730505192732634
+  },
+  "hub_ratio_continuation": {
+    "join": 0.5,
+    "asymptote": 0.3
+  },
+  "shock_asymptote": 0.7
 }

@@ -16,7 +16,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--no-plots", action="store_true", help="Recompute numerical evidence; use render_saved.py to redraw later.")
     args = parser.parse_args()
-    versions = {version: modules(version) for version in ("baseline", "candidate")}
+    versions = {"candidate": modules("candidate")}
     summaries, comparisons, plots = [], [], []
     groups = set()
     import_seconds = perf_counter() - START
@@ -33,7 +33,6 @@ def main():
     calculation_seconds = perf_counter() - started
     write_json(BASE / "data/sweep_manifest.json", summaries)
     write_json(BASE / "data/plot_manifest.json", plots)
-    write_csv(BASE / "data/provenance/model_comparison.csv", comparisons)
     from fundamental_probes import run_probes
     from validate_derivatives import main as validate_derivatives
     from review_nozzle_patch import main as review_nozzle
@@ -60,16 +59,17 @@ def main():
     calculate_clearance()
     from trailing_review import calculate as calculate_trailing
     calculate_trailing()
+    from ko_safeguards_review import calculate as calculate_safeguards
+    calculate_safeguards()
     probe_seconds = perf_counter() - started
     write_json(BASE / "data/provenance/run_summary.json", dict(
         level="fundamental", initial_points=200, studies=len(summaries), comparison_figures=len(plots),
         status_counts={version: {status: sum(row["status_counts"][version][status] for row in summaries) for status in ("ok", "nonfinite", "exception")} for version in versions},
-        all_nonfinite_masks_and_statuses_equal=all(row["nonfinite_mask_equal"] and row["statuses_equal"] for row in comparisons),
-        max_absolute_difference=max(row["max_absolute_difference"] for row in comparisons),
+        implementation="current production source",
     ))
     write_json(BASE / "data/provenance/source_manifest.json", dict(
         note="Paths relative to the repository; actual imported paths also recorded. Model functions are imported directly from repository turbodash, without audit source copies.",
-        files={path.relative_to(REPO).as_posix(): sha256(path) for path in [*sorted((REPO / "turbodash/loss_models").glob("*.py")), *sorted((REPO / "turbodash/loss_models_new").glob("*.py")), REPO / "turbodash/math.py", *sorted((BASE / "scripts").glob("*.py")), *sorted((BASE / "tests").glob("*.py"))]},
+        files={path.relative_to(REPO).as_posix(): sha256(path) for path in [*sorted((REPO / "turbodash/loss_models_new").glob("*.py")), REPO / "turbodash/math.py", *sorted((BASE / "scripts").glob("*.py")), *sorted((BASE / "tests").glob("*.py"))]},
         imported_modules=imported_sources(),
     ))
     write_json(BASE / "data/provenance/timings.json", dict(
@@ -79,10 +79,8 @@ def main():
         note="200 base points plus shared refinement; no complete row/stage calls. Plotting is measured separately by render_saved.py.",
     ))
     from verify import verify
-    from compare_profile_revision import compare
-    compare()
     result = verify(require_figures=False)
-    print(f"Verified numerical reproduction: {result['reference_files']} reference tables", flush=True)
+    print(f"Verified current-source data: {result['sweeps']} sweeps", flush=True)
     if not args.no_plots:
         from render_saved import main as render
         render()

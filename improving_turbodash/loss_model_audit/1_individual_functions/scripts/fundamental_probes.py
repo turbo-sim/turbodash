@@ -80,7 +80,7 @@ def probe_definitions(versions):
             "K2", "C2",
         )
     root = bisection(
-        lambda x: profile_values(perturb(case, "pitch_chord", x), versions["baseline"])[
+        lambda x: profile_values(perturb(case, "pitch_chord", x), versions["candidate"])[
             "floor_margin"
         ],
         1.3,
@@ -133,7 +133,7 @@ def probe_definitions(versions):
 
 
 def run_probes(versions=None):
-    versions = versions or {v: modules(v) for v in ("baseline", "candidate")}
+    versions = versions or {"candidate": modules("candidate")}
     records, findings, curvature = [], [], []
     for name, location, fun, field, claim in probe_definitions(versions):
         rows, result = local_join(name, fun, location, versions, field)

@@ -165,7 +165,7 @@ def plot_group(group, curves, metrics, log=False, directory=None):
             for version, a in arrays.items():
                 x = a["x"]
                 y = a["values"].get(key, np.full(x.shape, np.nan))
-                style = "--" if version == "candidate" else "-"
+                style = "-"
                 axes[i, 0].plot(
                     x,
                     y,
@@ -204,6 +204,12 @@ def plot_group(group, curves, metrics, log=False, directory=None):
                 shade_outside(ax, supported, (study["lo"], study["hi"]))
             if study["lo"] < supported[0] or study["hi"] > supported[1]:
                 axes[i, 0].text(.02, .97, coverage_label, transform=axes[i, 0].transAxes, va="top", fontsize=8)
+        if study.get("variable") == "exit_angle":
+            for ax in axes[i]:
+                ax.axvspan(study["lo"], 0, color="#8fb8d8", alpha=.2, zorder=0)
+                ax.axvline(0, color=".5", lw=.8)
+            if not supported:
+                axes[i, 0].text(.02, .97, "Blue: reversed trial outlet direction", transform=axes[i, 0].transAxes, va="top", fontsize=8)
         if key == "beta_out" and curves[0][1]["kind"] == "stage":
             # Reference envelope for derived angles, without clipping triangles.
             limits = axes[i, 0].get_ylim()
@@ -259,12 +265,8 @@ def plot_group(group, curves, metrics, log=False, directory=None):
                 ax.yaxis.get_major_locator().set_params(numticks=9)
     handles, labels = axes[0, 0].get_legend_handles_labels()
     present = {version for _, _, arrays in curves for version in arrays}
-    if "baseline" in present:
-        handles.append(
-            Line2D([], [], color="black", ls="-", label="preserved baseline")
-        )
     if "candidate" in present:
-        handles.append(Line2D([], [], color="black", ls="--", label="candidate"))
+        handles.append(Line2D([], [], color="black", ls="-", label="current implementation"))
     fig.legend(
         handles=handles,
         loc="upper center",

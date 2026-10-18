@@ -13,7 +13,8 @@ from common import BASE, REPO, imported_sources, modules, sha256, write_csv, wri
 
 DATA = BASE / "data/secondary_review"
 FIGURES = BASE / "figures"
-TABLES = ("factor", "geometry_ar", "geometry_angle", "compressibility_ar", "mach_out", "mach_in")
+TABLES = ("factor", "geometry_ar", "geometry_angle", "compressibility_ar", "mach_out", "mach_in",
+          "robustness_angle", "robustness_ar")
 ANGLES = (20., 30., 40., 50., 60., 70., 80.)
 INLETS = (0., *ANGLES)
 TURNING_RATIOS = (-1., -.75, -.5, -.25, 0., .25, .5, .75, 1.)
@@ -33,6 +34,31 @@ def continuation_slope(raw):
     raw = np.asarray(raw)
     t = np.where(np.real(raw) > .8, (raw-.8)/.2, 0.)
     return np.where(np.real(raw) <= .8, 1., (1+2*t)/(1+t+t*t)**2)
+
+
+def continued_tangent(angle):
+    """Independent bounded C2 tangent; angles and derivatives use degrees."""
+    angle = np.asarray(angle)
+    sign = np.where(np.real(angle) < 0, -1., 1.)
+    magnitude = sign*angle
+    ordinary = np.real(magnitude) <= 80.
+    h = np.where(ordinary, 0., magnitude-80.)
+    t0 = np.tan(np.deg2rad(80.))
+    limit = np.tan(np.deg2rad(85.))
+    d = limit-t0
+    slope = np.pi/180*(1+t0*t0)
+    curvature = 2*(np.pi/180)**2*t0*(1+t0*t0)
+    a = slope/d
+    b = a*a+curvature/(2*d)
+    raw = np.tan(np.where(ordinary, angle, 0.)*np.pi/180)
+    return np.where(ordinary, raw, sign*(limit-d/(1+a*h+b*h*h)))
+
+
+def continued_loading(beta_in, beta_out):
+    u, v = continued_tangent(beta_in), continued_tangent(beta_out)
+    raw = 4*(u-v)**2/(1+v*v)*np.sqrt(1+((u+v)/2)**2)
+    t = np.where(np.real(raw) > 16, (raw-16)/16, 0.)
+    return np.where(np.real(raw) <= 16, raw, 32-16/(1+t+t*t))
 
 
 def uncontinued_aspect_factor(ar):
@@ -58,6 +84,7 @@ def uncontinued_aspect_factor(ar):
 
 def source_hashes():
     names = ("turbodash/loss_models_new/loss_model_kacker_okapuu.py",
+             "turbodash/loss_models_new/_blade_loading.py",
              "turbodash/loss_models_new/_numerics.py", "turbodash/loss_models_new/_backend.py",
              "turbodash/math.py")
     return {name: sha256(REPO / name) for name in names}
@@ -75,11 +102,9 @@ def evaluate(ko, row=0, **parameters):
     flow, geometry = inputs(**parameters)
     ys = ko.get_secondary_loss(flow, geometry, row)
     # An independent assembly, including the explicit signed loading formula.
-    radians = np.pi / 180
-    b1, b2, theta = (flow["beta_in"]*radians, flow["beta_out"]*radians,
-                     geometry["leading_edge_angle"]*radians)
-    mean = np.arctan((np.tan(b1)+np.tan(b2))/2)
-    loading = 4*(np.tan(b1)-np.tan(b2))**2*np.cos(b2)**2/np.cos(mean)
+    loading = continued_loading(flow["beta_in"], flow["beta_out"])
+    cosine_out = 1/np.sqrt(1+continued_tangent(flow["beta_out"])**2)
+    cosine_in = 1/np.sqrt(1+continued_tangent(geometry["leading_edge_angle"])**2)
     aspect = geometry["height"]/geometry["chord"]
     factor = ko.get_secondary_aspect_ratio_factor(aspect)
     factor_uncontinued = uncontinued_aspect_factor(aspect)
@@ -91,8 +116,8 @@ def evaluate(ko, row=0, **parameters):
     ks = (1-influence)+influence*kp
     np.testing.assert_allclose(ks, ko.get_secondary_compressibility_factor(kp,
                                geometry["meridional_chord"]/geometry["height"]), rtol=4e-14, atol=1e-14)
-    no_compression = 1.2*.0334*factor*loading*np.cos(b2)/np.cos(theta)
-    without_aspect_continuation = 1.2*.0334*factor_uncontinued*loading*np.cos(b2)/np.cos(theta)*ks
+    no_compression = 1.2*.0334*factor*loading*cosine_out/cosine_in
+    without_aspect_continuation = 1.2*.0334*factor_uncontinued*loading*cosine_out/cosine_in*ks
     np.testing.assert_allclose(ys, no_compression*ks, rtol=4e-13, atol=2e-13)
     return dict(Ys=ys, Ys_without_aspect_continuation=without_aspect_continuation,
                 Ys_without_compression=no_compression,
@@ -124,7 +149,7 @@ def calculate():
     checks = []
     ar_grid = np.unique(np.r_[np.geomspace(.2, 5, 1201), np.linspace(.2, 5, 1201),
                               np.linspace(1.3, 2.7, 401), .2, 1.5, 2., 2.5])
-    angle_grid = np.linspace(0, 80, 1601)
+    angle_grid = np.linspace(-20, 80, 2001)
     specs = []
     for inlet in (0., 40.):
         for angle in ANGLES:
@@ -183,8 +208,18 @@ def calculate():
             np.testing.assert_allclose(derivatives["dYs_dx"],
                                        outlet_partial+fixed*inlet_partial,
                                        rtol=2e-12, atol=2e-13)
-            np.testing.assert_equal(values["Ys"][0], 0.)
-            np.testing.assert_equal(derivatives["dYs_dx"][0], 0.)
+            origin = np.flatnonzero(x == 0.)[0]
+            np.testing.assert_equal(values["Ys"][origin], 0.)
+            np.testing.assert_equal(derivatives["dYs_dx"][origin], 0.)
+            # Reversing a prescribed fixed-z angle path reverses all three
+            # angles. Loss is even and its path derivative is odd.
+            negative = np.linspace(-20., 0., 401)
+            negative_result = evaluate(ko, ar=2., inlet=fixed*negative, outlet=negative)
+            mirrored_result = evaluate(ko, ar=2., inlet=-fixed*negative, outlet=-negative)
+            np.testing.assert_allclose(negative_result["Ys"], mirrored_result["Ys"], rtol=2e-14, atol=1e-15)
+            path = lambda a: evaluate(ko, ar=2., inlet=fixed*a, outlet=a)["Ys"]
+            np.testing.assert_allclose(np.imag(path(negative+1j*STEP))/STEP,
+                -np.imag(path(-negative+1j*STEP))/STEP, rtol=2e-14, atol=1e-15)
             if fixed == -1.:
                 np.testing.assert_array_equal(values["Ys"], np.zeros_like(x))
                 np.testing.assert_array_equal(derivatives["dYs_dx"], np.zeros_like(x))
@@ -233,6 +268,9 @@ def calculate():
     ar, alpha1, alpha2 = ar[keep], alpha1[keep], alpha2[keep]
     a1, a2 = np.deg2rad(alpha1), np.deg2rad(alpha2)
     am = np.arctan(.5*(np.tan(a1)-np.tan(a2)))
+    raw_loading = 4*(np.tan(a1)+np.tan(a2))**2*np.cos(a2)**2/np.cos(am)
+    keep = raw_loading <= 16
+    ar, alpha1, alpha2, a1, a2, am = (v[keep] for v in (ar, alpha1, alpha2, a1, a2, am))
     lift_over_solidity = 2*(np.tan(a1)+np.tan(a2))*np.cos(am)
     published = 1.2*.0334*published_factor(ar)*(np.cos(a2)/np.cos(a1))*lift_over_solidity**2*np.cos(a2)**2/np.cos(am)**3
     actual = evaluate(ko, ar=ar, inlet=alpha1, outlet=alpha2)
@@ -265,6 +303,52 @@ def calculate():
     no_loss_cap = evaluate(ko, ar=.2, inlet=80., outlet=60., m1=0., m2=0.)
     assert no_loss_cap["Ys"] > .5
 
+    # Complete losses alongside the shared loading, including the old poles.
+    for family, parameters in ((0, (0., .5, 1.)), (1, (20., 40., 60., 80.))):
+        extreme_angles = np.unique(np.r_[np.linspace(-20 if family == 0 else 0, 120,
+            1401 if family == 0 else 1201), 0., 80., 85., 90.])
+        for parameter in parameters:
+            inlet = parameter*extreme_angles if family == 0 else extreme_angles
+            outlet = extreme_angles if family == 0 else np.full_like(extreme_angles, parameter)
+            result = evaluate(ko, ar=2., inlet=inlet, outlet=outlet)
+            raw = np.full_like(extreme_angles, np.nan)
+            raw_loss = np.full_like(extreme_angles, np.nan)
+            valid = extreme_angles <= 89.
+            a1, a2 = inlet[valid]*np.pi/180, outlet[valid]*np.pi/180
+            raw[valid] = 4*(np.tan(a1)+np.tan(a2))**2*np.cos(a2)**2*np.sqrt(1+((np.tan(a2)-np.tan(a1))/2)**2)
+            raw_loss[valid] = 1.2*.0334*ko.get_secondary_aspect_ratio_factor(2.)*raw[valid]*np.cos(a2)/np.cos(a1)
+            assert np.all(np.isfinite(result["Ys"])) and np.all(result["Ys"] >= 0)
+            for a, y, z_value, old, old_loss in zip(extreme_angles, result["Ys"], result["Z"], raw, raw_loss):
+                tables["robustness_angle"].append(dict(family=family, parameter=parameter,
+                    x=float(a), Ys=float(y), Z=float(z_value), raw_Z=float(old), raw_Ys=float(old_loss)))
+
+    endpoint_ar = np.unique(np.r_[np.linspace(0, 1.2, 1201), 1e-12, 1e-9, 1e-6])
+    for m1, m2 in ((0., 0.), (.6, .8), (1.2, .4)):
+        flow, geometry = inputs(ar=endpoint_ar, m1=m1, m2=m2)
+        ys_endpoint = ko.get_secondary_loss(flow, geometry, 0)
+        aspect_endpoint = ko.get_secondary_aspect_ratio_factor(endpoint_ar)
+        kp_endpoint = ko.get_compressible_correction_factors(m1, m2)[0]
+        ks_endpoint = ko.get_secondary_compressibility_factor_from_geometry(kp_endpoint,
+            geometry["meridional_chord"], geometry["height"])
+        derivative = np.imag(ko.get_secondary_loss(flow, dict(geometry,
+            height=.05*(endpoint_ar+1j*STEP)), 0))/STEP
+        assert np.isfinite(ys_endpoint).all() and np.isfinite(derivative).all()
+        assert aspect_endpoint[0] == 1 and abs(derivative[0]) < 1e-30
+        np.testing.assert_allclose(ks_endpoint[0], kp_endpoint, atol=2e-15)
+        for a, y, f, k, dy in zip(endpoint_ar, ys_endpoint, aspect_endpoint, ks_endpoint, derivative):
+            tables["robustness_ar"].append(dict(M1=m1, M2=m2, x=float(a), Ys=float(y),
+                f_AR=float(f), Ks=float(k), dYs_dAR=float(dy)))
+
+    extreme_probe = np.array([-1e6, -120., -90., -85., -80., 0., 80., 85., 90., 120., 1e6])
+    b1, b2, metal, height = np.meshgrid(extreme_probe, extreme_probe, extreme_probe,
+        [0., .001, .2, 2.], indexing="ij")
+    probe_flow, probe_geometry = inputs(ar=height, inlet=-b1, outlet=b2, m1=.6, m2=.8)
+    probe_geometry["leading_edge_angle"] = metal
+    stress = ko.get_secondary_loss(probe_flow, probe_geometry, 0)
+    assert np.isfinite(stress).all() and np.all(stress >= 0)
+    np.testing.assert_equal(ko.get_secondary_loss(*inputs(ar=0.), 0),
+        ko.get_secondary_loss(*inputs(ar=np.asarray(0.)), 0))
+
     joins = []
     onset_ar = float(np.min(np.roots([.8**2, .25**2-2*.8, 1-2*.25**2])))
     for x in (onset_ar, 1.5, 2.5):
@@ -290,7 +374,7 @@ def calculate():
                   max_paper_error=float(np.max(np.abs(actual["Ys_without_aspect_continuation"]-published))),
                   max_continued_paper_error=float(np.max(np.abs(actual["Ys"]-independently_continued))),
                   crossed_min_Ys=float(np.min(ys)), crossed_max_Ys=float(np.max(ys)),
-                  low_aspect_ratio=dict(AR=.01, cases=int(a1.size),
+                  low_aspect_ratio=dict(AR=.01, cases=int(low_ar["Ys"].size),
                                         min_Ys=float(np.min(low_ar["Ys"])),
                                         max_Ys=float(np.max(low_ar["Ys"])),
                                         max_Ys_without_aspect_continuation=float(np.max(low_ar["Ys_without_aspect_continuation"])),
@@ -301,13 +385,17 @@ def calculate():
                                                    separate_Ks_floor=False, convex_bounds_checked=True,
                                                    chain_rule_checked=True),
                   plotted_AR=[.2, 5.],
+                  endpoint_AR=[0., 1.2], zero_height_checked=True,
+                  extreme_angle_cases=int(stress.size), extreme_angle_max_Ys=float(stress.max()),
+                  shared_loading=True, bounded_tangent_onset=80., tangent_limit_degrees=85.,
                   no_final_loss_cap=dict(AR=.2, inlet_angle=80., outlet_angle=60.,
                                          M1=0., M2=0., Ys=float(no_loss_cap["Ys"])),
-                  angle_sweep=dict(AR=2., alpha2_deg=[0., 80.], z=list(TURNING_RATIOS),
+                  angle_sweep=dict(AR=2., alpha2_deg=[-20., 80.], z=list(TURNING_RATIOS),
                                    beta_in="-z*alpha2", theta_in="-z*alpha2",
                                    derivative="total derivative in degrees at fixed z",
                                    path_chain_rule_checked=True, zero_turning_checked=True,
-                                   zero_angle_values_and_slopes_checked=True),
+                                   zero_angle_values_and_slopes_checked=True,
+                                   negative_angle_reflection_checked=True),
                   source_hashes=before, imported_sources=imported_sources(), script_sha256=sha256(__file__),
                   data_sha256={name: sha256(DATA/(name+".csv")) for name in TABLES},
                   checks=checks, aspect_joins=joins,
@@ -440,7 +528,9 @@ def render():
             reference = {-1.: " (zero turning)", 0.: " (nozzle/reaction)", 1.: " (impulse)"}.get(z, "")
             handles.append(Line2D([], [], color=color, ls=style, label=rf"$z={z:g}$"+reference))
         for ax in axes:
-            ax.set(xlim=(0, 80), xlabel=r"Outlet angle $\alpha_2=\beta_{\mathrm{out}}$ (degrees)")
+            ax.set(xlim=(-20, 80), xlabel=r"Outlet angle $\alpha_2=\beta_{\mathrm{out}}$ (degrees)")
+            ax.axvspan(-20, 0, color="#d8d3c8", alpha=.4, zorder=0)
+            ax.axvline(0, color=".5", ls=":", lw=.8)
             ax.axhline(0, color=".6", lw=.7, zorder=0)
         maximum = max(r["Ys"] for r in rows)
         axes[0].set(ylabel=r"Secondary loss $Y_s$", title="Complete secondary function",
@@ -451,7 +541,7 @@ def render():
         finish(fig, "ko_secondary_geometry_angle",
                "AR = 2; zero incidence; beta_in = theta_in = -z alpha2. M1 = M2 = 0 gives Ks = 1.\n"
                "Dashed: negative z (same-sign flow). The derivative includes both changing inlet angles and the outlet angle.\n"
-               "The prescribed gauging angle is used as the outlet flow angle; all curves start at zero loss and slope.",
+               "Beige below zero: negative trial outlet angle. All curves pass through zero loss and slope at the origin.",
                handles, legend_columns=3)
 
         rows = read("compressibility_ar")
@@ -515,8 +605,69 @@ def render():
                    "Top row has b/H > 1.2, beyond Figure 13. Ks >= Kp with no separate floor; Kp continues above sonic exit.",
                    [Line2D([], [], color=c, label=rf"${fixed_symbol}={m:g}$") for m, c in zip(MACHS, colors(len(MACHS)))])
 
+        rows = read("robustness_angle")
+        fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+        handles = []
+        for family, parameters in ((0, (0., .5, 1.)), (1, (20., 40., 60., 80.))):
+            for parameter, color in zip(parameters, colors(len(parameters))):
+                selected = [r for r in rows if r["family"] == family and r["parameter"] == parameter]
+                for ax, key in zip(axes[family], ("Ys", "Z")):
+                    ax.plot(*xy(selected, "raw_"+key), color=color, ls="--", alpha=.5, lw=1.)
+                    ax.plot(*xy(selected, key), color=color)
+                label = (rf"Top: $z={parameter:g}$" if family == 0
+                         else rf"Bottom: $\beta_{{\mathrm{{out}}}}={parameter:g}^\circ$")
+                handles.append(Line2D([], [], color=color, label=label))
+            for j, ax in enumerate(axes[family]):
+                key = "Ys" if j == 0 else "Z"
+                maximum = max(r[key] for r in rows if r["family"] == family)
+                ax.set(xlim=(-20 if family == 0 else 0, 120), ylim=(0, 1.08*maximum) if j == 0 else (0, 34),
+                    ylabel=r"Secondary loss $Y_s$" if j == 0 else r"Loading $Z$",
+                    xlabel=(r"Outlet angle $\alpha_2$ (degrees); inlet $=-z\alpha_2$" if family == 0
+                            else r"Inlet magnitude $-\beta_{\mathrm{in}}$ (degrees); outlet fixed"))
+                ax.axvspan(80, 120, color="#d8d3c8", alpha=.4, zorder=0)
+                if family == 0:
+                    ax.axvspan(-20, 0, color="#d8d3c8", alpha=.4, zorder=0)
+                    ax.axvline(0, color=".6", ls=":", lw=.8)
+                ax.axvline(90, color=".6", ls=":", lw=.8)
+            axes[family, 1].axhline(32, color=".5", ls=":", lw=.8)
+        axes[0, 0].set_title("Nozzle to impulse: complete loss")
+        axes[0, 1].set_title("Nozzle to impulse: shared loading")
+        axes[1, 0].set_title("Fixed outlet angle: complete loss")
+        axes[1, 1].set_title("Fixed outlet angle: shared loading")
+        fig.suptitle("KO secondary loss: finite extreme-angle continuation", y=.99)
+        finish(fig, "ko_secondary_robustness_angle",
+            "AR = 2; zero incidence; M1 = M2 = 0. Left: complete loss. Right: loading Z.\n"
+            "Solid: production result. Dashed: original angle expressions, only through 89 deg (may leave panel).\n"
+            "Beige: negative outlet trials (top) and tangent continuation beyond 80 deg. Dotted: zero/90 deg and Z = 32.",
+            handles, legend_columns=3)
+
+        rows = read("robustness_ar")
+        fig, axes = plt.subplots(1, 2, figsize=(12, 5.8))
+        handles = []
+        for (m1, m2), color in zip(((0., 0.), (.6, .8), (1.2, .4)), colors(3)):
+            selected = [r for r in rows if r["M1"] == m1 and r["M2"] == m2]
+            axes[0].plot(*xy(selected, "Ys"), color=color)
+            axes[1].plot(*xy(selected, "Ks"), color=color)
+            axes[0].plot(selected[0]["x"], selected[0]["Ys"], "o", color=color, ms=4)
+            axes[1].plot(selected[0]["x"], selected[0]["Ks"], "o", color=color, ms=4)
+            handles.append(Line2D([], [], color=color, label=rf"$M_1={m1:g},\ M_2={m2:g}$"))
+        selected = [r for r in rows if r["M1"] == 0. and r["M2"] == 0.]
+        axes[1].plot(*xy(selected, "f_AR"), color=".3", ls="--", label=r"$f_{\mathrm{AR}}$")
+        handles.append(Line2D([], [], color=".3", ls="--", label=r"Aspect factor $f_{\mathrm{AR}}$"))
+        axes[0].set(ylabel=r"Secondary loss $Y_s$", title="Finite loss at zero blade height")
+        axes[1].set(ylabel="Factor", title=r"$f_{\mathrm{AR}}(0)=1$ and $K_s(0)=K_p$")
+        for ax in axes:
+            ax.set(xlim=(0, 1.2), xscale="linear", xlabel=r"Aspect ratio $\mathrm{AR}=H/c$")
+            ax.axvspan(0, CHORD_RATIO/1.2, color="#d8d3c8", alpha=.3, zorder=0)
+        fig.suptitle("KO secondary loss: continuation through zero aspect ratio", y=.99)
+        finish(fig, "ko_secondary_robustness_ar",
+            "alpha1 = 40 deg; alpha2 = 60 deg; zero incidence; b/c = cos(45 deg). Circles: direct H = 0 calls.\n"
+            "Both geometry factors cancel inverse powers before evaluation: no division by zero height.\n"
+            "The loss has a finite zero-height value and zero right slope. Beige: b/H > 1.2 diagnostic continuation.",
+            handles, legend_columns=2)
+
     verify_saved()
-    result = dict(figures=6, model_calls=0, derivative_recalculations=0, files=outputs,
+    result = dict(figures=8, model_calls=0, derivative_recalculations=0, files=outputs,
                   script_sha256=sha256(__file__), data_sha256={n: sha256(DATA/(n+".csv")) for n in TABLES})
     write_json(DATA/"render_manifest.json", result)
     return result

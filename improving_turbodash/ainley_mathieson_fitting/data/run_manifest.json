@@ -1,7 +1,7 @@
 {
-  "calculation_seconds": 0.006110200000421173,
+  "calculation_seconds": 0.07826570000179345,
   "full_fit_seconds": 86.96368190000067,
-  "wall_seconds": 11.258202800000163,
+  "wall_seconds": 13.083228299998154,
   "render_only": true,
   "plot_files": [
     "figures/nozzle_pitch_families.png",
@@ -40,121 +40,22 @@
     "figures/residuals.svg"
   ],
   "production_source_status": {
-    "turbodash/loss_models/loss_coefficient_conversion.py": {
-      "original_sha256": "21ffa896097129972ec2130ba6cf54377fc6726ba5960d73c8fd40cd90454309",
-      "current_sha256": "21ffa896097129972ec2130ba6cf54377fc6726ba5960d73c8fd40cd90454309",
-      "authorized_candidate_change": false,
-      "original_unchanged": true,
-      "expected_hash_matches": true
-    },
-    "turbodash/loss_models/loss_model.py": {
-      "original_sha256": "156fbe3b0a9510b760f32e73b39c09533edf8e3e4798df9cdb08cd32f905a3e4",
-      "current_sha256": "156fbe3b0a9510b760f32e73b39c09533edf8e3e4798df9cdb08cd32f905a3e4",
-      "authorized_candidate_change": false,
-      "original_unchanged": true,
-      "expected_hash_matches": true
-    },
-    "turbodash/loss_models/loss_model_benner.py": {
-      "original_sha256": "ce5e2aae37a04718c0ad8b6801b67be2e7824fdacd407affcb00e279ff46d649",
-      "current_sha256": "ce5e2aae37a04718c0ad8b6801b67be2e7824fdacd407affcb00e279ff46d649",
-      "authorized_candidate_change": false,
-      "original_unchanged": true,
-      "expected_hash_matches": true
-    },
-    "turbodash/loss_models/loss_model_kacker_okapuu.py": {
-      "original_sha256": "197794ed5736c997b865e43860ffeccdaf4dfd21dbc2f99b2191f4a28abab28d",
-      "current_sha256": "197794ed5736c997b865e43860ffeccdaf4dfd21dbc2f99b2191f4a28abab28d",
-      "authorized_candidate_change": false,
-      "original_unchanged": true,
-      "expected_hash_matches": true
-    },
-    "turbodash/loss_models/loss_model_moustapha.py": {
-      "original_sha256": "9918fc36bf9e3ed59d65256332d21780f0baff6ade302e8ee49c342e31b1d762",
-      "current_sha256": "9918fc36bf9e3ed59d65256332d21780f0baff6ade302e8ee49c342e31b1d762",
-      "authorized_candidate_change": false,
-      "original_unchanged": true,
-      "expected_hash_matches": true
-    },
-    "turbodash/loss_models/__init__.py": {
-      "original_sha256": "225e50f404dd5fcc97a95c6d3ff9d8a94844c73c4f0bfaa4fd65d0ff88747b18",
-      "current_sha256": "225e50f404dd5fcc97a95c6d3ff9d8a94844c73c4f0bfaa4fd65d0ff88747b18",
-      "authorized_candidate_change": false,
-      "original_unchanged": true,
-      "expected_hash_matches": true
-    },
-    "turbodash/loss_models_new/loss_coefficient_conversion.py": {
-      "original_sha256": "eab232ff2304b104726b2b3af4a87c96c65f302903e807ea9dd3dc2db827ae98",
-      "current_sha256": "eab232ff2304b104726b2b3af4a87c96c65f302903e807ea9dd3dc2db827ae98",
-      "authorized_candidate_change": false,
-      "original_unchanged": true,
-      "expected_hash_matches": true
-    },
-    "turbodash/loss_models_new/loss_model.py": {
-      "original_sha256": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11",
-      "current_sha256": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11",
-      "authorized_candidate_change": false,
-      "original_unchanged": true,
-      "expected_hash_matches": true
-    },
-    "turbodash/loss_models_new/loss_model_benner.py": {
-      "original_sha256": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba",
-      "current_sha256": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba",
-      "authorized_candidate_change": false,
-      "original_unchanged": true,
-      "expected_hash_matches": true
-    },
     "turbodash/loss_models_new/loss_model_kacker_okapuu.py": {
-      "original_sha256": "f75083e50008952dac5ffc7c9867dde4fbe620d9866c043ce2ea4c22a80894bc",
-      "current_sha256": "3fe7223b940849e8193583017d995262db75085d52ca7c87b5ece5248279d4d1",
-      "authorized_candidate_change": true,
-      "original_unchanged": false,
-      "expected_hash_matches": true
-    },
-    "turbodash/loss_models_new/loss_model_moustapha.py": {
-      "original_sha256": "923339d879bb7edf952112296b605073d9c5f466e541ea04b3ce10f3f8e1f489",
-      "current_sha256": "923339d879bb7edf952112296b605073d9c5f466e541ea04b3ce10f3f8e1f489",
-      "authorized_candidate_change": false,
-      "original_unchanged": true,
-      "expected_hash_matches": true
-    },
-    "turbodash/loss_models_new/_backend.py": {
-      "original_sha256": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
-      "current_sha256": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
-      "authorized_candidate_change": false,
-      "original_unchanged": true,
-      "expected_hash_matches": true
-    },
-    "turbodash/loss_models_new/_numerics.py": {
-      "original_sha256": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff",
-      "current_sha256": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff",
-      "authorized_candidate_change": false,
-      "original_unchanged": true,
-      "expected_hash_matches": true
-    },
-    "turbodash/loss_models_new/__init__.py": {
-      "original_sha256": "5b9d3bc6706ab907bf8314428b244132feb46cf2754de33ba2e0d8f7676593a3",
-      "current_sha256": "5b9d3bc6706ab907bf8314428b244132feb46cf2754de33ba2e0d8f7676593a3",
-      "authorized_candidate_change": false,
-      "original_unchanged": true,
-      "expected_hash_matches": true
-    },
-    "turbodash/math.py": {
-      "original_sha256": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
-      "current_sha256": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
-      "authorized_candidate_change": false,
-      "original_unchanged": true,
-      "expected_hash_matches": true
+      "current_sha256": "c3d88153360f75ec1e54e53a056d4ec7b41547b9d3e467e4847c66d7705afa08",
+      "expected_hash_matches": true,
+      "reference_functions_match_export": true
     }
   },
   "file_hashes": {
     "analytic_fits.py": "26f88bc58493938e84d34bfb2d239d224bfdec51ace10bd651de22ea8785245b",
+    "aungier_reference.py": "c0e3d7925abfa2127bbb3b24caaaf47d277c624b759c29d97e0d2cfb96869b44",
     "digitize_impulse.py": "f7674032ed874fc14ebaea42e0eb2a84c8db26287c398b6da4530c44ddee681c",
     "digitize_nozzle.py": "26a6f40f27464c9ded75e161d68003a7381802047907533c533c5db616ea08fc",
     "extrapolation_fit.py": "de4346d7c919f65c18b2d4179069fd73c3a7f36cde25df498929031d01f9f538",
     "fit_models.py": "fa82185e133a804b88a3c25d4b7c07ee864bbb3f220d297280fb1bfdb4692a99",
-    "plot_comparisons.py": "a04eaef698c4b84c0fb6dd453a7036cf4de3db60acb6894dac448944b5da9c82",
-    "run.py": "ed8754edd1fd45d2b4c11c9a74cd0a0314cdff516d1e195543a5a19578f6cfcc",
-    "verify.py": "964e37eff2903ffebc97d1ffec1ed6de227f36a40a731e33d7d2c7bcfae3781b",
+    "plot_comparisons.py": "cabc9add13a61c71cd965b83735b2e56c37fa60bff56a6ab54f2a7bd39162126",
+    "run.py": "24a278b920f2de7a73a3a183d7e12a619f81c9de6d1d40cbb6c1e4ecc1e1bd12",
+    "verify.py": "6aff252ecc8aa38b569879eff3277e0f7bbd77a77d1344bc21d80786f8663f20",
     "data/impulse_points.csv": "1c27bc339fe9099082c4a2f6b9475f512a3349c9de45be73da4e29d462360ec7",
     "data/nozzle_points.csv": "222d533b45ec9e01ebb405eba3f3d5a20e2d4d1fd64cf0601d2e8b51654f47b9"
   }

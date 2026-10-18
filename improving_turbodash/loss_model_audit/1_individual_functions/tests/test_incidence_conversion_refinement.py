@@ -128,12 +128,15 @@ def test_conversion_does_not_turn_invalid_inputs_into_finite_caps(mach, gamma, d
 
 
 def test_benner_patch_preserves_outer_polynomials_and_reference():
-    old, new = modules("baseline")["benner"], modules("candidate")["benner"]
+    new = modules("candidate")["benner"]
     chi = np.r_[np.linspace(-10, -0.1, 201), np.linspace(0, 20, 401)]
-    np.testing.assert_array_equal(
-        new.get_incidence_profile_loss_increment(chi, loss_limit=None),
-        old.get_incidence_profile_loss_increment(chi, loss_limit=None),
-    )
+    coefficients=[0.,-6.149e-5,1.327e-3,-2.506e-4,-1.542e-4,9.017e-5,1.106e-5,-5.318e-6,3.711e-7]
+    polynomial=np.polynomial.polynomial.polyval(chi,coefficients)
+    value_at_five=np.polynomial.polynomial.polyval(5.,coefficients)
+    slope_at_five=np.polynomial.polynomial.polyval(5.,np.polynomial.polynomial.polyder(coefficients))
+    expected=np.where(chi<0,-8.720e-4*chi+1.358e-4*chi**2,
+                      np.where(chi<=5,polynomial,value_at_five+slope_at_five*(chi-5)))
+    np.testing.assert_allclose(new.get_incidence_profile_loss_increment(chi,loss_limit=None),expected,rtol=2e-13,atol=1e-14)
     assert new.get_incidence_profile_loss_increment(0) == 0
     local = new.get_incidence_profile_loss_increment(np.linspace(-0.1, 0, 1001))
     assert np.all(local >= 0)

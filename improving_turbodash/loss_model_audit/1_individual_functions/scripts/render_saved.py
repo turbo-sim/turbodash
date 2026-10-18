@@ -48,8 +48,10 @@ def main():
     numeric_paths.extend(CLEARANCE_DATA / (name+".csv") for name in CLEARANCE_TABLES)
     from trailing_review import DATA as TRAILING_DATA, TABLES as TRAILING_TABLES
     numeric_paths.extend(TRAILING_DATA / (name+".csv") for name in TRAILING_TABLES)
+    from ko_safeguards_review import DATA as SAFEGUARD_DATA, TABLES as SAFEGUARD_TABLES
+    numeric_paths.extend(SAFEGUARD_DATA / (name+".csv") for name in SAFEGUARD_TABLES)
     before = {path.relative_to(BASE).as_posix(): sha256(path) for path in numeric_paths}
-    labels = {"incidence": "Inlet flow minus fixed inlet metal angle (deg)", "exit_angle": "Exit flow magnitude in the reference gauge direction (deg)", "raw_penetration": "Raw penetration / full height", "chi": "Benner incidence parameter chi", "delta_phi2": "Kinetic-energy loss increment delta_phi^2"}
+    labels = {"incidence": "Inlet flow minus fixed inlet metal angle (deg)", "exit_angle": "Signed exit angle in the fixed design outlet direction (deg)", "raw_penetration": "Raw penetration / full height", "chi": "Benner incidence parameter chi", "delta_phi2": "Kinetic-energy loss increment delta_phi^2"}
     for number, plot in enumerate(plots, 1):
         curves = []
         for source in sweeps:
@@ -59,7 +61,7 @@ def main():
             study["xlabel"] = labels.get(study.get("variable"), AXES.get(study.get("variable"), axis_label(study["group"])))
             curves.append((study["family"], study, saved_arrays(BASE / study["data_path"])))
         metrics = [key for key in next(iter(curves[0][2].values()))["values"] if key != "floor_margin"]
-        if curves[0][1]["mechanism"] == "ko_profile":
+        if plot["group"].startswith("ko_profile_"):
             metrics = ["Y_profile"]
         plot_group(plot["group"], curves, metrics, curves[0][1]["log"], (BASE / plot["path"]).parent)
         if number % 20 == 0 or number == len(plots):
@@ -81,6 +83,8 @@ def main():
     clearance = render_clearance()
     from trailing_review import render as render_trailing
     trailing = render_trailing()
+    from ko_safeguards_review import render as render_safeguards
+    safeguards = render_safeguards()
     supplemental_count = 4 + 1 + 4 + terms["figures"] + final["figures"]
     after = {path.relative_to(BASE).as_posix(): sha256(path) for path in numeric_paths}
     if before != after:
@@ -90,15 +94,16 @@ def main():
         supplemental_secondary_figures=secondary["figures"], render_seconds=perf_counter() - started,
         supplemental_clearance_figures=clearance["figures"],
         supplemental_trailing_figures=trailing["figures"],
+        supplemental_safeguard_figures=safeguards["figures"],
         saved_values_and_derivatives_unchanged=True, input_data_sha256=before,
         model_calls=0, derivative_recalculations=0,
-        script_sha256={name: sha256(BASE / "scripts" / name) for name in ("render_saved.py", "plotting.py", "reynolds_review.py", "profile_review.py", "profile_interpolation_review.py", "profile_terms.py", "shock_review.py", "profile_final_review.py", "secondary_review.py", "clearance_review.py", "trailing_review.py")},
+        script_sha256={name: sha256(BASE / "scripts" / name) for name in ("render_saved.py", "plotting.py", "reynolds_review.py", "profile_review.py", "profile_interpolation_review.py", "profile_terms.py", "shock_review.py", "profile_final_review.py", "secondary_review.py", "clearance_review.py", "trailing_review.py", "ko_safeguards_review.py")},
         imported_model_modules=imported_sources(),
         note="Existing imports can be present when invoked after run.py; the renderer calls no loss function.",
     ))
     from verify import verify
     verify(require_figures=True)
-    print(f"Rendered {len(plots)+2+supplemental_count+secondary['figures']+clearance['figures']+trailing['figures']} figures; saved numerical inputs unchanged.", flush=True)
+    print(f"Rendered {len(plots)+2+supplemental_count+secondary['figures']+clearance['figures']+trailing['figures']+safeguards['figures']} figures; saved numerical inputs unchanged.", flush=True)
 
 
 if __name__ == "__main__":

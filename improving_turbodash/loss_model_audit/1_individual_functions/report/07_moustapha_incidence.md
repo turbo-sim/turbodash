@@ -2,7 +2,7 @@
 
 [Previous: Shared numerical helpers](06_shared_math.md) · [Section index](../readme.md) · [Next: Moustapha: secondary incidence correction](08_moustapha_secondary.md)
 
-Comparison recorded on 2026-10-17: **previous implementation (baseline)** versus **revised implementation (candidate)**. These are individual-function results; [return to the audit overview](../../readme.md) for stage-level evidence.
+These plots evaluate the current production implementation. [Audit overview](../../readme.md).
 
 ## Functions and dependencies
 
@@ -12,11 +12,11 @@ Comparison recorded on 2026-10-17: **previous implementation (baseline)** versus
 
 The asymmetric raw incidence polynomials have a reference slope kink. Absolute-angle conventions may create cusps at inlet angle 0. Some prescribed leading-edge/spacing inputs produce energy increments above 1 despite admissible flow angles.
 
-## Implemented changes
+## Implemented formulation
 
 The empirical incidence function is unchanged. Its candidate conversion dependency now honors raw/limited modes and accurately handles small Mach. Plots expose the raw energy increment, thermodynamic domain margin and unrestricted pressure identity so bounded output cannot conceal an invalid state.
 
-## Baseline versus candidate
+## Current values and derivatives
 
 ![moustapha_incidence_incidence: values and d/dx](../figures/moustapha_incidence_incidence.png)
 
@@ -24,16 +24,13 @@ The empirical incidence function is unchanged. Its candidate conversion dependen
 
 ![moustapha_incidence_pitch_chord: values and d/dx](../figures/moustapha_incidence_pitch_chord.png)
 
-Solid: preserved baseline; dashed: revised candidate. Both use the same inputs, 200 base points and shared adaptive refinement. Right panels are d/dx, including logarithmic x axes. NaN value gaps remain explicit; omitted close derivative support does not delete value records.
-
 ## Quantitative checks
 
 Shrinking one-sided probes below use h=1e-5×max(1,|join|). The full h sequence is retained; the smallest h alone is not a continuity test.
 
 | Feature | Version | Extrapolated value jump | Right minus left slope |
 |---|---|---:|---:|
-| moustapha_incidence_reference | baseline | -2.347e-13 | 0.0020189 |
-| moustapha_incidence_reference | candidate | -2.347e-13 | 0.0020189 |
+| moustapha_incidence_reference | current | -2.347e-13 | 0.0020189 |
 
 4 fundamental sweeps for this mechanism. [Value/gradient data and manifest](../data/sweep_manifest.json), [first-derivative convergence](../data/provenance/fundamental_join_intervals.csv), [second-derivative convergence](../data/provenance/fundamental_curvature_intervals.csv). C2 claims additionally use endpoint regression tests; C1 table interpolation and retained C1 branches are explicitly distinguished.
 
@@ -43,7 +40,7 @@ A smooth nonnegative minimum at the exact reference would impose a reference con
 
 ## All sweeps for this mechanism
 
-Every figure contains the previous and revised curves; links below cover all saved sweeps, including those not embedded above. CSV files are gzip-compressed.
+Every figure contains current-source values and derivatives; links below cover all saved sweeps, including those not embedded above. CSV files are gzip-compressed.
 
 | Parameter / case | Range | Comparison figure | Numerical data |
 |---|---|---|---|

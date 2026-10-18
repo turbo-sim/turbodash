@@ -55,7 +55,7 @@ def calculate():
     tables = {name: [] for name in TABLES}
     # Dense near zero to resolve the bounded continuation, not a replacement
     # for zero spacing. Include the endpoint itself in both slice directions.
-    grids = {"angle": np.linspace(0, 80, 1601),
+    grids = {"angle": np.linspace(-20, 80, 2001),
              "spacing": np.unique(np.r_[0, np.geomspace(1e-6, .1, 300),
                                         np.linspace(0, MAX_SPACING, 1001)])}
     checks = []
@@ -64,13 +64,19 @@ def calculate():
         for direction, fixed_values in (("angle", SPACINGS), ("spacing", ANGLES)):
             x = grids[direction]
             for fixed in fixed_values:
-                call = (lambda q: function(fixed, q)) if direction == "angle" else (lambda q: function(q, fixed))
+                # Evaluate unsigned reference helpers along the same fixed
+                # positive-design angle path as the production profile wrapper.
+                def mapped_angle(q):
+                    effective = ko.get_effective_outlet_angle(q, reference=1.)
+                    represented = ko.get_blade_angle(effective)
+                    return np.sqrt(represented*represented+1e-5)
+                call = (lambda q: function(fixed, mapped_angle(q))) if direction == "angle" else (lambda q: function(q, fixed))
                 y = call(x)
                 dy = np.imag(call(x+1e-25j))/1e-25
                 assert np.isfinite(y).all() and np.isfinite(dy).all()
                 assert np.all((y > 0) & (y <= .5+1e-14))
                 # Check the complex-step slopes with independent real probes.
-                probe = np.linspace(.05, 79.95, 121) if direction == "angle" else np.geomspace(.001, MAX_SPACING, 151)
+                probe = np.r_[np.linspace(-19.95, 79.95, 151), 0.] if direction == "angle" else np.geomspace(.001, MAX_SPACING, 151)
                 exact = np.imag(call(probe+1e-25j))/1e-25
                 finite = slope(call, probe, 1e-4 if direction == "angle" else 1e-6)
                 np.testing.assert_allclose(finite, exact, atol=2e-7, rtol=2e-5)
@@ -183,7 +189,8 @@ def calculate():
     for name, rows in tables.items():
         write_csv(DATA / (name+".csv"), rows)
     assert source_hashes() == before
-    result = dict(passed=True, reference_curves=len(checks), angle_range=[0, 80], spacing_range=[0, MAX_SPACING],
+    result = dict(passed=True, reference_curves=len(checks), angle_range=[-20, 80], spacing_range=[0, MAX_SPACING],
+                  angle_display="Signed physical angle beta; unsigned family input is the smooth magnitude of the production effective outlet angle and bounded tangent angle, with fixed positive design direction.",
                   zero_spacing_value=.5, zero_spacing_slope=0.,
                   derivative_checks=checks, shock_max_derivative_error=shock_error,
                   raw_compressibility_checks=raw_compressibility_checks,
@@ -257,13 +264,13 @@ def render():
         for direction, wide in ((d, w) for d in ("angle", "spacing") for w in (False, True)):
             rows = read("reference_"+direction)
             fig, axes = plt.subplots(2, 2, figsize=(12, 8))
-            xlabel = r"Outlet reference angle $\alpha$ (degrees)" if direction == "angle" else r"Pitch / true chord, $s/c$"
+            xlabel = r"Signed outlet angle $\alpha_2$ (degrees), fixed design direction" if direction == "angle" else r"Pitch / true chord, $s/c$"
             for i, family in enumerate(("nozzle", "impulse")):
                 knots, spans = coverage(family)
                 common = (float(spans[:, 0].max()), float(spans[:, 1].min()))
                 if direction == "angle":
                     fixed_values = (0., .3, .45, .75, 1.5, MAX_SPACING) if wide else (.45, .55, .65, .75)
-                    limits = (0, 80) if wide else (knots[0], knots[-1])
+                    limits = (-20, 80) if wide else (-20, knots[-1])
                     supported = (knots[0], knots[-1])
                 else:
                     fixed_values = (0., 20., 40., 60., 70., 80.) if wide else tuple(a for a in (40., 50., 60., 65., 70., 80.) if a <= knots[-1])
@@ -280,15 +287,15 @@ def render():
                                         fixed if direction == "angle" else xx)
                     for j, key in enumerate(("Y", "dY_dx")):
                         yy = np.array([r[key] for r in selected])
-                        axes[i, j].plot(xx, yy, color=color, lw=1.4, ls="--" if wide else "-")
-                        if wide:
+                        axes[i, j].plot(xx, yy, color=color, lw=1.4, ls="--" if wide or direction == "angle" else "-")
+                        if wide or direction == "angle":
                             axes[i, j].plot(xx, np.where(measured, yy, np.nan), color=color, lw=1.6)
                     handles.append(Line2D([], [], color=color, lw=1.6, label=rf"$s/c={fixed:g}$" if direction == "angle" else rf"$\alpha={fixed:g}^\circ$"))
                 subscript = "reaction" if i == 0 else "impulse"
                 symbol = rf"Y_{{p,\mathrm{{{subscript}}}}}"
                 axes[i, 0].set_ylabel("$"+symbol+"$")
                 axes[i, 0].set_ylim(0, .525 if wide else None)
-                axes[i, 1].set_ylabel(r"$\partial "+symbol+(r"/\partial\alpha$ (per degree)" if direction == "angle" else r"/\partial(s/c)$"))
+                axes[i, 1].set_ylabel(r"$\partial "+symbol+(r"/\partial\alpha_2$ (per degree)" if direction == "angle" else r"/\partial(s/c)$"))
                 if direction == "spacing" and wide:
                     axes[i, 1].set_yscale("asinh", linear_width=.1)
                     lower, upper = axes[i, 1].get_ylim()
@@ -297,17 +304,24 @@ def render():
                 for ax in axes[i]:
                     ax.set_xlim(*limits)
                     ax.set_xlabel(xlabel)
-                    if wide:
+                    if wide or direction == "angle":
                         shade_outside(ax, supported, limits)
+                    if direction == "angle":
+                        ax.axvspan(-20, 10, color="#8fb8d8", alpha=.22, zorder=0)
+                        ax.axvline(0, color=".55", lw=.7)
+                        ax.axvline(10, color=".55", lw=.7, ls=":")
                 axes[i, 0].legend(handles=handles, loc="best", ncol=2, fontsize=8, framealpha=.9)
                 axes[i, 1].axhline(0, color=".6", lw=.6)
             axes[0, 0].set_title("Reference values")
             axes[0, 1].set_title("First derivatives")
             finish(fig, "ko_reference_"+direction+("" if wide else "_correlation"),
-                   "AM reference "+direction+" slices: "+("extended range" if wide else "within chart coverage"),
-                   ("Tint: outside overall chart envelope. Dashed: outside the individual trace-endpoint envelope.\n"
+                   "AM reference "+direction+" slices: "+("extended range" if wide else "chart spacings, signed angle extension" if direction == "angle" else "within chart coverage"),
+                   ("Blue: production angle continuation below 10 deg; beige/dashes: outside chart coverage.\n"
+                    "Unsigned reference families follow the fixed positive-design production angle path; no nozzle reset or angle reflection."
+                    if direction == "angle" else
+                    ("Tint: outside overall chart envelope. Dashed: outside the individual trace-endpoint envelope.\n"
                     + ("Spacing derivative axes use a smooth asinh scale; no slope clipping." if direction == "spacing" else "Zero spacing is a numerical limit. Direct references, before downstream KO corrections."))
-                   if wide else "Spacing restricted to the common coverage of all measured angles in each family.\nDirect reference coefficients and derivatives; no downstream KO corrections.")
+                   if wide else "Spacing restricted to the common coverage of all measured angles in each family.\nDirect reference coefficients and derivatives; no downstream KO corrections."))
 
         rows = read("compressibility")
         selected = [r for r in rows if r["term"] == "K1"]

@@ -1,10 +1,10 @@
 {
-  "description": "Baseline Aungier versus current analytical AM reference coefficients Yp(s/c,alpha); full-profile interpolation is reviewed separately.",
+  "description": "Current analytical AM reference coefficients Yp(s/c,alpha); full-profile interpolation is reviewed separately.",
   "conditions": {
     "maximum_thickness_chord": 0.2,
-    "applied_corrections": "Raw curves: no KO scaling, Reynolds, Mach, shock, thickness or inlet-angle interpolation. Full KO shown separately.",
-    "angle_units": "degrees from axial direction",
-    "angle_below_40": "Direct analytical extrapolation; KO uses the smooth outlet-angle magnitude without a minimum."
+    "applied_corrections": "Reference curves: no KO scaling, Reynolds, Mach, shock, thickness or inlet-angle interpolation. Full KO shown separately.",
+    "angle_units": "signed physical outlet angle in degrees from axial",
+    "angle_below_40": "Unsigned references evaluated along the production fixed-positive-design effective outlet angle, bounded tangent angle and smooth magnitude; no reflection at zero."
   },
   "coefficient_definition": "Reference stagnation-pressure loss coefficient (p0_in-p0_out)/(p0_out-p_out); raw fits do not solve a turbine or predict efficiency.",
   "candidate_reference": {
@@ -26,10 +26,10 @@
     "samples": 599
   },
   "angle_grid": {
-    "start": 0,
+    "start": -20,
     "stop": 80,
     "base_samples": 200,
-    "samples": 2677,
+    "samples": 3077,
     "pitch_chord": [
       0.5,
       0.65,
@@ -38,128 +38,11 @@
       1.2
     ],
     "zoom": [
-      55,
+      -20,
       60
     ]
   },
   "minima": [
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 40,
-      "pitch_chord": 0.9974999999999998,
-      "base_grid": 0,
-      "Yp": 0.01754457221259617,
-      "dYp_d_pitch_chord": -5.351756331051485e-06
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 50,
-      "pitch_chord": 0.921,
-      "base_grid": 0,
-      "Yp": 0.02078606726608917,
-      "dYp_d_pitch_chord": -2.506982503007979e-05
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 60,
-      "pitch_chord": 0.8445,
-      "base_grid": 0,
-      "Yp": 0.024027562822689523,
-      "dYp_d_pitch_chord": -7.538855534634972e-05
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 65,
-      "pitch_chord": 0.7839195979899497,
-      "base_grid": 1,
-      "Yp": 0.028773666618813195,
-      "dYp_d_pitch_chord": -0.0002162731280036846
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 70,
-      "pitch_chord": 0.7206030150753768,
-      "base_grid": 1,
-      "Yp": 0.03820765589396339,
-      "dYp_d_pitch_chord": 0.000251992541521835
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 75,
-      "pitch_chord": 0.6555,
-      "base_grid": 0,
-      "Yp": 0.04764158141840092,
-      "dYp_d_pitch_chord": 0.0002069374094435309
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 80,
-      "pitch_chord": 0.5902499999999999,
-      "base_grid": 0,
-      "Yp": 0.05707549365722739,
-      "dYp_d_pitch_chord": 0.00011547509407061312
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 40,
-      "pitch_chord": 0.7905,
-      "base_grid": 0,
-      "Yp": 0.06587448676669057,
-      "dYp_d_pitch_chord": 6.372527508467771e-05
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 50,
-      "pitch_chord": 0.7275,
-      "base_grid": 0,
-      "Yp": 0.07629981604882247,
-      "dYp_d_pitch_chord": 0.0005416334312593392
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 55,
-      "pitch_chord": 0.68475,
-      "base_grid": 0,
-      "Yp": 0.08616214733992937,
-      "dYp_d_pitch_chord": -0.00029095470524321415
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 60,
-      "pitch_chord": 0.6375,
-      "base_grid": 0,
-      "Yp": 0.09912466030198187,
-      "dYp_d_pitch_chord": -0.00023479470625447645
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 65,
-      "pitch_chord": 0.5849246231155778,
-      "base_grid": 1,
-      "Yp": 0.11518730045581244,
-      "dYp_d_pitch_chord": 0.0004671940832152344
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 70,
-      "pitch_chord": 0.5249999999999999,
-      "base_grid": 0,
-      "Yp": 0.1343497916829396,
-      "dYp_d_pitch_chord": 0.0003812727599332356
-    },
     {
       "version": "candidate",
       "family": "nozzle",
@@ -279,646 +162,16 @@
     }
   ],
   "counts": {
-    "pitch_families.csv": 15574,
-    "angle_transitions.csv": 53540,
-    "transition_probes.csv": 360
+    "pitch_families.csv": 7787,
+    "angle_transitions.csv": 30770,
+    "transition_probes.csv": 180
   },
   "source_references": [
     "https://reports.aerade.cranfield.ac.uk/handle/1826.2/3538",
     "https://www.asme.org/publications-submissions/books/find-book/turbine-aerodynamics-axial-flow-radial-inflow-turbine-design-analysis"
   ],
-  "derivative_method": "Three-point physical-coordinate differences; raw-angle baseline branches are split at known corners.",
+  "derivative_method": "Physical-coordinate differences for spacing and complex-step for angle; all values use current source.",
   "smallest_interval_probes": [
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 59.0,
-      "pitch_chord": 0.5,
-      "h": 1e-05,
-      "value": 0.04042902891832561,
-      "left_limit": 0.040429028918325616,
-      "right_limit": 0.040429028918325574,
-      "value_jump": -4.163336342344337e-17,
-      "left_slope": 0.00023647566960161012,
-      "right_slope": 0.00023647566890772073,
-      "slope_jump": -6.938893903907228e-13
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 59.0,
-      "pitch_chord": 0.65,
-      "h": 1e-05,
-      "value": 0.029121145630509618,
-      "left_limit": 0.029121145630509628,
-      "right_limit": 0.029121145630509618,
-      "value_jump": -1.0408340855860843e-17,
-      "left_slope": 0.00021774517397488144,
-      "right_slope": 0.00021774517397488144,
-      "slope_jump": 0.0
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 59.0,
-      "pitch_chord": 0.8,
-      "h": 1e-05,
-      "value": 0.024051152056388768,
-      "left_limit": 0.024051152056388757,
-      "right_limit": 0.024051152056388782,
-      "value_jump": 2.42861286636753e-17,
-      "left_slope": 0.00025615987594984624,
-      "right_slope": 0.00025615987594984624,
-      "slope_jump": 0.0
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 59.0,
-      "pitch_chord": 1.0,
-      "h": 1e-05,
-      "value": 0.026550240015660087,
-      "left_limit": 0.02655024001566007,
-      "right_limit": 0.026550240015660084,
-      "value_jump": 1.3877787807814457e-17,
-      "left_slope": 0.0008200005799374742,
-      "right_slope": 0.0008200005799374742,
-      "slope_jump": 0.0
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 59.0,
-      "pitch_chord": 1.2,
-      "h": 1e-05,
-      "value": 0.03995743215822092,
-      "left_limit": 0.039957432158220924,
-      "right_limit": 0.03995743215822092,
-      "value_jump": -6.938893903907228e-18,
-      "left_slope": 0.0016993816541466253,
-      "right_slope": 0.001699381653452736,
-      "slope_jump": -6.938893903907228e-13
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 60.0,
-      "pitch_chord": 0.5,
-      "h": 1e-05,
-      "value": 0.04066963757207976,
-      "left_limit": 0.04066963757207982,
-      "right_limit": 0.04114028645453279,
-      "value_jump": 0.00047064888245296893,
-      "left_slope": 0.00024473701745741927,
-      "right_slope": -0.0006447950423593696,
-      "slope_jump": -0.0008895320598167888
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 60.0,
-      "pitch_chord": 0.65,
-      "h": 1e-05,
-      "value": 0.029338737703411846,
-      "left_limit": 0.029338737703411867,
-      "right_limit": 0.029606047287602195,
-      "value_jump": 0.00026730958419032835,
-      "left_slope": 0.00021738133376691946,
-      "right_slope": -0.0003350316787886775,
-      "slope_jump": -0.0005524130125555969
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 60.0,
-      "pitch_chord": 0.8,
-      "h": 1e-05,
-      "value": 0.024308167103036613,
-      "left_limit": 0.024308167103036633,
-      "right_limit": 0.024372137388964238,
-      "value_jump": 6.397028592760451e-05,
-      "left_slope": 0.00025799529596026716,
-      "right_slope": 0.00014589019436961337,
-      "slope_jump": -0.00011210510159065379
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 60.0,
-      "pitch_chord": 1.0,
-      "h": 1e-05,
-      "value": 0.02740125183099159,
-      "left_limit": 0.027401251830991555,
-      "right_limit": 0.02719410305256896,
-      "value_jump": -0.0002071487784225945,
-      "left_slope": 0.0008826918189430709,
-      "right_slope": 0.0008666992498684855,
-      "slope_jump": -1.599256907458546e-05
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 60.0,
-      "pitch_chord": 1.2,
-      "h": 1e-05,
-      "value": 0.04169492192480022,
-      "left_limit": 0.04169492192480014,
-      "right_limit": 0.04121665408202732,
-      "value_jump": -0.00047826784277282125,
-      "left_slope": 0.0017757629311443421,
-      "right_slope": 0.001443790093036412,
-      "slope_jump": -0.0003319728381079301
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 61.0,
-      "pitch_chord": 0.5,
-      "h": 1e-05,
-      "value": 0.04048581441022915,
-      "left_limit": 0.04048581441022917,
-      "right_limit": 0.04048581441022916,
-      "value_jump": -1.3877787807814457e-17,
-      "left_slope": -0.0006627336693321161,
-      "right_slope": -0.0006627336721076736,
-      "slope_jump": -2.7755575615628914e-12
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 61.0,
-      "pitch_chord": 0.65,
-      "h": 1e-05,
-      "value": 0.029283240934860046,
-      "left_limit": 0.029283240934860053,
-      "right_limit": 0.029283240934860053,
-      "value_jump": 0.0,
-      "left_slope": -0.0003098422608760476,
-      "right_slope": -0.0003098422622638264,
-      "slope_jump": -1.3877787807814457e-12
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 61.0,
-      "pitch_chord": 0.8,
-      "h": 1e-05,
-      "value": 0.02454056510282322,
-      "left_limit": 0.02454056510282322,
-      "right_limit": 0.024540565102823236,
-      "value_jump": 1.734723475976807e-17,
-      "left_slope": 0.00019118323590916472,
-      "right_slope": 0.00019118323382749655,
-      "slope_jump": -2.0816681711721685e-12
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 61.0,
-      "pitch_chord": 1.0,
-      "h": 1e-05,
-      "value": 0.02808217143862433,
-      "left_limit": 0.02808217143862429,
-      "right_limit": 0.02808217143862434,
-      "value_jump": 5.204170427930421e-17,
-      "left_slope": 0.00090920359158142,
-      "right_slope": 0.0009092035943569775,
-      "slope_jump": 2.7755575615628914e-12
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 61.0,
-      "pitch_chord": 1.2,
-      "h": 1e-05,
-      "value": 0.04266750691812727,
-      "left_limit": 0.042667506918127235,
-      "right_limit": 0.042667506918127256,
-      "value_jump": 2.0816681711721685e-17,
-      "left_slope": 0.001457506777768902,
-      "right_slope": 0.001457506783320017,
-      "slope_jump": 5.551115123125783e-12
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 62.0,
-      "pitch_chord": 0.5,
-      "h": 1e-05,
-      "value": 0.039817543343438504,
-      "left_limit": 0.039817543343438504,
-      "right_limit": 0.039817543343438476,
-      "value_jump": -2.7755575615628914e-17,
-      "left_slope": -0.0006724988246831208,
-      "right_slope": -0.0006724988219075633,
-      "slope_jump": 2.7755575615628914e-12
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 62.0,
-      "pitch_chord": 0.65,
-      "h": 1e-05,
-      "value": 0.028987760768554405,
-      "left_limit": 0.0289877607685544,
-      "right_limit": 0.02898776076855438,
-      "value_jump": -1.734723475976807e-17,
-      "left_slope": -0.0002804580533088963,
-      "right_slope": -0.0002804580512272281,
-      "slope_jump": 2.0816681711721685e-12
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 62.0,
-      "pitch_chord": 0.8,
-      "h": 1e-05,
-      "value": 0.024754887328925293,
-      "left_limit": 0.024754887328925303,
-      "right_limit": 0.02475488732892531,
-      "value_jump": 6.938893903907228e-18,
-      "left_slope": 0.00023762745729460907,
-      "right_slope": 0.0002376274552129409,
-      "slope_jump": -2.0816681711721685e-12
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 62.0,
-      "pitch_chord": 1.0,
-      "h": 1e-05,
-      "value": 0.029012025842038686,
-      "left_limit": 0.029012025842038696,
-      "right_limit": 0.029012025842038717,
-      "value_jump": 2.0816681711721685e-17,
-      "left_slope": 0.0009502555090024066,
-      "right_slope": 0.0009502555048390703,
-      "slope_jump": -4.163336342344337e-12
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 62.0,
-      "pitch_chord": 1.2,
-      "h": 1e-05,
-      "value": 0.044130869484494274,
-      "left_limit": 0.04413086948449428,
-      "right_limit": 0.044130869484494316,
-      "value_jump": 3.469446951953614e-17,
-      "left_slope": 0.0014688297633735912,
-      "right_slope": 0.0014688297550469185,
-      "slope_jump": -8.326672684688674e-12
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 63.0,
-      "pitch_chord": 0.5,
-      "h": 1e-05,
-      "value": 0.039143333423941384,
-      "left_limit": 0.039143333423941426,
-      "right_limit": 0.0391433334239414,
-      "value_jump": -2.7755575615628914e-17,
-      "left_slope": -0.0006747132103024355,
-      "right_slope": 0.0008879301273412298,
-      "slope_jump": 0.0015626433376436653
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 63.0,
-      "pitch_chord": 0.65,
-      "h": 1e-05,
-      "value": 0.028723569235409616,
-      "left_limit": 0.02872356923540963,
-      "right_limit": 0.02872356923540965,
-      "value_jump": 2.0816681711721685e-17,
-      "left_slope": -0.0002473398444391428,
-      "right_slope": 0.0013153034952861908,
-      "slope_jump": 0.0015626433397253336
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 63.0,
-      "pitch_chord": 0.8,
-      "h": 1e-05,
-      "value": 0.02501610385587373,
-      "left_limit": 0.025016103855873734,
-      "right_limit": 0.025016103855873738,
-      "value_jump": 3.469446951953614e-18,
-      "left_slope": 0.0002849239739977083,
-      "right_slope": 0.00184756731580471,
-      "slope_jump": 0.0015626433418070016
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 63.0,
-      "pitch_chord": 1.0,
-      "h": 1e-05,
-      "value": 0.02998217038604169,
-      "left_limit": 0.029982170386041673,
-      "right_limit": 0.02998217038604171,
-      "value_jump": 3.8163916471489756e-17,
-      "left_slope": 0.0009897719907558944,
-      "right_slope": 0.0025524153353384538,
-      "slope_jump": 0.0015626433445825594
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 63.0,
-      "pitch_chord": 1.2,
-      "h": 1e-05,
-      "value": 0.045604412576646776,
-      "left_limit": 0.04560441257664674,
-      "right_limit": 0.04560441257664677,
-      "value_jump": 2.7755575615628914e-17,
-      "left_slope": 0.0014778919255054033,
-      "right_slope": 0.0030405352735574094,
-      "slope_jump": 0.0015626433480520061
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 64.0,
-      "pitch_chord": 0.5,
-      "h": 1e-05,
-      "value": 0.04003307713727506,
-      "left_limit": 0.04003307713727502,
-      "right_limit": 0.04003307713727503,
-      "value_jump": 1.3877787807814457e-17,
-      "left_slope": 0.0008926671513087568,
-      "right_slope": 0.000892667156859872,
-      "slope_jump": 5.551115123125783e-12
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 64.0,
-      "pitch_chord": 0.65,
-      "h": 1e-05,
-      "value": 0.030056823013912833,
-      "left_limit": 0.03005682301391279,
-      "right_limit": 0.030056823013912794,
-      "value_jump": 3.469446951953614e-18,
-      "left_slope": 0.0013517182637090561,
-      "right_slope": 0.0013517182734235076,
-      "slope_jump": 9.71445146547012e-12
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 64.0,
-      "pitch_chord": 0.8,
-      "h": 1e-05,
-      "value": 0.02688757062004063,
-      "left_limit": 0.026887570620040605,
-      "right_limit": 0.02688757062004059,
-      "value_jump": -1.3877787807814457e-17,
-      "left_slope": 0.0018954406127980048,
-      "right_slope": 0.0018954406211246775,
-      "slope_jump": 8.326672684688674e-12
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 64.0,
-      "pitch_chord": 1.0,
-      "h": 1e-05,
-      "value": 0.03255368122963995,
-      "left_limit": 0.032553681229639905,
-      "right_limit": 0.0325536812296399,
-      "value_jump": -6.938893903907228e-18,
-      "left_slope": 0.002590336769386914,
-      "right_slope": 0.0025903367770196972,
-      "slope_jump": 7.632783294297951e-12
-    },
-    {
-      "version": "baseline",
-      "family": "nozzle",
-      "angle_deg": 64.0,
-      "pitch_chord": 1.2,
-      "h": 1e-05,
-      "value": 0.04864859491388818,
-      "left_limit": 0.04864859491388818,
-      "right_limit": 0.04864859491388817,
-      "value_jump": -6.938893903907228e-18,
-      "left_slope": 0.0030474928955359633,
-      "right_slope": 0.0030474929010870784,
-      "slope_jump": 5.551115123125783e-12
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 59.0,
-      "pitch_chord": 0.5,
-      "h": 1e-05,
-      "value": 0.10383054957195657,
-      "left_limit": 0.10383054957195646,
-      "right_limit": 0.1038305495719565,
-      "value_jump": 4.163336342344337e-17,
-      "left_slope": 0.001820340267411069,
-      "right_slope": 0.0018203402896155294,
-      "slope_jump": 2.220446049250313e-11
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 59.0,
-      "pitch_chord": 0.65,
-      "h": 1e-05,
-      "value": 0.0962854624078385,
-      "left_limit": 0.09628546240783836,
-      "right_limit": 0.09628546240783852,
-      "value_jump": 1.5265566588595902e-16,
-      "left_slope": 0.002790980821454347,
-      "right_slope": 0.002790980835332135,
-      "slope_jump": 1.3877787807814457e-11
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 59.0,
-      "pitch_chord": 0.8,
-      "h": 1e-05,
-      "value": 0.10198125773743748,
-      "left_limit": 0.10198125773743734,
-      "right_limit": 0.10198125773743748,
-      "value_jump": 1.3877787807814457e-16,
-      "left_slope": 0.0034829375106237843,
-      "right_slope": 0.003482937524501572,
-      "slope_jump": 1.3877787807814457e-11
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 59.0,
-      "pitch_chord": 1.0,
-      "h": 1e-05,
-      "value": 0.11861578447023358,
-      "left_limit": 0.11861578447023349,
-      "right_limit": 0.1186157844702335,
-      "value_jump": 1.3877787807814457e-17,
-      "left_slope": 0.003556012828642707,
-      "right_slope": 0.003556012839744937,
-      "slope_jump": 1.1102230246251565e-11
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 59.0,
-      "pitch_chord": 1.2,
-      "h": 1e-05,
-      "value": 0.13105334898597684,
-      "left_limit": 0.13105334898597681,
-      "right_limit": 0.13105334898597687,
-      "value_jump": 5.551115123125783e-17,
-      "left_slope": 0.0021351892670606887,
-      "right_slope": 0.0021351892809384765,
-      "slope_jump": 1.3877787807814457e-11
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 60.0,
-      "pitch_chord": 0.5,
-      "h": 1e-05,
-      "value": 0.1057259559433178,
-      "left_limit": 0.10572595594331767,
-      "right_limit": 0.1057259559433178,
-      "value_jump": 1.249000902703301e-16,
-      "left_slope": 0.001971768887054637,
-      "right_slope": 0.002282896380267907,
-      "slope_jump": 0.00031112749321327016
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 60.0,
-      "pitch_chord": 0.65,
-      "h": 1e-05,
-      "value": 0.09916801059235919,
-      "left_limit": 0.09916801059235912,
-      "right_limit": 0.09916801059235923,
-      "value_jump": 1.1102230246251565e-16,
-      "left_slope": 0.0029748401492168948,
-      "right_slope": 0.0029772403570271773,
-      "slope_jump": 2.4002078102824953e-06
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 60.0,
-      "pitch_chord": 0.8,
-      "h": 1e-05,
-      "value": 0.10555045497272462,
-      "left_limit": 0.10555045497272458,
-      "right_limit": 0.10555045497272461,
-      "value_jump": 2.7755575615628914e-17,
-      "left_slope": 0.003655154551251982,
-      "right_slope": 0.004085191129821197,
-      "slope_jump": 0.0004300365785692155
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 60.0,
-      "pitch_chord": 1.0,
-      "h": 1e-05,
-      "value": 0.12221045123910913,
-      "left_limit": 0.12221045123910906,
-      "right_limit": 0.12221045123910913,
-      "value_jump": 6.938893903907228e-17,
-      "left_slope": 0.003630940886845124,
-      "right_slope": 0.005776613817842779,
-      "slope_jump": 0.0021456729309976548
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 60.0,
-      "pitch_chord": 1.2,
-      "h": 1e-05,
-      "value": 0.1331249654975023,
-      "left_limit": 0.13312496549750227,
-      "right_limit": 0.1331249654975023,
-      "value_jump": 2.7755575615628914e-17,
-      "left_slope": 0.0020027772773545394,
-      "right_slope": 0.0071731774936578665,
-      "slope_jump": 0.005170400216303327
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 61.0,
-      "pitch_chord": 0.5,
-      "h": 1e-05,
-      "value": 0.10804345331844495,
-      "left_limit": 0.10804345331844499,
-      "right_limit": 0.10804345331844505,
-      "value_jump": 5.551115123125783e-17,
-      "left_slope": 0.0023546248506534084,
-      "right_slope": 0.0023546248367756206,
-      "slope_jump": -1.3877787807814457e-11
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 61.0,
-      "pitch_chord": 0.65,
-      "h": 1e-05,
-      "value": 0.10224469672072214,
-      "left_limit": 0.10224469672072209,
-      "right_limit": 0.10224469672072224,
-      "value_jump": 1.5265566588595902e-16,
-      "left_slope": 0.003178598878550431,
-      "right_slope": 0.0031785988702237584,
-      "slope_jump": -8.326672684688674e-12
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 61.0,
-      "pitch_chord": 0.8,
-      "h": 1e-05,
-      "value": 0.10977674958312116,
-      "left_limit": 0.10977674958312109,
-      "right_limit": 0.10977674958312122,
-      "value_jump": 1.3877787807814457e-16,
-      "left_slope": 0.004369337813781016,
-      "right_slope": 0.004369337805454343,
-      "slope_jump": -8.326672684688674e-12
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 61.0,
-      "pitch_chord": 1.0,
-      "h": 1e-05,
-      "value": 0.12814103944295796,
-      "left_limit": 0.12814103944295788,
-      "right_limit": 0.12814103944295807,
-      "value_jump": 1.942890293094024e-16,
-      "left_slope": 0.006085071646566575,
-      "right_slope": 0.0060850716410154595,
-      "slope_jump": -5.551115123125783e-12
-    },
-    {
-      "version": "baseline",
-      "family": "impulse",
-      "angle_deg": 61.0,
-      "pitch_chord": 1.2,
-      "h": 1e-05,
-      "value": 0.14040791730693242,
-      "left_limit": 0.1404079173069324,
-      "right_limit": 0.14040791730693258,
-      "value_jump": 1.942890293094024e-16,
-      "left_slope": 0.007390972939225192,
-      "right_slope": 0.007390972939225192,
-      "slope_jump": 0.0
-    },
     {
       "version": "candidate",
       "family": "nozzle",
@@ -1551,9 +804,9 @@
     }
   ],
   "data_sha256": {
-    "pitch_families.csv": "3f22dee1f5c83f582d6458c4196e6f91b5dcc092d830623060bd72e9294d6fdc",
-    "angle_transitions.csv": "ec00db245c2aa0dc0be423e9c8fb31bee06dc2ae2d41284104e2e0fa3f8e4b25",
-    "transition_probes.csv": "f5fd9d9a1441960c1196ff61f5b0e7d326d03e52bedd23ab7ba469cc65da6167"
+    "pitch_families.csv": "889b712d25ba6bb9b629d1f74a5b4414cafda6fa38267e3b217ae0ec66b31ccb",
+    "angle_transitions.csv": "7efe084def1415a3acdddca2627a3bc0f3ff10c0341295ad36a1f1bc14c2d19b",
+    "transition_probes.csv": "7ec1d3c6471fb497b9350741a5f2ac7456d90cbc453f59d90a2374a8e77b9833"
   },
   "source_modules": {
     "turbodash.core_stage": {
@@ -1601,41 +854,6 @@
       "relative_path": "turbodash/__init__.py",
       "sha256": "4c7737a35da6c41e775164eabe7db6fe91180dd5cdc9b0449c548a99a29454aa"
     },
-    "turbodash.loss_models": {
-      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\__init__.py",
-      "relative_path": "turbodash/loss_models/__init__.py",
-      "sha256": "225e50f404dd5fcc97a95c6d3ff9d8a94844c73c4f0bfaa4fd65d0ff88747b18"
-    },
-    "turbodash.math": {
-      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\math.py",
-      "relative_path": "turbodash/math.py",
-      "sha256": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772"
-    },
-    "turbodash.loss_models.loss_model_kacker_okapuu": {
-      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model_kacker_okapuu.py",
-      "relative_path": "turbodash/loss_models/loss_model_kacker_okapuu.py",
-      "sha256": "197794ed5736c997b865e43860ffeccdaf4dfd21dbc2f99b2191f4a28abab28d"
-    },
-    "turbodash.loss_models.loss_coefficient_conversion": {
-      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_coefficient_conversion.py",
-      "relative_path": "turbodash/loss_models/loss_coefficient_conversion.py",
-      "sha256": "21ffa896097129972ec2130ba6cf54377fc6726ba5960d73c8fd40cd90454309"
-    },
-    "turbodash.loss_models.loss_model_benner": {
-      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model_benner.py",
-      "relative_path": "turbodash/loss_models/loss_model_benner.py",
-      "sha256": "ce5e2aae37a04718c0ad8b6801b67be2e7824fdacd407affcb00e279ff46d649"
-    },
-    "turbodash.loss_models.loss_model_moustapha": {
-      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model_moustapha.py",
-      "relative_path": "turbodash/loss_models/loss_model_moustapha.py",
-      "sha256": "9918fc36bf9e3ed59d65256332d21780f0baff6ade302e8ee49c342e31b1d762"
-    },
-    "turbodash.loss_models.loss_model": {
-      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models\\loss_model.py",
-      "relative_path": "turbodash/loss_models/loss_model.py",
-      "sha256": "156fbe3b0a9510b760f32e73b39c09533edf8e3e4798df9cdb08cd32f905a3e4"
-    },
     "turbodash.loss_models_new": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\__init__.py",
       "relative_path": "turbodash/loss_models_new/__init__.py",
@@ -1646,15 +864,30 @@
       "relative_path": "turbodash/loss_models_new/_backend.py",
       "sha256": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff"
     },
+    "turbodash.math": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\math.py",
+      "relative_path": "turbodash/math.py",
+      "sha256": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772"
+    },
     "turbodash.loss_models_new._numerics": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\_numerics.py",
       "relative_path": "turbodash/loss_models_new/_numerics.py",
       "sha256": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff"
     },
+    "turbodash.loss_models_new._trailing_edge": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\_trailing_edge.py",
+      "relative_path": "turbodash/loss_models_new/_trailing_edge.py",
+      "sha256": "594970afedea411fbf4e1f6a86017ac46372f36b5f0452c78234940441630ce8"
+    },
+    "turbodash.loss_models_new._blade_loading": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\_blade_loading.py",
+      "relative_path": "turbodash/loss_models_new/_blade_loading.py",
+      "sha256": "8be374f9be233a7027e39a552c8c424200a3f00d05706868d8c75968df1666a5"
+    },
     "turbodash.loss_models_new.loss_model_kacker_okapuu": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model_kacker_okapuu.py",
       "relative_path": "turbodash/loss_models_new/loss_model_kacker_okapuu.py",
-      "sha256": "4295e119d25fc43579ec79059484913ed0af83822088eaf2bd50af41f3fa5395"
+      "sha256": "c3d88153360f75ec1e54e53a056d4ec7b41547b9d3e467e4847c66d7705afa08"
     },
     "turbodash.loss_models_new.loss_coefficient_conversion": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_coefficient_conversion.py",
@@ -1664,12 +897,12 @@
     "turbodash.loss_models_new.loss_model_benner": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model_benner.py",
       "relative_path": "turbodash/loss_models_new/loss_model_benner.py",
-      "sha256": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba"
+      "sha256": "cac62576a82d6db189d94a5ee6f71f980b5e5de8dfe6d35d6ac2e3cdd22a1659"
     },
     "turbodash.loss_models_new.loss_model_moustapha": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model_moustapha.py",
       "relative_path": "turbodash/loss_models_new/loss_model_moustapha.py",
-      "sha256": "923339d879bb7edf952112296b605073d9c5f466e541ea04b3ce10f3f8e1f489"
+      "sha256": "556caad2121e18a57d4f5a6af3161fba8d421f957ac0779148fdec2e4efed4b8"
     },
     "turbodash.loss_models_new.loss_model": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model.py",
@@ -1677,6 +910,6 @@
       "sha256": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11"
     }
   },
-  "script_sha256": "c37c389bc53f0ba515e30c847848c348624580398d1d8c02f106f29e03f19457",
-  "calculate_seconds": 0.47935010000037437
+  "script_sha256": "72797490d656f6aa8420488f91c3ed80381f9a3e46b75b3ca4f69166817e3ed0",
+  "calculate_seconds": 0.29339830000390066
 }

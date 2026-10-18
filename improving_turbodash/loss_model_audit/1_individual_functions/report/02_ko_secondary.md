@@ -4,7 +4,7 @@
 
 This note checks the secondary-loss calculation in the production `kacker_okapuu_new` model against Kacker and Okapuu (1982), then examines its geometry and Mach-number sensitivities. The equations below distinguish the published correlation from the numerical modifications currently used by TurboDash. The figures call `get_secondary_loss` directly; they are prescribed-input diagnostics, rather than solved turbine operating points.
 
-The source is [Kacker and Okapuu, equations (11)-(16) and Figure 13, journal page 115](../source/kacker_okapuu_1982.pdf#page=5), [DOI: 10.1115/1.3227240](https://doi.org/10.1115/1.3227240). The implementation is in [the new KO source](../../../../turbodash/loss_models_new/loss_model_kacker_okapuu.py).
+The source is [Kacker and Okapuu, equations (11)-(16) and Figure 13, journal page 115](../source/kacker_okapuu_1982.pdf#page=5), [DOI: 10.1115/1.3227240](https://doi.org/10.1115/1.3227240). The implementation is in [the current KO source](../../../../turbodash/loss_models_new/loss_model_kacker_okapuu.py).
 
 ## 1. Equations and angle conventions
 
@@ -29,7 +29,7 @@ $$
 \alpha_m=\tan^{-1}\!\left[\frac{\tan\alpha_1-\tan\alpha_2}{2}\right].
 $$
 
-TurboDash uses signed row-frame flow angles `beta_in`, `beta_out` and inlet metal angle `leading_edge_angle`. To avoid confusing these names with the paper's metal-angle notation, call the code's angles $\beta_{\mathrm{in}}$, $\beta_{\mathrm{out}}$ and $\theta_{\mathrm{in}}$. The code evaluates
+TurboDash uses signed row-frame flow angles `beta_in`, `beta_out` and inlet metal angle `leading_edge_angle`. To avoid confusing these names with the paper's metal-angle notation, call the code's angles $\beta_{\mathrm{in}}$, $\beta_{\mathrm{out}}$ and $\theta_{\mathrm{in}}$. Before numerical continuation, the corresponding signed loading is
 
 $$
 \beta_m=\tan^{-1}\!\left[\frac{\tan\beta_{\mathrm{in}}+\tan\beta_{\mathrm{out}}}{2}\right],
@@ -40,15 +40,19 @@ $$
 
 $$
 G=1.2(0.0334)f_{\mathrm{AR}}(\mathrm{AR})Z
-\frac{\cos\beta_{\mathrm{out}}}{\cos\theta_{\mathrm{in}}},
+\frac{\mathcal C(\beta_{\mathrm{out}})}{\mathcal C(\theta_{\mathrm{in}})},
 \qquad \boxed{Y_s=GK_s.}
 $$
 
 Here $G$ is the geometric coefficient before compressibility, and $K_s$ applies the Mach-number correction. Section 2 defines a smooth continuation that keeps the aspect-ratio factor $f_{\mathrm{AR}}$ below one. There is no additional continuation or upper bound on the final $Y_s$.
 
-For the usual opposite-sign inlet and outlet directions, the mapping used in these plots is $\beta_{\mathrm{in}}=-\alpha_1$, $\beta_{\mathrm{out}}=\alpha_2$ and $\theta_{\mathrm{in}}=-\beta_1$. Substitution gives the paper's loading algebra exactly, before the numerical aspect-ratio and compressibility modifications. Reversing all three signs gives the same loss. The plus sign in the paper's loading formula and the minus sign in the code therefore describe the same turning.
+Here $Z$ uses the shared bounded blade-loading helper, and $\mathcal C(\beta)=1/\sqrt{1+T(\beta)^2}$ uses the same continued tangent $T$. The signed loading above is recovered when the angle and loading continuations are inactive. Section 3.3 describes the continued coordinates and shows their effect on the complete loss.
 
-All angles passed to the code are in degrees. The plots set $\theta_{\mathrm{in}}=\beta_{\mathrm{in}}$, so incidence is zero. Changing an inlet-angle curve also changes the inlet metal angle; it is a comparison between different blade designs. In general, the function accepts these two angles independently: inlet flow angle enters the loading $Z$, while inlet metal angle enters the denominator $\cos\theta_{\mathrm{in}}$. No additional incidence multiplier is applied inside this KO helper. The forward-flow domain uses finite positive height and chord, nonnegative row-frame Mach numbers, and $|\beta_{\mathrm{in}}|,|\beta_{\mathrm{out}}|,|\theta_{\mathrm{in}}|<90^\circ$. Meridional chord is positive for the plotted blades; the algebra also admits $b=0$ as a limiting case with $K_s=1$. Lengths must use a common unit. This helper does not validate or clip inputs: nonpositive height/chord or angles at $\pm90^\circ$ are outside the stated domain. The outlet flow angle itself may be zero.
+For the usual opposite-sign inlet and outlet directions, the mapping used in these plots is $\beta_{\mathrm{in}}=-\alpha_1$, $\beta_{\mathrm{out}}=\alpha_2$ and $\theta_{\mathrm{in}}=-\beta_1$. Substitution gives the paper's loading algebra exactly before numerical continuation. Reversing all three signs gives the same loss. The plus sign in the paper's loading formula and the minus sign in the code therefore describe the same turning.
+
+All angles passed to the code are in degrees. The plots set $\theta_{\mathrm{in}}=\beta_{\mathrm{in}}$, so incidence is zero. Changing an inlet-angle curve also changes the inlet metal angle; it is a comparison between different blade designs. In general, the function accepts these two angles independently: inlet flow angle enters loading, while inlet metal angle enters the continued cosine denominator. No additional incidence multiplier is applied inside this KO helper.
+
+The numerical continuation accepts finite angles, positive chord, nonnegative height and meridional chord, and nonnegative row-frame Mach numbers. At zero height, meridional chord must be positive; the simultaneous $b=H=0$ case has no unique compressibility limit and returns NaN. At positive height, $b=0$ gives $K_s=1$. Negative lengths are invalid. Lengths must use a common unit. Zero height and angles outside the intended forward-flow range are numerical extensions for intermediate solver states, not physically valid turbine geometries. Neither angles nor valid intermediate losses are hard-clipped.
 
 The same expression covers both the zero-inlet-angle nozzle/reaction reference and impulse-like turning; there is no separate interpolation between two secondary-loss families. It returns the same result for stator and rotor identifiers when their row-frame inputs are identical. Pitch/chord cancels through $C_L/(s/c)$, and this secondary term has no explicit Reynolds-number, thickness or separate shock multiplier. KO assigns the leading-edge shock contribution to the profile-loss calculation.
 
@@ -125,7 +129,26 @@ $$
 
 It tends to zero at the join, matching the identity branch. The final aspect factor therefore remains smooth and decreasing with increasing $\mathrm{AR}$ and is bounded above by one. Very small aspect ratios can round to a factor of exactly one in floating-point arithmetic; extremely small sensitivities can underflow. The absence of a finite plateau is a mathematical property of the continuation, not a guarantee of resolvable gradients at arbitrary machine-scale inputs.
 
-This choice limits the amplification caused by short blades. It leaves the angular loading and compressibility multipliers visible in the final result, $Y_s=GK_s$. Consequently, **$Y_s$ is no longer capped at 0.5**: large angular loading can still produce a larger coefficient. At fixed angles, Mach numbers and positive $b/c$, the low-height limits are $f_{\mathrm{AR}}\to1$, $\widetilde K_3\to1$ and $K_s\to K_p$, so $Y_s\to C_{\mathrm{angles}}K_p$. Thus there is no universal upper bound on the loss coefficient. Zero height and angles of $\pm90^\circ$ remain outside the formula's domain.
+This choice limits amplification from short blades while retaining $Y_s=GK_s$. **There is no separate final-loss cap at 0.5.** At fixed angles, Mach numbers and positive $b/c$, the zero-height limits are $f_{\mathrm{AR}}\to1$, $\widetilde K_3\to1$ and $K_s\to K_p$, giving $Y_s\to C_{\mathrm{angles}}K_p$. The shared angle continuation now also bounds $Z$ and the cosine ratio, so excessive flow or metal angles cannot make this geometric coefficient diverge.
+
+### 2.3 Evaluating the zero-height endpoint without division by zero
+
+Applying a bounded function after first forming $1/\mathrm{AR}$ would still divide by zero at the endpoint. The implementation cancels that inverse power analytically. On the small-aspect-ratio branch, write
+
+$$
+n(\mathrm{AR})=1-\frac14\sqrt{2-\mathrm{AR}},\qquad
+d=n(\mathrm{AR})-0.8\mathrm{AR}.
+$$
+
+Whenever $n/\mathrm{AR}>0.8$, the equivalent expression evaluated in the source is
+
+$$
+f_{\mathrm{AR}}
+=1-\frac{0.2(0.2\mathrm{AR})^2}
+{(0.2\mathrm{AR})^2+0.2\mathrm{AR}\,d+d^2}.
+$$
+
+It has no inverse aspect ratio. At the endpoint, $n(0)=1-\sqrt{2}/4>0$, so $f_{\mathrm{AR}}(0)=1$ and $f'_{\mathrm{AR}}(0)=0$. For positive aspect ratio this is algebraically the same continuation as Section 2.2; the change makes its existing limit directly evaluable for Python scalars and arrays alike. Section 4.1 similarly removes the inverse-height arithmetic from the compressibility factor.
 
 The onset at 0.8 and upper limit of one are engineering choices for continuation beyond the useful range of the original correlation. Kacker and Okapuu did not propose or calibrate these limits. The new Moustapha model shares this KO secondary contribution before applying its incidence multiplier; Benner uses its own secondary-loss expression.
 
@@ -151,7 +174,7 @@ Y_s(\mathrm{AR})=G(\mathrm{AR})=C_{\mathrm{angles}}f_{\mathrm{AR}}(\mathrm{AR}),
 \frac{dY_s}{d\mathrm{AR}}=C_{\mathrm{angles}}f'_{\mathrm{AR}}(\mathrm{AR}),
 $$
 
-where $C_{\mathrm{angles}}=1.2(0.0334)Z\cos\beta_{\mathrm{out}}/\cos\theta_{\mathrm{in}}$ is constant along each curve. We sweep $0.2\le \mathrm{AR}\le5$ on a linear horizontal axis. The two rows fix inlet flow angles $\alpha_1=0^\circ$ and $40^\circ$; the colors show outlet flow angles $\alpha_2=20^\circ,30^\circ,\ldots,80^\circ$.
+where $C_{\mathrm{angles}}=1.2(0.0334)Z\mathcal C(\beta_{\mathrm{out}})/\mathcal C(\theta_{\mathrm{in}})$ is constant along each curve. We sweep $0.2\le \mathrm{AR}\le5$ on a linear horizontal axis. The two rows fix inlet flow angles $\alpha_1=0^\circ$ and $40^\circ$; the colors show outlet flow angles $\alpha_2=20^\circ,30^\circ,\ldots,80^\circ$.
 
 ![Secondary loss versus aspect ratio for seven outlet angles and two fixed inlet angles](../figures/ko_secondary_geometry_ar.png)
 
@@ -163,7 +186,7 @@ The different angles change the magnitude through loading and the cosine factors
 
 ### 3.2 Outlet flow angle at fixed aspect ratio
 
-We hold $\mathrm{AR}=2$ and sweep the outlet angle $\alpha_2$ from $0^\circ$ to $80^\circ$. For this diagnostic, the prescribed gauging/design outlet angle is taken as the row-frame outlet flow angle $\beta_{\mathrm{out}}$. The secondary-loss function uses this flow angle; it does not use a separate outlet gauging-angle input.
+We hold $\mathrm{AR}=2$ and sweep the signed outlet angle $\alpha_2$ from $-20^\circ$ to $80^\circ$. For this diagnostic, the prescribed gauging/design outlet angle is taken as the row-frame outlet flow angle $\beta_{\mathrm{out}}$. The secondary-loss function uses this flow angle; it does not use a separate outlet gauging-angle input.
 
 Each curve holds the same inlet/outlet angle ratio used in the profile-loss study:
 
@@ -189,7 +212,7 @@ Intermediate negative $z$ values describe same-sign inlet and outlet directions;
 
 [PDF](../figures/ko_secondary_geometry_angle.pdf) | [CSV](../data/secondary_review/geometry_angle.csv)
 
-The left panel shows the final $Y_s=G$. Dashed curves identify negative $z$; solid curves identify $z\ge0$. The impulse curve rises throughout this sweep, while several intermediate curves reach a maximum and then decrease as the loading and cosine factors compete. The right panel makes these changes of slope visible and shows the total derivative per degree along each fixed-$z$ curve. Because the inlet angles also move, this is different from an outlet-angle derivative with the inlet held fixed:
+The left panel shows the final $Y_s=G$. Dashed curves identify negative $z$; solid curves identify $z\ge0$. On the positive-angle side, the impulse curve rises throughout, while several intermediate curves reach a maximum and then decrease as the loading and cosine factors compete. The new negative-angle part reverses every prescribed angle along each fixed-$z$ path, so the loss mirrors its positive-angle values, while its angle derivative reverses sign. The right panel makes these changes of slope visible and shows the total derivative per degree along each fixed-$z$ curve. Because the inlet angles also move, this is different from an outlet-angle derivative with the inlet held fixed:
 
 $$
 \left.\frac{dY_s}{d\alpha_2}\right|_z
@@ -200,7 +223,43 @@ $$
 \right).
 $$
 
-At $\alpha_2=0$, the ratio defining $z$ would be undefined. The calculation instead prescribes the angles directly as $\beta_{\mathrm{out}}=\alpha_2$ and $\beta_{\mathrm{in}}=\theta_{\mathrm{in}}=-z\alpha_2$, which remains well defined at zero. All three angles then vanish, and every curve starts at $Y_s=0$ with zero slope. For $z=-1$, both loss and slope remain exactly zero throughout. At $\mathrm{AR}=2$, $f_0<0.8$, so the new aspect-factor continuation is inactive. All prescribed angles stay within $\pm80^\circ$, away from the trigonometric singularities at $\pm90^\circ$. These sweeps show the behavior of the implemented equation, without establishing new experimental validity limits.
+At $\alpha_2=0$, the ratio defining $z$ would be undefined. The calculation instead prescribes the angles directly as $\beta_{\mathrm{out}}=\alpha_2$ and $\beta_{\mathrm{in}}=\theta_{\mathrm{in}}=-z\alpha_2$, which remains well defined at zero. All three angles then vanish, and every curve passes through $Y_s=0$ with zero slope. For $z=-1$, both loss and slope remain exactly zero throughout. At $\mathrm{AR}=2$, $f_0<0.8$, so the aspect-factor continuation is inactive. All prescribed angles stay within $\pm80^\circ$, so the tangent continuation is inactive; the separate loading continuation can act wherever $Z_0>16$. Beige shading below zero identifies negative trial outlet angles. The existing fixed-$z$ parameterization is retained there; this is not the fixed-inlet-metal-angle continuation used by the profile and trailing-edge wrappers. These sweeps show the implemented equation without establishing new experimental validity limits.
+
+### 3.3 Shared angle continuation and extreme-angle losses
+
+The same helpers now supply the loading for secondary and clearance loss. They avoid angle clipping and the poles of the original tangent. The odd function $T(\beta)$ equals $\tan\beta$ for $|\beta|\le80^\circ$. For larger magnitudes, let
+
+$$
+h=|\beta|-80^\circ,\quad t_0=\tan80^\circ,\quad
+L=\tan85^\circ,\quad D=L-t_0,
+$$
+
+$$
+a=\frac{T'_0}{D},\qquad
+b=a^2+\frac{T''_0}{2D},\qquad
+T(\beta)=\operatorname{sgn}(\beta)
+\left[L-\frac{D}{1+ah+bh^2}\right].
+$$
+
+Here $T'_0=(\pi/180)(1+t_0^2)$ and $T''_0=2(\pi/180)^2t_0(1+t_0^2)$ are derivatives per degree at $80^\circ$. The rational branch matches value, slope and curvature, stays increasing, and approaches $\pm\tan85^\circ$ without reaching a constant branch. The join and asymptote are numerical continuation choices.
+
+With $U=T(\beta_{\mathrm{in}})$ and $V=T(\beta_{\mathrm{out}})$, the source forms
+
+$$
+Z_0=\frac{4(U-V)^2}{1+V^2}
+\sqrt{1+\left(\frac{U+V}{2}\right)^2},
+\qquad \mathcal C(\beta)=\frac{1}{\sqrt{1+T(\beta)^2}}.
+$$
+
+It leaves $Z=Z_0$ for $Z_0\le16$ and uses $Z=32-16/(1+t+t^2)$ above, with $t=(Z_0-16)/16$. This $C^2$ continuation is the same as the one documented in [the clearance note](04_ko_clearance.md#11-loading-without-angle-clipping). The onset preserves the entire original symmetric-impulse range $Z=16\sin^2\alpha_2$. The upper bound of 32 allows additional loading while preventing runaway amplification. Both constants are modeling choices.
+
+Continuing the metal-angle cosine is necessary as well: bounded loading alone would still leave $1/\cos\theta_{\mathrm{in}}$ singular. The consistent continued cosine stays between $\cos85^\circ$ and one. It cannot change sign when an intermediate angle crosses $90^\circ$.
+
+![Complete secondary loss in the left column and shared loading in the right column at extreme inlet and outlet angles](../figures/ko_secondary_robustness_angle.png)
+
+[PDF](../figures/ko_secondary_robustness_angle.pdf) | [CSV](../data/secondary_review/robustness_angle.csv)
+
+The top row extends three nozzle-to-impulse outlet-angle paths from $-20^\circ$ to $120^\circ$; the bottom row retains inlet magnitude from $0^\circ$ to $120^\circ$ at fixed outlet angles. Both use $\mathrm{AR}=2$, zero incidence and $M_1=M_2=0$. Solid lines show the complete production result; dashed lines show the uncontinued angle expressions through $89^\circ$. The left column includes the metal-angle projection, so its shape need not match loading on the right. Beige marks negative trial outlet angles in the top row and tangent continuation beyond $80^\circ$ in both rows. All production curves remain finite and nonnegative through $90^\circ$, with no derivative panels needed to see the bounded loss response. Extreme-angle continuation is for solver robustness, not a reversed-flow correlation.
 
 ## 4. Compressibility and its interaction with aspect ratio
 
@@ -246,6 +305,16 @@ $$
 
 For tall blades, the influence is small and $K_s$ is close to one. As height decreases, the influence approaches one and $K_s$ approaches $K_p$. There is **no separate $K_s=0.1$ floor**. At fixed geometry, $\partial K_s/\partial K_p=\widetilde K_3$, so the continuation does not switch off the Mach sensitivity supplied by $K_p$.
 
+The production assembly calls `get_secondary_compressibility_factor_from_geometry(Kp, b, H)`. It cancels the inverse height before evaluating the continued branch. For $b^2>0.8H^2$, define $e=b^2-0.8H^2$ and use
+
+$$
+\widetilde K_3
+=1-\frac{0.2(0.2H^2)^2}
+{(0.2H^2)^2+0.2H^2e+e^2}.
+$$
+
+This equals $C((b/H)^2)$ wherever $H>0$, and gives $\widetilde K_3=1$, $K_s=K_p$ and zero height slope directly at $H=0$ for $b>0$. No infinite intermediate ratio is formed. The older ratio-taking helper remains available for callers already supplying $b/H$; the loss assembly uses geometry directly.
+
 The onset at 0.8 and unit asymptote are engineering continuation choices, not limits calibrated by Kacker and Okapuu. Figure 13 plots $K_3$ up to approximately $b/H=1.2$. The present modification starts at $b/H=\sqrt{0.8}\simeq0.894$, so it changes the upper part of that chart as well as defining behavior beyond it. The original KO expression is recovered exactly where $K_3\le0.8$.
 
 ### 4.2 Resulting secondary loss and aspect-ratio sensitivity
@@ -283,6 +352,14 @@ Here $K_p\simeq0.57836$, and the $K_3$ continuation starts below $\mathrm{AR}\si
 The severe low-height collapse is removed, but the complete loss is still not strictly monotone in aspect ratio. In this example, it has a shallow minimum of approximately 0.10707 near $\mathrm{AR}=0.653$ and a maximum of approximately 0.11509 near 0.870. The derivative panel shows this remaining reversal: $f_{\mathrm{AR}}$ decreases with increasing height, while $K_s$ increases, and neither effect always dominates. Bounding each factor does not impose monotonicity on their product.
 
 Beige shading marks $b/H>1.2$, beyond the extent of Figure 13. For this chord ratio that corresponds to $\mathrm{AR}<0.589$. Neither smoothness nor bounded factors establish experimental validity for very short blades.
+
+### 4.3 Direct evaluation at zero aspect ratio
+
+![Complete secondary coefficient and its geometry factors evaluated through zero aspect ratio](../figures/ko_secondary_robustness_ar.png)
+
+[PDF](../figures/ko_secondary_robustness_ar.pdf) | [CSV](../data/secondary_review/robustness_ar.csv)
+
+This additional linear-axis sweep includes $\mathrm{AR}=0$ explicitly, at fixed $\alpha_1=40^\circ$, $\alpha_2=60^\circ$ and $b/c=\cos45^\circ$. Circles are direct production evaluations at zero height, rather than values inferred from a small positive height. The complete coefficient approaches $C_{\mathrm{angles}}K_p$ and has zero right derivative there. At zero Mach, $K_p=K_s=1$ throughout; the other curves show the finite compressibility reduction. Chord remains positive. The simultaneously zero height and meridional chord case is deliberately invalid because its $b/H$ limit depends on the path.
 
 ## 5. Mach-number sensitivities of the complete secondary loss
 
@@ -323,29 +400,37 @@ At fixed positive $M_2$, increasing $M_1$ increases the bounded ratio factor $K_
 
 ## 6. Review findings and reproduction
 
-The loading algebra, mean-angle convention, constants 0.0334 and 1.2, true-chord aspect ratio, and axial-chord factor $K_3$ agree with the paper after translating signed angles. The current implementation adds the smooth aspect patch, a continuation that keeps $f_{\mathrm{AR}}$ below one, modified shared compressibility factors, and a smooth continuation of $K_3$ toward one. This gives $K_p\le K_s\le1$ without a separate $K_s$ floor. The aspect continuation leaves factors up to 0.8 unchanged; it does not impose an upper bound on the final secondary coefficient. The code also continues varying that coefficient beyond sonic exit, where the paper prescribes a constant value.
+The constants 0.0334 and 1.2, signed-angle convention, true-chord aspect ratio and axial-chord compressibility factor follow the KO construction. Where all angular and geometry continuations are inactive, the current calculation matches the paper. Outside those regions, the documented continuations keep loading, metal-angle projection, aspect factor and compressibility influence finite. The complete secondary coefficient has no separate hard cap and may remain larger than 0.5.
 
-The two factor continuations control height amplification and excessive compressibility reduction. They remove the 0.1 plateau but can leave a shallow reversal in the product $Y_s$. The choice of whether to restore the paper's sonic-exit continuation or adopt a documented smooth alternative remains open. The aspect-ratio smoothing remains $1.5<\mathrm{AR}<2.5$; the figures evaluate the production function with that patch and the bounded aspect factor. Neither differentiability nor a bounded factor alone validates an extrapolation.
+The zero-height treatment changes evaluation at the endpoint, not the positive-height formula: inverse powers are cancelled before arithmetic, so Python scalars and arrays share the same finite result. The common angle helpers remove tangent poles and cosine sign changes. Zero turning remains exactly zero, and reversing all angle signs preserves loss.
+
+The geometry factors can still produce a shallow reversal in the aspect-ratio trend: decreasing $f_{\mathrm{AR}}$ competes with increasing $K_s$. The code also continues varying the coefficient above sonic exit, where the original paper prescribes the sonic-exit value. These are documented features, not claims of calibration in the extrapolated domain. The aspect-ratio smoothing remains $1.5<\mathrm{AR}<2.5$.
 
 The source functions follow this sequence:
 
 | Source function | Implemented role |
 |---|---|
-| `get_secondary_loss` | Assemble signed-angle loading and $Y_s=GK_s$. |
-| `get_secondary_aspect_ratio_factor` | Construct the Hermite-patched $f_0$ and return $C(f_0)$. |
+| `get_secondary_loss` | Assemble $Y_s=GK_s$ with shared bounded loading and cosine coordinates. |
+| `get_blade_tangent` / `get_blade_cosine` | Continue angles beyond $\pm80^\circ$, with tangent asymptote $\pm\tan85^\circ$. |
+| `get_blade_loading` | Preserve loading through 16, then approach an upper bound of 32. |
+| `get_secondary_aspect_ratio_factor` | Construct the Hermite-patched $f_0$ and return its bounded continuation, including $\mathrm{AR}=0$. |
 | `continue_secondary_aspect_ratio_factor` | Forward the aspect factor to the common continuation. |
 | `get_secondary_compressibility_factor` | Compute $C((b/H)^2)$ and the weighted average defining $K_s$. |
+| `get_secondary_compressibility_factor_from_geometry` | Evaluate the same influence directly from $b,H$, including $H=0,b>0$, without dividing by height. |
 | `continue_secondary_factor` | Evaluate the shared rational law $C$ using reciprocal arithmetic for large raw factors. |
 
-The source docstrings specify the equations, domains and reasons for these modifications. No arithmetic discrepancy was found in the stated domain during this review; the changes clarify the documentation and add checks for independent inlet metal angle and common length-unit scaling.
+The source docstrings specify the equations, domains and reasons for the modifications. Independent assembly checks include inlet metal angle separately from flow angle, and direct endpoint calls verify the zero-height behavior.
 
-The [calculation and rendering script](../scripts/secondary_review.py) saves the sweep coordinates, values and derivatives for all six figures in [the secondary-review data directory](../data/secondary_review/); fixed inputs are defined in the script and above each figure. Its [validation record](../data/secondary_review/validation.json) records the checks and source provenance for these focused results:
+The [calculation and rendering script](../scripts/secondary_review.py) saves data for all eight figures in [the secondary-review data directory](../data/secondary_review/). Its [validation record](../data/secondary_review/validation.json) includes the shared angle helper in source provenance and records these focused checks:
 
-- 48 sensitivity curves, with complex-step derivatives checked against independent five-point real differences; the maximum absolute difference is $6.9\times10^{-11}$. Separate chain-rule checks verify both factor continuations, $dK_s/dx$ and the complete product derivative $dY_s/dx$. For the nine fixed-$z$ angle curves, additional checks include the moving inlet angles in the total derivative and verify zero loss and slope at the origin and along the entire $z=-1$ curve.
-- 3,330 independent comparisons against equations (11)-(14) and the factor 1.2 outside the aspect-ratio patch, with compressibility disabled. Before the aspect-factor continuation, the geometric coefficients agree within $8.6\times10^{-14}$; independently applying the factor continuation gives agreement within $2.9\times10^{-13}$ for the implemented loss.
-- 4,000 combined geometry/Mach cases over $0.2\le\mathrm{AR}\le5$. Checks cover finite nonnegative losses, $f_{\mathrm{AR}}\le1$, $0\le\widetilde K_3\le1$ and $K_p\le K_s\le1$, equality between row identifiers, reflection symmetry, and exactly zero loss at zero turning. An explicit high-turning case at $\mathrm{AR}=0.2$ gives $Y_s\simeq13.956$, confirming that the final coefficient has no 0.5 cap.
-- 2,016 additional angle/Mach combinations at $\mathrm{AR}=0.01$, below the plotted range. The aspect factor is approximately 0.999998, and all secondary coefficients are finite. Their maximum is approximately 79.13, compared with 5,122 before the aspect-factor continuation; large angular loading remains visible.
-- Value, slope and curvature checks at the aspect-continuation onset and both aspect-patch endpoints. All 40 targeted tests pass: nine existing refinement tests and [31 secondary-loss tests](../../../../tests/test_ko_secondary.py). The latter include 3,500 combined production cases checked against an independent assembly, and verify that compressibility acts exactly as $Y_s=GK_s$. Additional tests check the $K_3$ join, convex bounds, original-branch identity, nonzero low-aspect-ratio Mach sensitivity, independent inlet-metal-angle projection, and invariance to consistent changes of length units.
+- 48 sensitivity curves, with complex-step gradients checked against independent five-point real differences. Separate chain-rule checks verify both factor continuations, $dK_s/dx$ and the complete product derivative. Fixed-$z$ curves include the moving inlet-angle contribution, zero origin value and slope, exact zero turning, and reflection checks over the added negative-angle interval. Both values and total derivatives are checked: loss is even and the derivative is odd along these prescribed paths.
+- 2,588 comparisons against the paper where the aspect join and angle/loading continuations are inactive. Maximum absolute discrepancy is $2.9\times10^{-15}$ before the aspect continuation and $1.3\times10^{-15}$ after independently applying it.
+- 4,000 combined geometry/Mach cases: finite nonnegative losses, $f_{\mathrm{AR}}\le1$, $0\le\widetilde K_3\le1$, $K_p\le K_s\le1$, row-identifier equality, reflection symmetry and exact zero-turning loss.
+- 2,016 additional angle/Mach combinations at $\mathrm{AR}=0.01$. The largest loss is approximately 6.934 with the bounded angle treatment. An explicit $\mathrm{AR}=0.2$, $\alpha_1=80^\circ$, $\alpha_2=60^\circ$ case gives $Y_s\simeq3.6523$, confirming that no final 0.5 cap is applied.
+- 5,324 extreme-angle/height combinations, including independent inlet metal angles, exactly $\pm90^\circ$, angles up to $\pm10^6$ degrees and zero height. All losses are finite and nonnegative.
+- Direct zero-height evaluations and finite zero-height gradients for three Mach pairs, plus slope and curvature checks at both Hermite endpoints and the aspect-continuation onset.
+
+These are component robustness checks. They do not establish aerodynamic validity at zero height or extreme angles, and stage/turbine cases have not been rerun for this revision.
 
 Reproduce these focused results from the repository root with
 
@@ -355,11 +440,9 @@ python -B improving_turbodash/loss_model_audit/1_individual_functions/scripts/se
 
 The figures use the repository plotting style and ordered colors for each angle or Mach family. Shading and line annotations distinguish numerical joins and diagnostic continuations; they do not imply experimental validation over the entire displayed range.
 
-### Earlier baseline comparisons
+### Additional current-source slices
 
-The five comparisons below preserve the earlier baseline/candidate audit. They are historical results and are not the source of the new figures above. Their recorded inputs and provenance are available in the [original sweep manifest](../data/sweep_manifest.json).
-
-| Sweep | Historical figure | Numerical data |
+| Sweep | Comparison figure | Numerical data |
 |---|---|---|
 | Aspect ratio | [Open](../figures/ko_secondary_aspect_ratio.png) | [CSV](../data/sweeps/fundamental_ko_secondary_aspect_ratio__stator.csv.gz) |
 | Incidence | [Open](../figures/ko_secondary_incidence.png) | [CSV](../data/sweeps/fundamental_ko_secondary_incidence__stator.csv.gz) |

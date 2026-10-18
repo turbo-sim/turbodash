@@ -312,7 +312,7 @@
   },
   "propagation_comparison": "Current production versus independent analytical-reference substitution; all current corrections retained.",
   "propagation_csv": "data/profile_review/model_propagation.csv",
-  "corrected_ko_at_zero_spacing_re1000": 2.407098222298436,
+  "corrected_ko_at_zero_spacing_re1000": 1.3825148841352506,
   "corrected_ko_not_capped": true,
   "retained_corrections": [
     "Reynolds",
@@ -322,7 +322,7 @@
   ],
   "source_hashes": {
     "improving_turbodash/ainley_mathieson_fitting/analytic_fits.py": "26f88bc58493938e84d34bfb2d239d224bfdec51ace10bd651de22ea8785245b",
-    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "4295e119d25fc43579ec79059484913ed0af83822088eaf2bd50af41f3fa5395"
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "c3d88153360f75ec1e54e53a056d4ec7b41547b9d3e467e4847c66d7705afa08"
   },
   "limits": "Outside chart coverage remains unvalidated. Ordering checked numerically for 0<x<=.5; large-spacing impulse crossings remain possible. Current backend is NumPy; no JAX/JIT guarantee."
 }

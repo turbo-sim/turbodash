@@ -2,7 +2,7 @@
   "policy": "Production get_profile_loss_blend; no runtime overrides",
   "z_range": [
     -1.2,
-    1.2
+    2.0
   ],
   "thickness_values": [
     0.05,
@@ -36,9 +36,9 @@
   ],
   "thickness_transition_center": 0.025,
   "rows": {
-    "vary_alpha2": 4808,
-    "vary_pitch_chord": 4808,
-    "vary_thickness": 6010,
+    "vary_alpha2": 6408,
+    "vary_pitch_chord": 6408,
+    "vary_thickness": 8010,
     "thickness_z_zero_zoom": 5015,
     "thickness_z_zero_limits": 10
   }

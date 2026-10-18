@@ -4,7 +4,7 @@ This note documents the interpolation implemented in the [new KO source](../../t
 
 ## Coordinates and reference losses
 
-Let $\alpha_2$ denote the signed outlet flow angle from axial, named beta_out in the source, and $\theta_{\mathrm{in}}$ the inlet metal angle. The plotted outlet angles are positive. Define
+Let $\alpha_2$ denote the signed outlet flow angle from axial, named beta_out in the source, and $\theta_{\mathrm{in}}$ the inlet metal angle. The plotted outlet angles are positive and above ten degrees. In this range define
 
 $$
 z=-\frac{\theta_{\mathrm{in}}}{\alpha_2},
@@ -14,7 +14,7 @@ R=Y_{\mathrm{nozzle}}(s/c,\widetilde{\alpha}_2),
 I=Y_{\mathrm{impulse}}(s/c,\widetilde{\alpha}_2).
 $$
 
-The reference-fit input is $\widetilde{\alpha}_2=\sqrt{\alpha_2^2+10^{-5}}$, the source's smooth angle magnitude. There is no minimum outlet angle; low-angle inputs extrapolate the analytical references directly. Both reference families use the same pitch/true-chord ratio $s/c$. Nozzle/reaction means axial entry.
+The reference-fit input is the smooth magnitude of the shared continued angle. It equals $\sqrt{\alpha_2^2+10^{-5}}$ for the plotted angles (all within $80^\circ$); extreme magnitudes approach $85^\circ$ smoothly. There is no minimum outlet angle; low-angle inputs extrapolate the analytical references directly. Both reference families use the same pitch/true-chord ratio $s/c$. Nozzle/reaction means axial entry.
 
 | Coordinate | Meaning |
 |---|---|
@@ -35,7 +35,7 @@ Y_{p,\mathrm{ref}}=B(z)=
 \begin{cases}
 R\left(0.8+\dfrac{0.2}{1+z^2}\right), & z<0,\\[6pt]
 (1-z^2)R+z^2I, & 0\le z\le1,\\[3pt]
-R+z^2(I-R), & z>1,\ I\ge R.
+I+0.2I\,A\left(\dfrac{(I-R)(z^2-1)}{0.2I}\right), & z>1,
 \end{cases}
 $$
 
@@ -57,11 +57,11 @@ Loss therefore decreases gradually toward low turning without an angular plateau
 
 Both first derivatives at zero are zero, so the reference blend is $C^1$. Its one-sided curvatures are $-0.4R$ and $2(I-R)$, so it is generally not $C^2$. Complex-step perturbations in $z$, $R$ and $I$ are preserved.
 
-The helper requires finite inputs and positive references. Upper extrapolation with $I<R$ raises ValueError; it is not allowed to continue toward a negative coefficient. All cases plotted below satisfy $I>R$. Very negative $z$ has a small asymptotic gradient. The reverse-turning region $z<-1$ and the region above impulse remain diagnostic extrapolations, not validated design ranges.
+Here $A(v)=v/\sqrt{1+v^2}$ is odd. The helper requires finite inputs and positive references, and accepts either reference ordering. At $z=1$ the continuation matches the quadratic's value, slope and curvature; it tends to $1.2I$ for $I>R$, $0.8I$ for $I<R$, and remains $I$ when the references coincide. The 20% allowance is a numerical choice. Very large $|z|$ has a small asymptotic gradient. The reverse-turning region $z<-1$ and the region above impulse remain diagnostic extrapolations, not validated design ranges.
 
 ## Reference blend versus outlet angle
 
-Fixed $s/c=0.7$, with $\alpha_2=40^\circ,\ 50^\circ,\ 60^\circ,\ 70^\circ$ and $-1.2\le z\le1.2$.
+Fixed $s/c=0.7$, with $\alpha_2=40^\circ,\ 50^\circ,\ 60^\circ,\ 70^\circ$ and $-1.2\le z\le2$.
 
 ![Implemented reference blend for different outlet angles](figures/blend_alpha2.png)
 
@@ -100,13 +100,13 @@ F_t(\tau,z)=
 \begin{cases}
 1,&z\le0,\\[3pt]
 1+S(q)\left[\left(\dfrac{\tau}{0.2}\right)^z-1\right],&0<z<\delta,\\[5pt]
-\left(\dfrac{\tau}{0.2}\right)^z,&z\ge\delta.
+\left(\dfrac{\tau}{0.2}\right)^{E(z)},&z\ge\delta,
 \end{cases}
 $$
 
-This is a convex blend of positive thickness factors. At the midpoint, $S=0.5$. At both boundaries, $S'$ and $S''$ vanish, so the factor matches the value, slope and curvature of the outer laws. It is $C^2$ at both joins and identically one for $\tau=0.2$. The reference interpolation itself is unchanged. The transition width is a numerical modeling choice, not another AM calibration.
+Here $E(z)=z$ through $z=1$ and $E(z)=1+A(z-1)$ above one, gradually approaching two. This prevents exponential growth in $z$ at fixed positive thickness while preserving the original interval. The upper join is $C^2$. The onset remains a convex blend of positive thickness factors. At the midpoint, $S=0.5$. At both onset boundaries, $S'$ and $S''$ vanish, so the factor matches the value, slope and curvature of the outer laws. It is identically one for $\tau=0.2$. These continuation settings are numerical choices, not another AM calibration. The [full profile report](../loss_model_audit/1_individual_functions/report/01_ko_profile.md#23-checking-large-extrapolation-and-reversed-reference-ordering) shows the new large-$z$ limits and the additional zero-angle coordinate safeguard.
 
-The figures use $\alpha_2=60^\circ$, $s/c=0.7$, exit $Re=500000$, inlet/outlet Mach numbers 0.2/0.5, hub/tip ratio 0.8 and zero incidence. Here $f_{\mathrm{Re}}=1$, $K_p=0.94$ and $Y_{\mathrm{shock}}=0$. The horizontal coordinate is $-1.2\le z\le1.2$, with curves for $\tau=0.05,\ 0.15,\ 0.20,\ 0.25,\ 0.40$.
+The figures use $\alpha_2=60^\circ$, $s/c=0.7$, exit $Re=500000$, inlet/outlet Mach numbers 0.2/0.5, hub/tip ratio 0.8 and zero incidence. Here $f_{\mathrm{Re}}=1$, $K_p=0.94$ and $Y_{\mathrm{shock}}=0$. The horizontal coordinate is $-1.2\le z\le2$, with curves for $\tau=0.05,\ 0.15,\ 0.20,\ 0.25,\ 0.40$.
 
 ![Final KO profile loss versus z for different maximum thickness-to-chord ratios](figures/thickness_z.png)
 
@@ -136,7 +136,7 @@ From the repository root, using the project Python environment:
 
 [study.py](study.py) calls the production helper and full profile function. [plot.py](plot.py) renders saved values and derivatives without model evaluation. All four figures use `z` as the horizontal coordinate. In the first two CSVs, `blended_reference` is the plotted ordinate; `profile_loss` additionally records the corrected coefficient. The third figure plots `profile_loss` with curves grouped by `thickness_chord` in `vary_thickness.csv`. The close-up uses separate `thickness_z_zero_zoom.csv` and `thickness_z_zero_limits.csv` tables, with both transition boundaries included explicitly.
 
-[Validation](data/validation.json) checks the 13 main curves and five close-up curves against independent expressions, exact endpoints, the zero-turning value, complex-step slopes, one-sided join limits, sign reflection and positivity over 605,151 diagnostic grid points. The grid spans $40^\circ\le\alpha_2\le70^\circ$, $0.3\le s/c\le1.1$, $-1.2\le z\le1.2$; it is an implementation test, not a rectangular claim of chart coverage. [Provenance](data/provenance.json) identifies the production sources and saved data.
+[Validation](data/validation.json) checks the 13 main curves and five close-up curves against independent expressions, exact endpoints, the zero-turning value, complex-step slopes, one-sided join limits, sign reflection and positivity over 806,031 diagnostic grid points. The grid spans $40^\circ\le\alpha_2\le70^\circ$, $0.3\le s/c\le1.1$, $-1.2\le z\le2$; it is an implementation test, not a rectangular claim of chart coverage. [Provenance](data/provenance.json) identifies the production sources and saved data.
 
 The [profile report](../loss_model_audit/1_individual_functions/report/01_ko_profile.md) embeds the same four figures. [verify_markdown.cjs](verify_markdown.cjs), run with Node, checks dollar-delimited equations and local links using VS Code Markdown+Math and KaTeX.
 

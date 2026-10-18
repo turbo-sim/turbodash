@@ -4,24 +4,24 @@
   "derivative_recalculations": 0,
   "files": {
     "digitization_overlay.png": "45030337bcc27ab53c990e88b35d851d6a6ed0de2d6c34a57022b692a7c297ba",
-    "digitization_overlay.pdf": "e09d8c7a56b205e7dc4e89f36257f5819dc3feb3f59e66829c830d9ecf48e715",
-    "reference_fit.png": "39a4afd431439dc53a1023e05a69e96b83a3ce7e0fdec671a0fcb4dc76d894ca",
-    "reference_fit.pdf": "9f556e225cbfaa2dcae3df22818134561caedf514465a74f7492940a28599b2f",
+    "digitization_overlay.pdf": "ace42b286b0bcad9f775da55988a44f273c07bd8b5b70b81659bbbbbb56917d7",
+    "reference_fit.png": "b9d67a6ab76473ff110df34724dc40b36e72dfba2cd14a8bc77779410547d866",
+    "reference_fit.pdf": "0a17f662945945da0ae62f787e312b17b4ad560671333dec4f25ed3690da7ec2",
     "reference_continuation.png": "28780ad0ba36e8e7673a684ccbc43b474f1c6fc91fcc0c5d6b7accc6c1a59d56",
-    "reference_continuation.pdf": "5f88c1cb3c9ab31220d63ca7267d1dbf434c9125cf226e59dbebdf92d2832382",
+    "reference_continuation.pdf": "d58747a6a53a045007b15ea8a61ed8ec9fc0702b2a8be29ad30d989672b05ec2",
     "z_interpolation.png": "5a69ef7aab50e6cbab6db23811003e5fbcc467bd83c32d8f525be81eac4f1525",
-    "z_interpolation.pdf": "8aadb31beaf3766b9e8d4bb0552621ec5f494c608592c061a3f5c0bb1ec0b621",
-    "thickness_sensitivity.png": "ac1ebad6295b30108483d6d1d289c3d31d5ee092283394d5470fe3288f218cc8",
-    "thickness_sensitivity.pdf": "75cd5a86c9cc0489b19e928a2593d91e72ac913910dd565198821f7c22a54c7a",
-    "mach_sensitivity.png": "8c4f3f2230a79048d9f12ae7339d4b4f04619d284ab9abc16df305b46d089185",
-    "mach_sensitivity.pdf": "657a683490a03b8e09f7b1e75f3d376fd7acd1be0006a55a1d45651bd7051404"
+    "z_interpolation.pdf": "06b02dcfa66986886cebf2e9d4b321797a6279a1138103321d49a9499f0a3f6d",
+    "thickness_sensitivity.png": "5143ce571e456a0b01d07fe12930d20e40df77255e7f8fa1e6ffab54fbfe05c9",
+    "thickness_sensitivity.pdf": "7e655b34282ec7f32186df0fce9d3c50d5d832763cffca281f178ca6c9e1a942",
+    "mach_sensitivity.png": "69d96cb20ae2ad37b2b6a399fa20ee064473fea92d1822bef05cf7fa0e0ad515",
+    "mach_sensitivity.pdf": "190cea5ba648fd478748cfce078463ec648d2610590aeb3911f69174353fc5a6"
   },
   "data_sha256": {
     "digitized_points.csv": "f1bbfb09fc02a0bf2f63225111f99ccb0607c8b87848e3ae163704123954f19e",
     "fit_residuals.csv": "818cad71d0cfc245b7453af68cb9be0a67f4e6a20879cdcc3bbde7fb9046a4be",
     "join_checks.csv": "aa9d855f2384586cde92508207a8d2ac6f2711b8d0d04959d572e0573965ef65",
-    "mach_sensitivity.csv": "53c42b771b8945f6493331b5c3ed253e4b81632dea7099c9bcb4842350362364",
-    "references.csv": "3fcc0d7df44ef161315d2834fb0ab55466e9d6469d68f6da4414beecd8f07d59",
+    "mach_sensitivity.csv": "b5a806d5b4efb6980c6c0d9ad034ddb9702ddcdfb3f5776ecaa6b9209d1f4f31",
+    "references.csv": "f42cc8b70083fa056a3356fea53015173b9c0636170dd75e1a493b5b84f21e68",
     "thickness_sensitivity.csv": "9c5c272da918b1a3060e255e70144e3177082166766f04173530209320a05c21",
     "z_sensitivity.csv": "c90f30e0a83ef2f53ec011901ee18a4f205b029dbd15bbbc0c98f76a3dc2e9f2"
   },
@@ -30,8 +30,8 @@
     "fit.py": "681899a896268a5e084829ae3c99c454b9882d21edc43b003ffc47dae2351bf3",
     "fit_constants.py": "5b7fcdbd58c776ad973515cf54fdbbbbc9421e03ea4cb1ddbbf2be02f7dbf161",
     "model.py": "52f06fdbe04b01ffce7a8a76cb724baa3def98daeaab4055aa3e3ed261b82459",
-    "report.py": "3dc809ec533835eebc3b443e4bb5643debc3a87306aa51b6110c2553e23d1a17",
-    "run.py": "f2c62e1b605f5ebdcd91cb36f4fce5ca26d309fe7984c2b8401a3ff8fd851638",
+    "report.py": "a0b731fb3537319c1b5260d84aacbd433aa946704945bdab5823515090de2243",
+    "run.py": "fe905ca863fde272db6234b5a72bdb39d5d3afd2e3c6097d158c3e884aed4136",
     "test_model.py": "42d2ed90b2dfc4c1b2bcdfe259390376fb84024c3bf236c0a9397c1502c6f973"
   },
   "validated_code_sha256": {
@@ -39,26 +39,22 @@
     "fit.py": "681899a896268a5e084829ae3c99c454b9882d21edc43b003ffc47dae2351bf3",
     "fit_constants.py": "5b7fcdbd58c776ad973515cf54fdbbbbc9421e03ea4cb1ddbbf2be02f7dbf161",
     "model.py": "52f06fdbe04b01ffce7a8a76cb724baa3def98daeaab4055aa3e3ed261b82459",
-    "report.py": "85d1d952fb2fbb41cc08efaa3dd6db398810af2c6ef2ca922f89987c2df75879",
-    "run.py": "449556aca15c45353a6757bd7c9b3cd0413b3c9cfec0b830aa86a80eddc97873",
+    "report.py": "a0b731fb3537319c1b5260d84aacbd433aa946704945bdab5823515090de2243",
+    "run.py": "fe905ca863fde272db6234b5a72bdb39d5d3afd2e3c6097d158c3e884aed4136",
     "test_model.py": "42d2ed90b2dfc4c1b2bcdfe259390376fb84024c3bf236c0a9397c1502c6f973"
   },
   "comparison_source_sha256": {
     "turbodash/loss_models_new/__init__.py": "5b9d3bc6706ab907bf8314428b244132feb46cf2754de33ba2e0d8f7676593a3",
     "turbodash/loss_models_new/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
+    "turbodash/loss_models_new/_blade_loading.py": "8be374f9be233a7027e39a552c8c424200a3f00d05706868d8c75968df1666a5",
     "turbodash/loss_models_new/_numerics.py": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff",
+    "turbodash/loss_models_new/_trailing_edge.py": "594970afedea411fbf4e1f6a86017ac46372f36b5f0452c78234940441630ce8",
     "turbodash/loss_models_new/loss_coefficient_conversion.py": "eab232ff2304b104726b2b3af4a87c96c65f302903e807ea9dd3dc2db827ae98",
     "turbodash/loss_models_new/loss_model.py": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11",
-    "turbodash/loss_models_new/loss_model_benner.py": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba",
-    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "4f89c8c45e6eae69e9c0b52e5929d929137aa60b540040de4cba4081dda68b08",
-    "turbodash/loss_models_new/loss_model_moustapha.py": "923339d879bb7edf952112296b605073d9c5f466e541ea04b3ce10f3f8e1f489",
-    "turbodash/loss_models/__init__.py": "225e50f404dd5fcc97a95c6d3ff9d8a94844c73c4f0bfaa4fd65d0ff88747b18",
-    "turbodash/loss_models/loss_coefficient_conversion.py": "21ffa896097129972ec2130ba6cf54377fc6726ba5960d73c8fd40cd90454309",
-    "turbodash/loss_models/loss_model.py": "156fbe3b0a9510b760f32e73b39c09533edf8e3e4798df9cdb08cd32f905a3e4",
-    "turbodash/loss_models/loss_model_benner.py": "ce5e2aae37a04718c0ad8b6801b67be2e7824fdacd407affcb00e279ff46d649",
-    "turbodash/loss_models/loss_model_kacker_okapuu.py": "197794ed5736c997b865e43860ffeccdaf4dfd21dbc2f99b2191f4a28abab28d",
-    "turbodash/loss_models/loss_model_moustapha.py": "9918fc36bf9e3ed59d65256332d21780f0baff6ade302e8ee49c342e31b1d762",
+    "turbodash/loss_models_new/loss_model_benner.py": "cac62576a82d6db189d94a5ee6f71f980b5e5de8dfe6d35d6ac2e3cdd22a1659",
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "c3d88153360f75ec1e54e53a056d4ec7b41547b9d3e467e4847c66d7705afa08",
+    "turbodash/loss_models_new/loss_model_moustapha.py": "556caad2121e18a57d4f5a6af3161fba8d421f957ac0779148fdec2e4efed4b8",
     "turbodash/math.py": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772"
   },
-  "comparison_source_matches_worktree": false
+  "comparison_source_matches_worktree": true
 }

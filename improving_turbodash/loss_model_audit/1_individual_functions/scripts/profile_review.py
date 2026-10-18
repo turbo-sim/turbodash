@@ -1,6 +1,6 @@
-"""Baseline and current analytical AM reference losses.
+"""Current analytical AM reference losses.
 
-Calculate paired data with 200 base points plus shared refinement. Rendering
+Calculate current-source data with 200 base points plus shared refinement. Rendering
 reads only saved values and derivatives; no production sources are copied.
 """
 import argparse
@@ -17,7 +17,7 @@ from engine import bisection
 
 DATA = BASE / "data/profile_review"
 FIGURES = BASE / "figures"
-VERSIONS = ("baseline", "candidate")
+VERSIONS = ("candidate",)
 ANGLES = {"nozzle": (40, 50, 60, 65, 70, 75, 80), "impulse": (40, 50, 55, 60, 65, 70)}
 SPACINGS = (0.5, 0.65, 0.8, 1.0, 1.2)
 DATA_FILES = ("pitch_families.csv", "angle_transitions.csv", "transition_probes.csv")
@@ -52,13 +52,18 @@ def branch_slopes(x, y, breaks=()):
 
 
 def angle_grid():
-    return shared_grid(0., 80., 1601, np.linspace(55, 66, 1101))
+    return shared_grid(-20., 80., 2001, np.r_[np.linspace(55, 66, 1101), 0.])
 
 
 def raw_curves(model_modules):
     spacing, spacing_base = shared_grid(.3, 1.2, 401)
     angles_x, angle_base = angle_grid()
     families, angles, probes = [], [], []
+    angle_model = model_modules["candidate"]["ko"]
+    def mapped_angle(q):
+        effective = angle_model.get_effective_outlet_angle(q, reference=1.)
+        represented = angle_model.get_blade_angle(effective)
+        return np.sqrt(represented*represented+1e-5)
     for version in VERSIONS:
         ko = model_modules[version]["ko"]
         for family, prescribed_angles in ANGLES.items():
@@ -69,9 +74,10 @@ def raw_curves(model_modules):
                     families.append(dict(version=version, family=family, angle_deg=angle,
                         pitch_chord=x, base_grid=int(x in spacing_base), Yp=value, dYp_d_pitch_chord=slope))
             for pitch in SPACINGS:
-                values = np.asarray(function(pitch, angles_x), dtype=float)
+                magnitude = mapped_angle(angles_x)
+                values = np.asarray(function(pitch, magnitude), dtype=float)
                 breaks = (60., 63.) if family == "nozzle" else (60.,)
-                slopes = branch_slopes(angles_x, values, breaks if version == "baseline" else ())
+                slopes = np.imag(function(pitch, mapped_angle(angles_x+1e-25j)))/1e-25
                 for angle, value, slope in zip(angles_x, values, slopes):
                     angles.append(dict(version=version, family=family, angle_deg=angle,
                         pitch_chord=pitch, base_grid=int(angle in angle_base), Yp=value, dYp_d_angle_deg=slope))
@@ -99,16 +105,16 @@ def calculate():
         write_csv(DATA/name, table)
     minima = [min((r for r in families if r["version"]==v and r["family"]==f and r["angle_deg"]==a), key=lambda r:r["Yp"]) for v in VERSIONS for f, aa in ANGLES.items() for a in aa]
     write_json(DATA/"manifest.json", dict(
-        description="Baseline Aungier versus current analytical AM reference coefficients Yp(s/c,alpha); full-profile interpolation is reviewed separately.",
-        conditions=dict(maximum_thickness_chord=.2, applied_corrections="Raw curves: no KO scaling, Reynolds, Mach, shock, thickness or inlet-angle interpolation. Full KO shown separately.", angle_units="degrees from axial direction", angle_below_40="Direct analytical extrapolation; KO uses the smooth outlet-angle magnitude without a minimum."),
+        description="Current analytical AM reference coefficients Yp(s/c,alpha); full-profile interpolation is reviewed separately.",
+        conditions=dict(maximum_thickness_chord=.2, applied_corrections="Reference curves: no KO scaling, Reynolds, Mach, shock, thickness or inlet-angle interpolation. Full KO shown separately.", angle_units="signed physical outlet angle in degrees from axial", angle_below_40="Unsigned references evaluated along the production fixed-positive-design effective outlet angle, bounded tangent angle and smooth magnitude; no reflection at zero."),
         coefficient_definition="Reference stagnation-pressure loss coefficient (p0_in-p0_out)/(p0_out-p_out); raw fits do not solve a turbine or predict efficiency.",
         candidate_reference=dict(form="m+(A+B/x)*(x-x0)^2", coefficient_source="ainley_mathieson_fitting/data/fit_results.json:current_fit", angle_convention="positive outlet magnitude from axial; no complementary conversion", continuation_threshold=.25, reference_ceiling=.5, zero_spacing_limit=.5, zero_spacing_slope=0., continuation_regular="C2", former_aungier_blends="superseded", raw_and_bounded_differ_outside_chart=True),
         pitch_grid=dict(start=.3,stop=1.2,base_samples=200,samples=len(shared_grid(.3,1.2,401)[0])),
-        angle_grid=dict(start=0,stop=80,base_samples=200,samples=len(angle_grid()[0]),pitch_chord=list(SPACINGS),zoom=[55,60]),
+        angle_grid=dict(start=-20,stop=80,base_samples=200,samples=len(angle_grid()[0]),pitch_chord=list(SPACINGS),zoom=[-20,60]),
         minima=minima,
         counts={n:len(t) for n,t in zip(DATA_FILES,tables)},
         source_references=["https://reports.aerade.cranfield.ac.uk/handle/1826.2/3538", "https://www.asme.org/publications-submissions/books/find-book/turbine-aerodynamics-axial-flow-radial-inflow-turbine-design-analysis"],
-        derivative_method="Three-point physical-coordinate differences; raw-angle baseline branches are split at known corners.",
+        derivative_method="Physical-coordinate differences for spacing and complex-step for angle; all values use current source.",
         smallest_interval_probes=[r for r in probes if r["h"]==1e-5],
         data_sha256={n:sha256(DATA/n) for n in DATA_FILES},source_modules=imported_sources(),script_sha256=sha256(__file__),calculate_seconds=perf_counter()-started))
     return tables
@@ -158,7 +164,7 @@ def render():
         for ax in axes:
             shade_outside(ax, (.3, 1.1 if family == "nozzle" else 1.), (.3, 1.2))
         finish(fig,f"am_{family}_pitch_chord.png",f"Ainley-Mathieson reference curves: {family}",handles,"tmax/c=0.2; current analytical reference curves. Colors identify exit-angle magnitude.")
-    for name,lo,hi in [("am_angle_transitions.png",0,80),("am_angle_zoom.png",55,60)]:
+    for name,lo,hi in [("am_angle_transitions.png",-20,80),("am_angle_zoom.png",-20,60)]:
         fig,axes=plt.subplots(2,2,figsize=(16,7.5),sharex=True)
         for row,family in enumerate(ANGLES):
             for i,pitch in enumerate(SPACINGS):
@@ -169,13 +175,16 @@ def render():
             for ax in axes[row]:
                 ax.set_xlim(lo,hi)
                 shade_outside(ax, (40, 80 if family == "nozzle" else 70), (lo, hi))
+                ax.axvspan(-20, 10, color="#8fb8d8", alpha=.22, zorder=0)
+                ax.axvline(0, color=".55", lw=.7)
+                ax.axvline(10, color=".55", lw=.7, ls=":")
             axes[row,0].set_ylabel(f"{family.capitalize()} Yp")
             axes[row,1].set_ylabel("dYp / d alpha (per degree)")
         axes[0,0].set_title("Reference profile pressure-loss coefficient")
         axes[0,1].set_title("Angle sensitivity at fixed pitch/chord")
-        for ax in axes[-1]:ax.set_xlabel("Exit flow angle magnitude from axial direction (deg)")
+        for ax in axes[-1]:ax.set_xlabel("Signed exit angle from axial (deg); fixed design direction")
         handles=[Line2D([0],[0],color=color(i,len(SPACINGS)),lw=1.2,label=f"s/c={p:g}") for i,p in enumerate(SPACINGS)]+version_handles
-        finish(fig,name,f"Analytical Ainley-Mathieson reference curves: {lo}-{hi} deg",handles,"Tint: outside chart angle coverage; some fixed spacings also exceed chart coverage.\nKO evaluates low outlet angles directly, without a minimum-angle limit.")
+        finish(fig,name,f"Analytical Ainley-Mathieson reference curves: {lo}-{hi} deg",handles,"Blue: production angle continuation below 10 deg. Beige: outside chart angle coverage; some spacings also exceed coverage.\nReferences follow the fixed positive-design production angle path; the signed physical angle is not reflected.")
     assert before=={n:sha256(DATA/n) for n in DATA_FILES}
     write_json(DATA/"render_manifest.json",dict(displayed_versions=list(displayed_versions), obsolete_angle_blend_shading=False, model_calls=0,derivative_recalculations=0,saved_values_and_derivatives_unchanged=True,data_sha256=before,figures={n:sha256(FIGURES/n) for n in PLOT_FILES},script_sha256=sha256(__file__),render_seconds=perf_counter()-started))
 

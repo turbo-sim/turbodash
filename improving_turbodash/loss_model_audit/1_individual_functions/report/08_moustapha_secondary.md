@@ -2,7 +2,7 @@
 
 [Previous: Moustapha: incidence loss](07_moustapha_incidence.md) · [Section index](../readme.md) · [Next: Benner: secondary loss](09_benner_secondary.md)
 
-Comparison recorded on 2026-10-17: **previous implementation (baseline)** versus **revised implementation (candidate)**. These are individual-function results; [return to the audit overview](../../readme.md) for stage-level evidence.
+These plots evaluate the current production implementation. [Audit overview](../../readme.md).
 
 ## Functions and dependencies
 
@@ -12,17 +12,15 @@ Comparison recorded on 2026-10-17: **previous implementation (baseline)** versus
 
 The correction factor's extra positive-branch terms start quadratically, so its chi 0 join already has a continuous first derivative. Its second derivative changes there.
 
-## Implemented changes
+## Implemented formulation
 
 The correction factor is unchanged. The separate KO secondary component on which the complete Moustapha model depends receives the aspect-ratio repair described in its report. These fundamental plots show the factor alone.
 
-## Baseline versus candidate
+## Current values and derivatives
 
 ![moustapha_secondary_incidence: values and d/dx](../figures/moustapha_secondary_incidence.png)
 
 ![moustapha_secondary_leading_edge_ratio: values and d/dx](../figures/moustapha_secondary_leading_edge_ratio.png)
-
-Solid: preserved baseline; dashed: revised candidate. Both use the same inputs, 200 base points and shared adaptive refinement. Right panels are d/dx, including logarithmic x axes. NaN value gaps remain explicit; omitted close derivative support does not delete value records.
 
 ## Quantitative checks
 
@@ -30,8 +28,7 @@ Shrinking one-sided probes below use h=1e-5×max(1,|join|). The full h sequence 
 
 | Feature | Version | Extrapolated value jump | Right minus left slope |
 |---|---|---:|---:|
-| moustapha_secondary_reference | baseline | -1.1805e-12 | 1.8819e-07 |
-| moustapha_secondary_reference | candidate | -1.1805e-12 | 1.8819e-07 |
+| moustapha_secondary_reference | current | -1.1805e-12 | 1.8819e-07 |
 
 2 fundamental sweeps for this mechanism. [Value/gradient data and manifest](../data/sweep_manifest.json), [first-derivative convergence](../data/provenance/fundamental_join_intervals.csv), [second-derivative convergence](../data/provenance/fundamental_curvature_intervals.csv). C2 claims additionally use endpoint regression tests; C1 table interpolation and retained C1 branches are explicitly distinguished.
 
@@ -41,7 +38,7 @@ High-incidence growth and absolute-angle conventions remain unresolved. No satur
 
 ## All sweeps for this mechanism
 
-Every figure contains the previous and revised curves; links below cover all saved sweeps, including those not embedded above. CSV files are gzip-compressed.
+Every figure contains current-source values and derivatives; links below cover all saved sweeps, including those not embedded above. CSV files are gzip-compressed.
 
 | Parameter / case | Range | Comparison figure | Numerical data |
 |---|---|---|---|

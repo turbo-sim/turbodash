@@ -17,7 +17,7 @@ TABLES = ("geometry_spacing", "geometry_angle", "mach_inlet", "mach_hub",
 ANGLE_CURVES = (20., 40., 50., 60., 70., 80.)
 SPACING_CURVES = (.3, .5, .7, 1., 1.5, 2.)
 MACH_CURVES = (0., .3, .6, .9, 1.2, 1.5)
-HUB_CURVES = (.2, .3, .5, .7, .9, 1.)
+HUB_CURVES = (-.5, 0., .2, .5, .8, 1.)
 THICKNESS_CURVES = (.05, .1, .15, .2, .25, .4)
 STEP = 1e-25
 
@@ -25,11 +25,12 @@ STEP = 1e-25
 def source_hashes():
     names = ("turbodash/loss_models_new/loss_model_kacker_okapuu.py",
              "turbodash/loss_models_new/_numerics.py", "turbodash/loss_models_new/_backend.py",
+             "turbodash/loss_models_new/_blade_loading.py",
              "turbodash/math.py", "turbodash/loss_model_dispatch.py")
     return {name: sha256(REPO / name) for name in names}
 
 
-def inputs(*, spacing=.7, angle=60., z=.5, tau=.2, reynolds=5e5,
+def inputs(*, spacing=.7, angle=60., z=.5, theta=None, tau=.2, reynolds=5e5,
            m1=.6, m2=.8, hub=.8):
     # Q = (p0-p)/p0. expm1/log1p preserve the small positive outlet head.
     def head_fraction(mach):
@@ -38,9 +39,11 @@ def inputs(*, spacing=.7, angle=60., z=.5, tau=.2, reynolds=5e5,
                 p0_rel_in=2e5, p0_rel_out=2e5,
                 p_in=2e5*(1-head_fraction(m1)), p_out=2e5*(1-head_fraction(m2)),
                 beta_out=angle)
-    geometry = dict(chord=.05, pitch=.05*np.asarray(spacing),
+    effective_angle = modules("candidate")["ko"].get_effective_outlet_angle(angle, reference=60.)
+    inlet_metal = -np.asarray(z)*effective_angle if theta is None else np.asarray(theta)
+    geometry = dict(chord=.05, pitch=.05*np.asarray(spacing), metal_angle_out=60.,
                     maximum_thickness=.05*np.asarray(tau),
-                    leading_edge_angle=-np.asarray(z)*np.asarray(angle), hub_tip_ratio_in=hub)
+                    leading_edge_angle=inlet_metal, hub_tip_ratio_in=hub)
     return flow, geometry
 
 
@@ -48,10 +51,11 @@ def evaluate(ko, row=0, **parameters):
     """Direct total plus a separately assembled additive component budget."""
     flow, geometry = inputs(**parameters)
     total = ko.get_profile_loss(flow, geometry, row)
-    angle = np.sqrt(np.asarray(flow["beta_out"])**2+1e-5)
+    angle = np.sqrt(np.asarray(ko.get_blade_angle(ko.get_effective_outlet_angle(flow["beta_out"], reference=60.)))**2+1e-5)
     reaction = ko.nozzle_blades(geometry["pitch"]/geometry["chord"], angle)
     impulse = ko.impulse_blades(geometry["pitch"]/geometry["chord"], angle)
-    z = -geometry["leading_edge_angle"]/np.asarray(flow["beta_out"])
+    effective_outlet = ko.get_effective_outlet_angle(flow["beta_out"], reference=geometry["metal_angle_out"])
+    z = ko.get_cascade_angle_ratio(geometry["leading_edge_angle"], flow["beta_out"], reference=geometry["metal_angle_out"])
     reference = ko.get_profile_loss_blend(z, reaction, impulse)
     thickness = ko.get_profile_thickness_factor(z, geometry["maximum_thickness"]/geometry["chord"])
     kp = ko.get_compressible_correction_factors(flow["Ma_rel_in"], flow["Ma_rel_out"])[0]
@@ -63,7 +67,8 @@ def evaluate(ko, row=0, **parameters):
     return dict(Yp=total, profile_part=profile_part, shock_part=shock_part,
                 Kp=kp, f_Re=reynolds, reference=reference, thickness_factor=thickness,
                 Y_shock_raw=shock["Y_shock_raw"], Y_shock=shock["Y_shock"],
-                M1_hub=shock["Ma_hub"])
+                M1_hub=shock["Ma_hub"], z_used=z,
+                inlet_metal_deg=geometry["leading_edge_angle"], effective_outlet_deg=effective_outlet)
 
 
 def difference(function, x, h):
@@ -103,14 +108,14 @@ def calculate():
     tables = {name: [] for name in TABLES}
     checks = []
     spacing_grid = np.linspace(.1, 2., 761)
-    angle_grid = np.linspace(1., 80., 791)
+    angle_grid = np.linspace(-20., 80., 1001)
     specifications = []
     for fixed in ANGLE_CURVES:
         specifications.append(("geometry_spacing", 0, fixed, spacing_grid,
                                lambda x, fixed=fixed: dict(spacing=x, angle=fixed)))
     for fixed in SPACING_CURVES:
         specifications.append(("geometry_angle", 0, fixed, angle_grid,
-                               lambda x, fixed=fixed: dict(spacing=fixed, angle=x)))
+                               lambda x, fixed=fixed: dict(spacing=fixed, angle=x, theta=-30.)))
     for row in (0, 1):
         for fixed in MACH_CURVES:
             grid = np.unique(np.r_[np.linspace(.02, 2., 1201), .15, .2, .25, .9, 1.,
@@ -154,8 +159,8 @@ def calculate():
     rng = np.random.default_rng(20261018)
     stress = dict(spacing=rng.uniform(.1, 2, 2000), angle=rng.uniform(1, 80, 2000),
                   z=rng.uniform(-1.2, 1., 2000), tau=rng.uniform(.05, .4, 2000),
-                  reynolds=10**rng.uniform(4, 7, 2000), m1=rng.uniform(0, 1.5, 2000),
-                  m2=rng.uniform(.02, 2, 2000), hub=rng.uniform(.05, 1, 2000))
+                  reynolds=10**rng.uniform(4, 12, 2000), m1=rng.uniform(0, 1.5, 2000),
+                  m2=rng.uniform(.02, 2, 2000), hub=rng.uniform(-1, 1, 2000))
     stress_minima = []
     for row in (0, 1):
         result = evaluate(ko, row, **stress)
@@ -173,7 +178,7 @@ def calculate():
         np.testing.assert_allclose(complete-without_shock, expected, rtol=3e-13, atol=2e-15)
 
     thickness_checks = []
-    z_grid = np.unique(np.r_[np.linspace(-1.2, 1.2, 1201), np.linspace(-.01, .06, 1401), 0., .05])
+    z_grid = np.unique(np.r_[np.linspace(-1.2, 2., 1601), np.linspace(-.01, .06, 1401), 0., .05])
     for tau in THICKNESS_CURVES:
         value, first, second = thickness_derivatives(ko, z_grid, tau)
         assert np.isfinite(value).all() and np.isfinite(first).all() and np.isfinite(second).all()
@@ -182,7 +187,7 @@ def calculate():
         np.testing.assert_array_equal(value[lower], np.ones(np.count_nonzero(lower)))
         np.testing.assert_array_equal(first[lower], np.zeros(np.count_nonzero(lower)))
         probe = np.r_[np.linspace(-.009, -.001, 7), np.linspace(.001, .049, 97),
-                      np.linspace(.051, 1.19, 101)]
+                      np.linspace(.051, 1.99, 101)]
         function = lambda q: ko.get_profile_thickness_factor(q, tau)
         exact_first = np.imag(function(probe+1j*STEP))/STEP
         finite_first = difference(function, probe, 1e-6)
@@ -193,8 +198,14 @@ def calculate():
         weight = q**3*(10-15*q+6*q*q)
         dw = 30*q*q*(1-q)**2/.05
         ddw = 60*q*(1-q)*(1-2*q)/.05**2
-        power = np.exp(log_ratio*probe)
-        expected_second = ddw*(power-1)+2*dw*log_ratio*power+weight*log_ratio**2*power
+        excess = np.maximum(0., probe-1)
+        exponent = np.where(probe > 1, 1+excess/np.sqrt(1+excess**2), np.maximum(0, probe))
+        exponent_first = np.where(probe > 1, (1+excess**2)**(-1.5), np.where(probe > 0, 1., 0.))
+        exponent_second = np.where(probe > 1, -3*excess*(1+excess**2)**(-2.5), 0.)
+        power = np.exp(log_ratio*exponent)
+        power_first = power*log_ratio*exponent_first
+        power_second = power*(log_ratio*exponent_second+log_ratio**2*exponent_first**2)
+        expected_second = ddw*(power-1)+2*dw*power_first+weight*power_second
         expected_second = np.where(probe <= 0, 0., expected_second)
         observed_second = thickness_derivatives(ko, probe, tau)[2]
         np.testing.assert_allclose(observed_second, expected_second, rtol=5e-7, atol=2e-7)
@@ -225,14 +236,17 @@ def calculate():
                   script_sha256=sha256(__file__),
                   data_sha256={name: sha256(DATA / (name+".csv")) for name in TABLES},
                   total_function="turbodash.loss_models_new.loss_model_kacker_okapuu.get_profile_loss",
-                  model_selection="kacker_okapuu_new (unsuffixed names select the preserved baseline)",
+                  model_selection="current Kacker-Okapuu production helper",
                   curves=len(checks), derivative_checks=checks, thickness_checks=thickness_checks,
                   component_assembly_and_derivatives_verified=True, full_profile_shock_isolation_verified=True,
                   crossed_conditions=4000, crossed_minima=stress_minima,
                   defaults=dict(z=.5, tau=.2, Re=5e5, M1=.6, M2=.8, hub_tip=.8, spacing=.7, angle=60.),
                   pressure_prescription="gamma=1.4; equal row-frame p0=200 kPa; static pressures follow each Mach; Re prescribed independently",
-                  derivative_definition="Total derivative along the stated sweep; angle sweep holds z fixed by varying inlet metal angle; Mach sweep includes static-pressure changes",
-                  note="No production edits or function substitutions. Figures include downstream KO/Reynolds factors and continued shock loss. Exact zero outlet Mach/angle are excluded.")
+                  derivative_definition="Total derivative along the stated sweep; angle sweep fixes inlet metal angle -30 degrees and outlet metal angle +60 degrees; Mach sweep includes static-pressure changes",
+                  angle_path=dict(physical_outlet_range=[-20., 80.], inlet_metal_deg=-30.,
+                                  outlet_metal_deg=60., design_direction=1.,
+                                  baseline_z_at_60=.5, low_angle_onset_deg=10.),
+                  note="No production edits or function substitutions. Figures include downstream KO/Reynolds factors and continued shock loss. Exact zero outlet angle is included; zero outlet Mach is excluded.")
     write_json(DATA / "validation.json", result)
     return result
 
@@ -300,20 +314,23 @@ def render():
                     shade_outside(ax, support, (.1, 2.))
                     ax.set(xlim=(.1, 2.), xlabel=r"Pitch / true chord, $s/c$")
                 else:
-                    shade_outside(ax, (40, 70), (1, 80))
-                    ax.set(xlim=(1, 80), xlabel=r"Outlet angle $\alpha_2$ (degrees), fixed $z$")
+                    shade_outside(ax, (40, 70), (-20, 80))
+                    ax.axvspan(-20, 10, color="#8fb8d8", alpha=.22, zorder=0)
+                    ax.axvline(0, color=".5", lw=.7)
+                    ax.axvline(10, color=".5", lw=.7, ls=":")
+                    ax.set(xlim=(-20, 80), xlabel=r"Outlet angle $\alpha_2$ (degrees), fixed inlet metal angle")
             axes[i, 0].set_ylabel(r"Complete profile loss $Y_p$")
             axes[i, 1].set_ylabel(r"$dY_p/d(s/c)$" if i == 0 else r"$dY_p/d\alpha_2$ (per degree)")
             axes[i, 0].legend(handles=handles, ncol=2, fontsize=8, loc="best")
             axes[i, 1].axhline(0, color=".6", lw=.6)
         axes[0, 0].set_title("Full function: spacing sweep")
         axes[0, 1].set_title("First derivative")
-        axes[1, 0].set_title("Full function: angle sweep")
+        axes[1, 0].set_title("Full function: signed outlet-angle sweep")
         fig.suptitle("Complete KO profile: geometry sensitivity (stator)", y=.99)
         finish(fig, "ko_profile_final_geometry",
-               "z = 0.5; thickness/chord = 0.2; Re = 500000; M1/M2 = 0.6/0.8; hub/tip = 0.8.\n"
-               "Tint: beyond the combined AM chart envelope. Dashed: either reference outside its trace-endpoint envelope.\n"
-               "The angle sweep varies the inlet metal angle to keep z fixed; no minimum outlet angle is imposed.")
+               "Thickness/chord = 0.2; Re = 500000; M1/M2 = 0.6/0.8; hub/tip = 0.8. Top: z = 0.5 at each fixed angle.\n"
+               "Bottom: fixed inlet/outlet metal angles = -30/+60 deg; z = 0.5 at outlet 60 deg and varies along the sweep.\n"
+               "Blue: continuation below 10 deg; solid vertical: zero outlet angle. Beige/dashed: beyond combined AM chart coverage.")
 
         for table, fixeds, title in (("mach_inlet", MACH_CURVES, "inlet Mach"),
                                      ("mach_hub", HUB_CURVES, "hub/tip ratio")):
@@ -386,8 +403,8 @@ def render():
         for row in (0, 1):
             for col in range(3):
                 ax = axes[row, col]
-                ax.set(xlim=(-1.2, 1.2) if row == 0 else (-.01, .06), xlabel=r"Blend coordinate $z$")
-                shade_outside(ax, (0, 1), (-1.2, 1.2) if row == 0 else (-.01, .06))
+                ax.set(xlim=(-1.2, 2.) if row == 0 else (-.01, .06), xlabel=r"Blend coordinate $z$")
+                shade_outside(ax, (0, 1), (-1.2, 2.) if row == 0 else (-.01, .06))
                 ax.axvspan(0, .05, color="#8fb8d8", alpha=.2, zorder=0)
                 ax.axvline(0, color=".5", lw=.7, ls=":")
                 ax.axvline(.05, color=".5", lw=.7, ls=":")

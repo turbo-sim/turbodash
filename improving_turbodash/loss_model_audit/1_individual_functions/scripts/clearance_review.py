@@ -22,6 +22,7 @@ STEP = 1e-25
 
 def source_hashes():
     files = [REPO/'turbodash/loss_models_new/loss_model_kacker_okapuu.py',
+             REPO/'turbodash/loss_models_new/_blade_loading.py',
              REPO/'turbodash/loss_models_new/_numerics.py', REPO/'turbodash/math.py']
     return {p.relative_to(REPO).as_posix(): sha256(p) for p in files}
 
@@ -91,16 +92,21 @@ def calculate():
     write_csv(DATA/'gap_sensitivity.csv', gap_rows)
 
     for z in Z_VALUES:
-        angle = np.linspace(0, 80, 801)
+        angle = np.linspace(-20, 80, 1001)
         function = lambda v: ko.get_tip_clearance_loss(*inputs(angle=v, z=z), 1)
         values, derivatives = function(angle), slope(function, angle)
-        assert values[0] == 0 and derivatives[0] == 0
+        origin = np.flatnonzero(angle == 0.)[0]
+        assert values[origin] == 0 and derivatives[origin] == 0
+        negative = np.linspace(-20., 0., 201)
+        np.testing.assert_allclose(function(negative), function(-negative), rtol=2e-14, atol=1e-15)
+        np.testing.assert_allclose(slope(function, negative), -slope(function, -negative),
+            rtol=2e-14, atol=1e-15)
         if z == -1:
             np.testing.assert_array_equal(values, 0.)
             np.testing.assert_array_equal(derivatives, 0.)
         angle_rows.extend(dict(z=z, x=float(v), beta_in=float(-z*v), Ycl=float(y), derivative=float(dy))
                           for v, y, dy in zip(angle, values, derivatives))
-        checks = np.array([0., 20., 40., 60., 80.])
+        checks = np.array([-20., -10., 0., 20., 40., 60., 80.])
         h = 1e-3
         fd = (function(checks-2*h)-8*function(checks-h)+8*function(checks+h)-function(checks+2*h))/(12*h)
         np.testing.assert_allclose(fd, slope(function, checks), rtol=1e-8, atol=1e-10)
@@ -135,8 +141,9 @@ def calculate():
     extreme_gap_chord = extreme_geometry['tip_clearance']/extreme_geometry['chord']
     loss_per_loading = float(.37*ko.get_tip_clearance_aspect_ratio_factor(extreme_ar)
                              *fn(extreme_gap_chord))
-    angle_grid = np.unique(np.r_[np.linspace(0, 120, 1201), 80., 85., 90.])
     for kind, parameters in (('z', (0., .5, 1.)), ('outlet', (20., 40., 60., 80.))):
+        angle_grid = np.unique(np.r_[np.linspace(-20 if kind == 'z' else 0, 120,
+            1401 if kind == 'z' else 1201), 0., 80., 85., 90.])
         for parameter in parameters:
             def function(v):
                 return (ko.get_tip_clearance_loading(-parameter*v, v) if kind == 'z'
@@ -198,6 +205,8 @@ def calculate():
     assert source_hashes() == before
     reference = next(r for r in comparison if r['AR'] == 2. and r['gap_height'] == .01)
     result = dict(passed=True, curves=33, independent_paper_cases=len(ar),
+                  outlet_angle_sweep=dict(minimum=-20., maximum=80., samples=9*1001,
+                      negative_angle_reflection_checked=True, origin_values_and_slopes_checked=True),
                   extreme_angle_geometry=dict(AR=float(extreme_ar),
                       chord=float(extreme_geometry['chord']), height=float(extreme_geometry['height']),
                       effective_gap=float(extreme_geometry['tip_clearance']),
@@ -314,7 +323,9 @@ def render():
             extra = {-1.: ' (zero turning)', 0.: ' (nozzle/reaction)', 1.: ' (impulse)'}.get(z, '')
             handles.append(Line2D([], [], color=color, ls=style, label=rf'$z={z:g}$'+extra))
         for ax in axes:
-            ax.set(xlim=(0, 80), xlabel=r'Outlet angle $\alpha_2=\beta_{\mathrm{out}}$ (degrees)')
+            ax.set(xlim=(-20, 80), xlabel=r'Outlet angle $\alpha_2=\beta_{\mathrm{out}}$ (degrees)')
+            ax.axvspan(-20, 0, color='#d8d3c8', alpha=.4, zorder=0)
+            ax.axvline(0, color='.5', ls=':', lw=.8)
             ax.axhline(0, color='.6', lw=.6, zorder=0)
         axes[0].set(ylabel=r'Tip-clearance loss $Y_{\mathrm{cl}}$', title='Complete rotor clearance coefficient')
         axes[1].set(ylabel=r'$dY_{\mathrm{cl}}/d\alpha_2\vert_z$ (per degree)', title=r'Total angle derivative at fixed $z$')
@@ -322,7 +333,7 @@ def render():
         finish(fig, 'ko_clearance_angle_review',
                'AR = 2; effective gap/height = 0.01; chord = 0.05 m; height = 0.10 m; effective gap = 1 mm.\n'
                'Inlet flow = inlet metal angle = -z alpha2. Dashed: same-sign inlet/outlet flow (diagnostic extension).\n'
-               'The derivative includes both changing angles. Stator clearance is identically zero.', handles)
+               'Beige: negative trial outlet angles. Derivatives include both changing angles; stator clearance is zero.', handles)
 
         rows = read('aspect_factor')
         losses = read('aspect_sensitivity')
@@ -371,7 +382,10 @@ def render():
                              ylim=(0, 34*loss_per_loading))
             axes[row, 1].set(ylabel=r'Loading $Z$', ylim=(0, 34))
             for ax in axes[row]:
-                ax.set(xlim=(0, 120))
+                ax.set(xlim=(-20 if row == 0 else 0, 120))
+                if row == 0:
+                    ax.axvspan(-20, 0, color='#d8d3c8', alpha=.4, zorder=0)
+                    ax.axvline(0, color='.6', ls=':', lw=.8)
                 ax.axvspan(80, 120, color='#d8d3c8', alpha=.4, zorder=0)
                 ax.axvline(90, color='.6', ls=':', lw=.8)
         for ax in axes[0]:
@@ -386,7 +400,7 @@ def render():
         finish(fig, 'ko_clearance_loading_review',
                'Left: complete rotor clearance coefficient. Right: loading Z. AR = 2; gap/height = 0.01; chord = 0.05 m.\n'
                'Solid: production model. Dashed: original KO correlation (stops at 89 deg; may exceed panels).\n'
-               'Beige: tangent continuation beyond 80 deg. Dotted: 90 deg and corresponding Z = 32 limits.', handles, columns=3)
+               'Beige: negative outlet trials (top) and tangent continuation beyond 80 deg. Dotted: zero/90 deg and Z = 32 limits.', handles, columns=3)
     verify_saved()
     result = dict(figures=5, model_calls=0, derivative_recalculations=0, files=outputs,
                   script_sha256=sha256(__file__), data_sha256=record['data_sha256'])

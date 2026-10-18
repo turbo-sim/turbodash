@@ -74,7 +74,7 @@ RULES = {
     "incidence": "Fixed geometry and beta_des; beta_in=metal_in+offset, offset=-30..30 deg. All other flow values fixed. Samples outside -90<beta_in<90 are recorded as invalid, not clipped.",
     "beta_in": "Fixed blade geometry; inlet flow angle changes only. Prescribed correlation probe, not a redesign.",
     "beta_out": "Fixed blade geometry and opening, outlet flow angle changes only; includes exact zero and grazing limits.",
-    "exit_angle": "Fixed geometry/opening; exit magnitude=30..80 deg, retaining the sign of the reference exit metal angle (or reference flow if absent). Gauging_angle is stored unsigned. No reverse-direction exit sweep.",
+    "exit_angle": "Fixed geometry/opening; signed exit coordinate=-20..80 deg in the fixed reference outlet direction. beta_out=sign(reference metal angle)*coordinate, so negative coordinates reverse the trial flow. Includes exact zero. Gauging_angle remains fixed and unsigned.",
     "Re_in": "Flow probe: only inlet Reynolds changes; effective delta/H is recomputed as delta_ref*(Re_in/3e5)^(-1/7).",
     "Re_out": "Flow probe: only outlet Reynolds changes; penetration unchanged, profile Re correction active.",
     "Ma_rel_in": "Flow probe: only inlet Mach changes; prescribed pressures and Re fixed. Do not interpret as a physical thermodynamic path.",
@@ -120,7 +120,7 @@ def perturb(case, variable, value):
         reference = g.get("metal_angle_out", case["flow"]["beta_out"])
         if not np.isfinite(reference) or reference == 0:
             raise ValueError("A nonzero signed exit reference is needed.")
-        f["beta_out"] = np.copysign(value, reference)
+        f["beta_out"] = np.sign(reference) * value
     elif variable == "thickness_chord":
         g["maximum_thickness"] = value * g["chord"]
     elif variable == "leading_edge_ratio":

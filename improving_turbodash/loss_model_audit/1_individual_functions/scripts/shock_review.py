@@ -39,14 +39,14 @@ def calculate():
     checks = []
     for row, family in enumerate(("stator", "rotor")):
         end = ko.HUB_FIT[row][1]
-        radius = np.unique(np.r_[np.linspace(0, 1, 301), .3, .5, end-.01, end+.01])
+        radius = np.unique(np.r_[np.linspace(-1, 1, 601), 0., .5, end-.01, end+.01])
         result = ko.get_shock_loss(ideal_flow(.6), geometry(radius+1j*STEP), row)
         tables["hub_factor"].extend(dict(family=family, x=float(x), Y=float(np.real(y)), dY_dx=float(np.imag(y)/STEP))
                                     for x, y in zip(radius, result["f_hub"]))
         factor = float(ko.get_hub_to_mean_mach_ratio(.5, row))
         specifications = []
         for m1 in MACHS:
-            specifications.append(("hub_tip", m1, np.unique(np.r_[np.linspace(.01, 1, 241), .3, .5]),
+            specifications.append(("hub_tip", m1, np.unique(np.r_[np.linspace(-1, 1, 481), 0., .5]),
                 lambda x, m=m1: ko.get_shock_loss(ideal_flow(m), geometry(x), row),
                 lambda x, m=m1: (np.full_like(x, m), np.full_like(x, .6))))
             specifications.append(("exit_mach", m1, np.unique(np.r_[np.linspace(.02, 1.2, 241), 1.]),
@@ -149,9 +149,10 @@ def render():
                         else: ax.plot(x, y, color=color, lw=1.6)
                 for ax in axes[i]:
                     if sweep in ("hub_factor", "hub_tip"):
-                        ax.set(xlim=(0, 1), xlabel=r"Inlet hub/tip ratio $r_h/r_t$")
-                        shade_outside(ax, (.5, 1), (0, 1))
-                        ax.axvline(.3, color=".5", ls=":", lw=.8)
+                        ax.set(xlim=(-1, 1), xlabel=r"Raw inlet hub/tip ratio $r_h/r_t$")
+                        shade_outside(ax, (.5, 1), (-1, 1))
+                        ax.axvline(.5, color=".5", ls=":", lw=.8)
+                        ax.axvline(0., color=".5", lw=.8)
                     elif sweep == "exit_mach":
                         ax.set(xlim=(.02, 1.2), xlabel=r"Exit Mach number $M_2$")
                         shade_outside(ax, (.02, 1), (.02, 1.2))
@@ -160,8 +161,8 @@ def render():
                         ax.axvspan(.4, .5, color="#8fb8d8", alpha=.2, zorder=0)
                         for value in (.4, .5): ax.axvline(value, color=".5", lw=.8, ls=":")
                 if sweep in ("hub_tip", "exit_mach"):
-                    axes[i, 0].set_ylim(-.01, .52)
-                    axes[i, 0].axhline(.5, color=".5", ls=":", lw=.8)
+                    axes[i, 0].set_ylim(-.01, .72)
+                    axes[i, 0].axhline(.7, color=".5", ls=":", lw=.8)
                 axes[i, 0].set_ylabel(family.capitalize()+(r": $f_{\mathrm{hub}}$" if sweep == "hub_factor" else r": $Y_{p,\mathrm{shock}}$"))
                 coordinate = {"hub_factor":r"(r_h/r_t)", "hub_tip":r"(r_h/r_t)", "exit_mach":"M_2", "onset":r"M_{1,\mathrm{hub}}"}[sweep]
                 symbol = r"f_{\mathrm{hub}}" if sweep == "hub_factor" else r"Y_{p,\mathrm{shock}}"
@@ -171,13 +172,13 @@ def render():
             axes[0, 1].set_title("First derivative")
             if sweep == "hub_factor":
                 title = "Integrated KO shock: smooth hub Mach correction"
-                note = "Tint: r_h/r_t < 0.5, beyond the digitized chart. Dotted line: flattening below 0.3.\nZero ratio is a mathematical limit for this factor; it is outside the physical shock-loss domain."
+                note = "Tint: raw r_h/r_t < 0.5, beyond the digitized chart. Dotted line: C2 continuation starts at 0.5.\nSolid vertical line: zero hub radius. The shared loss coordinate tends to 0.3; signed geometry is retained."
             elif sweep == "hub_tip":
                 title = r"Integrated KO shock: hub/tip sensitivity at $M_2=0.6$"
-                note = "Equal inlet/exit p0 = 200 kPa; gamma = 1.4. Tint: r_h/r_t < 0.5.\nDashed: r_h/r_t < 0.5 or hub M1 > 1.2. Dotted horizontal line: smooth upper asymptote 0.5."
+                note = "Equal inlet/exit p0 = 200 kPa; gamma = 1.4. Tint: raw r_h/r_t < 0.5; solid vertical line: zero hub radius.\nDashed: r_h/r_t < 0.5 or hub M1 > 1.2. Dotted horizontal line: upper asymptote 0.7. Shared coordinate lower limit: 0.3."
             elif sweep == "exit_mach":
                 title = r"Integrated KO shock: exit-Mach sensitivity at $r_h/r_t=0.5$"
-                note = "Equal inlet/exit p0 = 200 kPa; gamma = 1.4. Linear axes; dotted horizontal line: smooth upper asymptote 0.5.\nTint: M2 > 1. Dashed: M2 > 1 or hub M1 > 1.2. Zero exit head is excluded."
+                note = "Equal inlet/exit p0 = 200 kPa; gamma = 1.4. Linear axes; dotted horizontal line: smooth upper asymptote 0.7.\nTint: M2 > 1. Dashed: M2 > 1 or hub M1 > 1.2. Zero exit head is excluded."
             else:
                 title = "Integrated KO shock: onset from hub Mach 0.4 to 0.5"
                 note = "r_h/r_t = 0.5; M2 = 0.6; equal p0 = 200 kPa; gamma = 1.4. Blue: numerical blend interval.\nValues and first two derivatives match at both joins; the source helper supplies all plotted components."

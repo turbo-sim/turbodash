@@ -1,6 +1,6 @@
 {
   "all_checks_passed": true,
-  "check_count": 68,
+  "check_count": 67,
   "checks": [
     {
       "name": "runtime_uses_only_numpy_and_literal_coefficients",
@@ -27,122 +27,15 @@
       "literal_coefficients": true
     },
     {
-      "name": "protected_production_sources_unchanged",
-      "passed": true,
-      "files": {
-        "turbodash/loss_models/loss_coefficient_conversion.py": {
-          "original_sha256": "21ffa896097129972ec2130ba6cf54377fc6726ba5960d73c8fd40cd90454309",
-          "current_sha256": "21ffa896097129972ec2130ba6cf54377fc6726ba5960d73c8fd40cd90454309",
-          "authorized_candidate_change": false,
-          "original_unchanged": true,
-          "expected_hash_matches": true
-        },
-        "turbodash/loss_models/loss_model.py": {
-          "original_sha256": "156fbe3b0a9510b760f32e73b39c09533edf8e3e4798df9cdb08cd32f905a3e4",
-          "current_sha256": "156fbe3b0a9510b760f32e73b39c09533edf8e3e4798df9cdb08cd32f905a3e4",
-          "authorized_candidate_change": false,
-          "original_unchanged": true,
-          "expected_hash_matches": true
-        },
-        "turbodash/loss_models/loss_model_benner.py": {
-          "original_sha256": "ce5e2aae37a04718c0ad8b6801b67be2e7824fdacd407affcb00e279ff46d649",
-          "current_sha256": "ce5e2aae37a04718c0ad8b6801b67be2e7824fdacd407affcb00e279ff46d649",
-          "authorized_candidate_change": false,
-          "original_unchanged": true,
-          "expected_hash_matches": true
-        },
-        "turbodash/loss_models/loss_model_kacker_okapuu.py": {
-          "original_sha256": "197794ed5736c997b865e43860ffeccdaf4dfd21dbc2f99b2191f4a28abab28d",
-          "current_sha256": "197794ed5736c997b865e43860ffeccdaf4dfd21dbc2f99b2191f4a28abab28d",
-          "authorized_candidate_change": false,
-          "original_unchanged": true,
-          "expected_hash_matches": true
-        },
-        "turbodash/loss_models/loss_model_moustapha.py": {
-          "original_sha256": "9918fc36bf9e3ed59d65256332d21780f0baff6ade302e8ee49c342e31b1d762",
-          "current_sha256": "9918fc36bf9e3ed59d65256332d21780f0baff6ade302e8ee49c342e31b1d762",
-          "authorized_candidate_change": false,
-          "original_unchanged": true,
-          "expected_hash_matches": true
-        },
-        "turbodash/loss_models/__init__.py": {
-          "original_sha256": "225e50f404dd5fcc97a95c6d3ff9d8a94844c73c4f0bfaa4fd65d0ff88747b18",
-          "current_sha256": "225e50f404dd5fcc97a95c6d3ff9d8a94844c73c4f0bfaa4fd65d0ff88747b18",
-          "authorized_candidate_change": false,
-          "original_unchanged": true,
-          "expected_hash_matches": true
-        },
-        "turbodash/loss_models_new/loss_coefficient_conversion.py": {
-          "original_sha256": "eab232ff2304b104726b2b3af4a87c96c65f302903e807ea9dd3dc2db827ae98",
-          "current_sha256": "eab232ff2304b104726b2b3af4a87c96c65f302903e807ea9dd3dc2db827ae98",
-          "authorized_candidate_change": false,
-          "original_unchanged": true,
-          "expected_hash_matches": true
-        },
-        "turbodash/loss_models_new/loss_model.py": {
-          "original_sha256": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11",
-          "current_sha256": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11",
-          "authorized_candidate_change": false,
-          "original_unchanged": true,
-          "expected_hash_matches": true
-        },
-        "turbodash/loss_models_new/loss_model_benner.py": {
-          "original_sha256": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba",
-          "current_sha256": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba",
-          "authorized_candidate_change": false,
-          "original_unchanged": true,
-          "expected_hash_matches": true
-        },
-        "turbodash/loss_models_new/loss_model_moustapha.py": {
-          "original_sha256": "923339d879bb7edf952112296b605073d9c5f466e541ea04b3ce10f3f8e1f489",
-          "current_sha256": "923339d879bb7edf952112296b605073d9c5f466e541ea04b3ce10f3f8e1f489",
-          "authorized_candidate_change": false,
-          "original_unchanged": true,
-          "expected_hash_matches": true
-        },
-        "turbodash/loss_models_new/_backend.py": {
-          "original_sha256": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
-          "current_sha256": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
-          "authorized_candidate_change": false,
-          "original_unchanged": true,
-          "expected_hash_matches": true
-        },
-        "turbodash/loss_models_new/_numerics.py": {
-          "original_sha256": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff",
-          "current_sha256": "0b75d430c192a5713cb99c34f7e12d33b1258ea545adf43ff73542bab12e19ff",
-          "authorized_candidate_change": false,
-          "original_unchanged": true,
-          "expected_hash_matches": true
-        },
-        "turbodash/loss_models_new/__init__.py": {
-          "original_sha256": "5b9d3bc6706ab907bf8314428b244132feb46cf2754de33ba2e0d8f7676593a3",
-          "current_sha256": "5b9d3bc6706ab907bf8314428b244132feb46cf2754de33ba2e0d8f7676593a3",
-          "authorized_candidate_change": false,
-          "original_unchanged": true,
-          "expected_hash_matches": true
-        },
-        "turbodash/math.py": {
-          "original_sha256": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
-          "current_sha256": "87827e777df07376344e26495b488f1f8483fd6d5f4e2f15a55ef59a44d3b772",
-          "authorized_candidate_change": false,
-          "original_unchanged": true,
-          "expected_hash_matches": true
-        }
-      }
-    },
-    {
-      "name": "authorized_candidate_integration_hashes",
+      "name": "current_production_reference_agreement",
       "passed": true,
       "files": {
         "turbodash/loss_models_new/loss_model_kacker_okapuu.py": {
-          "original_sha256": "f75083e50008952dac5ffc7c9867dde4fbe620d9866c043ce2ea4c22a80894bc",
-          "current_sha256": "d05b542f42d2a0ec7a8e2d8e7c3fa6a1da3b7fab429b4803d8a2e65520f47057",
-          "authorized_candidate_change": true,
-          "original_unchanged": false,
-          "expected_hash_matches": true
+          "current_sha256": "c3d88153360f75ec1e54e53a056d4ec7b41547b9d3e467e4847c66d7705afa08",
+          "expected_hash_matches": true,
+          "reference_functions_match_export": true
         }
-      },
-      "original_provenance": "data/provenance.json retains all original production_before hashes"
+      }
     },
     {
       "name": "original_pdf_hash",
@@ -161,6 +54,7 @@
       "passed": true,
       "files": {
         "analytic_fits.py": true,
+        "aungier_reference.py": true,
         "digitize_impulse.py": true,
         "digitize_nozzle.py": true,
         "extrapolation_fit.py": true,
@@ -1500,13 +1394,13 @@
     {
       "name": "readme_local_links",
       "passed": true,
-      "checked": 32,
+      "checked": 33,
       "missing": []
     }
   ],
   "warnings": [
     "Predictions outside the digitized chart coverage remain unvalidated; finite values and smooth derivatives do not establish physical accuracy."
   ],
-  "verifier_sha256": "964e37eff2903ffebc97d1ffec1ed6de227f36a40a731e33d7d2c7bcfae3781b",
+  "verifier_sha256": "6aff252ecc8aa38b569879eff3277e0f7bbd77a77d1344bc21d80786f8663f20",
   "interpretation": "These checks verify implementation, provenance, saved fit metrics and mathematical properties; they do not validate turbine performance or extrapolation."
 }

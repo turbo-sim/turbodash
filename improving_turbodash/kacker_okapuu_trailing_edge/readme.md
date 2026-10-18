@@ -1,8 +1,8 @@
 # Kacker–Okapuu trailing-edge loss: fitting and bounded continuation
 
-This standalone proposal implements the two curves in Figure 14 of the supplied [Kacker–Okapuu paper](source/kacker_okapuu_1982.pdf#page=6), their angle interpolation in equation (17), and the energy-to-pressure conversion in equation (18). It includes independently digitized points, fitted coefficients, numerical continuations and sensitivity plots. **This correlation is now integrated in the new Turbodash loss model; see the [production audit](../loss_model_audit/1_individual_functions/report/03_ko_trailing.md).** The comparison curves use the production snapshot saved with the study.
+This study documents the two curves in Figure 14 of the supplied [Kacker–Okapuu paper](source/kacker_okapuu_1982.pdf#page=6), their angle interpolation in equation (17), and the energy-to-pressure conversion in equation (18). It includes independently digitized points, fitted coefficients, numerical continuations and sensitivity plots. **This correlation is now integrated in the new Turbodash loss model; see the [production audit](../loss_model_audit/1_individual_functions/report/03_ko_trailing.md).** Comparison curves evaluate the current production helper directly.
 
-The main findings are that the impulse reference is **lower** than the nozzle reference, the existing three-point tables miss some of the chart shape, and the final pressure coefficient depends on outlet Mach number. The proposed correlations reproduce the digitized curves within their reading uncertainty and remain finite and nonnegative over a much wider diagnostic domain.
+The main findings are that the impulse reference is **lower** than the nozzle reference, the final pressure coefficient depends on outlet Mach number. The proposed correlations reproduce the digitized curves within their reading uncertainty and remain finite and nonnegative over a much wider diagnostic domain.
 
 ## 1. What the paper actually correlates
 
@@ -68,11 +68,11 @@ The cubic is the lowest tested polynomial degree that resolves both traces withi
 
 Five points per family were withheld when checking predictive error. The final coefficients were then refitted to all 21 points per family. The held-out samples belong to the same printed curve: they test interpolation of that curve, not prediction of independent cascade experiments. All final cubic residuals are smaller than the assigned vertical reading uncertainties.
 
-![Reference curves, digitized readings, recorded production tables and residuals](figures/reference_fit.png)
+![Reference curves, digitized readings, current production helper and residuals](figures/reference_fit.png)
 
 [PDF](figures/reference_fit.pdf) · [Residual CSV](data/fit_residuals.csv)
 
-The recorded production implementation's dashed curves use its three-point tables and cubic interpolation. The new fits follow the scanned ink more closely, especially toward $\hat{t}_{\mathrm{TE}}=0.4$. The fitted endpoint values are **0.141453** for nozzle and **0.073057** for impulse, compared with the source tables' 0.150 and 0.075. Error bars describe digitization uncertainty, not the experimental scatter underlying the paper's correlation.
+The current production helper is shown alongside the fitted source curves; their agreement checks the implemented reference functions. The fitted endpoint values are **0.141453** for nozzle and **0.073057** for impulse. Error bars describe digitization uncertainty, not the experimental scatter underlying the paper's correlation.
 
 ## 3. Smooth continuation beyond the thickness range
 
@@ -199,7 +199,7 @@ $$
 Y_{\mathrm{TE}}(M_2=0)=\frac{\Delta\phi^2_{\mathrm{TE}}}{1-\Delta\phi^2_{\mathrm{TE}}}.
 $$
 
-The recorded production source uses $\Delta\phi^2_{\mathrm{TE}}/(1-\Delta\phi^2_{\mathrm{TE}})$ at every Mach number. The standalone proposal restores equation (18), evaluating it with stable logarithmic relative functions so that the zero-Mach limit and its derivatives are well defined. There is no arbitrary positive Mach offset.
+The current implementation evaluates equation (18) with stable logarithmic relative functions so that the zero-Mach limit and its derivatives are well defined. There is no arbitrary positive Mach offset.
 
 The unrestricted equation requires
 
@@ -257,7 +257,7 @@ The top row holds $z=0.5$ and $\gamma=1.4$, with curves for different thickness 
 
 [PDF](figures/mach_sensitivity.pdf) · [CSV](data/mach_sensitivity.csv)
 
-The dashed gray line in the top-left panel shows unrestricted equation (18) at $\hat{t}_{\mathrm{TE}}=0.2$; the dotted line is the recorded production result at that ratio. The colored curves include the proposed Mach continuation. Blue shading marks the affected upper subsonic interval and beige marks $M_2>1$.
+The dashed gray line in the top-left panel shows unrestricted equation (18) at $\hat{t}_{\mathrm{TE}}=0.2$; the dotted line is the current production result at that ratio. The colored curves include the proposed Mach continuation. Blue shading marks the affected upper subsonic interval and beige marks $M_2>1$.
 
 Thickness/opening, $z$, outlet Mach and $\gamma$ are the inputs to this correlation. There is no independent inlet-Mach, Reynolds, pitch/chord or aspect-ratio factor. At fixed $z$, changing inlet and outlet angles together does not introduce another sensitivity. At $\alpha_2=0$, $z$ must be supplied as a chosen path limit; the model does not silently interpret $0/0$.
 
@@ -290,7 +290,7 @@ from improving_turbodash.kackec_okapuu_trailing_edge.model import trailing_loss
 Y_te = trailing_loss(thickness_opening=0.2, z=0.5, mach=0.7, gamma=1.4)
 ```
 
-The normal run redigitizes the saved crop, refits, calculates the sensitivity data and regenerates this note and all six PNG/PDF figures. Add `--prepare-source` to rerender the crop from the included PDF; this requires `pdftoppm`. Add `--render-only` to redraw the saved numerical results after verifying the numerical-source and data hashes. This allows notation changes while preserving the recorded production comparison, even if production has since changed. The [render manifest](data/render_manifest.json) records both the validated numerical sources and the current report/plotting sources. Plotting uses the repository's `set_plot_options()` and ordered viridis colors.
+The normal run redigitizes the saved crop, refits, calculates the sensitivity data and regenerates this note and all six PNG/PDF figures. Add `--prepare-source` to rerender the crop from the included PDF; this requires `pdftoppm`. Add `--render-only` to redraw the saved numerical results after verifying the numerical-source and data hashes. Source and data hashes identify the current calculation used for the figures. The [render manifest](data/render_manifest.json) records both the validated numerical sources and the current report/plotting sources. Plotting uses the repository's `set_plot_options()` and ordered viridis colors.
 
 | File | Purpose |
 |---|---|
@@ -301,4 +301,4 @@ The normal run redigitizes the saved crop, refits, calculates the sensitivity da
 | [run.py](run.py) | Calculation, numerical checks and saved-data rendering |
 | [test_model.py](test_model.py) | Dedicated regression and mathematical-property tests |
 
-The [production snapshot](data/production_before.json) and validation record the production sources used for the original comparison; a fresh numerical run requires them to match the working tree. The correlation and revised trailing-edge audit are now integrated. Stage/turbine results have not been rerun for this revision. The fitted chart curves are supported by the scan; the thickness ceilings, extrapolation allowances and Mach continuation are explicit proposals for stable numerical behavior outside that evidence.
+The [production source hashes](data/production_sources.json) and validation identify the current comparison. The fitted chart curves are supported by the scan; thickness ceilings, extrapolation allowances and Mach continuation are explicit modeling choices. The [current stage studies](../loss_model_audit/2_stage_turbine/readme.md) use the same production helpers.

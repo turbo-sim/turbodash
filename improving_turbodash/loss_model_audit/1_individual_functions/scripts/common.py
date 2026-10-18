@@ -97,9 +97,10 @@ def numeric_digest(path):
     return dict(rows=len(rows), sha256=hashlib.sha256(payload).hexdigest())
 
 
-def modules(version):
+def modules(version="candidate"):
+    """Import the repository's current loss models for every audit caller."""
     imported_sources()
-    package = "turbodash.loss_models_new" if version == "candidate" else "turbodash.loss_models"
+    package = "turbodash.loss_models_new"
     result = {key: importlib.import_module(package + "." + name) for key, name in {
         "benner": "loss_model_benner",
         "ko": "loss_model_kacker_okapuu",

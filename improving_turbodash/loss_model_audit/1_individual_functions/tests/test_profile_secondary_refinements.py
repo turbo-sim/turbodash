@@ -87,13 +87,17 @@ def test_compressibility_bounds_and_c2_joins():
 
 def test_digitized_hub_fit_monotonicity_and_smooth_continuation():
     ko = candidate()["ko"]
-    for cid, limit in ((0, 2.8851335712978265), (1, 4.775730229953466)):
-        values = ko.get_hub_to_mean_mach_ratio(np.linspace(0., 1, 301), cid)
+    for cid in (0, 1):
+        amplitude, end = ko.HUB_FIT[cid]
+        limit = 1+amplitude*(end-.3)**2
+        values = ko.get_hub_to_mean_mach_ratio(np.linspace(-1., 1, 601), cid)
         assert np.all(np.diff(values) <= 1e-14)
         assert np.min(values) >= 1 and np.max(values) <= limit+1e-12
-        np.testing.assert_allclose(values[0], limit, rtol=2e-14)
-        end = ko.HUB_FIT[cid][1]
-        for join in (.3, end-.01, end+.01):
+        np.testing.assert_allclose(ko.get_hub_to_mean_mach_ratio(-1e100, cid), limit, rtol=2e-14)
+        effective_at_zero = .3+.2/(1+2.5+2.5**2)
+        np.testing.assert_allclose(ko.get_hub_to_mean_mach_ratio(0., cid),
+                                   1+amplitude*(end-effective_at_zero)**2, rtol=2e-14)
+        for join in (.5, end-.01, end+.01):
             d1, _ = one_sided_derivatives(lambda x: ko.get_hub_to_mean_mach_ratio(x, cid), join, 1e-6)
             np.testing.assert_allclose(d1[0], d1[1], atol=1e-4)
 

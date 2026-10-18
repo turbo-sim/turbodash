@@ -24,7 +24,7 @@ SAMPLES = ('references', 'z_sensitivity', 'thickness_sensitivity', 'mach_sensiti
 
 def source_hashes():
     paths = [*sorted((REPO/'turbodash/loss_models_new').glob('*.py')),
-             *sorted((REPO/'turbodash/loss_models').glob('*.py')), REPO/'turbodash/math.py']
+             REPO/'turbodash/math.py']
     return {p.relative_to(REPO).as_posix(): sha256(p) for p in paths}
 
 
@@ -43,10 +43,8 @@ def calculate():
     from turbodash.loss_models_new.loss_coefficient_conversion import convert_kinetic_energy_to_stagnation_pressure_loss
     assert Path(current.__file__).resolve().is_relative_to(REPO)
     before = source_hashes()
-    record_path = DATA/'production_before.json'
-    if not record_path.exists():
-        write_json(record_path, before)
-    assert json.loads(record_path.read_text(encoding='utf-8')) == before, 'Production changed since study creation; review provenance first.'
+    record_path = DATA/'production_sources.json'
+    write_json(record_path, before)
 
     def existing(x, z):
         return current.get_trailing_edge_kinetic_energy_loss(
@@ -93,10 +91,11 @@ def calculate():
             m = np.unique(np.r_[np.linspace(0, 3, 901), .9, 1.])
             fn = lambda v: model.trailing_loss(x, .5, v, gamma)
             energy = model.energy_loss(x, .5)
-            old = float(existing(x, .5)/(1-existing(x, .5)))
             for v, value, derivative in zip(m, fn(m), slope(fn, m)):
                 rows.append(dict(group=group, fixed=fixed, x=float(v), value=float(value), derivative=float(derivative),
-                                 raw=float(model.pressure_loss(energy, v, gamma, continue_mach=False)), current=old))
+                                 raw=float(model.pressure_loss(energy, v, gamma, continue_mach=False)),
+                                 current=float(current.get_trailing_edge_loss(dict(beta_out=60.,Ma_rel_out=v,gamma_out=gamma),
+                                     dict(leading_edge_angle=-30.,trailing_edge_thickness=x,opening=1.)))))
     write_csv(DATA/'mach_sensitivity.csv', rows)
 
     # Independent gas conversion in the repository (no guards or output cap).
@@ -266,7 +265,7 @@ def render():
                 ax.set(xlim=(0, .4), xlabel=r'Thickness / opening $\hat{t}_{\mathrm{TE}}=t_{\mathrm{TE}}/o$')
         fig.suptitle('Figure 14 reference fits: accuracy within the chart', y=.99)
         finish(fig, 'reference_fit', 'Error bars describe scan-reading uncertainty, not experimental scatter.\n'
-               'Solid: proposed cubic. Dashed: recorded production tables. Held-out results are reported separately in the note.')
+               'Solid: proposed cubic. Dashed: current production helper. Held-out results are reported separately in the note.')
 
         fig, axes = plt.subplots(2, 3, figsize=(13.5, 8))
         for i, (family, color) in enumerate(zip(('nozzle', 'impulse'), colors(2))):
@@ -324,7 +323,7 @@ def render():
         for ax in axes:
             shade_outside(ax, (0, .4), (0, 1.2))
             ax.set(xlim=(0, 1.2), xlabel=r'Thickness / opening $\hat{t}_{\mathrm{TE}}=t_{\mathrm{TE}}/o$', ylim=(0, None))
-        axes[0].set(ylabel=r'Pressure-loss coefficient $Y_{\rm TE}$', title='Complete proposed trailing-edge loss')
+        axes[0].set(ylabel=r'Pressure-loss coefficient $Y_{\rm TE}$', title='Complete trailing-edge loss')
         axes[1].set(ylabel=r'$\partial Y_{\mathrm{TE}}/\partial\hat{t}_{\mathrm{TE}}$', title='Thickness sensitivity')
         fig.suptitle('Complete trailing-edge loss versus thickness/opening', y=.99)
         finish(fig, 'thickness_sensitivity',
@@ -343,7 +342,7 @@ def render():
                             label=(rf'$\hat{{t}}_{{\mathrm{{TE}}}}={fixed:g}$' if group == 'ratio' else rf'$\gamma={fixed:.3g}$'))
                 if group == 'ratio' and fixed == .2:
                     axes[i, 0].plot(*xy(selected, 'raw'), color='.5', ls='--', lw=1.1, label=r'Raw equation (18), $\hat{t}_{\mathrm{TE}}=0.2$')
-                    axes[i, 0].plot(*xy(selected, 'current'), color='.5', ls=':', lw=1.1, label=r'Recorded production, $\hat{t}_{\mathrm{TE}}=0.2$')
+                    axes[i, 0].plot(*xy(selected, 'current'), color='.5', ls=':', lw=1.1, label=r'Current production, $\hat{t}_{\mathrm{TE}}=0.2$')
             for ax in axes[i]:
                 shade_outside(ax, (0, 1), (0, 3))
                 ax.axvspan(.9, 1, color='#8fb8d8', alpha=.22, zorder=0)

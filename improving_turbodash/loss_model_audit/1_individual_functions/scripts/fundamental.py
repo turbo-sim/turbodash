@@ -15,20 +15,22 @@ from studies import RANGES
 def profile_values(case, mods):
     f, g = case["flow"], case["geometry"]
     math, ko = mods["math"], mods["ko"]
-    angle = (
-        math.smooth_abs(f["beta_out"])
-        if hasattr(ko, "numerics")
-        else math.smooth_maximum(math.smooth_abs(f["beta_out"]), 40.0)
-    )
+    if hasattr(ko, "get_effective_outlet_angle"):
+        metal_angle_out = g.get("metal_angle_out", 1.)
+        effective = ko.get_effective_outlet_angle(f["beta_out"], metal_angle_out)
+        angle = math.smooth_abs(ko.get_blade_angle(effective))
+        z = ko.get_cascade_angle_ratio(g["leading_edge_angle"], f["beta_out"], metal_angle_out)
+    else:
+        angle = math.smooth_maximum(math.smooth_abs(f["beta_out"]), 40.0)
+        z = -g["leading_edge_angle"] / f["beta_out"]
     reaction = ko.nozzle_blades(g["pitch"] / g["chord"], angle)
     impulse = ko.impulse_blades(g["pitch"] / g["chord"], angle)
-    ratio = g["leading_edge_angle"] / f["beta_out"]
     # Historical CSV field names are retained for baseline comparability.
     # For the candidate, blend_before_floor is the implemented reference blend;
     # floor is its negative-tail asymptote, not an applied clipping operation.
-    blend = (ko.get_profile_loss_blend(-ratio, reaction, impulse)
+    blend = (ko.get_profile_loss_blend(z, reaction, impulse)
              if hasattr(ko, "get_profile_loss_blend")
-             else reaction - math.smooth_abs(ratio) * ratio * (impulse - reaction))
+             else reaction + math.smooth_abs(z) * z * (impulse - reaction))
     return dict(
         Y_profile=ko.get_profile_loss(f, g, int(g["cascade_type"] == "rotor")),
         blend_before_floor=blend,
@@ -159,6 +161,15 @@ def unrestricted_formula(mach, gamma, loss):
     )
 
 
+def reference_values(exit_angle, mods):
+    """Compare unsigned reference fits along the current signed-angle path."""
+    from turbodash.loss_models_new import loss_model_kacker_okapuu as current_ko
+    continued = current_ko.get_effective_outlet_angle(exit_angle, reference=1.)
+    angle = mods["math"].smooth_abs(current_ko.get_blade_angle(continued))
+    return dict(reaction=mods["ko"].nozzle_blades(.8, angle),
+                impulse=mods["ko"].impulse_blades(.8, angle))
+
+
 def conversion_values(x, mods, mach, gamma):
     conversion = mods["conversion"]
     out = dict(
@@ -210,7 +221,7 @@ def fundamental_studies():
         }.get(variable, [])
         xlabel = {
             "incidence": "Inlet flow minus fixed inlet metal angle (deg)",
-            "exit_angle": "Exit flow magnitude in the reference gauge direction (deg)",
+            "exit_angle": "Signed exit angle in the fixed design outlet direction (deg)",
             "raw_penetration": "Raw penetration / full height",
             "chi": "Benner incidence parameter chi",
             "delta_phi2": "Kinetic-energy loss increment delta_phi^2",
@@ -341,10 +352,8 @@ def fundamental_studies():
         "nozzle_angle",
         "ko_profile",
         "exit_angle",
-        lambda x, m: dict(
-            reaction=m["ko"].nozzle_blades(0.8, x),
-            impulse=m["ko"].impulse_blades(0.8, x),
-        ),
+        reference_values,
+        rule="Unsigned nozzle/impulse reference helpers at s/c=0.8 along the current positive-design effective outlet angle, bounded tangent angle and smooth magnitude. No downstream KO correction or angle reflection.",
     )
     add(
         "penetration_cap",
@@ -390,8 +399,8 @@ def fundamental_studies():
         "hub_tip",
         lambda x, m: dict(
             preprocessed=(
-                np.clip(x, 0.5, 1.0)
-                if hasattr(m["ko"], "numerics")
+                m["ko"].effective_hub_tip_ratio(x)
+                if hasattr(m["ko"], "effective_hub_tip_ratio")
                 else m["math"].smooth_maximum(x, 0.5)
             ),
             stator=m["ko"].get_hub_to_mean_mach_ratio(x, 0),

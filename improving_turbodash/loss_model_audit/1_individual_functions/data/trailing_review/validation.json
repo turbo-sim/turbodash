@@ -17,9 +17,20 @@
   "maximum_study_difference": 0.0,
   "conversion_cases": 5084,
   "maximum_conversion_difference": 3.3306690738754696e-16,
+  "signed_outlet_sweep": {
+    "minimum": -20.0,
+    "maximum": 80.0,
+    "inlet_metal": -30.0,
+    "design_direction": 1.0,
+    "continuation_threshold": 10.0,
+    "samples": 10005,
+    "finite_nonnegative": true,
+    "zero_and_join_continuity": true
+  },
   "source_hashes": {
     "turbodash/loss_models_new/_trailing_edge.py": "594970afedea411fbf4e1f6a86017ac46372f36b5f0452c78234940441630ce8",
-    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "4f30461692d5590aa9bac8586ce330af3e09d9f4d185e5e66d9e20d86d71fd70",
+    "turbodash/loss_models_new/_blade_loading.py": "8be374f9be233a7027e39a552c8c424200a3f00d05706868d8c75968df1666a5",
+    "turbodash/loss_models_new/loss_model_kacker_okapuu.py": "c3d88153360f75ec1e54e53a056d4ec7b41547b9d3e467e4847c66d7705afa08",
     "turbodash/loss_models_new/_backend.py": "3e92a400a81923a796fbc10a3830c52877504b4d297909491726ec2db636e8ff",
     "turbodash/loss_models_new/loss_coefficient_conversion.py": "eab232ff2304b104726b2b3af4a87c96c65f302903e807ea9dd3dc2db827ae98"
   },
@@ -94,10 +105,15 @@
       "relative_path": "turbodash/loss_models_new/_trailing_edge.py",
       "sha256": "594970afedea411fbf4e1f6a86017ac46372f36b5f0452c78234940441630ce8"
     },
+    "turbodash.loss_models_new._blade_loading": {
+      "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\_blade_loading.py",
+      "relative_path": "turbodash/loss_models_new/_blade_loading.py",
+      "sha256": "8be374f9be233a7027e39a552c8c424200a3f00d05706868d8c75968df1666a5"
+    },
     "turbodash.loss_models_new.loss_model_kacker_okapuu": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model_kacker_okapuu.py",
       "relative_path": "turbodash/loss_models_new/loss_model_kacker_okapuu.py",
-      "sha256": "4f30461692d5590aa9bac8586ce330af3e09d9f4d185e5e66d9e20d86d71fd70"
+      "sha256": "c3d88153360f75ec1e54e53a056d4ec7b41547b9d3e467e4847c66d7705afa08"
     },
     "turbodash.loss_models_new.loss_coefficient_conversion": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_coefficient_conversion.py",
@@ -107,12 +123,12 @@
     "turbodash.loss_models_new.loss_model_benner": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model_benner.py",
       "relative_path": "turbodash/loss_models_new/loss_model_benner.py",
-      "sha256": "adc5aabe829e0f9145224266687caa9a20be4010e048d1b2e158a6c150a41fba"
+      "sha256": "cac62576a82d6db189d94a5ee6f71f980b5e5de8dfe6d35d6ac2e3cdd22a1659"
     },
     "turbodash.loss_models_new.loss_model_moustapha": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model_moustapha.py",
       "relative_path": "turbodash/loss_models_new/loss_model_moustapha.py",
-      "sha256": "923339d879bb7edf952112296b605073d9c5f466e541ea04b3ce10f3f8e1f489"
+      "sha256": "556caad2121e18a57d4f5a6af3161fba8d421f957ac0779148fdec2e4efed4b8"
     },
     "turbodash.loss_models_new.loss_model": {
       "path": "C:\\Users\\roagr\\git_projects\\turbodash\\turbodash\\loss_models_new\\loss_model.py",
@@ -120,13 +136,14 @@
       "sha256": "1b29484d2044027a6d8dc72f9b0fee7430628434184638f73599b133e734db11"
     }
   },
-  "script_sha256": "b0d03c896977497963af8d39eb4979ff339dba26938afe3c58dc31f3fc2e2449",
+  "script_sha256": "484e04fe727bd4b4f88b19e8bb9c8c3f23571c77368e691d9843f41099962f06",
   "study_model_sha256": "52f06fdbe04b01ffce7a8a76cb724baa3def98daeaab4055aa3e3ed261b82459",
   "digitized_points_sha256": "f1bbfb09fc02a0bf2f63225111f99ccb0607c8b87848e3ae163704123954f19e",
   "data_sha256": {
     "references": "84bd39c2bae2f521272a0a6a3d4903c10546eb93a6aac4199643de9cf1b42778",
     "fit_residuals": "223b50989bb5d42d9314dfcfb80544e55d2b38e9490506fd30f2af289174b112",
     "z_sensitivity": "c43fbbea271731c89cd8198d4846704c1630250c9733417c1023baa7492f5e62",
+    "angle_sensitivity": "64b8ca0c979f35f9065cf2030abea01111ff40d0803050068f129a15d3c74140",
     "thickness_sensitivity": "2c3d0932765f26b92be67ae7113420a7e4490af0111df43fad566b938d319efc",
     "mach_sensitivity": "ba472a0240e32adfc042fe2f791a7611a9652c6d027318619e8be74abe74e69c",
     "join_checks": "7877dd825a01def1ff4524e644cea437d6c05cc7d95bc0dacb5f92be981ad356"

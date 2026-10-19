@@ -1,0 +1,32 @@
+.td-opt-panel {border: 1px solid #cddce9; border-radius: 10px; margin-bottom: 16px; background: #fff; box-shadow: 0 3px 12px #163e6410; color: #26394b;}
+.td-opt-panel > summary, .td-opt-terminal > summary {cursor: pointer; padding: 13px 16px; font-weight: 650; border-radius: 10px; background: #f4f8fc;}
+.td-opt-badge {float: right; font: 10px/20px 'Segoe UI', sans-serif; color: #527293; border: 1px solid #cddce9; border-radius: 20px; padding: 0 8px;}
+.td-opt-body {padding: 12px; font-size: 13px;}
+.td-opt-hint {color: #617386; font-size: 12px; line-height: 1.6; margin: 0 0 12px;}
+.td-opt-panel .nav-tabs {gap: 3px; border: 0; padding: 3px; border-radius: 8px; background: #eef3f8; display: flex; flex-wrap: nowrap;}
+.td-opt-panel .nav-item {flex: 1; text-align: center;}
+.td-opt-panel .nav-link {border: 0; border-radius: 6px; padding: 8px 5px; font-size: 12px; color: #526b82; width: 100%; white-space: nowrap;}
+.td-opt-panel .nav-link.active {background: white; color: #0866b4; box-shadow: 0 1px 5px #22446622; font-weight: 600;}
+.td-opt-tab {padding: 14px 0 5px;}
+.td-opt-field {display: block; min-width: 0; margin: 0 0 10px; font-size: 12px;}
+.td-opt-field > span {display: block; margin-bottom: 5px; color: #53697d; font-weight: 600;}
+.td-opt-field .form-control {font-size: 12px; min-width: 0; width: 100%;}
+.td-opt-settings-grid {display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;}
+.td-opt-row {background: #fafcfe; border: 1px solid #dce5ee; border-radius: 8px; padding: 10px; margin-bottom: 10px;}
+.td-opt-row-head {display: grid; grid-template-columns: minmax(0, 1fr) 25px; gap: 4px; align-items: start; margin-bottom: 10px;}
+.td-opt-row-head button {padding: 0 4px; color: #6b7c8c; text-decoration: none; font-size: 22px;}
+.td-opt-row-head button:hover {color: #bf3b4b;}
+.td-opt-bounds {display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px;}
+.td-opt-bounds .td-opt-field {margin-bottom: 0;}
+.td-opt-empty {padding: 20px 12px; border: 1px dashed #cbd7e4; background: #f8fafc; border-radius: 8px; font-size: 12px; color: #64788c; text-align: center;}
+.td-opt-panel .Select, .td-opt-panel .Select-control {font-size: 12px;}
+.td-opt-panel .Select-menu-outer {z-index: 30;}
+.td-opt-start {width: 100%; font-weight: 600; padding: 11px; border-radius: 7px; margin: 12px 0;}
+#opt-status {line-height: 1.6; overflow-wrap: anywhere;}
+.td-opt-progress {font: 11px/1.5 Consolas, monospace; color: #58718a; padding-top: 6px;}
+.td-opt-busy #opt-status:before {content: ''; display: inline-block; width: 13px; height: 13px; margin-right: 8px; vertical-align: middle; border: 2px solid #ccdfef; border-top-color: #1679bd; border-radius: 50%; animation: td-opt-spin .8s linear infinite;}
+.td-opt-busy .td-opt-tab {pointer-events: none; opacity: .65;}
+.td-opt-terminal {margin-top: 24px; border: 1px solid #ccd9e5; border-radius: 10px; overflow: hidden;}
+.td-opt-terminal pre {margin: 0; padding: 18px; min-height: 120px; max-height: 340px; overflow: auto; background: #101e2d; color: #d6e6f6; font: 12px/1.65 Consolas, 'Cascadia Code', monospace; tab-size: 4;}
+@keyframes td-opt-spin {to {transform: rotate(360deg);}}
+@media (prefers-reduced-motion: reduce) {.td-opt-busy #opt-status:before {animation-duration: 2s;}}

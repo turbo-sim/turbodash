@@ -6,7 +6,7 @@ import pytest
 from dash import Dash, dcc, html, no_update
 from dash.exceptions import PreventUpdate
 
-from turbodash.apps.components import meshing as ui
+from turbodash.apps.shared.components import meshing as ui
 
 
 @pytest.fixture
@@ -173,7 +173,7 @@ def test_mesh_summary_explains_counts_and_quality():
 
 
 def test_three_tab_layout_keeps_controls_and_stores_mounted():
-    from turbodash.apps.turbine_experimental import app, switch_tab
+    from turbodash.apps.turbine_experimental.app import app, switch_tab
 
     def components(component):
         yield component
@@ -247,7 +247,7 @@ def _components(component):
 
 @pytest.mark.parametrize("turbine_type", ["axial", "radial"])
 def test_geometry_editors_match_every_mounted_meanline_parameter(turbine_type):
-    from turbodash.apps.turbine_experimental import geometry_stage_panel, make_stage_accordion_item, stage_defaults_for
+    from turbodash.apps.turbine_experimental.app import geometry_stage_panel, make_stage_accordion_item, stage_defaults_for
 
     values = stage_defaults_for(turbine_type)
     meanline = make_stage_accordion_item(1, values, turbine_type)
@@ -263,7 +263,7 @@ def test_geometry_editors_match_every_mounted_meanline_parameter(turbine_type):
 
 @pytest.mark.parametrize("element,value", [("geometry", 0.45), ("slider", 0.25), ("input", 0.35)])
 def test_geometry_meanline_and_slider_use_one_value(monkeypatch, element, value):
-    from turbodash.apps import turbine_experimental as app_experimental
+    from turbodash.apps.turbine_experimental import app as app_experimental
 
     monkeypatch.setattr(app_experimental, "ctx", SimpleNamespace(triggered_id={"elem": element}))
     assert app_experimental.sync_stage_slider_input(.25, .35, .45) == (value, value, value)

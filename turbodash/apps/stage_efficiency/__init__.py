@@ -1,0 +1,1 @@
+"""Stage efficiency application package."""

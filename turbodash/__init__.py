@@ -14,7 +14,7 @@ else:
 from .core.stage import *
 from .reporting.stage import *
 from .visualization.matplotlib_style import *
-from .apps.launchers import launch_app_stage, launch_app_turbine, launch_app_experimental
+from .apps.shared.launchers import launch_app_stage, launch_app_turbine, launch_app_experimental
 
 # Package info
 __version__ = "0.7.0"

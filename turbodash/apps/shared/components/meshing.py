@@ -16,11 +16,11 @@ from dash.exceptions import PreventUpdate
 from plotly.utils import PlotlyJSONEncoder
 
 from turbodash.meshing import turbomoc as meshing
-from turbodash.apps import mesh_jobs as mesh_jobs
+from turbodash.apps.shared import mesh_jobs
 from turbodash.visualization.plotly_mesh import plot_profile_preview, plot_geometry_meridional, mesh_figures
 from turbodash.visualization import vtk as vtk
 from turbodash.visualization.vtk_assets import available as vtk_assets_available
-from turbodash.apps.components.turbogrid import turbogrid_export_panel
+from turbodash.apps.shared.components.turbogrid import turbogrid_export_panel
 
 
 _LOG = logging.getLogger(__name__)

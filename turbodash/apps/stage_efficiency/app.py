@@ -1,3 +1,5 @@
+from turbodash.apps.shared.paths import SHARED_ASSETS_DIRECTORY, DOCUMENTATION_FILE
+
 from pathlib import Path
 import numpy as np
 import plotly.graph_objects as go
@@ -6,14 +8,14 @@ from plotly.colors import sample_colorscale
 from turbodash.core.stage import compute_performance_stage
 
 # === initialize app ===
-app = Dash(__name__, assets_folder=str(Path(__file__).resolve().parents[1]/"assets"))
+app = Dash(__name__, assets_folder=str(SHARED_ASSETS_DIRECTORY))
 server = app.server
 
 
 def configure(config_path):
     """Load a YAML startup case before serving this application's layout."""
     import sys
-    from .startup import configure as configure_case
+    from turbodash.apps.shared.startup import configure as configure_case
     return configure_case(sys.modules[__name__], config_path, "efficiency")
 
 
@@ -177,11 +179,7 @@ calculator_layout = html.Div(
 import os
 
 # Go one level up from the turbodash/ folder to root/, then into docs/
-theory_path = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),  # root folder
-    "docs",
-    "documentation.md",
-)
+theory_path = str(DOCUMENTATION_FILE)
 
 if os.path.exists(theory_path):
     with open(theory_path, "r", encoding="utf-8") as f:

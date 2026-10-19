@@ -1,1 +1,1 @@
-"""apps implementations for Turbodash."""
+"""Independent app packages and shared resources for Turbodash."""

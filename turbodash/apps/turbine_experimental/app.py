@@ -1,3 +1,11 @@
+"""Experimental turbine workspace with meanline, geometry and meshing tabs.
+
+The stable meanline app lives in turbodash.apps.turbine; keep workspace changes here
+until they are ready to become the default.
+"""
+
+from turbodash.apps.shared.paths import SHARED_ASSETS_DIRECTORY, DOCUMENTATION_FILE
+
 from pathlib import Path
 import os
 import base64
@@ -22,10 +30,13 @@ from dash import (
     ctx,
     ALL,
     MATCH,
+    no_update,
     dash_table,
 )
 from dash.exceptions import PreventUpdate
-from turbodash.apps.components.turbogrid import register_turbogrid_callbacks, turbogrid_export_panel
+from turbodash.apps.shared.components.turbogrid import register_turbogrid_callbacks
+from turbodash.apps.shared.components.meshing import geometry_panel, input_signature, mesh_panel, register_meshing_callbacks
+from turbodash.visualization.vtk_assets import register_vtk_assets
 
 
 # =========================
@@ -33,18 +44,20 @@ from turbodash.apps.components.turbogrid import register_turbogrid_callbacks, tu
 # =========================
 app = Dash(
     __name__,
-    assets_folder=str(Path(__file__).resolve().parents[1]/"assets"),
+    assets_folder=str(SHARED_ASSETS_DIRECTORY),
     suppress_callback_exceptions=True,
     external_stylesheets=[dbc.themes.BOOTSTRAP],
 )
 server = app.server
+register_vtk_assets(app)
 register_turbogrid_callbacks(app)
+register_meshing_callbacks(app)
 
 
 def configure(config_path):
     """Load a YAML startup case before serving this application's layout."""
     import sys
-    from .startup import configure as configure_case
+    from turbodash.apps.shared.startup import configure as configure_case
     return configure_case(sys.modules[__name__], config_path, "turbine")
 
 
@@ -214,11 +227,7 @@ def _prettify(name):
 # =========================
 # Documentation layout
 # =========================
-docs_path = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)),
-    "docs",
-    "documentation.md",
-)
+docs_path = str(DOCUMENTATION_FILE)
 if os.path.exists(docs_path):
     with open(docs_path, "r", encoding="utf-8") as f:
         theory_md = f.read()
@@ -416,6 +425,32 @@ def make_stage_accordion_item(stage_idx, stage_values, turbine_type):
         item_id=f"stage-{stage_idx}",
         children=html.Div(fields, style={"paddingTop": "6px"}),
     )
+
+
+def geometry_stage_panel(stage_idx, stage_values, turbine_type):
+    """Mirror the live stage inputs through the shared three-way sync callback."""
+    def field(key, label, lo, hi, step):
+        value = stage_values.get(key, STAGE_DEFAULTS[key])
+        if "." in key:
+            row, parameter = key.split(".", 1)
+            value = stage_values.get(key, stage_values.get("blade_geometry", {}).get(row, {}).get(parameter, value))
+        return html.Div([
+            html.Label(label),
+            dbc.Input(id={"scope": "stage", "stage": stage_idx, "key": key, "elem": "geometry"},
+                      type="number", value=value, min=lo, max=hi, step=step, debounce=True),
+        ], className="td-parameter")
+
+    groups = [html.Details([html.Summary("Stage design"),
+                           *[field(key, label, lo, hi, step) for key, label, lo, hi, step in STAGE_FIELDS]],
+                          className="td-row-settings")]
+    for row in ("stator", "rotor"):
+        controls = list(field(f"{row}.{key}", label, lo, hi, step)
+                        for key, label, lo, hi, step in BLADE_GEOMETRY_FIELDS
+                        if key != "aspect_ratio" or turbine_type != "radial")
+        groups.append(html.Details([html.Summary(row.title()), *controls],
+                                   open=stage_idx == 0 and row == "stator", className="td-row-settings"))
+    return html.Details([html.Summary(f"Stage {stage_idx + 1}"), *groups], open=stage_idx == 0,
+                        className="td-row-settings")
 
 
 # =========================
@@ -616,6 +651,7 @@ controls = html.Div(
         save_load_row(),
         dcc.Download(id="download_yaml"),
         dcc.Store(id="result_store"),
+        dcc.Store(id="result_input_signature"),
         dcc.Store(id="loaded_cfg_store"),
         # stage_data_store holds the list of per-stage value dicts. It only
         # changes on +/- or load, so editing a value never rebuilds (and never
@@ -823,43 +859,47 @@ app.layout = html.Div(
     children=[
         dcc.Tabs(
             id="tabs",
-            value="calculator",
+            value="meanline",
             style={
                 "fontFamily": "Segoe UI, Arial, sans-serif",
                 "fontSize": "16px",
                 "borderBottom": "1px solid #d0d7de",
             },
             children=[
-                dcc.Tab(
-                    **styled_tab("Turbodash", "calculator"),
-                    children=[
-                        html.Div(
-                            style={
-                                "display": "flex",
-                                "width": "100vw",
-                                "height": "100vh",
-                                "overflow": "hidden",
-                                "fontFamily": "Arial",
-                            },
-                            children=[
-                                controls,
-                                html.Div(
-                                    style={
-                                        "flex": "1 1 auto",
-                                        "overflowY": "auto",
-                                        "padding": "20px",
-                                    },
-                                    children=[plots, tables, turbogrid_export_panel()],
-                                ),
-                            ],
-                        )
-                    ],
-                ),
-                dcc.Tab(**styled_tab("Documentation", "docs"), children=[docs_layout]),
+                dcc.Tab(**styled_tab("Meanline", "meanline")),
+                dcc.Tab(**styled_tab("Turbine geometry", "geometry")),
+                dcc.Tab(**styled_tab("Mesh", "mesh")),
             ],
-        )
+        ),
+        # Content lives outside dcc.Tab so controls, stores and callbacks stay
+        # mounted when the user switches views.
+        html.Div(
+            id="meanline_pane",
+            style={"display": "flex", "width": "100%", "height": "calc(100vh - 54px)", "overflow": "hidden", "fontFamily": "Arial"},
+            children=[
+                controls,
+                html.Div(
+                    style={"flex": "1 1 auto", "minWidth": 0, "overflowY": "auto", "padding": "20px"},
+                    children=[plots, tables, html.Details([html.Summary("Documentation"), docs_layout], className="mt-4")],
+                ),
+            ],
+        ),
+        html.Div(id="geometry_pane", children=geometry_panel(), style={"display": "none"}),
+        html.Div(id="mesh_pane", children=mesh_panel(), style={"display": "none"}),
     ]
 )
+
+
+@app.callback(
+    Output("meanline_pane", "style"), Output("geometry_pane", "style"), Output("mesh_pane", "style"),
+    Input("tabs", "value"),
+)
+def switch_tab(tab):
+    return (
+        {"display": "flex" if tab == "meanline" else "none", "width": "100%", "height": "calc(100vh - 54px)", "overflow": "hidden", "fontFamily": "Arial"},
+        {"display": "block" if tab == "geometry" else "none"},
+        {"display": "block" if tab == "mesh" else "none"},
+    )
 
 
 # =========================================
@@ -938,18 +978,20 @@ def update_stage_store(
 @app.callback(
     Output({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "slider"}, "value"),
     Output({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "input"}, "value"),
+    Output({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "geometry"}, "value"),
     Input({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "slider"}, "value"),
     Input({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "input"}, "value"),
+    Input({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "geometry"}, "value"),
     prevent_initial_call=True,
 )
-def sync_stage_slider_input(slider_val, input_val):
+def sync_stage_slider_input(slider_val, input_val, geometry_val):
     trigger = ctx.triggered_id
     if trigger is None:
         raise PreventUpdate
-    val = slider_val if trigger.get("elem") == "slider" else input_val
+    val = {"slider": slider_val, "input": input_val, "geometry": geometry_val}[trigger.get("elem")]
     if val is None:
-        raise PreventUpdate
-    return val, val
+        return no_update, None, None
+    return val, val, val
 
 
 # =========================================
@@ -959,6 +1001,7 @@ def sync_stage_slider_input(slider_val, input_val):
 @app.callback(
     Output("stages_accordion_container", "children"),
     Output("stage_count_label", "children"),
+    Output("geometry_rows_container", "children"),
     Input("stage_data_store", "data"),
     State({"scope": "overall", "key": "turbine_type"}, "value"),
     prevent_initial_call=False,
@@ -974,7 +1017,8 @@ def render_stage_accordion(stages, turbine_type):
         always_open=True,
         children=items,
     )
-    return accordion, str(len(stages))
+    geometry = [geometry_stage_panel(i, sv, turbine_type) for i, sv in enumerate(stages)]
+    return accordion, str(len(stages)), geometry
 
 
 # =========================================
@@ -991,6 +1035,7 @@ def render_stage_accordion(stages, turbine_type):
     Output("geom_table", "children"),
     Output("stations_table", "children"),
     Output("result_store", "data"),
+    Output("result_input_signature", "data"),
     Input({"scope": "overall", "key": ALL}, "value"),
     Input({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "value"),
     State({"scope": "overall", "key": ALL}, "id"),
@@ -1075,6 +1120,7 @@ def update_turbine(overall_values, stage_values, overall_ids, stage_ids, store_s
             geom_tbl,
             stn_tbl,
             out,
+            input_signature(overall_values, stage_values, overall_ids, stage_ids, store_stages),
         )
 
     except Exception as e:

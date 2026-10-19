@@ -241,7 +241,7 @@ def test_meanline_table_displays_fractional_counts(reference):
 @pytest.mark.parametrize("app_name", ["turbine", "turbine_experimental"])
 @pytest.mark.parametrize("profile_failure", [False, True])
 def test_app_callback_retains_meanline_result_when_physical_plot_fails(monkeypatch, app_name, profile_failure):
-    app = importlib.import_module(f"turbodash.apps.{app_name}")
+    app = importlib.import_module(f"turbodash.apps.{app_name}.app")
     if profile_failure:
         def fail(*args, **kwargs):
             raise ValueError("Example invalid physical profile")

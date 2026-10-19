@@ -1,3 +1,5 @@
+from turbodash.apps.shared.paths import SHARED_ASSETS_DIRECTORY, DOCUMENTATION_FILE
+
 from pathlib import Path
 import os
 import yaml
@@ -26,14 +28,14 @@ from dash.dash_table.Format import Format, Scheme
 # =========================
 # Global / setup
 # =========================
-app = Dash(__name__, assets_folder=str(Path(__file__).resolve().parents[1]/"assets"))
+app = Dash(__name__, assets_folder=str(SHARED_ASSETS_DIRECTORY))
 server = app.server
 
 
 def configure(config_path):
     """Load a YAML startup case before serving this application's layout."""
     import sys
-    from .startup import configure as configure_case
+    from turbodash.apps.shared.startup import configure as configure_case
     return configure_case(sys.modules[__name__], config_path, "stage")
 
 
@@ -75,11 +77,7 @@ DEFAULTS = dict(
 # Documentation layout
 # =========================
 # Go one level up from the turbodash/ folder to root/, then into docs/
-docs_path = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),  # root folder
-    "docs",
-    "documentation.md",
-)
+docs_path = str(DOCUMENTATION_FILE)
 
 if os.path.exists(docs_path):
     with open(docs_path, "r", encoding="utf-8") as f:

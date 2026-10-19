@@ -14,6 +14,34 @@ import pytest
 import turbodash
 
 
+@pytest.mark.parametrize("name", ["turbine", "turbine_experimental", "turbine_optimization", "stage", "stage_efficiency"])
+def test_app_package_entrypoints_call_their_own_main(name, monkeypatch):
+    import runpy
+
+    module = importlib.import_module(f"turbodash.apps.{name}.app")
+    main = Mock()
+    monkeypatch.setattr(module, "main", main)
+    runpy.run_module(f"turbodash.apps.{name}", run_name="__main__")
+    main.assert_called_once_with()
+
+
+def test_optimization_assets_belong_to_the_optimization_app():
+    from turbodash.apps.turbine import app as stable
+    from turbodash.apps.turbine_optimization import app as optimization
+    from turbodash.apps.shared.paths import SHARED_ASSETS_DIRECTORY, DOCUMENTATION_FILE
+
+    assert DOCUMENTATION_FILE.is_file()
+    assert Path(stable.app.config.assets_folder) == SHARED_ASSETS_DIRECTORY
+    assert Path(optimization.app.config.assets_folder) == SHARED_ASSETS_DIRECTORY
+    assert not any("optimization.css" in url for url in stable.app.config.external_stylesheets)
+    client = optimization.server.test_client()
+    directory = Path(optimization.__file__).parent / "assets"
+    for name in ("optimization.css", "optimization.js"):
+        response = client.get(f"/app-assets/turbine-optimization/{name}")
+        assert response.status_code == 200
+        assert response.get_data(as_text=True) == (directory / name).read_text(encoding="utf-8")
+
+
 def _components(component):
     """Walk the component JSON returned to the browser."""
     if isinstance(component, list):
@@ -27,8 +55,8 @@ def _components(component):
 @pytest.mark.parametrize(
     "module_name,labels,experimental",
     [
-        ("apps.turbine", ["Turbodash", "Documentation"], False),
-        ("apps.turbine_experimental", ["Meanline", "Turbine geometry", "Mesh"], True),
+        ("apps.turbine.app", ["Turbodash", "Documentation"], False),
+        ("apps.turbine_experimental.app", ["Meanline", "Turbine geometry", "Mesh"], True),
     ],
 )
 def test_each_app_serves_its_own_workspace(module_name, labels, experimental):
@@ -55,7 +83,8 @@ def test_each_app_serves_its_own_workspace(module_name, labels, experimental):
 
 
 def test_apps_have_independent_servers_and_callbacks():
-    from turbodash.apps import turbine as app_turbine, turbine_experimental as app_experimental
+    from turbodash.apps.turbine import app as app_turbine
+    from turbodash.apps.turbine_experimental import app as app_experimental
 
     assert app_turbine.app is not app_experimental.app
     assert app_turbine.server is not app_experimental.server
@@ -63,8 +92,8 @@ def test_apps_have_independent_servers_and_callbacks():
 
 
 @pytest.mark.parametrize("module_name,launcher", [
-    ("apps.turbine", "launch_app_turbine"),
-    ("apps.turbine_experimental", "launch_app_experimental"),
+    ("apps.turbine.app", "launch_app_turbine"),
+    ("apps.turbine_experimental.app", "launch_app_experimental"),
 ])
 @pytest.mark.parametrize("reloader_child", [False, True])
 def test_launchers_run_the_selected_app_and_open_one_browser(
@@ -104,8 +133,8 @@ def test_stable_app_starts_without_importing_experimental_dependencies():
         import sys
 
         blocked = (
-            "turbodash.apps.turbine_experimental", "turbodash.apps.components.meshing",
-            "turbodash.meshing", "turbodash.apps.mesh_jobs",
+            "turbodash.apps.turbine_experimental", "turbodash.apps.shared.components.meshing",
+            "turbodash.meshing", "turbodash.apps.shared.mesh_jobs",
             "turbodash.visualization.plotly_mesh", "turbodash.visualization.vtk",
             "turbodash.visualization.vtk_assets", "turbo_moc", "dash_vtk",
         )
@@ -116,7 +145,7 @@ def test_stable_app_starts_without_importing_experimental_dependencies():
                     raise ImportError("Stable app imported " + fullname)
 
         sys.meta_path.insert(0, BlockExperimentalImports())
-        from turbodash.apps.turbine import server
+        from turbodash.apps.turbine.app import server
         assert server.test_client().get("/_dash-layout").status_code == 200
     """)
     result = subprocess.run(

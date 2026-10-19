@@ -1,8 +1,6 @@
-"""Experimental turbine workspace with meanline, geometry and meshing tabs.
+"""Optimization edition of the experimental workspace; existing apps stay independent."""
 
-The stable meanline app lives in turbodash.apps.turbine; keep workspace changes here
-until they are ready to become the default.
-"""
+from turbodash.apps.shared.paths import SHARED_ASSETS_DIRECTORY, DOCUMENTATION_FILE
 
 from pathlib import Path
 import os
@@ -32,9 +30,13 @@ from dash import (
     dash_table,
 )
 from dash.exceptions import PreventUpdate
-from turbodash.apps.components.turbogrid import register_turbogrid_callbacks
-from turbodash.apps.components.meshing import geometry_panel, input_signature, mesh_panel, register_meshing_callbacks
+from turbodash.apps.shared.assets import register_app_assets
+from turbodash.apps.shared.components.turbogrid import register_turbogrid_callbacks
+from turbodash.apps.shared.components.meshing import geometry_panel, input_signature, mesh_panel, register_meshing_callbacks
 from turbodash.visualization.vtk_assets import register_vtk_assets
+from .panel import panel as optimization_panel, terminal as optimization_terminal, register_callbacks as register_optimization_callbacks
+from . import jobs as optimization_jobs
+from .model import nested_config
 
 
 # =========================
@@ -42,11 +44,21 @@ from turbodash.visualization.vtk_assets import register_vtk_assets
 # =========================
 app = Dash(
     __name__,
-    assets_folder=str(Path(__file__).resolve().parents[1]/"assets"),
+    title="Turbodash · Optimization",
+    assets_folder=str(SHARED_ASSETS_DIRECTORY),
     suppress_callback_exceptions=True,
     external_stylesheets=[dbc.themes.BOOTSTRAP],
 )
+register_app_assets(app, Path(__file__).resolve().parent / "assets", "turbine-optimization")
 server = app.server
+optimization_jobs.configure_sessions(server)
+
+
+@server.before_request
+def initialize_session():
+    optimization_jobs.session_owner()
+
+
 register_vtk_assets(app)
 register_turbogrid_callbacks(app)
 register_meshing_callbacks(app)
@@ -55,7 +67,7 @@ register_meshing_callbacks(app)
 def configure(config_path):
     """Load a YAML startup case before serving this application's layout."""
     import sys
-    from .startup import configure as configure_case
+    from turbodash.apps.shared.startup import configure as configure_case
     return configure_case(sys.modules[__name__], config_path, "turbine")
 
 
@@ -225,11 +237,7 @@ def _prettify(name):
 # =========================
 # Documentation layout
 # =========================
-docs_path = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)),
-    "docs",
-    "documentation.md",
-)
+docs_path = str(DOCUMENTATION_FILE)
 if os.path.exists(docs_path):
     with open(docs_path, "r", encoding="utf-8") as f:
         theory_md = f.read()
@@ -263,7 +271,8 @@ LABEL_STYLE = dict(
     fontWeight="bold", display="block", marginBottom="6px", marginTop="8px"
 )
 CONTROLS_STYLE = dict(
-    width="600px",
+    width="520px",
+    flex="0 0 520px",
     padding="24px",
     overflowY="auto",
     borderRight="1px solid #ddd",
@@ -659,11 +668,13 @@ controls = html.Div(
         # changes on +/- or load, so editing a value never rebuilds (and never
         # collapses) the per-stage accordion.
         dcc.Store(id="stage_data_store", data=[dict(STAGE_DEFAULTS)]),
+        optimization_panel(),
         overall_accordion(),
         # Rebuilt only when the stage count or a loaded config changes.
         html.Div(id="stages_accordion_container", style={"marginTop": "12px"}),
     ],
     style=CONTROLS_STYLE,
+    id="design-controls",
 )
 
 
@@ -882,7 +893,7 @@ app.layout = html.Div(
                 controls,
                 html.Div(
                     style={"flex": "1 1 auto", "minWidth": 0, "overflowY": "auto", "padding": "20px"},
-                    children=[plots, tables, html.Details([html.Summary("Documentation"), docs_layout], className="mt-4")],
+                    children=[plots, tables, optimization_terminal(), html.Details([html.Summary("Documentation"), docs_layout], className="mt-4")],
                 ),
             ],
         ),
@@ -911,17 +922,19 @@ def switch_tab(tab):
 # =========================================
 @app.callback(
     Output("stage_data_store", "data"),
+    Output({"scope": "overall", "key": ALL}, "value"),
     Input("stage_plus", "n_clicks"),
     Input("stage_minus", "n_clicks"),
     Input("loaded_cfg_store", "data"),
     Input({"scope": "overall", "key": "turbine_type"}, "value"),
     State("stage_data_store", "data"),
+    State({"scope": "overall", "key": ALL}, "id"),
     State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "value"),
     State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "id"),
     prevent_initial_call=True,
 )
 def update_stage_store(
-    n_plus, n_minus, loaded_cfg, turbine_type, stages, live_values, live_ids
+    n_plus, n_minus, loaded_cfg, turbine_type, stages, overall_ids, live_values, live_ids
 ):
     trigger = ctx.triggered_id
     stages = list(stages or [dict(STAGE_DEFAULTS)])
@@ -943,7 +956,7 @@ def update_stage_store(
         if not turbine_type:
             raise PreventUpdate
         defaults = stage_defaults_for(turbine_type)
-        return [dict(defaults) for _ in stages]
+        return [dict(defaults) for _ in stages], no_update
 
     # Loading a config: replace the whole stage list from the YAML.
     if trigger == "loaded_cfg_store" and loaded_cfg:
@@ -958,18 +971,18 @@ def update_stage_store(
                     for key, *_ in BLADE_GEOMETRY_FIELDS:
                         merged[f"{row}.{key}"] = row_geometry.get(key)
                 new_stages.append(merged)
-            return new_stages
+            return new_stages, loaded_overall_values(loaded_cfg, overall_ids)
         raise PreventUpdate
 
     # Add a stage: copy the previous (last) stage's current values as the seed.
     if trigger == "stage_plus":
         seed = dict(stages[-1]) if stages else dict(STAGE_DEFAULTS)
-        return stages + [seed]
+        return stages + [seed], no_update
 
     # Remove a stage: drop the last one, leaving the others unchanged. Never go
     # below one stage.
     if trigger == "stage_minus":
-        return stages[:-1] if len(stages) > 1 else stages
+        return (stages[:-1] if len(stages) > 1 else stages), no_update
 
     raise PreventUpdate
 
@@ -1040,11 +1053,31 @@ def render_stage_accordion(stages, turbine_type):
     Output("result_input_signature", "data"),
     Input({"scope": "overall", "key": ALL}, "value"),
     Input({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "value"),
+    Input("opt-applied-result", "data"),
     State({"scope": "overall", "key": ALL}, "id"),
     State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "id"),
     State("stage_data_store", "data"),
 )
-def update_turbine(overall_values, stage_values, overall_ids, stage_ids, store_stages):
+def update_turbine(overall_values, stage_values, applied, overall_ids, stage_ids, store_stages):
+    if any(isinstance(identity, dict) and identity.get("key") == "turbine_type"
+           for identity in ctx.triggered_prop_ids.values()):
+        # The stage-load callback replaces the row controls next. Preserve the
+        # previous plots until those controls match the new turbine type.
+        raise PreventUpdate
+    cfg = live_config(overall_values, stage_values, overall_ids, stage_ids, store_stages)
+    signature = input_signature(overall_values, stage_values, overall_ids, stage_ids, store_stages)
+    if applied and optimization_jobs.fingerprint(cfg) == optimization_jobs.fingerprint(applied["config"]):
+        out = dict(applied["turbine_results"])
+        out["optimization"] = applied["config"]["optimization"]
+    elif ctx.triggered_id == "opt-applied-result":
+        # Inputs are still being reconciled through the existing load pipeline.
+        raise PreventUpdate
+    else:
+        out = core.compute_turbine_performance(cfg)
+    return render_results(out, signature)
+
+
+def live_config(overall_values, stage_values, overall_ids, stage_ids, store_stages):
     # Overall inputs.
     overall = {d["key"]: v for d, v in zip(overall_ids or [], overall_values or [])}
 
@@ -1069,69 +1102,61 @@ def update_turbine(overall_values, stage_values, overall_ids, stage_ids, store_s
     ):
         raise PreventUpdate
 
-    cfg = _assemble_cfg(overall, stages)
+    return _assemble_cfg(overall, stages)
 
+
+
+def render_results(out, signature):
+    fig_meridional = _plotting.plot_turbine_meridional_channel(out)
     try:
-        out = core.compute_turbine_performance(cfg)
-
-        fig_meridional = _plotting.plot_turbine_meridional_channel(out)
-        try:
-            fig_blades = _plotting.plot_turbine_blades(
-                out, N_points=500, N_blades_plot=8
-            )
-        except ValueError as error:
-            # Physical profile construction must not discard a meanline solve.
-            fig_blades = {"data": [], "layout": {"annotations": [{
-                "text": f"Blade geometry unavailable: {error}", "showarrow": False,
-                "xref": "paper", "yref": "paper", "x": 0.5, "y": 0.5,
-            }]}}
-        # Now returns a LIST of figures, one per stage.
-        triangle_figs = _plotting.plot_velocity_triangles_turbine(
-            out, mode="mach"
+        fig_blades = _plotting.plot_turbine_blades(
+            out, N_points=500, N_blades_plot=8
         )
-        fig_loss = _plotting.plot_turbine_loss_distribution(out)
+    except ValueError as error:
+        # Physical profile construction must not discard a meanline solve.
+        fig_blades = {"data": [], "layout": {"annotations": [{
+            "text": f"Blade geometry unavailable: {error}", "showarrow": False,
+            "xref": "paper", "yref": "paper", "x": 0.5, "y": 0.5,
+        }]}}
+    # Now returns a LIST of figures, one per stage.
+    triangle_figs = _plotting.plot_velocity_triangles_turbine(
+        out, mode="mach"
+    )
+    fig_loss = _plotting.plot_turbine_loss_distribution(out)
 
-        # Overall efficiency trends vs blade velocity ratio (kinematic sweep).
-        nu_sweep = np.linspace(1e-3, 1.0, 100)
-        trends = core.compute_turbine_efficiency_trends(out, nu_sweep)
-        fig_efficiency_trends = (
-            _plotting.plot_turbine_efficiency_trends(trends, out)
-        )
+    # Overall efficiency trends vs blade velocity ratio (kinematic sweep).
+    nu_sweep = np.linspace(1e-3, 1.0, 100)
+    trends = core.compute_turbine_efficiency_trends(out, nu_sweep)
+    fig_efficiency_trends = (
+        _plotting.plot_turbine_efficiency_trends(trends, out)
+    )
 
-        # Wrap each per-stage figure in its own card row.
-        triangles_children = [
-            triangle_card(f"triangles_plot_{i}", fig)
-            for i, fig in enumerate(triangle_figs)
-        ]
+    # Wrap each per-stage figure in its own card row.
+    triangles_children = [
+        triangle_card(f"triangles_plot_{i}", fig)
+        for i, fig in enumerate(triangle_figs)
+    ]
 
-        # Build the three result tables from the same `out` structure.
-        perf_cols, perf_data = reporting.overall_performance_table(out)
-        geom_cols, geom_data = reporting.geometry_table(out)
-        stn_cols, stn_data = reporting.flow_stations_table(out)
-        perf_tbl = make_data_table(perf_cols, perf_data)
-        geom_tbl = make_data_table(geom_cols, geom_data)
-        stn_tbl = make_data_table(stn_cols, stn_data)
+    # Build the three result tables from the same `out` structure.
+    perf_cols, perf_data = reporting.overall_performance_table(out)
+    geom_cols, geom_data = reporting.geometry_table(out)
+    stn_cols, stn_data = reporting.flow_stations_table(out)
+    perf_tbl = make_data_table(perf_cols, perf_data)
+    geom_tbl = make_data_table(geom_cols, geom_data)
+    stn_tbl = make_data_table(stn_cols, stn_data)
 
-        return (
-            fig_meridional,
-            fig_blades,
-            triangles_children,
-            fig_efficiency_trends,
-            fig_loss,
-            perf_tbl,
-            geom_tbl,
-            stn_tbl,
-            out,
-            input_signature(overall_values, stage_values, overall_ids, stage_ids, store_stages),
-        )
-
-    except Exception as e:
-        print("\n=== ERROR IN update_turbine CALLBACK ===")
-        print(repr(e))
-        print("cfg was:", cfg)
-        print("========================================\n")
-        raise
-
+    return (
+        fig_meridional,
+        fig_blades,
+        triangles_children,
+        fig_efficiency_trends,
+        fig_loss,
+        perf_tbl,
+        geom_tbl,
+        stn_tbl,
+        out,
+        signature,
+    )
 
 def _assemble_cfg(overall, stages):
     """Translate flat overall dict + stage list into the YAML-style cfg."""
@@ -1216,16 +1241,10 @@ def load_design(contents):
 # =========================================
 # Callback: push loaded overall values into the overall inputs
 # =========================================
-@app.callback(
-    Output({"scope": "overall", "key": ALL}, "value"),
-    Input("loaded_cfg_store", "data"),
-    State({"scope": "overall", "key": ALL}, "id"),
-    prevent_initial_call=True,
-)
-def apply_loaded_overall(cfg, overall_ids):
+def loaded_overall_values(cfg, overall_ids):
     if not cfg:
         raise PreventUpdate
-    inp = cfg.get("inputs", {})
+    inp = nested_config(cfg).get("inputs", {})
     out_values = []
     for id_dict in overall_ids:
         key = id_dict["key"]
@@ -1244,6 +1263,9 @@ def apply_loaded_overall(cfg, overall_ids):
         else:
             out_values.append(inp.get(key, OVERALL_DEFAULTS.get(key)))
     return out_values
+
+
+register_optimization_callbacks(app, live_config, render_results)
 
 
 if __name__ == "__main__":

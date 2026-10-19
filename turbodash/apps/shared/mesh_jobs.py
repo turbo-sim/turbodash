@@ -23,7 +23,8 @@ import time
 import uuid
 from zipfile import ZIP_DEFLATED, ZipFile
 
-import numpy as np
+from turbodash.apps.shared.paths import PROJECT_ROOT
+from turbodash.apps.shared.serialization import json_default
 
 
 CACHE_ROOT = Path(tempfile.gettempdir()) / "turbodash_mesh_jobs"
@@ -33,26 +34,18 @@ MAX_ACTIVE_JOBS = 2
 _PROCESSES = {}
 
 
-def _json_default(value):
-    if isinstance(value, np.ndarray):
-        return value.tolist()
-    if isinstance(value, np.generic):
-        return value.item()
-    raise TypeError(f"Cannot serialize {type(value).__name__}.")
-
-
 def fingerprint(results, stage_index=0, row="stator", options=None):
     """Identify the complete solved design and requested mesh settings."""
     payload = json.dumps(
         [results, stage_index, row, options or {}], sort_keys=True,
-        separators=(",", ":"), default=_json_default,
+        separators=(",", ":"), default=json_default,
     )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 def _write_json(path, value):
     temporary = path.with_name(path.name + "." + uuid.uuid4().hex + ".tmp")
-    temporary.write_text(json.dumps(value, default=_json_default), encoding="utf-8")
+    temporary.write_text(json.dumps(value, default=json_default), encoding="utf-8")
     temporary.replace(path)
 
 
@@ -198,9 +191,9 @@ def _start_job(results, stage_index, row, options):
     try:
         with (folder / "worker.log").open("w", encoding="utf-8") as log:
             process = subprocess.Popen(
-                [sys.executable, "-m", "turbodash.apps.mesh_jobs", str(folder / "request.json")],
+                [sys.executable, "-m", "turbodash.apps.shared.mesh_jobs", str(folder / "request.json")],
                 stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
-                cwd=str(Path(__file__).resolve().parents[2]),
+                cwd=str(PROJECT_ROOT),
                 creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
             )
         _PROCESSES[handle["id"]] = process
@@ -298,7 +291,7 @@ def _run_worker(request_path):
 
 def main():
     if len(sys.argv) != 2:
-        raise SystemExit("Usage: python -m turbodash.apps.mesh_jobs REQUEST_JSON")
+        raise SystemExit("Usage: python -m turbodash.apps.shared.mesh_jobs REQUEST_JSON")
     _run_worker(sys.argv[1])
 
 

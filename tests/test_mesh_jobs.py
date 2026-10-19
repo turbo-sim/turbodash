@@ -12,7 +12,7 @@ from zipfile import ZipFile
 import numpy as np
 import pytest
 
-from turbodash.apps import mesh_jobs as jobs
+from turbodash.apps.shared import mesh_jobs as jobs
 
 
 @pytest.fixture(autouse=True)

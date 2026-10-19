@@ -10,9 +10,11 @@ documentation = "https://github.com/turbo-sim/turbodash"
 packages = [{ include = "turbodash" }]
 
 [tool.poetry.scripts]
-turbodash = "turbodash.apps.turbine:main"
-turbodash-experimental = "turbodash.apps.turbine_experimental:main"
-turbodash-stage = "turbodash.apps.stage:main"
+turbodash = "turbodash.apps.turbine.app:main"
+turbodash-experimental = "turbodash.apps.turbine_experimental.app:main"
+
+turbodash-optimization = "turbodash.apps.turbine_optimization.app:main"
+turbodash-stage = "turbodash.apps.stage.app:main"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"
@@ -26,11 +28,13 @@ jaxprop = "^0.5.2"
 python-docx = "^1.2.0"
 xlwings = "0.34.0"
 dash-bootstrap-components = "^2.0.4"
+pysolver-view = { version = "^0.6.9", optional = true }
 # Use a published version so the optional mesh extra is accepted by PyPI.
 turbo_moc = { version = "1.2.0", optional = true }
 
 [tool.poetry.extras]
 mesh = ["turbo_moc"]
+optimization = ["pysolver-view"]
 
 [tool.poetry.group.dev.dependencies]
 ipython = ">=8.13,<8.17"

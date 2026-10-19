@@ -1240,8 +1240,9 @@ def compute_turbine_performance(cfg):
       the per-stage radius-ratio chain; between stages
       ``r_0(i+1) = r_4(i)`` with no interstage gap.
     - The shaft speed is either supplied directly in rpm
-      (``rotational_speed.type = "actual"``) or back-computed from a target
-      specific speed (``type = "specific"``).
+      (``rotational_speed_type = "actual"``) or back-computed from a target
+      specific speed (``rotational_speed_type = "specific"``). The numeric
+      value is ``rotational_speed``; older nested speed inputs remain supported.
     - Each stage has its own local ``nu = U_4 / v_0_local``. The global
       ``nu`` only sets the anchor.
     - ``work_fraction_split`` values are relative weights, normalised
@@ -1355,8 +1356,13 @@ def compute_turbine_performance(cfg):
     if speed_spec is None:
         raise KeyError("Missing `rotational_speed` in inputs.")
 
-    speed_type = str(speed_spec.get("type", "actual")).lower()
-    value = float(speed_spec["value"])
+    if isinstance(speed_spec, dict):
+        # Existing application and saved-case inputs use this older format.
+        speed_type = str(speed_spec.get("type", "actual")).lower()
+        value = float(speed_spec["value"])
+    else:
+        speed_type = str(inp["rotational_speed_type"]).lower()
+        value = float(speed_spec)
 
     if speed_type == "actual":
         omega = value * 2.0 * np.pi / 60.0
@@ -1365,7 +1371,7 @@ def compute_turbine_performance(cfg):
         omega = value * dh_is_total ** (3 / 4) / np.sqrt(V_4s)
     else:
         raise ValueError(
-            f"Unknown rotational_speed.type = {speed_type!r}; "
+            f"Unknown rotational_speed_type = {speed_type!r}; "
             "expected 'actual' or 'specific'."
         )
 

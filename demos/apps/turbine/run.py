@@ -5,7 +5,7 @@ import sys
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO))
 
-from turbodash.apps import turbine as application
+from turbodash.apps.turbine import app as application
 
 
 def main():

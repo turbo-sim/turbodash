@@ -11,7 +11,7 @@ import sys
 import numpy as np
 import pytest
 
-from turbodash.apps.startup import components
+from turbodash.apps.shared.startup import components
 from turbodash.core import stage, turbine
 from turbodash.reporting import stage as reports
 
@@ -58,9 +58,9 @@ def dispatch_calculation(module):
     """Use the endpoint payload produced by Dash for fixed and pattern inputs."""
     controls = list(components(module.app.layout))
     fixed = {c.id: c for c in controls if isinstance(getattr(c, "id", None), str)}
-    if module.__name__.endswith("stage_efficiency"):
+    if module.__name__.endswith("stage_efficiency.app"):
         target = "efficiency_ts_plot"
-    elif module.__name__.endswith(".stage"):
+    elif module.__name__.endswith(".stage.app"):
         target = "stage_result_store"
     else:
         target = "result_store"
@@ -97,7 +97,7 @@ def dispatch_calculation(module):
 
 @pytest.mark.parametrize("name", APPLICATIONS)
 def test_four_yaml_cases_serve_and_calculate_via_dash(name, monkeypatch):
-    module = importlib.import_module("turbodash.apps." + name)
+    module = importlib.import_module("turbodash.apps." + name + ".app")
     original = module.app.layout
     from copy import deepcopy
     monkeypatch.setattr(module.app, "layout", deepcopy(original))
@@ -105,7 +105,7 @@ def test_four_yaml_cases_serve_and_calculate_via_dash(name, monkeypatch):
     client = module.server.test_client()
     for route in ("/", "/_dash-layout", "/_dash-dependencies"):
         assert client.get(route).status_code == 200
-    assert Path(module.app.config.assets_folder) == ROOT / "turbodash/assets"
+    assert Path(module.app.config.assets_folder) == ROOT / "turbodash/apps/shared/assets"
     response = dispatch_calculation(module)
     if name == "stage_efficiency":
         for identity in ("efficiency_ts_plot", "efficiency_tt_plot"):
@@ -125,7 +125,7 @@ def test_four_yaml_cases_serve_and_calculate_via_dash(name, monkeypatch):
 @pytest.mark.parametrize("name", APPLICATIONS)
 def test_demo_runner_passes_its_adjacent_yaml_to_the_app(name, monkeypatch):
     import runpy
-    module = importlib.import_module("turbodash.apps." + name)
+    module = importlib.import_module("turbodash.apps." + name + ".app")
     observed = []
     monkeypatch.setattr(module, "main", lambda path: observed.append(path))
     runner = ROOT / "demos/apps" / name / "run.py"
@@ -139,7 +139,7 @@ def test_worker_publishes_failure_from_outside_checkout(tmp_path):
     request.write_text(json.dumps(dict(results={}, stage_index=0, row="stator", options={}, created=time.time())))
     # Select the tested checkout even when an older release is installed.
     environment = {**os.environ, "PYTHONPATH": str(ROOT)}
-    completed = subprocess.run([sys.executable, "-B", "-m", "turbodash.apps.mesh_jobs", str(request)],
+    completed = subprocess.run([sys.executable, "-B", "-m", "turbodash.apps.shared.mesh_jobs", str(request)],
                                cwd=tmp_path, env=environment, capture_output=True, text=True, timeout=30)
     assert completed.returncode == 0, completed.stderr
     assert json.loads((tmp_path / "status.json").read_text())["state"] == "failed"

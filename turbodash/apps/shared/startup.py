@@ -40,6 +40,8 @@ def configure(module, filename, kind):
         overall = dict(module.OVERALL_DEFAULTS)
         overall.update(values)
         rotation = values.get("rotational_speed", {})
+        if not isinstance(rotation, dict):
+            rotation = {"type": values.get("rotational_speed_type", "specific"), "value": rotation}
         overall["rotational_speed_type"] = rotation.get("type", overall["rotational_speed_type"])
         overall["rotational_speed_value"] = rotation.get("value", overall["rotational_speed_value"])
         stages = []

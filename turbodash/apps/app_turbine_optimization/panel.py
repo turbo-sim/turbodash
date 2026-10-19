@@ -39,13 +39,13 @@ def panel():
                 ], className="td-opt-tab")),
                 dbc.Tab(label="Design variables", tab_id="variables", children=html.Div([
                     html.Span("About design variables", title="Only selected inputs are free. A blank initial value uses the current design; values outside bounds are clipped and logged.", tabIndex=0, className="td-help"),
+                    dbc.Button("+ Add variable", id="opt-add-variable", outline=True, color="primary", size="sm", n_clicks=0, className="mb-3"),
                     html.Div(id="opt-variable-rows"),
-                    dbc.Button("+ Add variable", id="opt-add-variable", outline=True, color="primary", size="sm", n_clicks=0),
                 ], className="td-opt-tab")),
                 dbc.Tab(label="Constraints", tab_id="constraints", children=html.Div([
                     html.Span("About constraint scaling", title="Scale divides the residual into dimensionless units. Use a positive physical scale, even for a zero target.", tabIndex=0, className="td-help"),
+                    dbc.Button("+ Add constraint", id="opt-add-constraint", outline=True, color="primary", size="sm", n_clicks=0, className="mb-3"),
                     html.Div(id="opt-constraint-rows"),
-                    dbc.Button("+ Add constraint", id="opt-add-constraint", outline=True, color="primary", size="sm", n_clicks=0),
                 ], className="td-opt-tab")),
             ]),
             dbc.Button("Start optimization", id="opt-start", color="primary", className="td-opt-start", n_clicks=0),
@@ -53,6 +53,7 @@ def panel():
             html.Div(id="opt-progress", className="td-opt-progress", **{"aria-live": "polite"}),
         ], className="td-opt-body"),
         dcc.Store(id="opt-launching", data=False), dcc.Store(id="opt-catalog"), dcc.Store(id="opt-editor-state", data={"variables": [], "constraints": []}),
+        dcc.Store(id="opt-editor-load"),
         dcc.Store(id="opt-job", storage_type="session"), dcc.Store(id="opt-applied-result"),
         dcc.Store(id="opt-progress-snapshot"),
         dcc.Interval(id="opt-poll", interval=750),
@@ -95,7 +96,7 @@ def variable_row(row, catalog):
             _numeric("variable", key, "initial", "Initial", row.get("initial"), f"Current: {choice['value']:g}" if choice else "Current design"),
             _numeric("variable", key, "upper", "Upper", row.get("upper")),
         ], className="td-opt-bounds"),
-    ], className="td-opt-row")
+    ], className="td-opt-row", key=key)
 
 
 def constraint_row(row, catalog):
@@ -117,7 +118,7 @@ def constraint_row(row, catalog):
             _numeric("constraint", key, "target", "Target", row.get("target", 0)),
             _numeric("constraint", key, "scale", "Scale", row.get("scale", 1)),
         ], className="td-opt-bounds"),
-    ], className="td-opt-row")
+    ], className="td-opt-row", key=key)
 
 
 def collect_rows(path_values, path_ids, number_values, number_ids, comparisons=None, comparison_ids=None):
@@ -132,18 +133,25 @@ def collect_rows(path_values, path_ids, number_values, number_ids, comparisons=N
     return list(rows.values())
 
 
-def reconcile_editor(rows, previous, catalog, kind, trigger, loaded=None):
+def reconcile_editor(rows, previous, catalog, kind, trigger, loaded=None, *,
+                     add_count=None, removed=(), edited_fields=None):
     """Preserve live numeric edits while refreshing choices and path defaults."""
+    rows = [dict(row) for row in rows]
     if loaded is not None:
-        rows = loaded
-    elif trigger == f"opt-add-{kind}":
-        chosen = {row.get("path") for row in rows}
-        path = next((path for path in catalog if path not in chosen), None)
-        if kind == "constraint":
-            path = DEFAULT_CONSTRAINT if DEFAULT_CONSTRAINT in catalog else path
-        rows.append(dict(id=uuid4().hex, path=path))
-    elif isinstance(trigger, dict) and trigger.get("type") == f"opt-remove-{kind}":
-        rows = [row for row in rows if row["id"] != trigger["row"]]
+        rows = [dict(row) for row in loaded]
+    else:
+        removed = set(removed)
+        if isinstance(trigger, dict) and trigger.get("type") == f"opt-remove-{kind}":
+            removed.add(trigger["row"])
+        rows = [row for row in rows if row["id"] not in removed]
+        if add_count is None:
+            add_count = int(trigger == f"opt-add-{kind}")
+        for _ in range(add_count):
+            chosen = {row.get("path") for row in rows}
+            path = next((path for path in catalog if path not in chosen), None)
+            if kind == "constraint":
+                path = DEFAULT_CONSTRAINT if DEFAULT_CONSTRAINT in catalog else path
+            rows.append(dict(id=uuid4().hex, path=path))
     old = {row["id"]: row for row in previous}
     for row in rows:
         choice = catalog.get(row.get("path"), {})
@@ -151,10 +159,18 @@ def reconcile_editor(rows, previous, catalog, kind, trigger, loaded=None):
         changed = before.get("path") != row.get("path") or (
             row.get("path") == "rotational_speed" and before.get("label") != choice.get("label"))
         if changed and loaded is None:
+            fields = (edited_fields or {}).get(row["id"], set())
+            # A path response can still be pending when the user commits new
+            # bounds. Keep those later edits, while resetting untouched fields
+            # to defaults for the newly selected quantity and its units.
+            kept = {key: row.get(key) for key in
+                    (("lower", "initial", "upper") if kind == "variable" else ("target", "scale", "comparison"))
+                    if before and fields and (key in fields or row.get(key) != before.get(key))}
             if kind == "variable":
                 row.update(lower=choice.get("lower"), upper=choice.get("upper"), initial=None)
             else:
                 row.update(target=0, comparison="=", scale=choice.get("scale", 1))
+            row.update(kept)
         row["label"] = choice.get("label")
     return rows
 
@@ -183,32 +199,45 @@ def register_callbacks(app, live_config, render_results):
         variables, outputs = variable_catalog(config), output_catalog(config, results)
         return dict(variables=variables, constraints=outputs, fingerprint=jobs.fingerprint(config)), _dropdown_options({k: v for k, v in outputs.items() if v["objective"]})
 
+    app.clientside_callback(
+        """function(config, variables, constraints, previous) {
+            return config ? {config: config, revision: (previous?.revision || 0) + 1, add_clicks: {
+                variable: variables || 0, constraint: constraints || 0
+            }} : null;
+        }""",
+        Output("opt-editor-load", "data"), Input("loaded_cfg_store", "data"),
+        State("opt-add-variable", "n_clicks"), State("opt-add-constraint", "n_clicks"),
+        State("opt-editor-load", "data"),
+    )
+
     @app.callback(Output("opt-variable-rows", "children"), Output("opt-constraint-rows", "children"),
                   Output("opt-editor-state", "data"),
                   Input("opt-add-variable", "n_clicks"), Input("opt-add-constraint", "n_clicks"),
                   Input({"type": "opt-remove-variable", "row": ALL}, "n_clicks"),
                   Input({"type": "opt-remove-constraint", "row": ALL}, "n_clicks"),
                   Input(var_path, "value"), Input(con_path, "value"),
-                  Input("opt-catalog", "data"), Input("loaded_cfg_store", "data"),
+                  Input(var_num, "value"), Input(con_num, "value"), Input(comparison, "value"),
+                  Input("opt-catalog", "data"), Input("opt-editor-load", "data"),
+                  State({"type": "opt-remove-variable", "row": ALL}, "id"),
+                  State({"type": "opt-remove-constraint", "row": ALL}, "id"),
                   State("opt-editor-state", "data"), *editor_states)
-    def edit_rows(_addv, _addc, _removev, _removec, _vp, _cp, catalog, loaded_config, previous, *values):
+    def edit_rows(_addv, _addc, _removev, _removec, _vp, _cp, _vn, _cn, _comparisons, catalog, load_transition,
+                  remove_variable_ids, remove_constraint_ids, previous, *values):
         if not catalog:
             raise PreventUpdate
         trigger = ctx.triggered_id
-        # Preserve explicit user actions when a calculation refreshes the
-        # catalog in the same batch. Loading a new design still takes priority.
-        for preferred in ("loaded_cfg_store", "opt-add-variable", "opt-add-constraint", "opt-catalog"):
-            if preferred in ctx.triggered_prop_ids.values():
-                trigger = preferred
-                break
-        if isinstance(trigger, dict) and trigger["type"].startswith("opt-remove") and not ctx.triggered[0]["value"]:
-            raise PreventUpdate
+        if "opt-editor-load" in ctx.triggered_prop_ids.values():
+            trigger = "opt-editor-load"
+        loaded_config = (load_transition or {}).get("config")
         variables = collect_rows(*values[:4])
         constraints = collect_rows(*values[4:])
         previous = previous or dict(variables=[], constraints=[])
+        # Committed numbers and comparisons are Inputs as well as shared job
+        # State: a new edit must supersede any older in-flight children rebuild,
+        # otherwise a delayed Add/catalog response can restore stale bounds.
         loaded_variables = loaded_constraints = None
-        loaded_signature = jobs.fingerprint(loaded_config) if loaded_config else None
-        load_pending = loaded_config and (trigger == "loaded_cfg_store" or previous.get("loaded_signature") != loaded_signature)
+        loaded_revision = (load_transition or {}).get("revision")
+        load_pending = loaded_config and (trigger == "opt-editor-load" or previous.get("loaded_revision") != loaded_revision)
         if load_pending:
             # Loading also changes turbine/speed type. Derive choices from that
             # configuration immediately, without waiting on downstream plots.
@@ -222,13 +251,46 @@ def register_callbacks(app, live_config, render_results):
                                        scale=(abs(spec.get("value", 0)) if spec.get("normalize") is True else
                                               1 if spec.get("normalize") in (False, None) else spec["normalize"]))
                                   for spec in settings.get("constraints", [])]
-        variables = reconcile_editor(variables, previous["variables"], catalog["variables"], "variable", trigger, loaded_variables)
-        constraints = reconcile_editor(constraints, previous["constraints"], catalog["constraints"], "constraint", trigger, loaded_constraints)
+        # Dash may coalesce rapid clicks, and a catalog refresh can arrive in
+        # the same request as a button action. Reconcile the cumulative click
+        # counts, rather than applying only the first triggered event. Removal
+        # buttons belong to stable row IDs, so all clicked rows can be removed
+        # together without confusing array positions after another deletion.
+        clicks = dict(variable=_addv or 0, constraint=_addc or 0)
+        # A new design intentionally replaces the old editor. The browser
+        # snapshots the click counters when that load arrives, so actions made
+        # after loading started survive even if its first response is delayed.
+        previous_clicks = (load_transition if load_pending else previous).get("add_clicks", {})
+        additions = {kind: max(0, clicks[kind] - previous_clicks.get(kind, 0))
+                     for kind in clicks}
+        edited_fields = {}
+        for identity in ctx.triggered_prop_ids.values():
+            if isinstance(identity, dict) and identity.get("type") in (
+                    "opt-variable-number", "opt-constraint-number", "opt-comparison"):
+                edited_fields.setdefault(identity["row"], set()).add(identity.get("field", "comparison"))
+        variables = reconcile_editor(
+            variables, previous["variables"], catalog["variables"], "variable", None,
+            loaded_variables, add_count=additions["variable"],
+            removed=[identity["row"] for count, identity in zip(_removev or [], remove_variable_ids or []) if count],
+            edited_fields=edited_fields,
+        )
+        constraints = reconcile_editor(
+            constraints, previous["constraints"], catalog["constraints"], "constraint", None,
+            loaded_constraints, add_count=additions["constraint"],
+            removed=[identity["row"] for count, identity in zip(_removec or [], remove_constraint_ids or []) if count],
+            edited_fields=edited_fields,
+        )
+        if load_pending:
+            variables = reconcile_editor(variables, variables, catalog["variables"], "variable", None,
+                                         add_count=additions["variable"])
+            constraints = reconcile_editor(constraints, constraints, catalog["constraints"], "constraint", None,
+                                           add_count=additions["constraint"])
         # New children can trigger the path inputs once more; stop the cycle.
-        if isinstance(trigger, dict) and trigger["type"].endswith("-path"):
+        if isinstance(trigger, dict):
             if variables == previous["variables"] and constraints == previous["constraints"]:
                 raise PreventUpdate
-        state = dict(variables=variables, constraints=constraints, loaded_signature=loaded_signature)
+        state = dict(variables=variables, constraints=constraints, loaded_revision=loaded_revision,
+                     add_clicks=clicks)
         return ([variable_row(row, catalog["variables"]) for row in variables] or html.P("No free inputs yet. Add a variable to begin.", className="td-opt-empty"),
                 [constraint_row(row, catalog["constraints"]) for row in constraints] or html.P("No constraints · bounds still apply to every free input.", className="td-opt-empty"), state)
 

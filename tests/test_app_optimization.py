@@ -105,6 +105,165 @@ class EditorTests(unittest.TestCase):
                             [{"row": "a", "field": "upper"}, {"row": "a", "field": "lower"}])
         self.assertEqual(rows, [dict(id="a", path="blade_velocity_ratio", lower=.5, upper=1)])
 
+    def test_numeric_edits_after_pending_path_change_keep_only_edited_fields(self):
+        catalog = variable_catalog(case())
+        before = [dict(id="row", path="stages.0.degree_reaction", lower=0, upper=.75, initial=None)]
+        live = [dict(before[0], path="stages.0.stator_exit_angle", lower=55.1234567, initial=60.1234567)]
+        result = reconcile_editor(live, before, catalog, "variable", None,
+                                  edited_fields={"row": {"initial"}})
+        self.assertEqual(result[0]["lower"], 55.1234567)
+        self.assertEqual(result[0]["initial"], 60.1234567)
+        self.assertEqual(result[0]["upper"], 80)
+        outputs = output_catalog(case())
+        before = [dict(id="limit", path="$overall_performance.efficiency_ts", target=0, scale=1, comparison="=")]
+        live = [dict(before[0], path="$overall_performance.power_actual", target=12345.6789, comparison=">=")]
+        result = reconcile_editor(live, before, outputs, "constraint", None,
+                                  edited_fields={"limit": {"comparison"}})
+        self.assertEqual(result[0]["target"], 12345.6789)
+        self.assertEqual(result[0]["comparison"], ">=")
+        self.assertEqual(result[0]["scale"], 1e5)
+
+    def test_editor_reconciles_coalesced_clicks_and_removals_during_catalog_refresh(self):
+        from dash._callback_context import context_value
+        from dash._utils import AttributeDict
+        from turbodash.apps.app_turbine_optimization import app as module
+
+        callback = next(value["callback"].__wrapped__ for key, value in module.app.callback_map.items()
+                        if "opt-variable-rows.children" in key)
+        catalog = dict(variables=variable_catalog(case()), constraints=output_catalog(case()))
+        variables = reconcile_editor([], [], catalog["variables"], "variable", None, add_count=2)
+        variables[0].update(lower=.51234567, initial=.61234567, upper=.7)
+        constraints = reconcile_editor([], [], catalog["constraints"], "constraint", "opt-add-constraint")
+        previous = dict(variables=deepcopy(variables), constraints=deepcopy(constraints),
+                        add_clicks=dict(variable=5, constraint=3))
+
+        def states(rows, kind):
+            numbers = [(row, key) for row in rows for key in
+                       (("lower", "initial", "upper") if kind == "variable" else ("target", "scale"))]
+            return [[row["path"] for row in rows],
+                    [dict(type=f"opt-{kind}-path", row=row["id"]) for row in rows],
+                    [row.get(key) for row, key in numbers],
+                    [dict(type=f"opt-{kind}-number", row=row["id"], field=key) for row, key in numbers]]
+
+        remove_variables = [dict(type="opt-remove-variable", row=row["id"]) for row in variables]
+        remove_constraints = [dict(type="opt-remove-constraint", row=row["id"]) for row in constraints]
+        token = context_value.set(AttributeDict(triggered_inputs=[
+            dict(prop_id="opt-catalog.data", value=catalog),
+            dict(prop_id="opt-add-variable.n_clicks", value=8),
+            dict(prop_id="opt-add-constraint.n_clicks", value=5),
+        ]))
+        try:
+            _, _, state = callback(
+                8, 5, [0, 1], [1], [], [], [], [], [], catalog, None,
+                remove_variables, remove_constraints, previous,
+                *states(variables, "variable"), *states(constraints, "constraint"),
+                [row["comparison"] for row in constraints],
+                [dict(type="opt-comparison", row=row["id"]) for row in constraints],
+            )
+        finally:
+            context_value.reset(token)
+        self.assertEqual(len(state["variables"]), 4)
+        self.assertEqual(len(state["constraints"]), 2)
+        self.assertEqual(state["variables"][0]["initial"], .61234567)
+        self.assertEqual(state["variables"][0]["lower"], .51234567)
+        self.assertNotIn(variables[1]["id"], [row["id"] for row in state["variables"]])
+        self.assertNotIn(constraints[0]["id"], [row["id"] for row in state["constraints"]])
+        self.assertEqual(state["add_clicks"], dict(variable=8, constraint=5))
+        self.assertEqual(variables, previous["variables"])
+
+    def test_loaded_editor_supersedes_pending_actions_without_mutating_source(self):
+        catalog = variable_catalog(case())
+        loaded = [dict(id="loaded", path="blade_velocity_ratio", lower=.55, initial=.6, upper=.7)]
+        source = deepcopy(loaded)
+        result = reconcile_editor([], [], catalog, "variable", None, loaded,
+                                  add_count=5, removed=["loaded"])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["initial"], .6)
+        self.assertEqual(loaded, source)
+
+    def test_committed_editor_values_trigger_new_responses(self):
+        from turbodash.apps.app_turbine_optimization import app as module
+
+        callback = next(value for key, value in module.app.callback_map.items()
+                        if "opt-variable-rows.children" in key)
+        identities = {json.loads(item["id"])["type"] for item in callback["inputs"]
+                      if item["id"].startswith("{")}
+        self.assertTrue({"opt-variable-number", "opt-constraint-number", "opt-comparison"}
+                        <= identities)
+
+    def test_actions_after_load_snapshot_survive_stale_previous_editor_state(self):
+        from dash._callback_context import context_value
+        from dash._utils import AttributeDict
+        from turbodash.apps.app_turbine_optimization import app as module
+
+        callback = next(value["callback"].__wrapped__ for key, value in module.app.callback_map.items()
+                        if "opt-variable-rows.children" in key)
+        config = case()
+        config["optimization"] = dict(
+            design_variables={"blade_velocity_ratio": dict(lower_value=.55, initial_value=.6, upper_value=.7)},
+            constraints=[],
+        )
+        catalog = dict(variables=variable_catalog(config), constraints=output_catalog(config))
+        previous = dict(variables=[], constraints=[], add_clicks=dict(variable=2, constraint=2))
+        transition = dict(config=config, revision=1, add_clicks=dict(variable=4, constraint=3))
+        token = context_value.set(AttributeDict(triggered_inputs=[
+            dict(prop_id="opt-add-variable.n_clicks", value=5),
+            dict(prop_id="opt-add-constraint.n_clicks", value=4),
+        ]))
+        try:
+            _, _, state = callback(
+                5, 4, [], [], [], [], [], [], [], catalog, transition, [], [], previous,
+                *[[] for _ in range(10)],
+            )
+        finally:
+            context_value.reset(token)
+        self.assertEqual(len(state["variables"]), 2)
+        self.assertEqual(len(state["constraints"]), 1)
+        self.assertEqual(state["variables"][0]["lower"], .55)
+        self.assertEqual(state["variables"][0]["initial"], .6)
+        self.assertEqual(state["variables"][1]["path"], "rotational_speed")
+        self.assertEqual(state["add_clicks"], dict(variable=5, constraint=4))
+
+    def test_reloading_identical_turbine_inputs_resets_bounds_before_pending_add(self):
+        from dash._callback_context import context_value
+        from dash._utils import AttributeDict
+        from turbodash.apps.app_turbine_optimization import app as module
+
+        callback = next(value["callback"].__wrapped__ for key, value in module.app.callback_map.items()
+                        if "opt-variable-rows.children" in key)
+        # Both changing optimization settings and reloading the same file to
+        # discard manual edits need a fresh load, despite identical model inputs.
+        for loaded_lower in (.57, .55):
+            with self.subTest(loaded_lower=loaded_lower):
+                config = case()
+                config["optimization"] = dict(
+                    design_variables={"blade_velocity_ratio": dict(lower_value=loaded_lower, upper_value=.7)},
+                    constraints=[],
+                )
+                catalog = dict(variables=variable_catalog(config), constraints=output_catalog(config))
+                row = dict(id="existing", path="blade_velocity_ratio", lower=.52, initial=None, upper=.65,
+                           label=catalog["variables"]["blade_velocity_ratio"]["label"])
+                previous = dict(variables=[row], constraints=[], loaded_revision=1,
+                                add_clicks=dict(variable=0, constraint=0))
+                transition = dict(config=config, revision=2, add_clicks=dict(variable=0, constraint=0))
+                numeric_ids = [dict(type="opt-variable-number", row="existing", field=key)
+                               for key in ("lower", "initial", "upper")]
+                states = [[row["path"]], [dict(type="opt-variable-path", row="existing")],
+                          [.52, None, .65], numeric_ids, [], [], [], [], [], []]
+                token = context_value.set(AttributeDict(triggered_inputs=[
+                    dict(prop_id="opt-add-variable.n_clicks", value=1),
+                ]))
+                try:
+                    _, _, state = callback(
+                        1, 0, [0], [], [], [], [], [], [], catalog, transition,
+                        [dict(type="opt-remove-variable", row="existing")], [], previous, *states,
+                    )
+                finally:
+                    context_value.reset(token)
+                self.assertEqual(len(state["variables"]), 2)
+                self.assertEqual(state["variables"][0]["lower"], loaded_lower)
+                self.assertEqual(state["loaded_revision"], 2)
+
     def test_invalid_editor_values_rejected_before_launch(self):
         config = case()
         row = dict(path="blade_velocity_ratio", lower=.5, upper=.65)
@@ -241,7 +400,7 @@ class WorkspaceTests(unittest.TestCase):
         app = Dash(__name__, suppress_callback_exceptions=True)
         ui.register_callbacks(app, lambda *args: edited, lambda *args: None)
         poll = next(entry["callback"].__wrapped__ for entry in app.callback_map.values()
-                    if entry["callback"].__wrapped__.__name__ == "poll_job")
+                    if entry.get("callback") and entry["callback"].__wrapped__.__name__ == "poll_job")
         handle = dict(id="a" * 32, applying=True, target=jobs.fingerprint(optimized),
                       applied_at=100, message="Optimization applied")
         # The displayed result may already be optimized, or may still be the
@@ -437,7 +596,7 @@ class WorkspaceTests(unittest.TestCase):
             self.assertEqual(jobs.fingerprint(rendered[8]), delivered[0]["target"])
             expected_results = dict(optimized.turbine_results, optimization=optimized.config["optimization"])
             expected = module.render_results(expected_results, rendered[9])
-            self.assertEqual(json.dumps(rendered, cls=PlotlyJSONEncoder),
+            self.assertEqual(json.dumps(rendered[:10], cls=PlotlyJSONEncoder),
                              json.dumps(expected, cls=PlotlyJSONEncoder))
             self.assertEqual(len(rendered[2]), 2)
             acknowledged = invoke("opt-poll.n_intervals", poll,

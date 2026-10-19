@@ -1,0 +1,20 @@
+{
+  "checks": [
+    "Adding a stage updates both controls and results",
+    "Switching to radial updates the two-stage result",
+    "Removing a stage and restoring axial updates results",
+    "Four rapid stage additions retain every click",
+    "Rapid removals and interleaved add/remove clamp at one without losing later additions",
+    "Adding stages retains a precise numeric draft without requiring a separate blur",
+    "Loading a named design resets the stage-count target and preserves stage names",
+    "Repeated axial/radial switches refresh every stage and return to the final requested type",
+    "Speed conversion preserves the latest unblurred value while a previous result may be pending",
+    "Rapid shaft-speed toggles preserve the canonical units and physical RPM",
+    "Structural edits retain blank drafts and recover live plots after the invalid value is repaired",
+    "Interleaved stage counts and turbine types preserve both intents under delayed responses",
+    "A stage value committed while Add is pending survives the delayed editor rebuild",
+    "Adding during a pending YAML load uses the new file's stages and keeps the added stage"
+  ],
+  "errors": [],
+  "results": 31
+}

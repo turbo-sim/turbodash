@@ -59,3 +59,19 @@ inside the checkout when running repository-confined development checks.
 display padding, additional entered digits, tiny tolerances, focused editing,
 dynamic controls and precise YAML round trips. Formatting must not cause an
 extra calculation or change numeric model values.
+
+Interaction stress regressions start and stop their own local servers. They use
+real controls and compare the rendered graphs with the calculated figures:
+
+```powershell
+python tests/browser_stage_stress.py --chromium "C:/Program Files/Google/Chrome/Application/chrome.exe"
+python tests/browser_editor_stress.py --chromium "C:/Program Files/Google/Chrome/Application/chrome.exe" --output development/app_design/output_stress_optimization
+python tests/browser_interaction_stress.py --chromium "C:/Program Files/Google/Chrome/Application/chrome.exe"
+```
+
+These cover stage/type changes, rapid add/remove actions, overlapping calculations,
+optimization row identities and precise edits, invalid drafts, property-pair
+conversion, and out-of-order responses. Browser profiles, logs and downloads stay
+in ignored `development/app_design/output_stress_*` directories. Relevant Python
+tests also exercise Dash's HTTP dispatch so wildcard-output serialization errors
+cannot hide behind direct callback calls.

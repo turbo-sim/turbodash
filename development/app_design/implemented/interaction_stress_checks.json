@@ -1,0 +1,18 @@
+{
+  "checks": [
+    "Ordinary numeric edit updates result and both real Plotly coordinate arrays",
+    "Rapid model edits interleaved with theme and workspace changes keep graph coordinates synchronized",
+    "Keyboard text entry and Enter commit exact floating point values",
+    "Blank draft retains valid plots and correcting it resumes updates",
+    "Saved design matches final visible precise control values",
+    "Out-of-order valid calculation responses retain the latest design figures",
+    "Out-of-order invalid draft responses cannot mark a corrected design stale",
+    "Out-of-order successful responses cannot hide the current invalid-draft warning",
+    "Property-pair change during an in-flight calculation preserves the current inlet state",
+    "Changing property pair from an invalid inlet requests both new values",
+    "Add during a pending YAML editor load retains the loaded row and the new row"
+  ],
+  "failures": [],
+  "browser_errors": [],
+  "result_updates": 31
+}

@@ -60,6 +60,10 @@ def configure(module, filename, kind):
         fixed["stage_data_store"].data = stages
         if "td-inlet-pair" in fixed:
             fixed["td-inlet-pair"].value = overall["inlet_property_pair"]
+        if "td-speed-mode" in fixed:
+            fixed["td-speed-mode"].value = overall["rotational_speed_type"]
+        if "td-stage-model-type" in fixed:
+            fixed["td-stage-model-type"].data = overall["turbine_type"]
         rendered = module.render_stage_accordion(stages, overall["turbine_type"])
         accordion, count = rendered[:2]
         fixed["stages_accordion_container"].children = accordion

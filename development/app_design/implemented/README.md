@@ -18,7 +18,7 @@ The existing virtual environment can also run `.venv/Scripts/python.exe -m turbo
 - Five numbered, initially closed sections with named stage selection and **Stator / Rotor** scope. Every stage's input stays mounted to preserve exact edits.
 - One continuous numeric field per row, with `step="any"`, debounced changes and no sliders. Continuous values display at least three decimal places, retaining extra supplied precision; formatting never rounds the model or interrupts typing. Inherently discrete counts remain integers.
 - Keyboard typeahead search that selects the right workspace/stage/row, expands the containing sections and focuses the field. Desktop inspector resizing and a narrow-screen drawer are included.
-- TurboMoC-inspired fluid/property labels with an atomic conversion of the last accepted inlet state. Impossible transitions clear both new inputs; invalid drafts retain the last valid results and prevent stale saves.
+- TurboMoC-inspired fluid/property labels with an atomic conversion of the current inlet values. Impossible transitions clear both new inputs; invalid drafts retain the last valid results and prevent stale saves.
 - Four overview metrics and the complete performance, geometry and flow reports, styled in both themes. Power uses two decimals and adaptive W/kW/MW units.
 - Current design and optimization editor settings are saved together, including precise bounds, constraints and stage names.
 - Delayed optimization application never restores older inputs over a newer edit; an unconfirmed update keeps the current controls and reports its status.
@@ -42,7 +42,7 @@ These screenshots use calculated results from the real Dash app. They supersede 
 
 ## Verification
 
-The full regression suite passed: **553 passed, 8 skipped**. Seven skips require
+The full regression suite passed: **574 passed, 8 skipped**. Seven skips require
 the optional TurboMoC package, which is not installed in this environment; one
 requires Windows symlink privileges. Real mesh generation was therefore not
 exercised here. The updated workbench passed **12 browser workflow groups** with
@@ -64,5 +64,17 @@ and invalid drafts, dynamic editors and precise YAML round trips. Presentation
 changes and unchanged focus/blur do not trigger a numerical calculation.
 
 Regression coverage lives in `tests/test_app_workbench.py`, `test_app_fluid_inputs.py`, `test_mesh_workbench.py` and `test_plotting_turbine.py`, alongside the existing app, solver, optimization and mesh tests. Guide containment, real station placement, upstream extent clipping, radial extension limits, and theme changes that preserve zoom are covered directly.
+
+The [interaction stress-test follow-up](interaction_fixes.md) documents fixes for
+stage/type controls, overlapping updates, optimization editor actions and YAML
+reloads. Its browser regressions deliberately delay and reorder requests, check
+the accepted design state, and compare actual plotted coordinates:
+
+- [Stage, type and unit controls: 14 groups](stage_stress_checks.json).
+- [Optimization editor: 17 groups](editor_stress_checks.json).
+- [Model/plot interactions: 11 groups](interaction_stress_checks.json).
+
+All three reports contain zero browser or callback errors. Together with the
+14 optimization workflow checks above, the final browser runs passed 56 groups.
 
 The decision source is [approved_feedback.json](../approved_feedback.json); the complete resolved requirements remain in [implementation_prompt.md](../implementation_prompt.md).

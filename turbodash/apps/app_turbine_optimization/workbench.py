@@ -378,10 +378,14 @@ def build_layout(defaults, stage_defaults, loss_models, docs_layout):
         ),
     ]
     speed = [
+        dcc.Input(
+            id={"scope": "overall", "key": "rotational_speed_type"},
+            type="hidden", value=defaults["rotational_speed_type"],
+        ),
         field(
             "Speed definition",
             dcc.RadioItems(
-                id={"scope": "overall", "key": "rotational_speed_type"},
+                id="td-speed-mode",
                 options=[
                     {"label": "Specific", "value": "specific"},
                     {"label": "Actual", "value": "actual"},
@@ -541,6 +545,10 @@ def build_layout(defaults, stage_defaults, loss_models, docs_layout):
             dcc.Store(
                 id="stage_data_store", data=[dict(stage_defaults, name="stage_1")]
             ),
+            dcc.Store(id="td-stage-count-request"),
+            dcc.Store(id="td-stage-model-type", data=defaults["turbine_type"]),
+            dcc.Store(id="td-stage-transaction"),
+            dcc.Store(id="td-applied-load-revision"),
             dcc.Store(id="td-workspace", data="meanline"),
             dcc.Store(id="td-calculation-state", data={"valid": False}),
             html.Header(

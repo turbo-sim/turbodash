@@ -299,14 +299,15 @@ def test_invalid_draft_retains_all_results_and_displays_essential_error(
         live_form["stage_ids"],
         live_form["store_stages"],
     )
-    assert all(value is no_update for value in result)
-    assert len(result) == 10
+    assert all(value is no_update for value in result[:10])
+    assert len(result) == 13
     compute.assert_not_called()
-    assert changes["td-calculation-state"]["data"]["valid"] is False
-    assert "Low-pressure stage" in changes["td-calculation-status"]["children"]
+    assert result[11]["valid"] is False
+    assert "Low-pressure stage" in result[10]
+    assert changes == {}, "Calculation status must use ordered callback outputs"
 
 
-@pytest.mark.parametrize("key", ["turbine_type", "rotational_speed_type"])
+@pytest.mark.parametrize("key", ["turbine_type"])
 def test_mode_change_waits_for_reconciled_controls_before_solving(
     live_form, monkeypatch, key
 ):
@@ -326,7 +327,7 @@ def test_mode_change_waits_for_reconciled_controls_before_solving(
     compute.assert_not_called()
 
 
-def test_valid_load_preserves_named_stages_precision_and_closes_groups(live_form):
+def test_valid_load_preserves_named_stages_precision_without_delayed_ui_side_effects(live_form):
     edit(live_form, "degree_reaction", 0.3123456789123, stage=1)
     config = application.live_config(**live_form)
     loaded, changes = invoke(
@@ -357,17 +358,157 @@ def test_valid_load_preserves_named_stages_precision_and_closes_groups(live_form
     assert stages[1]["degree_reaction"] == 0.3123456789123
     assert overall == live_form["overall_values"]
     assert pair == "PT_INPUTS" and error == ""
-    assert all(
-        changes[key]["open"] is False
-        for key in (
-            "td-section-setup",
-            "td-section-operating",
-            "td-section-speed",
-            "td-section-stage",
-            "opt-panel",
-        )
+    assert changes == {}, "Load UI resets belong to the synchronous browser event, not a delayed server response"
+
+
+def stage_transaction(form, trigger, *, pair="PT_INPUTS", speed_type="specific", results=None, count_request=None,
+                      turbine_type="axial", stage_model_type=None):
+    return invoke(
+        trigger, application.update_stage_store, 0, 0, None,
+        turbine_type, pair, speed_type, form["store_stages"], form["overall_ids"],
+        form["stage_values"], form["stage_ids"], form["overall_values"], results,
+        count_request, stage_model_type,
     )
-    assert changes["td-stage-selector"]["value"] == 0
+
+
+@pytest.mark.parametrize("count", [1, 3, 6])
+def test_absolute_stage_count_preserves_latest_edits_and_unique_names(live_form, count):
+    edit(live_form, "degree_reaction", .4123456789, stage=0)
+    edit(live_form, "rotor.maximum_thickness_to_chord", .2712345678, stage=1)
+    (stages, overall, _, _), _ = stage_transaction(
+        live_form, "td-stage-count-request", count_request={"count": count, "plus": 8, "minus": 3},
+    )
+    assert len(stages) == count
+    assert stages[0]["degree_reaction"] == .4123456789
+    if count > 1:
+        assert stages[-1]["rotor.maximum_thickness_to_chord"] == .2712345678
+    assert len({stage["name"] for stage in stages}) == count
+    assert len(overall) == len(live_form["overall_ids"])
+    assert all(item is no_update for item in overall)
+
+
+@pytest.mark.parametrize("trigger,count,turbine_type", [
+    ("td-stage-count-request", 4, "axial"),
+    ("td-stage-count-request", 1, "axial"),
+    ({"scope": "overall", "key": "turbine_type"}, 2, "radial"),
+])
+def test_stage_transactions_dispatch_serializable_partial_updates(live_form, trigger, count, turbine_type):
+    """Exercise Dash serialization: direct callback calls missed the HTTP 500."""
+    edit(live_form, "turbine_type", turbine_type)
+    callback_id = "td-stage-transaction.data"
+    declaration = application.app.callback_map[callback_id]
+    request = {"count": count, "plus": 3, "minus": 1}
+    input_values = [request, None, turbine_type, "PT_INPUTS", "specific"]
+    state_values = [
+        live_form["store_stages"], live_form["overall_ids"],
+        live_form["stage_values"], live_form["stage_ids"], live_form["overall_values"], None, "axial", -1, None,
+    ]
+    outputs = {"id": "td-stage-transaction", "property": "data"}
+    identity = json.dumps(trigger, sort_keys=True, separators=(",", ":")) if isinstance(trigger, dict) else trigger
+    payload = {
+        "output": callback_id, "outputs": outputs,
+        "changedPropIds": [identity + (".data" if isinstance(trigger, str) else ".value")],
+        "inputs": [dict(item, value=value) for item, value in zip(declaration["inputs"], input_values)],
+        "state": [dict(item, value=value) for item, value in zip(declaration["state"], state_values)],
+    }
+    response = application.server.test_client().post("/_dash-update-component", json=payload)
+    assert response.status_code == 200, response.get_data(as_text=True)
+    stages = response.get_json()["response"]["td-stage-transaction"]["data"]["patch"]["stages"]
+    assert len(stages) == count
+    if turbine_type == "radial":
+        assert all(stage["radius_ratio_12"] == application.STAGE_DEFAULTS_RADIAL["radius_ratio_12"] for stage in stages)
+
+
+def test_pair_change_converts_current_inlet_even_while_previous_result_is_stale(live_form):
+    previous = application.live_config(**live_form)
+    edit(live_form, "inlet_property_1", 650123.456789)
+    (stages, values, pair, message), _ = stage_transaction(
+        live_form, "td-inlet-pair", pair="HmassP_INPUTS", results=previous,
+    )
+    changed = dict(zip((item["key"] for item in live_form["overall_ids"]), values))
+    assert changed["inlet_property_2"] == 650123.456789
+    expected = application.convert_pair("Air", "PT_INPUTS", (650123.456789, 600.), "HmassP_INPUTS")
+    assert changed["inlet_property_1"] == pytest.approx(expected[0])
+    assert stages is no_update and pair == "HmassP_INPUTS" and message == ""
+
+
+def test_pair_change_clears_invalid_current_draft_instead_of_restoring_previous_inlet(live_form):
+    previous = application.live_config(**live_form)
+    edit(live_form, "inlet_property_1", None)
+    (_, values, pair, message), _ = stage_transaction(
+        live_form, "td-inlet-pair", pair="HmassP_INPUTS", results=previous,
+    )
+    changed = dict(zip((item["key"] for item in live_form["overall_ids"]), values))
+    assert changed["inlet_property_1"] is None and changed["inlet_property_2"] is None
+    assert pair == "HmassP_INPUTS" and "Enter both inlet values" in message
+
+
+def test_speed_change_converts_current_draft_speed_and_operating_point(live_form):
+    previous = application.core.compute_turbine_performance(application.live_config(**live_form))
+    edit(live_form, "rotational_speed_value", .9123456789)
+    edit(live_form, "mass_flow_rate", 12.3456789)
+    expected = application.core.compute_turbine_performance(application.live_config(**live_form))
+    (_, values, _, _), _ = stage_transaction(
+        live_form, "td-speed-mode", speed_type="actual", results=previous,
+    )
+    changed = dict(zip((item["key"] for item in live_form["overall_ids"]), values))
+    assert changed["rotational_speed_value"] == pytest.approx(expected["overall_performance"]["rotational_speed"])
+    assert changed["rotational_speed_value"] != pytest.approx(previous["overall_performance"]["rotational_speed"])
+
+
+def test_speed_change_does_not_resurrect_cleared_draft(live_form):
+    previous = application.core.compute_turbine_performance(application.live_config(**live_form))
+    edit(live_form, "rotational_speed_value", None)
+    (_, values, _, _), _ = stage_transaction(
+        live_form, "td-speed-mode", speed_type="actual", results=previous,
+    )
+    changed = dict(zip((item["key"] for item in live_form["overall_ids"]), values))
+    assert changed["rotational_speed_value"] is None
+
+
+@pytest.mark.parametrize("trigger", ["td-stage-count-request", {"scope": "overall", "key": "turbine_type"}, "td-speed-mode"])
+def test_latest_transaction_reconciles_all_pending_structural_intents(live_form, trigger):
+    previous = application.core.compute_turbine_performance(application.live_config(**live_form))
+    edit(live_form, "turbine_type", "radial")
+    (stages, values, pair, message), _ = stage_transaction(
+        live_form, trigger, pair="HmassP_INPUTS", speed_type="actual", turbine_type="radial",
+        stage_model_type="axial", count_request={"count": 4, "plus": 2, "minus": 0}, results=previous,
+    )
+    changed = dict(zip((item["key"] for item in live_form["overall_ids"]), values))
+    assert len(stages) == 4
+    assert all(stage["radius_ratio_12"] == .85 for stage in stages)
+    assert [stage["name"] for stage in stages[:2]] == ["High-pressure stage", "Low-pressure stage"]
+    assert pair == "HmassP_INPUTS" and message == ""
+    assert changed["inlet_property_2"] == 500000
+    assert changed["rotational_speed_type"] == "actual"
+    assert changed["rotational_speed_value"] == pytest.approx(previous["overall_performance"]["rotational_speed"])
+
+
+@pytest.mark.parametrize("trigger,fields", [
+    ("td-speed-mode", ("rotational_speed_type", "rotational_speed_value")),
+    ("td-inlet-pair", ("inlet_property_pair", "inlet_property_1", "inlet_property_2")),
+])
+def test_returning_to_canonical_selection_explicitly_supersedes_pending_conversion(live_form, trigger, fields):
+    (_, values, _, _), _ = stage_transaction(live_form, trigger)
+    original = dict(zip((item["key"] for item in live_form["overall_ids"]), live_form["overall_values"]))
+    changed = dict(zip((item["key"] for item in live_form["overall_ids"]), values))
+    assert all(changed[key] == original[key] for key in fields)
+
+
+def test_add_during_pending_load_uses_loaded_stage_baseline(live_form):
+    loaded = application.live_config(**live_form)
+    loaded["inputs"]["stages"][1].update(name="Loaded last stage", degree_reaction=.4712345678)
+    edit(live_form, "degree_reaction", .8123456789, stage=1)
+    (stages, _, _, _), _ = invoke(
+        "td-stage-count-request", application.update_stage_store,
+        4, 1, loaded, "axial", "PT_INPUTS", "specific",
+        live_form["store_stages"], live_form["overall_ids"], live_form["stage_values"],
+        live_form["stage_ids"], live_form["overall_values"], None,
+        {"count": 3, "plus": 4, "minus": 1}, "axial", True,
+    )
+    assert len(stages) == 3
+    assert stages[1]["name"] == "Loaded last stage"
+    assert stages[1]["degree_reaction"] == stages[2]["degree_reaction"] == .4712345678
 
 
 @pytest.mark.parametrize(

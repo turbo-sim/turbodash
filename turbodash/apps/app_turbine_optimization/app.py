@@ -6,6 +6,7 @@ from turbodash.apps.shared.cli import run_app, run_cli
 from pathlib import Path
 import os
 import base64
+import json
 import yaml
 import numpy as np
 from turbodash.core import turbine as core
@@ -39,6 +40,7 @@ from turbodash.apps.shared.fluid_inputs import (
     convert_pair,
     validate_inlet_inputs,
     fluid_options,
+    property_pair_options,
 )
 from turbodash.visualization.vtk_assets import register_vtk_assets
 from .panel import register_callbacks as register_optimization_callbacks
@@ -305,6 +307,57 @@ app.clientside_callback(
 
 
 @app.callback(
+    Output("td-stage-transaction", "data"),
+    Input("td-stage-count-request", "data"),
+    Input("loaded_cfg_store", "data"),
+    Input({"scope": "overall", "key": "turbine_type"}, "value"),
+    Input("td-inlet-pair", "value"),
+    Input("td-speed-mode", "value"),
+    State("stage_data_store", "data"),
+    State({"scope": "overall", "key": ALL}, "id"),
+    State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "value"),
+    State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "id"),
+    State({"scope": "overall", "key": ALL}, "value"),
+    State("result_store", "data"),
+    State("td-stage-model-type", "data"),
+    State("loaded_cfg_store", "modified_timestamp"),
+    State("td-applied-load-revision", "data"),
+    prevent_initial_call=True,
+)
+def dispatch_stage_store(
+    count_request, loaded_cfg, turbine_type, pair, speed_type, stages,
+    overall_ids, live_values, live_ids, overall_values, results,
+    stage_model_type, load_revision, applied_load_revision,
+):
+    loading = bool(loaded_cfg) and (
+        "loaded_cfg_store" in ctx.triggered_prop_ids.values() or
+        load_revision != applied_load_revision
+    )
+    result = update_stage_store(
+        (count_request or {}).get("plus", 0),
+        (count_request or {}).get("minus", 0),
+        loaded_cfg, turbine_type, pair, speed_type, stages,
+        overall_ids, live_values, live_ids, overall_values, results,
+        count_request=count_request, stage_model_type=stage_model_type,
+        pending_load=loading,
+    )
+    patch = {"overall": {identity["key"]: value for identity, value in zip(overall_ids, result[1]) if value is not no_update}}
+    for key, value in zip(("stages", "pair", "error"), (result[0], result[2], result[3])):
+        if value is not no_update:
+            patch[key] = value
+    if loading:
+        patch["speed"] = patch["overall"]["rotational_speed_type"]
+        turbine_type = loaded_cfg["inputs"].get("turbine_type", "axial")
+    patch["model_type"] = turbine_type
+    patch["reset_stages"] = loading or stage_model_type != turbine_type
+    return {"patch": patch, "loading": loading, "intent": {
+        "count": (count_request or {}).get("count", len(stages or [{}])),
+        "type": turbine_type, "pair": pair, "speed": speed_type,
+        "load_revision": load_revision,
+    }}
+
+
+@app.callback(
     Output({"scope": "overall", "key": "fluid_name"}, "options"),
     Input({"scope": "overall", "key": "fluid_name"}, "value"),
 )
@@ -321,21 +374,32 @@ app.clientside_callback(
 )
 
 
-@app.callback(
-    Output("td-inlet-label-1", "children"),
-    Output("td-inlet-label-2", "children"),
-    Input({"scope": "overall", "key": "inlet_property_pair"}, "value"),
-)
 def inlet_labels(pair):
     return [f"{field['label']} [{field['unit']}]" for field in pair_fields(pair)]
 
 
-@app.callback(
-    Output("td-speed-label", "children"),
-    Input({"scope": "overall", "key": "rotational_speed_type"}, "value"),
-)
 def speed_label(mode):
     return "Specific speed [−]" if mode == "specific" else "Shaft speed [rpm]"
+
+
+# Watch the complete canonical snapshot, just as the solver does. Individual
+# exact-ID listeners can miss values committed through a wildcard output, and
+# server responses for labels can arrive after a newer mode was selected.
+app.clientside_callback(
+    """function(values, ids) {
+        const labels = """ + json.dumps({option["value"]: inlet_labels(option["value"])
+                                        for option in property_pair_options()}) + """;
+        const current = Object.fromEntries(ids.map((id, index) => [id.key, values[index]]));
+        const pair = labels[current.inlet_property_pair] || labels.PT_INPUTS;
+        return [pair[0], pair[1], current.rotational_speed_type === 'specific' ?
+            'Specific speed [−]' : 'Shaft speed [rpm]'];
+    }""",
+    Output("td-inlet-label-1", "children"),
+    Output("td-inlet-label-2", "children"),
+    Output("td-speed-label", "children"),
+    Input({"scope": "overall", "key": ALL}, "value"),
+    State({"scope": "overall", "key": ALL}, "id"),
+)
 
 
 @app.callback(Output("td-metrics", "children"), Input("result_store", "data"))
@@ -371,25 +435,83 @@ app.clientside_callback(
 # switch, never on an ordinary value edit, so editing a parameter does not
 # rebuild/collapse the accordion.
 # =========================================
-@app.callback(
+app.clientside_callback(
+    """function(plus, minus, loaded, request, stages) {
+        const changed = dash_clientside.callback_context.triggered.map(item => item.prop_id);
+        plus = plus || 0; minus = minus || 0;
+        if (changed.includes('loaded_cfg_store.data') && loaded && loaded.inputs) {
+            ['setup', 'operating', 'speed', 'stage'].forEach(section =>
+                dash_clientside.set_props('td-section-' + section, {open: false}));
+            dash_clientside.set_props('opt-panel', {open: false});
+            dash_clientside.set_props('td-stage-selector', {value: 0});
+            dash_clientside.set_props('td-workbench', {'data-design-revision': String(Date.now())});
+            return {count: loaded.inputs.stages.length, plus: plus, minus: minus};
+        }
+        const previous = request || {count: (stages || [{}]).length, plus: 0, minus: 0};
+        const count = Math.max(1, previous.count + plus - previous.plus - minus + previous.minus);
+        return {count: count, plus: plus, minus: minus};
+    }""",
+    Output("td-stage-count-request", "data"),
+    Input("stage_plus", "n_clicks"),
+    Input("stage_minus", "n_clicks"),
+    Input("loaded_cfg_store", "data"),
+    State("td-stage-count-request", "data"),
+    State("stage_data_store", "data"),
+    prevent_initial_call=True,
+)
+
+
+# Network responses can arrive out of order across different structural
+# controls. Commit only a transaction that still matches the user's selectors.
+app.clientside_callback(
+    """function(transaction, request, turbine, pair, speed, revision, ids, stageValues, stageIds, currentStages) {
+        const unchanged = dash_clientside.no_update;
+        const skip = [unchanged, ids.map(() => unchanged), unchanged, unchanged, unchanged, unchanged, unchanged];
+        if (!transaction) return skip;
+        const intent = transaction.intent;
+        if ((intent.load_revision ?? null) !== (revision ?? null)) return skip;
+        if (request && intent.count !== request.count) return skip;
+        if (!transaction.loading && (intent.type !== turbine ||
+            intent.pair !== pair || intent.speed !== speed)) return skip;
+        const patch = transaction.patch;
+        const take = key => Object.prototype.hasOwnProperty.call(patch, key) ? patch[key] : unchanged;
+        let stages = take('stages');
+        if (Array.isArray(stages) && !patch.reset_stages) {
+            stages = stages.map(stage => ({...stage}));
+            stageIds.forEach((id, index) => {
+                if (stages[id.stage]) stages[id.stage][id.key] = stageValues[index];
+            });
+            const previousCount = (currentStages || []).length;
+            for (let index = previousCount; index < stages.length; index++) {
+                if (index > 0) stages[index] = {...stages[index - 1], name: stages[index].name};
+            }
+        }
+        return [stages, ids.map(id => Object.prototype.hasOwnProperty.call(patch.overall, id.key) ?
+            patch.overall[id.key] : unchanged), patch.pair === pair ? unchanged : take('pair'),
+            take('error'), patch.speed === speed ? unchanged : take('speed'), take('model_type'),
+            transaction.loading ? intent.load_revision : unchanged];
+    }""",
     Output("stage_data_store", "data"),
     Output({"scope": "overall", "key": ALL}, "value"),
     Output("td-inlet-pair", "value"),
     Output("td-fluid-error", "children"),
-    Input("stage_plus", "n_clicks"),
-    Input("stage_minus", "n_clicks"),
-    Input("loaded_cfg_store", "data"),
-    Input({"scope": "overall", "key": "turbine_type"}, "value"),
-    Input("td-inlet-pair", "value"),
-    Input({"scope": "overall", "key": "rotational_speed_type"}, "value"),
-    State("stage_data_store", "data"),
+    Output("td-speed-mode", "value"),
+    Output("td-stage-model-type", "data"),
+    Output("td-applied-load-revision", "data"),
+    Input("td-stage-transaction", "data"),
+    State("td-stage-count-request", "data"),
+    State({"scope": "overall", "key": "turbine_type"}, "value"),
+    State("td-inlet-pair", "value"),
+    State("td-speed-mode", "value"),
+    State("loaded_cfg_store", "modified_timestamp"),
     State({"scope": "overall", "key": ALL}, "id"),
     State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "value"),
     State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "id"),
-    State({"scope": "overall", "key": ALL}, "value"),
-    State("result_store", "data"),
+    State("stage_data_store", "data"),
     prevent_initial_call=True,
 )
+
+
 def update_stage_store(
     n_plus,
     n_minus,
@@ -403,6 +525,9 @@ def update_stage_store(
     live_ids,
     overall_values,
     results,
+    count_request=None,
+    stage_model_type=None,
+    pending_load=False,
 ):
     trigger = ctx.triggered_id
     if "loaded_cfg_store" in ctx.triggered_prop_ids.values():
@@ -413,97 +538,19 @@ def update_stage_store(
     overall = {
         identity["key"]: value for identity, value in zip(overall_ids, overall_values)
     }
-
-    if trigger == "td-inlet-pair":
-        if pair == overall["inlet_property_pair"]:
-            raise PreventUpdate
-        # Read the last accepted inlet, not a partially typed/invalid draft.
-        source = (results or {}).get("inputs", overall)
-        message = ""
-        try:
-            if source.get("fluid_name") != overall.get("fluid_name"):
-                raise ValueError(
-                    "The working fluid has changed; enter both inlet values."
-                )
-            first, second = convert_pair(
-                overall["fluid_name"],
-                source["inlet_property_pair"],
-                (source["inlet_property_1"], source["inlet_property_2"]),
-                pair,
-            )
-        except (ValueError, KeyError) as error:
-            first = second = None
-            message = f"Enter both inlet values for the new pair. {error}"
-        changed = {
-            "inlet_property_pair": pair,
-            "inlet_property_1": first,
-            "inlet_property_2": second,
-        }
-        return (
-            no_update,
-            [changed.get(identity["key"], no_update) for identity in overall_ids],
-            pair,
-            message,
-        )
-
-    if trigger == {"scope": "overall", "key": "rotational_speed_type"}:
-        performance = (results or {}).get("overall_performance", {})
-        value = performance.get(
-            "specific_speed" if speed_type == "specific" else "rotational_speed"
-        )
-        if value is None:
-            value = (
-                OVERALL_DEFAULTS["rotational_speed_value"]
-                if speed_type == "specific"
-                else None
-            )
-        return (
-            no_update,
-            [
-                value if identity["key"] == "rotational_speed_value" else no_update
-                for identity in overall_ids
-            ],
-            no_update,
-            no_update,
-        )
-
-    # Reconcile the store with the user's current live edits before doing
-    # anything else, so that add/remove operate on up-to-date values. (Loading
-    # and a type switch intentionally discard live edits, so skip there.)
-    if trigger in ("stage_plus", "stage_minus"):
-        for d, v in zip(live_ids or [], live_values or []):
-            si = d["stage"]
-            if 0 <= si < len(stages):
-                stages[si][d["key"]] = v
-
-    # Switching turbine type: reset ALL stages to the defaults for that type,
-    # keeping the current number of stages.
-    if trigger == {"scope": "overall", "key": "turbine_type"}:
-        if not turbine_type:
-            raise PreventUpdate
-        defaults = stage_defaults_for(turbine_type)
-        return (
-            [
-                dict(defaults, name=stage.get("name", f"stage_{index + 1}"))
-                for index, stage in enumerate(stages)
-            ],
-            no_update,
-            no_update,
-            "",
-        )
-
     # Loading a config: replace the whole stage list from the YAML.
-    if trigger == "loaded_cfg_store" and loaded_cfg:
+    if (trigger == "loaded_cfg_store" or pending_load) and loaded_cfg:
         cfg_stages = loaded_cfg.get("inputs", {}).get("stages", [])
         if cfg_stages:
             new_stages = loaded_stages(loaded_cfg)
-            for section in ("setup", "operating", "speed", "stage"):
-                set_props(f"td-section-{section}", {"open": False})
-            set_props("opt-panel", {"open": False})
-            set_props("td-stage-selector", {"value": 0})
-            set_props(
-                "td-workbench", {"data-design-revision": datetime.now().isoformat()}
-            )
+            count = max(1, int(count_request["count"])) if count_request else len(new_stages)
+            while len(new_stages) < count:
+                existing = {stage.get("name") for stage in new_stages}
+                index = len(new_stages) + 1
+                while f"stage_{index}" in existing:
+                    index += 1
+                new_stages.append(dict(new_stages[-1], name=f"stage_{index}"))
+            new_stages = new_stages[:count]
             return (
                 new_stages,
                 loaded_overall_values(loaded_cfg, overall_ids),
@@ -512,27 +559,85 @@ def update_stage_store(
             )
         raise PreventUpdate
 
-    # Add a stage: copy the previous (last) stage's current values as the seed.
+    # Reconcile every pending intent, not only the triggering control. If an
+    # earlier type/pair/speed/count response is still in flight, Dash retains
+    # only the newest response from this callback. It must contain all edits.
+    type_changed = bool(turbine_type) and (
+        turbine_type != stage_model_type if stage_model_type is not None else
+        trigger == {"scope": "overall", "key": "turbine_type"}
+    )
+    if type_changed:
+        defaults = stage_defaults_for(turbine_type)
+        stages = [dict(defaults, name=stage.get("name", f"stage_{index + 1}"))
+                  for index, stage in enumerate(stages)]
+    else:
+        for identity, value in zip(live_ids or [], live_values or []):
+            if 0 <= identity["stage"] < len(stages):
+                stages[identity["stage"]][identity["key"]] = value
+
+    count = max(1, int(count_request["count"])) if count_request else len(stages)
     if trigger == "stage_plus":
-        seed = dict(stages[-1]) if stages else dict(STAGE_DEFAULTS)
+        count += 1
+    elif trigger == "stage_minus":
+        count = max(1, count - 1)
+    structure_changed = type_changed or count != len(stages) or trigger in (
+        "td-stage-count-request", "stage_plus", "stage_minus"
+    ) or trigger == {"scope": "overall", "key": "turbine_type"}
+    while len(stages) < count:
         existing = {stage.get("name") for stage in stages}
         index = len(stages) + 1
         while f"stage_{index}" in existing:
             index += 1
-        seed["name"] = f"stage_{index}"
-        return stages + [seed], no_update, no_update, no_update
+        stages.append(dict(stages[-1], name=f"stage_{index}"))
+    stages = stages[:count]
 
-    # Remove a stage: drop the last one, leaving the others unchanged. Never go
-    # below one stage.
-    if trigger == "stage_minus":
-        return (
-            (stages[:-1] if len(stages) > 1 else stages),
-            no_update,
-            no_update,
-            no_update,
-        )
+    changed = {}
+    message = "" if type_changed else no_update
+    pair_changed = bool(pair) and pair != overall["inlet_property_pair"]
+    if pair_changed:
+        # Convert the current visible inlet, including drafts whose solve has
+        # not completed. Invalid drafts stay incomplete instead of reverting.
+        message = ""
+        try:
+            first, second = convert_pair(
+                overall["fluid_name"], overall["inlet_property_pair"],
+                (overall["inlet_property_1"], overall["inlet_property_2"]), pair,
+            )
+        except (ValueError, KeyError) as error:
+            first = second = None
+            message = f"Enter both inlet values for the new pair. {error}"
+        changed.update(inlet_property_pair=pair, inlet_property_1=first, inlet_property_2=second)
+        overall.update(changed)
+    elif trigger == "td-inlet-pair":
+        # A quick return to the canonical selection still needs an explicit
+        # response to supersede an earlier conversion already in flight.
+        changed.update({key: overall[key] for key in (
+            "inlet_property_pair", "inlet_property_1", "inlet_property_2"
+        )})
 
-    raise PreventUpdate
+    if speed_type and speed_type != overall["rotational_speed_type"]:
+        try:
+            values = [overall[identity["key"]] for identity in overall_ids]
+            cfg = live_config(values, [], overall_ids, [], stages)
+            performance = core.compute_turbine_performance(cfg)["overall_performance"]
+            value = performance["specific_speed" if speed_type == "specific" else "rotational_speed"]
+        except (ValueError, KeyError, TypeError, RuntimeError):
+            value = None
+        changed.update(rotational_speed_type=speed_type, rotational_speed_value=value)
+    elif trigger == "td-speed-mode":
+        changed.update(rotational_speed_type=speed_type,
+                       rotational_speed_value=overall["rotational_speed_value"])
+
+    if not structure_changed and not changed:
+        raise PreventUpdate
+    # Wildcard outputs always require one entry per matched component, even
+    # when every value is unchanged; scalar no_update fails Dash dispatch.
+    return (
+        stages if structure_changed else no_update,
+        [changed.get(identity["key"], no_update) for identity in overall_ids],
+        pair if pair_changed or trigger == "td-inlet-pair" else no_update,
+        message,
+    )
 
 
 def loaded_stages(config):
@@ -599,23 +704,27 @@ def stage_choices(stages, active):
     Output("stations_table", "children"),
     Output("result_store", "data"),
     Output("result_input_signature", "data"),
+    Output("td-calculation-status", "children"),
+    Output("td-calculation-state", "data"),
+    Output("td-fluid-error", "children", allow_duplicate=True),
     Input({"scope": "overall", "key": ALL}, "value"),
     Input({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "value"),
     Input("opt-applied-result", "data"),
     State({"scope": "overall", "key": ALL}, "id"),
     State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "id"),
     State("stage_data_store", "data"),
+    prevent_initial_call="initial_duplicate",
 )
 def update_turbine(
     overall_values, stage_values, applied, overall_ids, stage_ids, store_stages
 ):
     if any(
         isinstance(identity, dict)
-        and identity.get("key") in ("turbine_type", "rotational_speed_type")
+        and identity.get("key") == "turbine_type"
         for identity in ctx.triggered_prop_ids.values()
     ):
-        # Wait for the transaction that replaces stage defaults or converts
-        # speed units; do not solve an intermediate interpretation of values.
+        # Wait for the transaction that replaces stage defaults. Shaft-speed
+        # mode and its value already arrive together as one canonical update.
         raise PreventUpdate
     try:
         cfg = live_config(
@@ -637,18 +746,17 @@ def update_turbine(
     except PreventUpdate:
         raise
     except Exception as error:
-        set_props(
-            "td-calculation-status",
-            {"children": f"Results retained from the last valid design. {error}"},
+        return (
+            *((no_update,) * 10),
+            f"Results retained from the last valid design. {error}",
+            {"valid": False, "message": str(error)},
+            no_update,
         )
-        set_props(
-            "td-calculation-state", {"data": {"valid": False, "message": str(error)}}
-        )
-        return (no_update,) * 10
-    set_props("td-calculation-status", {"children": ""})
-    set_props("td-fluid-error", {"children": ""})
-    set_props("td-calculation-state", {"data": {"valid": True, "signature": signature}})
-    return rendered
+    # Status belongs to the same request as the figures. Dash discards older
+    # declared outputs when a newer edit supersedes a request; set_props side
+    # effects bypass that ordering and can mark an already corrected design
+    # stale (or hide a newer invalid draft) when responses arrive out of order.
+    return (*rendered, "", {"valid": True, "signature": signature}, "")
 
 
 def live_config(overall_values, stage_values, overall_ids, stage_ids, store_stages):

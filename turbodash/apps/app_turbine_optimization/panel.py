@@ -25,7 +25,6 @@ def panel():
     return html.Details([
         html.Summary(["Optimization", html.Span("SLSQP", className="td-opt-badge")]),
         html.Div([
-            html.P("Choose the inputs to vary and the limits your design must meet.", className="td-opt-hint"),
             dbc.Tabs(id="opt-tabs", active_tab="settings", children=[
                 dbc.Tab(label="Settings", tab_id="settings", children=html.Div([
                     field("Objective", dcc.Dropdown(id="opt-objective", value=DEFAULT_OBJECTIVE, clearable=False)),
@@ -39,12 +38,12 @@ def panel():
                     ], className="td-opt-settings-grid"),
                 ], className="td-opt-tab")),
                 dbc.Tab(label="Design variables", tab_id="variables", children=html.Div([
-                    html.P("Only selected inputs are free. A blank initial value uses the current design; values outside bounds are clipped and logged.", className="td-opt-hint"),
+                    html.Span("About design variables", title="Only selected inputs are free. A blank initial value uses the current design; values outside bounds are clipped and logged.", tabIndex=0, className="td-help"),
                     html.Div(id="opt-variable-rows"),
                     dbc.Button("+ Add variable", id="opt-add-variable", outline=True, color="primary", size="sm", n_clicks=0),
                 ], className="td-opt-tab")),
                 dbc.Tab(label="Constraints", tab_id="constraints", children=html.Div([
-                    html.P("Scale divides the residual into dimensionless units. Use a positive physical scale, even for a zero target.", className="td-opt-hint"),
+                    html.Span("About constraint scaling", title="Scale divides the residual into dimensionless units. Use a positive physical scale, even for a zero target.", tabIndex=0, className="td-help"),
                     html.Div(id="opt-constraint-rows"),
                     dbc.Button("+ Add constraint", id="opt-add-constraint", outline=True, color="primary", size="sm", n_clicks=0),
                 ], className="td-opt-tab")),
@@ -196,9 +195,9 @@ def register_callbacks(app, live_config, render_results):
         if not catalog:
             raise PreventUpdate
         trigger = ctx.triggered_id
-        # A children replacement can report synthetic pattern events alongside
-        # the new catalog. Always process the configuration/catalog update.
-        for preferred in ("loaded_cfg_store", "opt-catalog", "opt-add-variable", "opt-add-constraint"):
+        # Preserve explicit user actions when a calculation refreshes the
+        # catalog in the same batch. Loading a new design still takes priority.
+        for preferred in ("loaded_cfg_store", "opt-add-variable", "opt-add-constraint", "opt-catalog"):
             if preferred in ctx.triggered_prop_ids.values():
                 trigger = preferred
                 break
@@ -297,8 +296,10 @@ def register_callbacks(app, live_config, render_results):
                         and jobs.fingerprint(current) == handle["target"]):
                     return None, handle["message"], no_update, no_update, no_update, no_update, no_update, no_update
                 if time.time() - handle["applied_at"] > 45:
-                    source = jobs.source_config(handle, owner)
-                    return None, "Could not apply optimized controls. Previous inputs restored.", no_update, no_update, "", nested_config(source), None, True
+                    # The inspector remains editable while jobs run. A user may
+                    # have changed the design after the optimized values arrived;
+                    # never overwrite those edits with the pre-run configuration.
+                    return None, "Optimization application was not confirmed. Current inputs retained.", no_update, no_update, "", no_update, no_update, True
                 raise PreventUpdate
             status, log, progress, result = jobs.read_job(handle, owner)
             summary = (f"Update {progress['iteration']} · objective {progress['objective']:.7g} · violation {progress['max_constraint_violation']:.3g}" if progress else "Preparing initial design…")
@@ -328,8 +329,8 @@ def register_callbacks(app, live_config, render_results):
 
     app.clientside_callback(
         """function(job, launching, style) {
-            return [!!job || !!launching, job ? 'td-opt-panel td-opt-busy' : 'td-opt-panel',
-                    Object.assign({}, style, {pointerEvents: job ? 'none' : 'auto'})];
+            return [!!job || !!launching, job ? 'td-opt-panel td-section td-opt-busy' : 'td-opt-panel td-section',
+                    Object.assign({}, style, {pointerEvents: 'auto'})];
         }""",
         Output("opt-start", "disabled"), Output("opt-panel", "className"), Output("design-controls", "style"),
         Input("opt-job", "data"), Input("opt-launching", "data"), State("design-controls", "style"))

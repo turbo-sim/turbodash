@@ -1,5 +1,7 @@
 # Turbodash design review 02
 
+The user's approved choices are now recorded in `decisions.json` and [approved_feedback.json](../approved_feedback.json). See the [implemented workbench](../implemented/README.md) for the real app and screenshots. This earlier offline prototype is retained for design history; its layout does not apply every approved option (notably the left workspace rail and lighter inspector).
+
 Open [the review](index.html) in a browser and [the implementation prompt](../implementation_prompt.md) in an editor. This review translates the user's latest notes into the Blueprint light direction, a provisional Graphite dark direction, and five numbered sections. It is separate from the production Dash apps.
 
 ## Give feedback
@@ -10,7 +12,7 @@ Open [the review](index.html) in a browser and [the implementation prompt](../im
 
 You can instead edit `decisions.json` directly and rebuild `index.html` with `python -B development/app_design/review_v2/build_review.py`. Browser-saved choices take precedence on the same file URL; clear this page's browser storage or use a fresh browser profile to review revised source defaults.
 
-The unresolved choices are the dark palette, logo, brand click, workspace navigation, sliders, global blade velocity ratio location, first-visit theme, target app editions, property-pair transition and strictness of the zero radial axis. Geometry/Mesh workspace placeholders also link to an additional-feedback field. Recommendations are not recorded as user choices.
+The review records choices for the dark palette, logo, brand click, workspace navigation, sliders, global blade velocity ratio location, first-visit theme, target app editions, property-pair transition and strictness of the zero radial axis. Geometry/Mesh workspace placeholders also link to an additional-feedback field. The source selections now reflect the user's submitted feedback; browser-local edits can still override these values in this prototype.
 
 ## What can be tried
 

@@ -17,11 +17,14 @@ from plotly.utils import PlotlyJSONEncoder
 
 from turbodash.meshing import turbomoc as meshing
 from turbodash.apps.shared import mesh_jobs
-from turbodash.visualization.plotly_mesh import plot_profile_preview, plot_geometry_meridional, mesh_figures
+from turbodash.visualization.plotly_mesh import (
+    plot_profile_preview,
+    plot_geometry_meridional,
+    mesh_figures,
+)
 from turbodash.visualization import vtk as vtk
 from turbodash.visualization.vtk_assets import available as vtk_assets_available
 from turbodash.apps.shared.components.turbogrid import turbogrid_export_panel
-
 
 _LOG = logging.getLogger(__name__)
 _SETTINGS = (
@@ -32,7 +35,14 @@ _SETTINGS = (
     ("profile_points", "Profile points", 200, 40, 1000, 10),
     ("inlet_chords", "Inlet extension / chord", 0.5, 0.05, 10, 0.05),
     ("outlet_chords", "Outlet extension / chord", 1.0, 0.05, 10, 0.05),
-    ("first_height_mm", "First inflation layer height [mm]", None, 0.000001, None, "any"),
+    (
+        "first_height_mm",
+        "First inflation layer height [mm]",
+        None,
+        0.000001,
+        None,
+        "any",
+    ),
     ("inflation_thickness_mm", "Inflation thickness [mm]", None, 0.000001, None, "any"),
     ("inflation_growth", "Inflation growth ratio", 1.2, 1.001, 3, 0.05),
 )
@@ -94,164 +104,591 @@ def _unavailable(results, calculated_signature, live_signature):
     return ""
 
 
-def _row_selector(prefix):
-    return dbc.Row([
-        dbc.Col([dbc.Label("Stage"), dcc.Dropdown(id=f"{prefix}_stage", options=[], value=0, clearable=False)], md=6),
-        dbc.Col([dbc.Label("Blade row"), dcc.Dropdown(id=f"{prefix}_row", options=[
-            {"label": "Stator", "value": "stator"}, {"label": "Rotor", "value": "rotor"},
-        ], value="stator", clearable=False)], md=6),
-    ], className="mb-3")
+def _row_selector(prefix, *, workbench=False):
+    return dbc.Row(
+        [
+            dbc.Col(
+                [
+                    dbc.Label("Stage"),
+                    dcc.Dropdown(
+                        id=f"{prefix}_stage", options=[], value=0, clearable=False
+                    ),
+                ],
+                md=12 if workbench else 6,
+            ),
+            dbc.Col(
+                [
+                    dbc.Label("Blade row"),
+                    dcc.Dropdown(
+                        id=f"{prefix}_row",
+                        options=[
+                            {"label": "Stator", "value": "stator"},
+                            {"label": "Rotor", "value": "rotor"},
+                        ],
+                        value="stator",
+                        clearable=False,
+                    ),
+                ],
+                md=12 if workbench else 6,
+            ),
+        ],
+        className="mb-3",
+    )
 
 
 def _card(title, children):
     return dbc.Card([dbc.CardHeader(title), dbc.CardBody(children)], className="mb-3")
 
 
-def geometry_panel():
+def _hint(text, target):
+    """Small help control available to pointer and keyboard users."""
+    return html.Span(
+        [
+            html.Button(
+                "i",
+                id=target,
+                type="button",
+                className="td-mesh-help",
+                style={
+                    "border": "none",
+                    "background": "transparent",
+                    "color": "inherit",
+                    "fontSize": "0.8em",
+                    "marginLeft": "0.4rem",
+                },
+                **{"aria-label": text},
+            ),
+            dbc.Tooltip(text, target=target, trigger="hover focus"),
+        ]
+    )
+
+
+def geometry_panel(*, workbench=False):
     """Keep these components mounted while the tab is hidden."""
-    return html.Div([
-        html.Aside([
-            html.H4("Turbine geometry"),
-            html.P("Edit the stage and blade parameters here or in Meanline. Physical geometry rounds blade counts up and recomputes pitch and profile dimensions. Meanline performance uses continuous counts.", className="small text-muted"),
-            html.Details([
-                html.Summary("Inspect and export a row"),
-                _row_selector("geometry"),
-                dbc.Button("Download 3D model ZIP", id="geometry_download_button", n_clicks=0, disabled=True, color="primary"),
-                dcc.Download(id="geometry_download"),
-                html.Div(id="geometry_download_error", role="alert", className="text-danger mt-2"),
-            ], open=True, className="td-row-settings"),
-            html.Div(id="geometry_rows_container"),
-        ], className="td-sidebar"),
-        html.Main([
-            html.Div(id="geometry_message", role="status", className="small text-muted mb-3"),
-            html.Section([
-                html.Div([
-                    _engineering_plot("Blade-to-blade view", "geometry_profile"),
-                    _engineering_plot("Meridional channel", "geometry_meridional"),
-                ], className="td-plot-pair"),
-            ], className="td-plot-group"),
-            html.Section([
-                html.H5("3D turbine"),
-                html.Div(id="geometry_overview", children=vtk.vtk_panel("overview", message="Calculate a turbine to view its blade rows.")),
-            ], className="td-plot-group"),
-            html.Details([html.Summary("TurboGrid export"), turbogrid_export_panel()], className="td-row-settings"),
-            # Retain the legacy row host without presenting a duplicate viewport.
-            html.Div(id="geometry_model", children=vtk.vtk_panel("geometry"), style={"display": "none"}),
-        ], className="td-workspace-main"),
-    ], className="td-workspace")
+    return html.Div(
+        [
+            html.Aside(
+                [
+                    html.H4(
+                        [
+                            "Turbine geometry",
+                            _hint(
+                                "Physical geometry rounds blade counts up and recomputes pitch and profile dimensions. Meanline performance uses continuous counts.",
+                                "geometry-rounding-help",
+                            ),
+                        ]
+                        if workbench
+                        else "Turbine geometry"
+                    ),
+                    (
+                        None
+                        if workbench
+                        else html.P(
+                            "Edit the stage and blade parameters here or in Meanline. Physical geometry rounds blade counts up and recomputes pitch and profile dimensions. Meanline performance uses continuous counts.",
+                            className="small text-muted",
+                        )
+                    ),
+                    html.Details(
+                        [
+                            html.Summary("Inspect and export a row"),
+                            _row_selector("geometry", workbench=workbench),
+                            dbc.Button(
+                                "Download 3D model ZIP",
+                                id="geometry_download_button",
+                                n_clicks=0,
+                                disabled=True,
+                                color="primary",
+                            ),
+                            dcc.Download(id="geometry_download"),
+                            html.Div(
+                                id="geometry_download_error",
+                                role="alert",
+                                className="text-danger mt-2",
+                            ),
+                        ],
+                        open=not workbench,
+                        className="td-row-settings",
+                    ),
+                    html.Div(id="geometry_rows_container"),
+                ],
+                className="td-sidebar",
+            ),
+            html.Main(
+                [
+                    html.Div(
+                        id="geometry_message",
+                        role="status",
+                        className="small text-muted mb-3",
+                    ),
+                    html.Section(
+                        [
+                            html.Div(
+                                [
+                                    _engineering_plot(
+                                        "Blade-to-blade view", "geometry_profile"
+                                    ),
+                                    _engineering_plot(
+                                        "Meridional channel",
+                                        "geometry_meridional",
+                                        hint=(
+                                            "Physical row geometry uses cylindrical averaged radii. The meanline channel can have flared hub and shroud surfaces."
+                                            if workbench
+                                            else None
+                                        ),
+                                    ),
+                                ],
+                                className="td-plot-pair",
+                            ),
+                        ],
+                        className="td-plot-group",
+                    ),
+                    html.Section(
+                        [
+                            html.H5("3D turbine"),
+                            html.Div(
+                                id="geometry_overview",
+                                children=vtk.vtk_panel(
+                                    "overview",
+                                    message="Calculate a turbine to view its blade rows.",
+                                ),
+                            ),
+                        ],
+                        className="td-plot-group",
+                    ),
+                    html.Details(
+                        [html.Summary("TurboGrid export"), turbogrid_export_panel()],
+                        className="td-row-settings",
+                    ),
+                    # Retain the legacy row host without presenting a duplicate viewport.
+                    html.Div(
+                        id="geometry_model",
+                        children=vtk.vtk_panel("geometry"),
+                        style={"display": "none"},
+                    ),
+                ],
+                className="td-workspace-main",
+            ),
+        ],
+        className="td-workspace",
+    )
 
 
-def _engineering_plot(title, graph_id):
-    return html.Div([
-        html.H5(title),
-        dcc.Graph(id=graph_id, figure=_empty("Calculate a turbine to view this section."),
-                  responsive=True, style={"height": "100%", "minHeight": 0},
-                  config={"responsive": True, "displaylogo": False}),
-    ], className="td-engineering-plot")
+def _engineering_plot(title, graph_id, *, hint=None):
+    return html.Div(
+        [
+            html.H5([title, _hint(hint, f"{graph_id}-help")] if hint else title),
+            dcc.Graph(
+                id=graph_id,
+                figure=_empty("Calculate a turbine to view this section."),
+                responsive=True,
+                style={"height": "100%", "minHeight": 0},
+                config={"responsive": True, "displaylogo": False},
+            ),
+        ],
+        className="td-engineering-plot",
+    )
 
 
-def mesh_row_panels(stages, values=None, ids=None):
+def mesh_row_panels(stages, values=None, ids=None, *, precise_inputs=False):
     """Each mounted row owns its settings, independently of the active row."""
-    existing = {(item["stage"], item["row"], item["key"]): value
-                for item, value in zip(ids or [], values or [])}
+    existing = {
+        (item["stage"], item["row"], item["key"]): value
+        for item, value in zip(ids or [], values or [])
+    }
     panels = []
     for stage in range(len(stages or [])):
         rows = []
         for row in ("stator", "rotor"):
             fields = []
             for key, label, default, minimum, maximum, step in _SETTINGS:
-                fields.append(html.Div([
-                    html.Label(label),
-                    dbc.Input(id={"scope": "mesh-row", "stage": stage, "row": row, "key": key},
-                              type="number", value=existing.get((stage, row, key), default), min=minimum,
-                              max=maximum, step=step, debounce=True, placeholder="Automatic" if default is None else None),
-                ], className="td-parameter"))
-            fields.extend([
-                dbc.Checklist(id={"scope": "mesh-row", "stage": stage, "row": row, "key": "inflation_enabled"},
-                    options=[{"label": "Blade boundary-layer inflation", "value": "enabled"}],
-                    value=existing.get((stage, row, "inflation_enabled"), []), switch=True, className="my-3"),
-                dbc.Button("Use this row", id={"scope": "mesh-row-select", "stage": stage, "row": row},
-                           n_clicks=0, size="sm", color="primary", outline=True),
-            ])
-            rows.append(html.Details([html.Summary(row.title()), *fields],
-                                     open=stage == 0 and row == "stator", className="td-row-settings"))
-        panels.append(html.Details([html.Summary(f"Stage {stage + 1}"), *rows],
-                                  open=stage == 0, className="td-row-settings"))
+                if precise_inputs:
+                    step = 1 if key in {"span_layers", "profile_points"} else "any"
+                fields.append(
+                    html.Div(
+                        [
+                            html.Label(label),
+                            dbc.Input(
+                                id={
+                                    "scope": "mesh-row",
+                                    "stage": stage,
+                                    "row": row,
+                                    "key": key,
+                                },
+                                type="number",
+                                value=existing.get((stage, row, key), default),
+                                min=minimum,
+                                max=maximum,
+                                step=step,
+                                debounce=True,
+                                placeholder="Automatic" if default is None else None,
+                            ),
+                        ],
+                        className="td-parameter",
+                    )
+                )
+            fields.extend(
+                [
+                    dbc.Checklist(
+                        id={
+                            "scope": "mesh-row",
+                            "stage": stage,
+                            "row": row,
+                            "key": "inflation_enabled",
+                        },
+                        options=[
+                            {
+                                "label": "Blade boundary-layer inflation",
+                                "value": "enabled",
+                            }
+                        ],
+                        value=existing.get((stage, row, "inflation_enabled"), []),
+                        switch=True,
+                        className="my-3",
+                    ),
+                    dbc.Button(
+                        "Use this row",
+                        id={"scope": "mesh-row-select", "stage": stage, "row": row},
+                        n_clicks=0,
+                        size="sm",
+                        color="primary",
+                        outline=True,
+                    ),
+                ]
+            )
+            rows.append(
+                html.Details(
+                    [html.Summary(row.title()), *fields],
+                    open=not precise_inputs and stage == 0 and row == "stator",
+                    className="td-row-settings",
+                )
+            )
+        stage_name = (
+            (stages[stage].get("name") or f"Stage {stage + 1}")
+            if precise_inputs
+            else f"Stage {stage + 1}"
+        )
+        panels.append(
+            html.Details(
+                [html.Summary(str(stage_name)), *rows],
+                open=not precise_inputs and stage == 0,
+                className="td-row-settings",
+            )
+        )
     return panels
 
 
-def _inspection_controls_panel():
-    return html.Details([
-        html.Summary("Mesh inspection"),
-        dbc.Row([
-            dbc.Col([dbc.Label("View"), dcc.Dropdown(id="mesh_view", options=[
-                {"label": "Boundary surfaces", "value": "surface"},
-                {"label": "Slice", "value": "slice"},
-                {"label": "Spanwise layer", "value": "layer"},
-                {"label": "Worst quality cells", "value": "worst"},
-                {"label": "Quality threshold", "value": "threshold"},
-            ], value="surface", clearable=False)], width=12),
-            dbc.Col([dbc.Label("Quality metric"), dcc.Dropdown(id="mesh_metric", options=[
-                {"label": "Skewness", "value": "skewness"},
-                {"label": "Orthogonality", "value": "orthogonality"},
-                {"label": "Aspect ratio", "value": "aspect_ratio"},
-            ], value="skewness", clearable=False)], width=12),
-        ], className="mb-3"),
-        dbc.Row([
-            dbc.Col([dbc.Label("Slice axis"), dcc.Dropdown(id="mesh_axis", options=["X", "Y", "Z"], value="Z", clearable=False)], width=6),
-            dbc.Col([dbc.Label("Spanwise layer"), dbc.Input(id="mesh_layer", type="number", min=1, step=1, value=1, debounce=True)], width=6),
-            dbc.Col([dbc.Label("Worst-cell count"), dbc.Input(id="mesh_worst_count", type="number", min=1, max=500, step=1, value=20, debounce=True)], width=6),
-            dbc.Col([dbc.Label("Threshold"), dbc.Input(id="mesh_threshold", type="number", value=0.8, step="any", debounce=True)], width=6),
-        ], className="mb-3"),
-        dbc.Label("Slice position [% of extent]"),
-        dcc.Slider(id="mesh_fraction", min=0, max=100, step=1, value=50, marks={0: "0%", 50: "50%", 100: "100%"}, tooltip={"placement": "bottom"}),
-        html.P("High skewness and aspect ratio, or low orthogonality, indicate poorer cells. Inspection changes do not regenerate the mesh.", className="small text-muted mt-3"),
-        html.Div(id="mesh_inspection_message", className="small", role="status"),
-    ], open=False, className="td-row-settings")
+def _inspection_controls_panel(*, workbench=False):
+    return html.Details(
+        [
+            html.Summary("Mesh inspection"),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Label("View"),
+                            dcc.Dropdown(
+                                id="mesh_view",
+                                options=[
+                                    {"label": "Boundary surfaces", "value": "surface"},
+                                    {"label": "Slice", "value": "slice"},
+                                    {"label": "Spanwise layer", "value": "layer"},
+                                    {"label": "Worst quality cells", "value": "worst"},
+                                    {
+                                        "label": "Quality threshold",
+                                        "value": "threshold",
+                                    },
+                                ],
+                                value="surface",
+                                clearable=False,
+                            ),
+                        ],
+                        width=12,
+                    ),
+                    dbc.Col(
+                        [
+                            dbc.Label("Quality metric"),
+                            dcc.Dropdown(
+                                id="mesh_metric",
+                                options=[
+                                    {"label": "Skewness", "value": "skewness"},
+                                    {
+                                        "label": "Orthogonality",
+                                        "value": "orthogonality",
+                                    },
+                                    {"label": "Aspect ratio", "value": "aspect_ratio"},
+                                ],
+                                value="skewness",
+                                clearable=False,
+                            ),
+                        ],
+                        width=12,
+                    ),
+                ],
+                className="mb-3",
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Label("Slice axis"),
+                            dcc.Dropdown(
+                                id="mesh_axis",
+                                options=["X", "Y", "Z"],
+                                value="Z",
+                                clearable=False,
+                            ),
+                        ],
+                        width=12 if workbench else 6,
+                    ),
+                    dbc.Col(
+                        [
+                            dbc.Label("Spanwise layer"),
+                            dbc.Input(
+                                id="mesh_layer",
+                                type="number",
+                                min=1,
+                                step=1,
+                                value=1,
+                                debounce=True,
+                            ),
+                        ],
+                        width=12 if workbench else 6,
+                    ),
+                    dbc.Col(
+                        [
+                            dbc.Label("Worst-cell count"),
+                            dbc.Input(
+                                id="mesh_worst_count",
+                                type="number",
+                                min=1,
+                                max=500,
+                                step=1,
+                                value=20,
+                                debounce=True,
+                            ),
+                        ],
+                        width=12 if workbench else 6,
+                    ),
+                    dbc.Col(
+                        [
+                            dbc.Label("Threshold"),
+                            dbc.Input(
+                                id="mesh_threshold",
+                                type="number",
+                                value=0.8,
+                                step="any",
+                                debounce=True,
+                            ),
+                        ],
+                        width=12 if workbench else 6,
+                    ),
+                ],
+                className="mb-3",
+            ),
+            dbc.Label("Slice position [% of extent]"),
+            (
+                dbc.Input(
+                    id="mesh_fraction",
+                    type="number",
+                    min=0,
+                    max=100,
+                    step="any",
+                    value=50,
+                    debounce=True,
+                )
+                if workbench
+                else dcc.Slider(
+                    id="mesh_fraction",
+                    min=0,
+                    max=100,
+                    step=1,
+                    value=50,
+                    marks={0: "0%", 50: "50%", 100: "100%"},
+                    tooltip={"placement": "bottom"},
+                )
+            ),
+            (
+                _hint(
+                    "High skewness and aspect ratio, or low orthogonality, indicate poorer cells. Inspection changes do not regenerate the mesh.",
+                    "mesh-inspection-help",
+                )
+                if workbench
+                else html.P(
+                    "High skewness and aspect ratio, or low orthogonality, indicate poorer cells. Inspection changes do not regenerate the mesh.",
+                    className="small text-muted mt-3",
+                )
+            ),
+            html.Div(id="mesh_inspection_message", className="small", role="status"),
+        ],
+        open=False,
+        className="td-row-settings",
+    )
 
 
-def mesh_panel():
+def mesh_panel(*, workbench=False):
     # Selected-row values feed the established generation callbacks. Editors
     # themselves are the persistent per-row controls in the sidebar.
-    controls = [dbc.Input(id=f"mesh_{key}", type="number", value=default)
-                for key, _, default, *_ in _SETTINGS]
-    controls.append(dbc.Checklist(id="mesh_inflation_enabled", options=[{"label": "Inflation", "value": "enabled"}], value=[]))
-    return html.Div([
-        dcc.Store(id="mesh_job"),
-        dcc.Store(id="mesh_status", data={"state": "idle", "message": "Choose a blade row, then generate a mesh."}),
-        dcc.Interval(id="mesh_poll", interval=1500, disabled=True, n_intervals=0),
-        dcc.Download(id="mesh_download"),
-        dcc.Store(id="mesh_row_choice"),
-        html.Div(controls, style={"display": "none"}),
-        html.Aside([
-                html.H4("Mesh generation"),
-                html.P("Set each row independently, select the active row, then generate its mesh. Editing settings does not start a mesh job.", className="small text-muted"),
-                html.Details([
-                    html.Summary("Active row"),
-                    _row_selector("mesh"),
-                    dbc.Button("Generate mesh", id="mesh_generate", color="primary", n_clicks=0, disabled=True),
-                    html.Div(id="mesh_availability", className="small mt-2", role="status"),
-                ], open=True, className="td-row-settings"),
-                html.Div(id="mesh_rows_container"),
-                html.P("Blank sizes use chord-based defaults. Rows use constant radius and span; endwall flaring is omitted.", className="small text-muted"),
-                html.Details([
-                    html.Summary("Generation status and download"),
-                    html.Div(id="mesh_status_text", role="status"),
-                    dbc.Progress(id="mesh_progress", value=0, className="mt-3", style={"height": "8px"}),
-                    html.Pre(id="mesh_summary", className="small mt-3", style={"whiteSpace": "pre-wrap"}),
-                    dbc.Button("Download mesh ZIP", id="mesh_download_button", color="primary", outline=True, n_clicks=0, disabled=True),
-                    html.Div(id="mesh_download_error", role="alert", className="text-danger mt-2"),
-                ], open=True, className="td-row-settings"),
-        ], className="td-sidebar"),
-        html.Main([
-            html.Div(id="mesh_2d_message", className="small text-muted mb-2", role="status"),
-            html.Section([
-                html.Div([_engineering_plot("Blade-to-blade mesh", "mesh_profile"),
-                          _engineering_plot("Meridional mesh", "mesh_meridional")], className="td-plot-pair"),
-            ], className="td-plot-group"),
-            html.Section([html.H5("3D mesh"), html.Div(id="mesh_figure", children=vtk.vtk_panel("mesh", message="Generate a mesh to inspect it.", extra_controls=_inspection_controls_panel()))], className="td-plot-group"),
-        ], className="td-workspace-main"),
-    ], className="td-workspace")
+    controls = [
+        dbc.Input(id=f"mesh_{key}", type="number", value=default)
+        for key, _, default, *_ in _SETTINGS
+    ]
+    controls.append(
+        dbc.Checklist(
+            id="mesh_inflation_enabled",
+            options=[{"label": "Inflation", "value": "enabled"}],
+            value=[],
+        )
+    )
+    return html.Div(
+        [
+            dcc.Store(id="mesh_job"),
+            dcc.Store(
+                id="mesh_status",
+                data={
+                    "state": "idle",
+                    "message": "Choose a blade row, then generate a mesh.",
+                },
+            ),
+            dcc.Interval(id="mesh_poll", interval=1500, disabled=True, n_intervals=0),
+            dcc.Download(id="mesh_download"),
+            dcc.Store(id="mesh_row_choice"),
+            html.Div(controls, style={"display": "none"}),
+            html.Aside(
+                [
+                    html.H4(
+                        [
+                            "Mesh generation",
+                            _hint(
+                                "Set each row independently, select the active row, then generate its mesh. Editing settings does not start a mesh job. Blank sizes use chord-based defaults.",
+                                "mesh-generation-help",
+                            ),
+                        ]
+                        if workbench
+                        else "Mesh generation"
+                    ),
+                    (
+                        None
+                        if workbench
+                        else html.P(
+                            "Set each row independently, select the active row, then generate its mesh. Editing settings does not start a mesh job.",
+                            className="small text-muted",
+                        )
+                    ),
+                    html.Details(
+                        [
+                            html.Summary("Active row"),
+                            _row_selector("mesh", workbench=workbench),
+                            dbc.Button(
+                                "Generate mesh",
+                                id="mesh_generate",
+                                color="primary",
+                                n_clicks=0,
+                                disabled=True,
+                            ),
+                            html.Div(
+                                id="mesh_availability",
+                                className="small mt-2",
+                                role="status",
+                            ),
+                        ],
+                        open=not workbench,
+                        className="td-row-settings",
+                    ),
+                    html.Div(id="mesh_rows_container"),
+                    (
+                        None
+                        if workbench
+                        else html.P(
+                            "Blank sizes use chord-based defaults. Rows use constant radius and span; endwall flaring is omitted.",
+                            className="small text-muted",
+                        )
+                    ),
+                    html.Details(
+                        [
+                            html.Summary("Generation status and download"),
+                            html.Div(id="mesh_status_text", role="status"),
+                            dbc.Progress(
+                                id="mesh_progress",
+                                value=0,
+                                className="mt-3",
+                                style={"height": "8px"},
+                            ),
+                            html.Pre(
+                                id="mesh_summary",
+                                className="small mt-3",
+                                style={"whiteSpace": "pre-wrap"},
+                            ),
+                            dbc.Button(
+                                "Download mesh ZIP",
+                                id="mesh_download_button",
+                                color="primary",
+                                outline=True,
+                                n_clicks=0,
+                                disabled=True,
+                            ),
+                            html.Div(
+                                id="mesh_download_error",
+                                role="alert",
+                                className="text-danger mt-2",
+                            ),
+                        ],
+                        open=not workbench,
+                        className="td-row-settings",
+                    ),
+                ],
+                className="td-sidebar",
+            ),
+            html.Main(
+                [
+                    html.Div(
+                        id="mesh_2d_message",
+                        className="small text-muted mb-2",
+                        role="status",
+                    ),
+                    html.Section(
+                        [
+                            html.Div(
+                                [
+                                    _engineering_plot(
+                                        "Blade-to-blade mesh", "mesh_profile"
+                                    ),
+                                    _engineering_plot(
+                                        "Meridional mesh",
+                                        "mesh_meridional",
+                                        hint=(
+                                            "Projection of actual swept mesh stations. Mesh rows use cylindrical averaged radii; they do not reproduce flared meanline endwalls."
+                                            if workbench
+                                            else None
+                                        ),
+                                    ),
+                                ],
+                                className="td-plot-pair",
+                            ),
+                        ],
+                        className="td-plot-group",
+                    ),
+                    html.Section(
+                        [
+                            html.H5("3D mesh"),
+                            html.Div(
+                                id="mesh_figure",
+                                children=vtk.vtk_panel(
+                                    "mesh",
+                                    message="Generate a mesh to inspect it.",
+                                    extra_controls=_inspection_controls_panel(
+                                        workbench=workbench
+                                    ),
+                                ),
+                            ),
+                        ],
+                        className="td-plot-group",
+                    ),
+                ],
+                className="td-workspace-main",
+            ),
+        ],
+        className="td-workspace",
+    )
 
 
 def _options(values):
@@ -315,16 +752,45 @@ def _summary_text(summary, metrics=None):
     return "\n".join(lines)
 
 
-def register_meshing_callbacks(app):
+def _named_stage_options(results):
+    """Use solved names, falling back to input names and then stage numbers."""
+    inputs = (results or {}).get("inputs", {}).get("stages", [])
+    if isinstance(inputs, dict):
+        input_names = [str(name) for name in inputs]
+    else:
+        input_names = [stage.get("name") for stage in inputs]
+    return [
+        {
+            "label": str(
+                stage.get("name")
+                or (input_names[index] if index < len(input_names) else None)
+                or f"Stage {index + 1}"
+            ),
+            "value": index,
+        }
+        for index, stage in enumerate((results or {}).get("stages_performance", []))
+    ]
+
+
+def register_meshing_callbacks(app, *, precise_inputs=False):
+    """Register the shared workflow; presentation refinements are opt-in."""
     vtk.register_vtk_callbacks(app)
 
+    def geometry_meridional(preview):
+        if precise_inputs:
+            return plot_geometry_meridional(
+                preview, start_at_zero=True, show_note=False
+            )
+        return plot_geometry_meridional(preview)
+
     @app.callback(
-        Output("mesh_rows_container", "children"), Input("stage_data_store", "data"),
+        Output("mesh_rows_container", "children"),
+        Input("stage_data_store", "data"),
         State({"scope": "mesh-row", "stage": ALL, "row": ALL, "key": ALL}, "value"),
         State({"scope": "mesh-row", "stage": ALL, "row": ALL, "key": ALL}, "id"),
     )
     def render_mesh_rows(stages, values, ids):
-        return mesh_row_panels(stages, values, ids)
+        return mesh_row_panels(stages, values, ids, precise_inputs=precise_inputs)
 
     @app.callback(
         Output("mesh_row_choice", "data"),
@@ -338,18 +804,37 @@ def register_meshing_callbacks(app):
         return {"stage": trigger["stage"], "row": trigger["row"]}
 
     @app.callback(
-        Output("geometry_stage", "options"), Output("geometry_stage", "value"),
-        Output("mesh_stage", "options"), Output("mesh_stage", "value"),
+        Output("geometry_stage", "options"),
+        Output("geometry_stage", "value"),
+        Output("mesh_stage", "options"),
+        Output("mesh_stage", "value"),
         Output("mesh_row", "value"),
-        Input("result_store", "data"), Input("mesh_row_choice", "data"),
-        State("geometry_stage", "value"), State("mesh_stage", "value"), State("mesh_row", "value"),
+        Input("result_store", "data"),
+        Input("mesh_row_choice", "data"),
+        State("geometry_stage", "value"),
+        State("mesh_stage", "value"),
+        State("mesh_row", "value"),
     )
     def update_stages(results, choice, geometry_stage, mesh_stage, mesh_row):
         count = len((results or {}).get("stages_performance", []))
-        options = [{"label": f"Stage {i + 1}", "value": i} for i in range(count)]
-        if ctx.triggered_id == "mesh_row_choice" and choice and choice.get("stage") in range(count):
+        options = (
+            _named_stage_options(results)
+            if precise_inputs
+            else [{"label": f"Stage {i + 1}", "value": i} for i in range(count)]
+        )
+        if (
+            ctx.triggered_id == "mesh_row_choice"
+            and choice
+            and choice.get("stage") in range(count)
+        ):
             mesh_stage, mesh_row = choice["stage"], choice["row"]
-        return options, geometry_stage if geometry_stage in range(count) else 0, options, mesh_stage if mesh_stage in range(count) else 0, mesh_row or "stator"
+        return (
+            options,
+            geometry_stage if geometry_stage in range(count) else 0,
+            options,
+            mesh_stage if mesh_stage in range(count) else 0,
+            mesh_row or "stator",
+        )
 
     @app.callback(
         *[Output(f"mesh_{key}", "value") for key in _OPTION_KEYS],
@@ -366,11 +851,15 @@ def register_meshing_callbacks(app):
                      for key, old in zip(_OPTION_KEYS, current))
 
     @app.callback(
-        Output("geometry_profile", "figure"), Output("geometry-vtk-data", "data"),
-        Output("geometry_message", "children"), Output("geometry_download_button", "disabled"),
+        Output("geometry_profile", "figure"),
+        Output("geometry-vtk-data", "data"),
+        Output("geometry_message", "children"),
+        Output("geometry_download_button", "disabled"),
         Output("geometry_meridional", "figure"),
-        Input("result_store", "data"), Input("result_input_signature", "data"),
-        Input("geometry_stage", "value"), Input("geometry_row", "value"),
+        Input("result_store", "data"),
+        Input("result_input_signature", "data"),
+        Input("geometry_stage", "value"),
+        Input("geometry_row", "value"),
         Input("geometry_pane", "style"),
         *[Input(*item) for item in _LIVE],
     )
@@ -383,12 +872,32 @@ def register_meshing_callbacks(app):
         try:
             preview = _cached_preview(_preview_key(results), stage, row)
             metadata = preview.get("metadata", {})
-            message = " ".join(metadata.get("notes", [])) or "Constant-radius, constant-span blade row."
-            return plot_profile_preview(preview), vtk.geometry_data(preview), str(message), False, plot_geometry_meridional(preview)
+            message = (
+                " ".join(metadata.get("notes", []))
+                or "Constant-radius, constant-span blade row."
+            )
+            message = (
+                _hint(str(message), "geometry-preview-note")
+                if precise_inputs
+                else str(message)
+            )
+            return (
+                plot_profile_preview(preview),
+                vtk.geometry_data(preview),
+                message,
+                False,
+                geometry_meridional(preview),
+            )
         except Exception as error:
             _LOG.exception("Geometry preview failed")
             message = f"Could not build this blade row: {error}"
-            return _empty(message), vtk.empty_data(message), message, True, _empty(message)
+            return (
+                _empty(message),
+                vtk.empty_data(message),
+                message,
+                True,
+                _empty(message),
+            )
 
     @app.callback(
         Output("overview-vtk-data", "data"), Input("result_store", "data"),
@@ -411,12 +920,21 @@ def register_meshing_callbacks(app):
             return vtk.empty_data(f"Could not build the turbine overview: {error}")
 
     @app.callback(
-        Output("mesh_profile", "figure"), Output("mesh_meridional", "figure"), Output("mesh_2d_message", "children"),
-        Input("mesh_job", "data"), Input("mesh_status", "data"), Input("result_store", "data"),
-        Input("result_input_signature", "data"), Input("mesh_stage", "value"), Input("mesh_row", "value"),
-        Input("mesh_pane", "style"), *[Input(*item) for item in _LIVE],
+        Output("mesh_profile", "figure"),
+        Output("mesh_meridional", "figure"),
+        Output("mesh_2d_message", "children"),
+        Input("mesh_job", "data"),
+        Input("mesh_status", "data"),
+        Input("result_store", "data"),
+        Input("result_input_signature", "data"),
+        Input("mesh_stage", "value"),
+        Input("mesh_row", "value"),
+        Input("mesh_pane", "style"),
+        *[Input(*item) for item in _LIVE],
     )
-    def update_mesh_sections(handle, status, results, signature, stage, row, pane_style, *live):
+    def update_mesh_sections(
+        handle, status, results, signature, stage, row, pane_style, *live
+    ):
         reason = _unavailable(results, signature, input_signature(*live))
         if reason:
             return _empty(reason), _empty(reason), reason
@@ -424,10 +942,28 @@ def register_meshing_callbacks(app):
             raise PreventUpdate
         try:
             if handle and (status or {}).get("state") == "complete":
-                profile, meridional = mesh_figures(mesh_jobs.job_directory(handle))
-                return profile, meridional, "Generated reference-section cells and physical spanwise mesh."
+                if precise_inputs:
+                    profile, meridional = mesh_figures(
+                        mesh_jobs.job_directory(handle),
+                        start_at_zero=True,
+                        show_notes=False,
+                    )
+                else:
+                    profile, meridional = mesh_figures(mesh_jobs.job_directory(handle))
+                message = (
+                    "Generated reference-section cells and physical spanwise mesh."
+                )
+                return (
+                    profile,
+                    meridional,
+                    _hint(message, "mesh-section-note") if precise_inputs else message,
+                )
             preview = _cached_preview(_preview_key(results), stage, row)
-            return plot_profile_preview(preview), plot_geometry_meridional(preview), "Geometry preview. Generate this row to display its 2D mesh."
+            return (
+                plot_profile_preview(preview),
+                geometry_meridional(preview),
+                "Geometry preview. Generate this row to display its 2D mesh.",
+            )
         except Exception as error:
             message = f"Could not display the row sections: {error}"
             return _empty(message), _empty(message), message

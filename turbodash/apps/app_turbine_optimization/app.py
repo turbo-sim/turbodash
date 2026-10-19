@@ -8,11 +8,9 @@ import os
 import base64
 import yaml
 import numpy as np
-import jaxprop as jxp
 from turbodash.core import turbine as core
 from turbodash.visualization import plotly_turbine as _plotting
 from turbodash.reporting import turbine as reporting
-import CoolProp.CoolProp as CP
 import dash_bootstrap_components as dbc
 
 from datetime import datetime
@@ -26,19 +24,34 @@ from dash import (
     State,
     ctx,
     ALL,
-    MATCH,
     no_update,
-    dash_table,
+    set_props,
 )
 from dash.exceptions import PreventUpdate
 from turbodash.apps.shared.assets import register_app_assets
 from turbodash.apps.shared.components.turbogrid import register_turbogrid_callbacks
-from turbodash.apps.shared.components.meshing import geometry_panel, input_signature, mesh_panel, register_meshing_callbacks
+from turbodash.apps.shared.components.meshing import (
+    input_signature,
+    register_meshing_callbacks,
+)
+from turbodash.apps.shared.fluid_inputs import (
+    pair_fields,
+    convert_pair,
+    validate_inlet_inputs,
+    fluid_options,
+)
 from turbodash.visualization.vtk_assets import register_vtk_assets
-from .panel import panel as optimization_panel, terminal as optimization_terminal, register_callbacks as register_optimization_callbacks
+from .panel import register_callbacks as register_optimization_callbacks
 from . import jobs as optimization_jobs
-from .model import nested_config
-
+from .model import nested_config, build_settings
+from .panel import collect_rows
+from .workbench import (
+    build_layout,
+    stage_editor,
+    triangle_card,
+    make_data_table,
+    metric_cards,
+)
 
 # =========================
 # Global / setup
@@ -50,7 +63,9 @@ app = Dash(
     suppress_callback_exceptions=True,
     external_stylesheets=[dbc.themes.BOOTSTRAP],
 )
-register_app_assets(app, Path(__file__).resolve().parent / "assets", "turbine-optimization")
+register_app_assets(
+    app, Path(__file__).resolve().parent / "assets", "turbine-optimization"
+)
 server = app.server
 optimization_jobs.configure_sessions(server)
 
@@ -62,7 +77,7 @@ def initialize_session():
 
 register_vtk_assets(app)
 register_turbogrid_callbacks(app)
-register_meshing_callbacks(app)
+register_meshing_callbacks(app, precise_inputs=True)
 
 
 def configure(config_path):
@@ -160,8 +175,8 @@ def stage_defaults_for(turbine_type):
 STAGE_DEFAULTS = STAGE_DEFAULTS_AXIAL
 
 # Per-stage fields: (cfg_key, label, min, max, step). Labels carry the full
-# variable name with symbol and unit. Order = display order. Each renders as a
-# slider + linked number box.
+# variable name with symbol and unit. Order = display order. Continuous inputs
+# use step="any"; the historical step column remains for shared field metadata.
 STAGE_FIELDS = [
     ("work_fraction_split", ["Work fraction split"], 0.001, 10.0, 0.001),
     (
@@ -207,36 +222,41 @@ BLADE_GEOMETRY_FIELDS = [
     (
         "aspect_ratio",
         "Aspect ratio, height / meridional chord (axial) [-]",
-        0.1, 10.0, 0.1,
+        0.1,
+        10.0,
+        0.1,
     ),
     (
         "maximum_thickness_to_chord",
         "Maximum thickness / meridional chord [-]",
-        0.001, 1.0, 0.001,
+        0.001,
+        1.0,
+        0.001,
     ),
     (
         "maximum_thickness_location",
         "Maximum thickness location / chord [-]",
-        0.001, 0.999, 0.001,
+        0.001,
+        0.999,
+        0.001,
     ),
     (
         "leading_edge_radius_to_max_thickness",
         "Leading-edge radius / maximum thickness [-]",
-        0.001, 1.0, 0.001,
+        0.001,
+        1.0,
+        0.001,
     ),
     (
         "trailing_edge_thickness_to_opening",
         "Trailing-edge thickness / opening [-]",
-        0.001, 1.0, 0.001,
+        0.001,
+        1.0,
+        0.001,
     ),
     ("trailing_edge_wedge_angle", "Trailing-edge wedge angle [deg]", 0.0, 89.0, 0.1),
     ("leading_edge_wedge_angle", "Leading-edge wedge angle [deg]", 0.0, 89.0, 0.1),
 ]
-
-
-def _prettify(name):
-    """internal_name -> 'Internal Name' for display in dropdowns."""
-    return name.replace("_", " ").title()
 
 
 # =========================
@@ -261,663 +281,89 @@ docs_layout = html.Div(
                 "fontFamily": "Segoe UI, Roboto, Helvetica, Arial, sans-serif",
                 "fontSize": "16px",
                 "lineHeight": "1.6",
-                "color": "#24292e",
-                "backgroundColor": "#ffffff",
+                "color": "var(--td-text)",
+                "backgroundColor": "var(--td-surface)",
             },
         ),
     ],
 )
 
 
-# =========================
-# Styles
-# =========================
-LABEL_STYLE = dict(
-    fontWeight="bold", display="block", marginBottom="6px", marginTop="8px"
-)
-CONTROLS_STYLE = dict(
-    width="520px",
-    flex="0 0 520px",
-    padding="24px",
-    overflowY="auto",
-    borderRight="1px solid #ddd",
-    backgroundColor="#fdfdfd",
-)
-INPUT_STYLE = {
-    "width": "60px",
-    "padding": "6px 8px",
-    "fontSize": "14px",
-    "borderRadius": "4px",
-    "border": "1px solid #ccc",
-    "backgroundColor": "#ffffff",
-}
-WIDE_INPUT_STYLE = {**INPUT_STYLE, "width": "95%"}
-
-
-def html_section(title):
-    return html.H4(
-        title,
-        style={
-            "marginTop": "20px",
-            "paddingBottom": "6px",
-            "borderBottom": "1px solid #ddd",
-        },
-    )
-
-
-def labeled(label, component):
-    return html.Div([html.Label(label, style=LABEL_STYLE), component])
-
-
-# =========================
-# UI helpers
-# =========================
-def overall_number(label, key, default):
-    """A plain number input bound to an overall-parameter dict id."""
-    return html.Div(
-        style={"marginBottom": "12px"},
-        children=[
-            html.Label(label, style=LABEL_STYLE),
-            dcc.Input(
-                id={"scope": "overall", "key": key},
-                type="number",
-                value=default,
-                debounce=True,
-                style=WIDE_INPUT_STYLE,
-            ),
-        ],
-    )
-
-
-def stage_linked(stage_idx, key, label, lo, hi, step, value):
-    """
-    A slider + linked number box bound to per-stage dict ids. The two share
-    the same (stage, key) and differ by `elem` ('slider' / 'input'); a
-    pattern-matching callback keeps them in sync.
-    """
-    return html.Div(
-        style={"marginBottom": "16px", "marginTop": "8px"},
-        children=[
-            html.Label(label, style=LABEL_STYLE),
-            html.Div(
-                style={"display": "flex", "alignItems": "center", "gap": "10px"},
-                children=[
-                    html.Div(
-                        dcc.Slider(
-                            id={
-                                "scope": "stage",
-                                "stage": stage_idx,
-                                "key": key,
-                                "elem": "slider",
-                            },
-                            min=lo,
-                            max=hi,
-                            step=step,
-                            value=value,
-                            marks=None,
-                            tooltip={"placement": "bottom", "always_visible": False},
-                            updatemode="drag",
-                        ),
-                        style={"flexGrow": "1"},
-                    ),
-                    dcc.Input(
-                        id={
-                            "scope": "stage",
-                            "stage": stage_idx,
-                            "key": key,
-                            "elem": "input",
-                        },
-                        type="number",
-                        value=value,
-                        min=lo,
-                        max=hi,
-                        step=step,
-                        debounce=True,
-                        style=INPUT_STYLE,
-                    ),
-                ],
-            ),
-        ],
-    )
-
-
-def accordion_title(text):
-    return html.Span(text, style={"fontWeight": "bold", "fontSize": "15px"})
-
-
-def make_stage_accordion_item(stage_idx, stage_values, turbine_type):
-    """Build one AccordionItem for a single stage from a values dict."""
-    fields = [
-        stage_linked(
-            stage_idx,
-            key,
-            label,
-            lo,
-            hi,
-            step,
-            stage_values.get(key, STAGE_DEFAULTS[key]),
-        )
-        for (key, label, lo, hi, step) in STAGE_FIELDS
-    ]
-    geometry_items = []
-    for row in ("stator", "rotor"):
-        row_geometry = stage_values.get("blade_geometry", {}).get(row, {})
-        geometry_controls = [
-            stage_linked(
-                stage_idx,
-                f"{row}.{key}",
-                label,
-                lo,
-                hi,
-                step,
-                stage_values.get(
-                    f"{row}.{key}",
-                    row_geometry.get(key, BLADE_GEOMETRY_DEFAULTS[f"{row}.{key}"]),
-                ),
-            )
-            for key, label, lo, hi, step in BLADE_GEOMETRY_FIELDS
-            if key != "aspect_ratio" or turbine_type != "radial"
-        ]
-        geometry_items.append(
-            dbc.AccordionItem(
-                title=accordion_title(f"{row.title()} blade geometry"),
-                item_id=row,
-                children=html.Div(
-                    geometry_controls,
-                    style={"paddingTop": "6px"},
-                ),
-            )
-        )
-    fields.append(
-        dbc.Accordion(
-            id=f"stage-{stage_idx}-blade-geometry",
-            always_open=True,
-            active_item=["stator", "rotor"],
-            children=geometry_items,
-        )
-    )
-    return dbc.AccordionItem(
-        title=accordion_title(f"Stage {stage_idx + 1}"),
-        item_id=f"stage-{stage_idx}",
-        children=html.Div(fields, style={"paddingTop": "6px"}),
-    )
-
-
-def geometry_stage_panel(stage_idx, stage_values, turbine_type):
-    """Mirror the live stage inputs through the shared three-way sync callback."""
-    def field(key, label, lo, hi, step):
-        value = stage_values.get(key, STAGE_DEFAULTS[key])
-        if "." in key:
-            row, parameter = key.split(".", 1)
-            value = stage_values.get(key, stage_values.get("blade_geometry", {}).get(row, {}).get(parameter, value))
-        return html.Div([
-            html.Label(label),
-            dbc.Input(id={"scope": "stage", "stage": stage_idx, "key": key, "elem": "geometry"},
-                      type="number", value=value, min=lo, max=hi, step=step, debounce=True),
-        ], className="td-parameter")
-
-    groups = [html.Details([html.Summary("Stage design"),
-                           *[field(key, label, lo, hi, step) for key, label, lo, hi, step in STAGE_FIELDS]],
-                          className="td-row-settings")]
-    for row in ("stator", "rotor"):
-        controls = list(field(f"{row}.{key}", label, lo, hi, step)
-                        for key, label, lo, hi, step in BLADE_GEOMETRY_FIELDS
-                        if key != "aspect_ratio" or turbine_type != "radial")
-        groups.append(html.Details([html.Summary(row.title()), *controls],
-                                   open=stage_idx == 0 and row == "stator", className="td-row-settings"))
-    return html.Details([html.Summary(f"Stage {stage_idx + 1}"), *groups], open=stage_idx == 0,
-                        className="td-row-settings")
-
-
-# =========================
-# Controls: overall accordion + dynamic stage accordion
-# =========================
-def stage_count_row():
-    return html.Div(
-        style={
-            "display": "flex",
-            "alignItems": "center",
-            "gap": "10px",
-            "margin": "14px 0",
-        },
-        children=[
-            html.Label("Number of stages", style={"fontWeight": "bold"}),
-            html.Button(
-                "-",
-                id="stage_minus",
-                n_clicks=0,
-                style={"width": "34px", "fontWeight": "bold"},
-            ),
-            html.Div(
-                id="stage_count_label",
-                style={"minWidth": "24px", "textAlign": "center"},
-            ),
-            html.Button(
-                "+",
-                id="stage_plus",
-                n_clicks=0,
-                style={"width": "34px", "fontWeight": "bold"},
-            ),
-        ],
-    )
-
-
-def overall_accordion():
-    body = [
-        labeled(
-            "Turbine type",
-            dcc.RadioItems(
-                id={"scope": "overall", "key": "turbine_type"},
-                options=[
-                    {"label": "Axial", "value": "axial"},
-                    {"label": "Radial", "value": "radial"},
-                ],
-                value=OVERALL_DEFAULTS["turbine_type"],
-                style=dict(display="flex", gap="14px"),
-            ),
-        ),
-        # 2. Number of stages
-        stage_count_row(),
-        # 3. Loss model (pretty labels, internal values)
-        labeled(
-            "Loss model",
-            dcc.Dropdown(
-                id={"scope": "overall", "key": "loss_model"},
-                options=[
-                    {"label": _prettify(m), "value": m} for m in LOSS_MODEL_OPTIONS
-                ],
-                value=OVERALL_DEFAULTS["loss_model"],
-                clearable=False,
-            ),
-        ),
-        # 4. Working fluid and the rest
-        labeled(
-            "Working fluid",
-            dcc.Dropdown(
-                id={"scope": "overall", "key": "fluid_name"},
-                options=[
-                    {"label": f, "value": f}
-                    for f in sorted(CP.get_global_param_string("FluidsList").split(","))
-                ],
-                value=OVERALL_DEFAULTS["fluid_name"],
-                clearable=False,
-            ),
-        ),
-        labeled(
-            "Inlet property pair",
-            dcc.Dropdown(
-                id={"scope": "overall", "key": "inlet_property_pair"},
-                options=list(jxp.INPUT_PAIRS.keys()),
-                value=OVERALL_DEFAULTS["inlet_property_pair"],
-                clearable=False,
-            ),
-        ),
-        overall_number(
-            "Inlet property 1", "inlet_property_1", OVERALL_DEFAULTS["inlet_property_1"]
-        ),
-        overall_number(
-            "Inlet property 2", "inlet_property_2", OVERALL_DEFAULTS["inlet_property_2"]
-        ),
-        overall_number(
-            ["Exit pressure, p", html.Sub("out"), " [Pa]"],
-            "exit_pressure",
-            OVERALL_DEFAULTS["exit_pressure"],
-        ),
-        overall_number(
-            "Mass flow rate, ṁ [kg/s]",
-            "mass_flow_rate",
-            OVERALL_DEFAULTS["mass_flow_rate"],
-        ),
-        overall_number(
-            ["Inlet flow angle, α", html.Sub("0"), " [deg]"],
-            "inlet_flow_angle",
-            OVERALL_DEFAULTS["inlet_flow_angle"],
-        ),
-        overall_number(
-            "Blade velocity ratio, ν",
-            "blade_velocity_ratio",
-            OVERALL_DEFAULTS["blade_velocity_ratio"],
-        ),
-        labeled(
-            "Rotational speed type",
-            dcc.RadioItems(
-                id={"scope": "overall", "key": "rotational_speed_type"},
-                options=[
-                    {"label": "Specific", "value": "specific"},
-                    {"label": "Actual", "value": "actual"},
-                ],
-                value=OVERALL_DEFAULTS["rotational_speed_type"],
-                style=dict(display="flex", gap="14px"),
-            ),
-        ),
-        overall_number(
-            "Rotational speed value",
-            "rotational_speed_value",
-            OVERALL_DEFAULTS["rotational_speed_value"],
-        ),
-    ]
-    return dbc.Accordion(
-        id="overall_accordion",
-        start_collapsed=False,
-        always_open=True,
-        children=[
-            dbc.AccordionItem(
-                title=accordion_title("Overall parameters"),
-                item_id="overall",
-                children=html.Div(body),
-            )
-        ],
-    )
-
-def save_load_row():
-    button_style = {
-        "width": "100%",
-        "padding": "10px 16px",
-        "fontWeight": "600",
-        "fontSize": "14px",
-        "borderRadius": "6px",
-        "margin": "0",
-        "boxSizing": "border-box",
-    }
-    cell_style = {
-        "flex": "0 0 50%",
-        "maxWidth": "50%",
-        "minWidth": "0",
-        "boxSizing": "border-box",
-    }
-    return html.Div(
-        [
-            html.Div(
-                dbc.Button(
-                    "Save design",
-                    id="save_button",
-                    n_clicks=0,
-                    color="primary",
-                    outline=True,
-                    style=button_style,
-                ),
-                style={**cell_style, "paddingRight": "6px"},
-            ),
-            html.Div(
-                dcc.Upload(
-                    id="load_button",
-                    accept=".yaml,.yml",
-                    style={"width": "100%", "display": "block"},
-                    style_active={},
-                    children=dbc.Button(
-                        "Load design",
-                        color="primary",
-                        outline=True,
-                        style=button_style,
-                    ),
-                ),
-                style={**cell_style, "paddingLeft": "6px"},
-            ),
-        ],
-        style=dict(
-            display="flex",
-            marginBottom="16px",
-            width="100%",
-            boxSizing="border-box",
-        ),
-    )
-
-controls = html.Div(
-    [
-        save_load_row(),
-        dcc.Download(id="download_yaml"),
-        dcc.Store(id="result_store"),
-        dcc.Store(id="result_input_signature"),
-        dcc.Store(id="loaded_cfg_store"),
-        # stage_data_store holds the list of per-stage value dicts. It only
-        # changes on +/- or load, so editing a value never rebuilds (and never
-        # collapses) the per-stage accordion.
-        dcc.Store(id="stage_data_store", data=[dict(STAGE_DEFAULTS)]),
-        overall_accordion(),
-        # Rebuilt only when the stage count or a loaded config changes.
-        html.Div(id="stages_accordion_container", style={"marginTop": "12px"}),
-        optimization_panel(),
-    ],
-    style=CONTROLS_STYLE,
-    id="design-controls",
+app.layout = build_layout(
+    OVERALL_DEFAULTS, STAGE_DEFAULTS, LOSS_MODEL_OPTIONS, docs_layout
 )
 
-
-# =========================
-# Results layout (plots; tables left as placeholders)
-# =========================
-def plot_card(title, graph_id):
-    return html.Div(
-        style={
-            "display": "flex",
-            "flexDirection": "column",
-            "border": "1px solid #ddd",
-            "borderRadius": "6px",
-            "padding": "10px",
-            "backgroundColor": "white",
-        },
-        children=[
-            html.Div(title, style={"fontWeight": "bold", "marginBottom": "6px"}),
-            dcc.Graph(
-                id=graph_id, style={"flex": "1 1 auto"}, config={"responsive": True}
-            ),
-        ],
-    )
-
-
-def triangle_card(graph_id, figure):
-    """
-    A card holding one stage's velocity-triangle figure in its own full-width
-    row. Takes the figure directly (the callback builds one per stage). The
-    figure sets its own height (340 px), so the graph is not flex-stretched.
-    """
-    return html.Div(
-        style={
-            "display": "flex",
-            "flexDirection": "column",
-            "border": "1px solid #ddd",
-            "borderRadius": "6px",
-            "padding": "10px",
-            "backgroundColor": "white",
-            "marginBottom": "24px",
-        },
-        children=[
-            dcc.Graph(
-                id=graph_id,
-                figure=figure,
-                style={"width": "100%"},
-                config={"responsive": True},
-            ),
-        ],
-    )
-
-
-# The three "compact" plots keep the 2x2-style grid: each has a roughly fixed
-# natural size and is happy in an equal-height cell. The 4th grid slot is left
-# open for a future summary card or table.
-plots_grid = html.Div(
-    style={
-        "display": "grid",
-        "gridTemplateColumns": "repeat(2, 1fr)",
-        "gridAutoRows": "minmax(420px, 1fr)",
-        "gap": "24px",
-    },
-    children=[
-        plot_card("Meridional channel", "meridional_plot"),
-        plot_card("Blade-to-blade view", "blades_plot"),
-        plot_card("Efficiency trends", "efficiency_trends_plot"),
-        plot_card("Loss distribution", "loss_plot"),
-    ],
-)
-
-# Velocity triangles: one standalone figure per stage, each in its own row.
-# The callback fills this container with N plot cards (N = number of stages),
-# so it grows naturally for multistage without any subplot/aspect issues.
-plots_triangles = html.Div(
-    style={"marginTop": "24px"},
-    children=[
-        html.Div(
-            "Velocity triangles",
-            style={"fontWeight": "bold", "marginBottom": "6px", "fontSize": "16px"},
-        ),
-        html.Div(id="triangles_container"),
-    ],
-)
-
-plots = html.Div(children=[plots_grid, plots_triangles])
-
-def make_data_table(columns, data, first_col_left=True):
-    """
-    Build a styled dash_table.DataTable from (columns, data) as returned by the
-    reporting_utils table builders. The first column (the row label) is left-
-    aligned and bold; numeric columns are right-aligned.
-
-    Values arrive already scaled and rounded to their intended decimals by the
-    builders, so the displayed number is exactly the stored number. (No Dash
-    Format layer is used: it applied per-column scaling inconsistently in
-    practice, leaving some columns unscaled.)
-    """
-    first_id = columns[0]["id"] if columns else None
-
-    return dash_table.DataTable(
-        columns=[{"name": c["name"], "id": c["id"]} for c in columns],
-        data=data,
-        style_table={"overflowX": "auto"},
-        style_cell={
-            "fontFamily": "Segoe UI, Arial, sans-serif",
-            "fontSize": "13px",
-            "padding": "4px 8px",
-            "textAlign": "right",
-            "whiteSpace": "nowrap",
-        },
-        style_header={
-            "fontWeight": "bold",
-            "backgroundColor": "#f6f8fa",
-            "borderBottom": "2px solid #d0d7de",
-            "textAlign": "right",
-        },
-        style_data={"borderBottom": "1px solid #eee"},
-        style_cell_conditional=(
-            [
-                {
-                    "if": {"column_id": first_id},
-                    "textAlign": "left",
-                    "fontWeight": "bold",
-                    "minWidth": "180px",
-                }
-            ]
-            if (first_col_left and first_id)
-            else []
-        ),
-    )
-
-
-def table_card(title, table_id):
-    """A titled card wrapping a DataTable container (the callback fills it)."""
-    return html.Div(
-        style={
-            "display": "flex",
-            "flexDirection": "column",
-            "border": "1px solid #ddd",
-            "borderRadius": "6px",
-            "padding": "10px",
-            "backgroundColor": "white",
-            "overflowX": "auto",
-        },
-        children=[
-            html.Div(title, style={"fontWeight": "bold", "marginBottom": "6px"}),
-            html.Div(id=table_id),
-        ],
-    )
-
-
-# Tables: overall performance and geometry side by side in one row, flow
-# stations full-width in the row below. The callback fills the three inner
-# containers (perf_table / geom_table / stations_table) with DataTables.
-tables = html.Div(
-    id="tables_container",
-    style={"marginTop": "24px"},
-    children=[
-        html.Div(
-            style={
-                "display": "grid",
-                "gridTemplateColumns": "1fr 1fr",
-                "gap": "24px",
-                "alignItems": "start",
-            },
-            children=[
-                table_card("Overall performance", "perf_table"),
-                table_card("Meanline geometry", "geom_table"),
-            ],
-        ),
-        html.Div(
-            style={"marginTop": "24px"},
-            children=[table_card("Flow stations", "stations_table")],
-        ),
-    ],
-)
-
-
-# =========================
-# App layout
-# =========================
-def styled_tab(label, value):
-    base = {
-        "fontWeight": "bold",
-        "padding": "10px 18px",
-        "backgroundColor": "#f6f8fa",
-        "border": "1px solid #d0d7de",
-        "borderBottom": "none",
-    }
-    sel = {**base, "backgroundColor": "#ffffff", "borderBottom": "3px solid #007acc"}
-    return dict(style=base, selected_style=sel, label=label, value=value)
-
-
-app.layout = html.Div(
-    children=[
-        dcc.Tabs(
-            id="tabs",
-            value="meanline",
-            style={
-                "fontFamily": "Segoe UI, Arial, sans-serif",
-                "fontSize": "16px",
-                "borderBottom": "1px solid #d0d7de",
-            },
-            children=[
-                dcc.Tab(**styled_tab("Meanline", "meanline")),
-                dcc.Tab(**styled_tab("Turbine geometry", "geometry")),
-                dcc.Tab(**styled_tab("Mesh", "mesh")),
-            ],
-        ),
-        # Content lives outside dcc.Tab so controls, stores and callbacks stay
-        # mounted when the user switches views.
-        html.Div(
-            id="meanline_pane",
-            style={"display": "flex", "width": "100%", "height": "calc(100vh - 54px)", "overflow": "hidden", "fontFamily": "Arial"},
-            children=[
-                controls,
-                html.Div(
-                    style={"flex": "1 1 auto", "minWidth": 0, "overflowY": "auto", "padding": "20px"},
-                    children=[plots, tables, optimization_terminal(), html.Details([html.Summary("Documentation"), docs_layout], className="mt-4")],
-                ),
-            ],
-        ),
-        html.Div(id="geometry_pane", children=geometry_panel(), style={"display": "none"}),
-        html.Div(id="mesh_pane", children=mesh_panel(), style={"display": "none"}),
-    ]
+app.clientside_callback(
+    """function(workspace) {
+        return ['meanline', 'geometry', 'mesh'].map(name => ({display: name === workspace ? 'block' : 'none'}));
+    }""",
+    Output("meanline_pane", "style"),
+    Output("geometry_pane", "style"),
+    Output("mesh_pane", "style"),
+    Input("td-workspace", "data"),
 )
 
 
 @app.callback(
-    Output("meanline_pane", "style"), Output("geometry_pane", "style"), Output("mesh_pane", "style"),
-    Input("tabs", "value"),
+    Output({"scope": "overall", "key": "fluid_name"}, "options"),
+    Input({"scope": "overall", "key": "fluid_name"}, "value"),
 )
-def switch_tab(tab):
+def working_fluid_options(current):
+    return fluid_options(current)
+
+
+app.clientside_callback(
+    """function(stage, row) {return [String(stage || 0), row || 'stator'];}""",
+    Output("td-workbench", "data-stage-index"),
+    Output("td-workbench", "data-blade-row"),
+    Input("td-stage-selector", "value"),
+    Input("td-row-selector", "value"),
+)
+
+
+@app.callback(
+    Output("td-inlet-label-1", "children"),
+    Output("td-inlet-label-2", "children"),
+    Input({"scope": "overall", "key": "inlet_property_pair"}, "value"),
+)
+def inlet_labels(pair):
+    return [f"{field['label']} [{field['unit']}]" for field in pair_fields(pair)]
+
+
+@app.callback(
+    Output("td-speed-label", "children"),
+    Input({"scope": "overall", "key": "rotational_speed_type"}, "value"),
+)
+def speed_label(mode):
+    return "Specific speed [−]" if mode == "specific" else "Shaft speed [rpm]"
+
+
+@app.callback(Output("td-metrics", "children"), Input("result_store", "data"))
+def update_metrics(results):
+    return metric_cards(results)
+
+
+@app.callback(
+    Output("td-results-label", "children"), Input("td-calculation-state", "data")
+)
+def calculation_label(state):
     return (
-        {"display": "flex" if tab == "meanline" else "none", "width": "100%", "height": "calc(100vh - 54px)", "overflow": "hidden", "fontFamily": "Arial"},
-        {"display": "block" if tab == "geometry" else "none"},
-        {"display": "block" if tab == "mesh" else "none"},
+        "Live results"
+        if (state or {}).get("valid")
+        else (
+            "Last valid results"
+            if (state or {}).get("message")
+            else "Waiting for results"
+        )
     )
+
+
+app.clientside_callback(
+    """function(job, status) {return job ? status : (status && !status.startsWith('Ready') ? status : '');}""",
+    Output("td-job-status", "children"),
+    Input("opt-job", "data"),
+    Input("opt-status", "children"),
+)
 
 
 # =========================================
@@ -928,21 +374,98 @@ def switch_tab(tab):
 @app.callback(
     Output("stage_data_store", "data"),
     Output({"scope": "overall", "key": ALL}, "value"),
+    Output("td-inlet-pair", "value"),
+    Output("td-fluid-error", "children"),
     Input("stage_plus", "n_clicks"),
     Input("stage_minus", "n_clicks"),
     Input("loaded_cfg_store", "data"),
     Input({"scope": "overall", "key": "turbine_type"}, "value"),
+    Input("td-inlet-pair", "value"),
+    Input({"scope": "overall", "key": "rotational_speed_type"}, "value"),
     State("stage_data_store", "data"),
     State({"scope": "overall", "key": ALL}, "id"),
     State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "value"),
     State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "id"),
+    State({"scope": "overall", "key": ALL}, "value"),
+    State("result_store", "data"),
     prevent_initial_call=True,
 )
 def update_stage_store(
-    n_plus, n_minus, loaded_cfg, turbine_type, stages, overall_ids, live_values, live_ids
+    n_plus,
+    n_minus,
+    loaded_cfg,
+    turbine_type,
+    pair,
+    speed_type,
+    stages,
+    overall_ids,
+    live_values,
+    live_ids,
+    overall_values,
+    results,
 ):
     trigger = ctx.triggered_id
-    stages = list(stages or [dict(STAGE_DEFAULTS)])
+    if "loaded_cfg_store" in ctx.triggered_prop_ids.values():
+        trigger = "loaded_cfg_store"
+    stages = [
+        dict(stage) for stage in (stages or [dict(STAGE_DEFAULTS, name="stage_1")])
+    ]
+    overall = {
+        identity["key"]: value for identity, value in zip(overall_ids, overall_values)
+    }
+
+    if trigger == "td-inlet-pair":
+        if pair == overall["inlet_property_pair"]:
+            raise PreventUpdate
+        # Read the last accepted inlet, not a partially typed/invalid draft.
+        source = (results or {}).get("inputs", overall)
+        message = ""
+        try:
+            if source.get("fluid_name") != overall.get("fluid_name"):
+                raise ValueError(
+                    "The working fluid has changed; enter both inlet values."
+                )
+            first, second = convert_pair(
+                overall["fluid_name"],
+                source["inlet_property_pair"],
+                (source["inlet_property_1"], source["inlet_property_2"]),
+                pair,
+            )
+        except (ValueError, KeyError) as error:
+            first = second = None
+            message = f"Enter both inlet values for the new pair. {error}"
+        changed = {
+            "inlet_property_pair": pair,
+            "inlet_property_1": first,
+            "inlet_property_2": second,
+        }
+        return (
+            no_update,
+            [changed.get(identity["key"], no_update) for identity in overall_ids],
+            pair,
+            message,
+        )
+
+    if trigger == {"scope": "overall", "key": "rotational_speed_type"}:
+        performance = (results or {}).get("overall_performance", {})
+        value = performance.get(
+            "specific_speed" if speed_type == "specific" else "rotational_speed"
+        )
+        if value is None:
+            value = (
+                OVERALL_DEFAULTS["rotational_speed_value"]
+                if speed_type == "specific"
+                else None
+            )
+        return (
+            no_update,
+            [
+                value if identity["key"] == "rotational_speed_value" else no_update
+                for identity in overall_ids
+            ],
+            no_update,
+            no_update,
+        )
 
     # Reconcile the store with the user's current live edits before doing
     # anything else, so that add/remove operate on up-to-date values. (Loading
@@ -950,9 +473,7 @@ def update_stage_store(
     if trigger in ("stage_plus", "stage_minus"):
         for d, v in zip(live_ids or [], live_values or []):
             si = d["stage"]
-            if 0 <= si < len(stages) and (
-                v is not None or d["key"].startswith(("stator.", "rotor."))
-            ):
+            if 0 <= si < len(stages):
                 stages[si][d["key"]] = v
 
     # Switching turbine type: reset ALL stages to the defaults for that type,
@@ -961,84 +482,106 @@ def update_stage_store(
         if not turbine_type:
             raise PreventUpdate
         defaults = stage_defaults_for(turbine_type)
-        return [dict(defaults) for _ in stages], no_update
+        return (
+            [
+                dict(defaults, name=stage.get("name", f"stage_{index + 1}"))
+                for index, stage in enumerate(stages)
+            ],
+            no_update,
+            no_update,
+            "",
+        )
 
     # Loading a config: replace the whole stage list from the YAML.
     if trigger == "loaded_cfg_store" and loaded_cfg:
         cfg_stages = loaded_cfg.get("inputs", {}).get("stages", [])
         if cfg_stages:
-            new_stages = []
-            for sc in cfg_stages:
-                merged = dict(STAGE_DEFAULTS)
-                merged.update({k: sc[k] for k in STAGE_DEFAULTS if k in sc})
-                for row in ("stator", "rotor"):
-                    row_geometry = sc.get("blade_geometry", {}).get(row, {})
-                    for key, *_ in BLADE_GEOMETRY_FIELDS:
-                        merged[f"{row}.{key}"] = row_geometry.get(key)
-                new_stages.append(merged)
-            return new_stages, loaded_overall_values(loaded_cfg, overall_ids)
+            new_stages = loaded_stages(loaded_cfg)
+            for section in ("setup", "operating", "speed", "stage"):
+                set_props(f"td-section-{section}", {"open": False})
+            set_props("opt-panel", {"open": False})
+            set_props("td-stage-selector", {"value": 0})
+            set_props(
+                "td-workbench", {"data-design-revision": datetime.now().isoformat()}
+            )
+            return (
+                new_stages,
+                loaded_overall_values(loaded_cfg, overall_ids),
+                loaded_cfg["inputs"].get("inlet_property_pair", "PT_INPUTS"),
+                "",
+            )
         raise PreventUpdate
 
     # Add a stage: copy the previous (last) stage's current values as the seed.
     if trigger == "stage_plus":
         seed = dict(stages[-1]) if stages else dict(STAGE_DEFAULTS)
-        return stages + [seed], no_update
+        existing = {stage.get("name") for stage in stages}
+        index = len(stages) + 1
+        while f"stage_{index}" in existing:
+            index += 1
+        seed["name"] = f"stage_{index}"
+        return stages + [seed], no_update, no_update, no_update
 
     # Remove a stage: drop the last one, leaving the others unchanged. Never go
     # below one stage.
     if trigger == "stage_minus":
-        return (stages[:-1] if len(stages) > 1 else stages), no_update
+        return (
+            (stages[:-1] if len(stages) > 1 else stages),
+            no_update,
+            no_update,
+            no_update,
+        )
 
     raise PreventUpdate
 
 
-# =========================================
-# Callback: keep each stage slider and its number box in sync
-# =========================================
-@app.callback(
-    Output({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "slider"}, "value"),
-    Output({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "input"}, "value"),
-    Output({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "geometry"}, "value"),
-    Input({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "slider"}, "value"),
-    Input({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "input"}, "value"),
-    Input({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "geometry"}, "value"),
-    prevent_initial_call=True,
-)
-def sync_stage_slider_input(slider_val, input_val, geometry_val):
-    trigger = ctx.triggered_id
-    if trigger is None:
-        raise PreventUpdate
-    val = {"slider": slider_val, "input": input_val, "geometry": geometry_val}[trigger.get("elem")]
-    if val is None:
-        return no_update, None, None
-    return val, val, val
+def loaded_stages(config):
+    """Flatten the YAML stage mappings without discarding names or precision."""
+    stages = []
+    for index, stage in enumerate(config["inputs"]["stages"]):
+        values = dict(
+            stage_defaults_for(config["inputs"].get("turbine_type")),
+            name=stage.get("name", f"stage_{index + 1}"),
+        )
+        values.update({key: stage[key] for key in STAGE_DEFAULTS if key in stage})
+        for row in ("stator", "rotor"):
+            geometry = stage.get("blade_geometry", {}).get(row, {})
+            for key, *_ in BLADE_GEOMETRY_FIELDS:
+                values[f"{row}.{key}"] = geometry.get(key, values[f"{row}.{key}"])
+        stages.append(values)
+    return stages
 
 
-# =========================================
-# Callback: rebuild the per-stage accordion. Fires only when stage_data_store
-# changes (i.e. +/- or load), so it does not collapse on value edits.
-# =========================================
 @app.callback(
     Output("stages_accordion_container", "children"),
     Output("stage_count_label", "children"),
     Output("geometry_rows_container", "children"),
     Input("stage_data_store", "data"),
     State({"scope": "overall", "key": "turbine_type"}, "value"),
-    prevent_initial_call=False,
 )
 def render_stage_accordion(stages, turbine_type):
-    stages = stages or [dict(STAGE_DEFAULTS)]
-    items = [
-        make_stage_accordion_item(i, sv, turbine_type)
-        for i, sv in enumerate(stages)
-    ]
-    accordion = dbc.Accordion(
-        id="stages_accordion",
-        always_open=True,
-        children=items,
+    stages = stages or [dict(STAGE_DEFAULTS, name="stage_1")]
+    return (
+        stage_editor(
+            stages, turbine_type, STAGE_FIELDS, BLADE_GEOMETRY_FIELDS, STAGE_DEFAULTS
+        ),
+        str(len(stages)),
+        [],
     )
-    geometry = [geometry_stage_panel(i, sv, turbine_type) for i, sv in enumerate(stages)]
-    return accordion, str(len(stages)), geometry
+
+
+@app.callback(
+    Output("td-stage-selector", "options"),
+    Output("td-stage-selector", "value"),
+    Input("stage_data_store", "data"),
+    State("td-stage-selector", "value"),
+)
+def stage_choices(stages, active):
+    stages = stages or [dict(name="stage_1")]
+    return [
+        {"label": stage.get("name", f"Stage {index + 1}"), "value": index}
+        for index, stage in enumerate(stages)
+    ], min(active or 0, len(stages) - 1)
 
 
 # =========================================
@@ -1063,52 +606,93 @@ def render_stage_accordion(stages, turbine_type):
     State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "id"),
     State("stage_data_store", "data"),
 )
-def update_turbine(overall_values, stage_values, applied, overall_ids, stage_ids, store_stages):
-    if any(isinstance(identity, dict) and identity.get("key") == "turbine_type"
-           for identity in ctx.triggered_prop_ids.values()):
-        # The stage-load callback replaces the row controls next. Preserve the
-        # previous plots until those controls match the new turbine type.
+def update_turbine(
+    overall_values, stage_values, applied, overall_ids, stage_ids, store_stages
+):
+    if any(
+        isinstance(identity, dict)
+        and identity.get("key") in ("turbine_type", "rotational_speed_type")
+        for identity in ctx.triggered_prop_ids.values()
+    ):
+        # Wait for the transaction that replaces stage defaults or converts
+        # speed units; do not solve an intermediate interpretation of values.
         raise PreventUpdate
-    cfg = live_config(overall_values, stage_values, overall_ids, stage_ids, store_stages)
-    signature = input_signature(overall_values, stage_values, overall_ids, stage_ids, store_stages)
-    if applied and optimization_jobs.fingerprint(cfg) == optimization_jobs.fingerprint(applied["config"]):
-        out = dict(applied["turbine_results"])
-        out["optimization"] = applied["config"]["optimization"]
-    elif ctx.triggered_id == "opt-applied-result":
-        # Inputs are still being reconciled through the existing load pipeline.
-        raise PreventUpdate
-    else:
-        out = core.compute_turbine_performance(cfg)
-    return render_results(out, signature)
+    try:
+        cfg = live_config(
+            overall_values, stage_values, overall_ids, stage_ids, store_stages
+        )
+        signature = input_signature(
+            overall_values, stage_values, overall_ids, stage_ids, store_stages
+        )
+        if applied and optimization_jobs.fingerprint(
+            cfg
+        ) == optimization_jobs.fingerprint(applied["config"]):
+            out = dict(applied["turbine_results"])
+            out["optimization"] = applied["config"]["optimization"]
+        elif ctx.triggered_id == "opt-applied-result":
+            raise PreventUpdate
+        else:
+            out = core.compute_turbine_performance(cfg)
+        rendered = render_results(out, signature)
+    except PreventUpdate:
+        raise
+    except Exception as error:
+        set_props(
+            "td-calculation-status",
+            {"children": f"Results retained from the last valid design. {error}"},
+        )
+        set_props(
+            "td-calculation-state", {"data": {"valid": False, "message": str(error)}}
+        )
+        return (no_update,) * 10
+    set_props("td-calculation-status", {"children": ""})
+    set_props("td-fluid-error", {"children": ""})
+    set_props("td-calculation-state", {"data": {"valid": True, "signature": signature}})
+    return rendered
 
 
 def live_config(overall_values, stage_values, overall_ids, stage_ids, store_stages):
     # Overall inputs.
     overall = {d["key"]: v for d, v in zip(overall_ids or [], overall_values or [])}
+    validate_inlet_inputs(overall)
+    for key, value in overall.items():
+        if isinstance(OVERALL_DEFAULTS.get(key), (float, int)):
+            if value is None or isinstance(value, bool) or not np.isfinite(value):
+                raise ValueError(f"Enter a finite value for {key.replace('_', ' ')}.")
+    for key in (
+        "exit_pressure",
+        "mass_flow_rate",
+        "blade_velocity_ratio",
+        "rotational_speed_value",
+    ):
+        if overall[key] <= 0:
+            raise ValueError(
+                f"{key.replace('_', ' ').capitalize()} must be greater than zero."
+            )
 
     # Stage list rebuilt from the live number boxes; count comes from the store.
     # The baseline defaults follow the selected turbine type so any key not
     # carried by a live box falls back to the right per-type default.
     defaults = stage_defaults_for(overall.get("turbine_type"))
     n = len(store_stages or [dict(defaults)])
-    stages = [dict(defaults) for _ in range(n)]
+    stages = [
+        dict(defaults, **stage)
+        for stage in (store_stages or [dict(defaults, name="stage_1")])
+    ]
     for d, v in zip(stage_ids or [], stage_values or []):
         si = d["stage"]
-        if 0 <= si < n and (
-            v is not None or d["key"].startswith(("stator.", "rotor."))
-        ):
+        if 0 <= si < n:
             stages[si][d["key"]] = v
 
-    if any(
-        stage.get(f"{row}.{key}") is None
-        for stage in stages
-        for row in ("stator", "rotor")
-        for key, *_ in BLADE_GEOMETRY_FIELDS
-    ):
-        raise PreventUpdate
+    for index, stage in enumerate(stages):
+        for key in defaults:
+            value = stage.get(key)
+            if value is None or isinstance(value, bool) or not np.isfinite(value):
+                raise ValueError(
+                    f"{stage.get('name', f'Stage {index + 1}')}: enter a finite {key.replace('_', ' ')}."
+                )
 
     return _assemble_cfg(overall, stages)
-
 
 
 def render_results(out, signature):
@@ -1163,6 +747,7 @@ def render_results(out, signature):
         signature,
     )
 
+
 def _assemble_cfg(overall, stages):
     """Translate flat overall dict + stage list into the YAML-style cfg."""
     stages = stages or [dict(STAGE_DEFAULTS)]
@@ -1189,17 +774,14 @@ def _assemble_cfg(overall, stages):
         },
         "stages": [
             {
-                "name": f"stage_{i + 1}",
+                "name": sv.get("name", f"stage_{i + 1}"),
                 **{
                     k: sv.get(k, STAGE_DEFAULTS[k])
                     for k in STAGE_DEFAULTS
                     if k not in BLADE_GEOMETRY_DEFAULTS
                 },
                 "blade_geometry": {
-                    row: {
-                        key: sv[f"{row}.{key}"]
-                        for key, *_ in BLADE_GEOMETRY_FIELDS
-                    }
+                    row: {key: sv[f"{row}.{key}"] for key, *_ in BLADE_GEOMETRY_FIELDS}
                     for row in ("stator", "rotor")
                 },
             }
@@ -1216,11 +798,52 @@ def _assemble_cfg(overall, stages):
     Output("download_yaml", "data"),
     Input("save_button", "n_clicks"),
     State("result_store", "data"),
+    State("result_input_signature", "data"),
+    State({"scope": "overall", "key": ALL}, "value"),
+    State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "value"),
+    State({"scope": "overall", "key": ALL}, "id"),
+    State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "id"),
+    State("stage_data_store", "data"),
+    State({"type": "opt-variable-path", "row": ALL}, "value"),
+    State({"type": "opt-variable-path", "row": ALL}, "id"),
+    State({"type": "opt-variable-number", "row": ALL, "field": ALL}, "value"),
+    State({"type": "opt-variable-number", "row": ALL, "field": ALL}, "id"),
+    State({"type": "opt-constraint-path", "row": ALL}, "value"),
+    State({"type": "opt-constraint-path", "row": ALL}, "id"),
+    State({"type": "opt-constraint-number", "row": ALL, "field": ALL}, "value"),
+    State({"type": "opt-constraint-number", "row": ALL, "field": ALL}, "id"),
+    State({"type": "opt-comparison", "row": ALL}, "value"),
+    State({"type": "opt-comparison", "row": ALL}, "id"),
+    State("opt-objective", "value"),
+    State("opt-direction", "value"),
+    State("opt-tolerance", "value"),
+    State("opt-iterations", "value"),
+    State("opt-feasibility", "value"),
     prevent_initial_call=True,
 )
-def download_yaml(n_clicks, cfg):
+def download_yaml(n_clicks, cfg, signature, ov, sv, oi, si, stages, *editor):
     if cfg is None:
         raise PreventUpdate
+    try:
+        current = live_config(ov, sv, oi, si, stages)
+        if input_signature(ov, sv, oi, si, stages) != signature:
+            raise ValueError(
+                "Wait for a successful calculation of the current inputs before saving."
+            )
+        variables, constraints = collect_rows(*editor[:4]), collect_rows(*editor[4:10])
+        settings = build_settings(
+            current,
+            variables,
+            constraints,
+            *editor[10:15],
+            results=cfg,
+            require_variables=False,
+        )
+    except (ValueError, KeyError) as error:
+        set_props("td-load-error", {"children": f"Design was not saved. {error}"})
+        return no_update
+    cfg = dict(cfg, inputs=current["inputs"], optimization=settings)
+    set_props("td-load-error", {"children": ""})
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     yaml_str = yaml.safe_dump(cfg, sort_keys=False, default_flow_style=False)
     return dict(
@@ -1236,10 +859,28 @@ def download_yaml(n_clicks, cfg):
 def load_design(contents):
     if contents is None:
         raise PreventUpdate
-    _, content_string = contents.split(",")
-    decoded = base64.b64decode(content_string).decode("utf-8")
-    cfg = yaml.safe_load(decoded) or {}
-    cfg = core.convert_turbine_config_to_solidity(cfg)
+    try:
+        _, content_string = contents.split(",", 1)
+        decoded = base64.b64decode(content_string, validate=True).decode("utf-8")
+        cfg = yaml.safe_load(decoded)
+        if not isinstance(cfg, dict) or not isinstance(cfg.get("inputs"), dict):
+            raise ValueError("A design must contain an inputs mapping.")
+        if (
+            not isinstance(cfg["inputs"].get("stages"), list)
+            or not cfg["inputs"]["stages"]
+        ):
+            raise ValueError("A design must contain at least one stage.")
+        cfg = nested_config(core.convert_turbine_config_to_solidity(cfg))
+        validate_inlet_inputs(cfg["inputs"])
+        for stage in cfg["inputs"]["stages"]:
+            if not isinstance(stage, dict):
+                raise ValueError("Every stage must contain a mapping of design inputs.")
+        ids = [{"scope": "overall", "key": key} for key in OVERALL_DEFAULTS]
+        live_config(loaded_overall_values(cfg, ids), [], ids, [], loaded_stages(cfg))
+    except Exception as error:
+        set_props("td-load-error", {"children": f"Could not load YAML. {error}"})
+        return no_update
+    set_props("td-load-error", {"children": ""})
     return cfg
 
 

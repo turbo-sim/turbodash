@@ -132,7 +132,7 @@ def finite(value, label):
     return float(value)
 
 
-def build_settings(config, variables, constraints, objective, direction, tolerance, iterations, feasibility, results=None):
+def build_settings(config, variables, constraints, objective, direction, tolerance, iterations, feasibility, results=None, *, require_variables=True):
     """Validate UI values before launching; let the API clip initial guesses."""
     choices = variable_catalog(config)
     outputs = output_catalog(config, results)
@@ -154,7 +154,7 @@ def build_settings(config, variables, constraints, objective, direction, toleran
         if initial is not None:
             initial = finite(initial, "Initial value")
         selected[path] = dict(lower_value=lo, upper_value=hi, initial_value=initial)
-    if not selected:
+    if not selected and require_variables:
         raise ValueError("Add at least one design variable before starting.")
     limits = []
     for row in constraints:

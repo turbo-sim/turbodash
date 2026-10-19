@@ -34,3 +34,28 @@ implementation modules directly; tests of removed compatibility paths are gone.
 Study-specific tests remain alongside their analyses in `development/loss_model_analysis/`.
 `test_development_layout.py` checks their repository roots from another working
 directory, local report links, and source-paper availability after relocation.
+
+The optimization workbench has focused state/precision tests in
+`test_app_workbench.py`, thermodynamic pair-transition tests in
+`test_app_fluid_inputs.py`, and channel/mesh presentation tests in
+`test_plotting_turbine.py` and `test_mesh_workbench.py`.
+
+Optional real-browser checks use an existing Playwright installation and Chrome
+or Chromium. `browser_optimization.py` starts and stops its own app server and
+checks clipping, successful/failed workers, multistage application, radial
+constraints and session isolation. `browser_workbench.py` checks the redesign
+against a separately running local app:
+
+```powershell
+python tests/browser_workbench.py --url http://127.0.0.1:8050 --browser "C:/Program Files/Google/Chrome/Application/chrome.exe"
+```
+
+The workbench script saves actual-app PNGs and a JSON report under
+`development/app_design/implemented/`; browser profiles and downloads stay in
+its ignored `output_browser/` directory. Keep the server's temporary directory
+inside the checkout when running repository-confined development checks.
+
+`browser_numeric_format.py` starts its own server and checks three-decimal
+display padding, additional entered digits, tiny tolerances, focused editing,
+dynamic controls and precise YAML round trips. Formatting must not cause an
+extra calculation or change numeric model values.

@@ -105,8 +105,38 @@ For a Linux WSGI deployment, the corresponding target is
 It is a separate app based on the experimental workspace. Both earlier app
 entrypoints retain their behavior. Optional meshing still uses the `mesh` extra.
 
-Expand **Optimization** at the bottom of the left sidebar, below the overall
-parameters and every stage's initial inputs. Settings select a scalar objective,
+The optimization edition uses a light Blueprint / dark Graphite workbench.
+The first visit follows your operating-system theme; the switch at the far right
+remembers an explicit choice. The left rail switches between **Meanline**,
+**Geometry**, and **Mesh** without resetting inputs or jobs. Clicking the brand
+returns to Meanline. Load YAML and Save design remain in the header.
+
+Five numbered sections start collapsed: **Turbine setup**, **Operating point**,
+**Shaft speed**, **Stage design & geometry**, and **Optimization**. The stage
+selector uses saved names; Stator/Rotor switches the visible blade fields while
+all stage inputs remain mounted. Continuous inputs accept full floating-point
+precision and display at least three decimal places, preserving extra supplied
+digits. Formatting does not round stored values or interrupt typing; discrete
+counts stay whole numbers. Find a parameter (Ctrl/Cmd+K) searches names and aliases, opens its
+section, selects its stage/row, and focuses the field. The inspector can be resized
+on desktop and opened as a drawer on narrow screens.
+
+Fluid controls use readable property names and units. Changing an inlet pair
+converts the last valid state atomically; an impossible conversion clears both
+new values and requests fresh input. Invalid drafts retain the last successful
+results and prevent saving a stale design. Save design includes the current
+optimization editor, including unsolved settings and precise bounds.
+
+The overview reports total-to-static/total-to-total efficiency, shaft speed in
+rpm, and adaptive W/kW/MW power. Detailed reports retain all rows and offer CSV
+exports. Meridional and blade-to-blade views appear side by side on desktop;
+reset/autoscale restores a zero radial baseline while deliberate zoom is allowed.
+The channel has upstream/downstream display extensions and smooth guide
+streamlines constrained within the hub/shroud passage. These illustrate the
+channel shape, rather than a computed CFD velocity field. Stator/rotor profiles
+use orange/blue outlines with matching translucent fills.
+
+Expand **Optimization** at the bottom of the left sidebar. Settings select a scalar objective,
 maximize/minimize, solver tolerance, iteration limit, and feasibility tolerance.
 Add inputs under **Design variables**, then set physical lower/upper bounds.
 Leave Initial blank to use the current design, or enter an explicit override;
@@ -138,6 +168,8 @@ YAML also restores its optimization editors and bounds; both flat and older
 nested speed schemas are accepted. Saving a successfully optimized design
 includes its optimization settings without reapplying old initial overrides.
 
+`app_turbine_optimization/workbench.py` owns the layout and display formatting;
+`shared/fluid_inputs.py` owns readable thermodynamic properties and safe pair conversion.
 `app_turbine_optimization/model.py` owns editor choices and validation;
 `app_turbine_optimization/panel.py` owns the panel/callbacks;
 `app_turbine_optimization/jobs.py` owns isolated processes, session ownership,

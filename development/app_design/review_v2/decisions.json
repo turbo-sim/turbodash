@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "scope": "Implementation planning and an offline review prototype; the production Dash app is unchanged by this review.",
+  "kind": "design feedback, not production settings",
   "decisions": [
     {
       "id": "D01",
@@ -13,8 +13,8 @@
         "Midnight Blueprint: deep navy with pale blue",
         "Graphite Console with cyan accents"
       ],
-      "choice": null,
-      "notes": ""
+      "choice": "Graphite with restrained blue accents",
+      "notes": "I like the dark theme. I also like the light theme, but I think that the left pane for the light theme should be lighter, not it feels to dark for a light there"
     },
     {
       "id": "D02",
@@ -27,8 +27,8 @@
         "Axial cascade symbol",
         "TD monogram"
       ],
-      "choice": null,
-      "notes": ""
+      "choice": "Blade-ring symbol",
+      "notes": "The blade ring symbol and typography is excellnet"
     },
     {
       "id": "D03",
@@ -41,7 +41,7 @@
         "Open About and project links",
         "Open GitHub in a new tab"
       ],
-      "choice": null,
+      "choice": "Return to Meanline; preserve the design",
       "notes": ""
     },
     {
@@ -55,8 +55,8 @@
         "Top: Meanline design / Geometry generation / Mesh generation",
         "Left workspace rail"
       ],
-      "choice": null,
-      "notes": ""
+      "choice": "Left workspace rail",
+      "notes": "Put the light/dark selector as the right most option of the top pane"
     },
     {
       "id": "D05",
@@ -69,7 +69,7 @@
         "Offer optional Explore sliders",
         "Retain sliders beside selected number fields"
       ],
-      "choice": null,
+      "choice": "Remove sliders from the default view",
       "notes": ""
     },
     {
@@ -82,7 +82,7 @@
         "Shaft speed",
         "Operating point"
       ],
-      "choice": null,
+      "choice": "Shaft speed",
       "notes": ""
     },
     {
@@ -95,7 +95,7 @@
         "Start with Blueprint light",
         "Follow the operating-system preference initially"
       ],
-      "choice": null,
+      "choice": "Follow the operating-system preference initially",
       "notes": ""
     },
     {
@@ -109,7 +109,7 @@
         "Experimental and optimization editions",
         "All turbine app editions together"
       ],
-      "choice": null,
+      "choice": "Optimization edition first; shared resources reusable",
       "notes": ""
     },
     {
@@ -122,7 +122,7 @@
         "Convert from valid state, otherwise request both values",
         "Always clear both fields and request new values"
       ],
-      "choice": null,
+      "choice": "Convert from valid state, otherwise request both values",
       "notes": ""
     },
     {
@@ -135,8 +135,10 @@
         "Keep radial lower bound at zero in every view",
         "Zero on initial view and reset; allow manual radial zoom"
       ],
-      "choice": null,
+      "choice": "Zero on initial view and reset; allow manual radial zoom",
       "notes": ""
     }
-  ]
+  ],
+  "generalFeedback": "",
+  "updatedAt": "2026-10-19T20:41:56.609Z"
 }

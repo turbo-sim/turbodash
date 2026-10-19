@@ -1,0 +1,15 @@
+{
+  "checks": [
+    "Default continuous values have at least three decimals; full precision and integer counts remain intact",
+    "Formatting and unchanged focus/blur generate no numerical recalculation",
+    "Focused editing and Enter commit retain typed text; blur pads shorter fractions",
+    "Additional significant digits and deliberate trailing zeros survive refresh without rounding or callbacks",
+    "Negative values and signed zero retain their meaning",
+    "Out-of-range, blank and partially entered exponent drafts are never reformatted",
+    "Tiny scientific-notation tolerances keep their exponent and all supplied mantissa digits",
+    "Dynamic optimization bounds are padded while blanks and user precision survive row rebuilding",
+    "Property-only updates and YAML save/reload retain exact numerical values independently of display padding"
+  ],
+  "browser_errors": [],
+  "successful_result_updates": 10
+}

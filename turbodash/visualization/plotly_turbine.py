@@ -1,11 +1,14 @@
 import numpy as np
 import plotly.graph_objects as go
+from scipy.interpolate import PchipInterpolator
 from plotly.subplots import make_subplots
 from plotly.colors import sample_colorscale
 from turbodash.core.turbine import get_blade_row_geometry
 
-from turbodash.geometry.blade import compute_blade_coordinates_radial, compute_blade_coordinates_cartesian
-
+from turbodash.geometry.blade import (
+    compute_blade_coordinates_radial,
+    compute_blade_coordinates_cartesian,
+)
 
 # =============================================================================
 # Styling constants (mirror of the mpl module's intent, plotly idiom)
@@ -22,6 +25,205 @@ AXIS_LINE_WIDTH = 2
 TICK_LENGTH = 6
 
 INTERCASCADE_GAP_FACTOR = 1.5
+CHANNEL_EXTENSION_CHORDS = 1.5
+_ROW_FILLS = {"Stator": "rgba(255,127,14,0.16)", "Rotor": "rgba(31,119,180,0.18)"}
+
+
+_PLOT_THEMES = {
+    "light": dict(
+        surface="#FFFFFF",
+        text="#23364D",
+        axis="#9AAABD",
+        grid="#E3E9F1",
+        wall="#647892",
+        solid="rgba(100,120,146,0.12)",
+        channel="rgba(36,98,209,0.035)",
+        guide="rgba(68,118,188,0.48)",
+    ),
+    "dark": dict(
+        surface="#17212E",
+        text="#E2E8F1",
+        axis="#586A80",
+        grid="#2C3B4D",
+        wall="#A0B2CA",
+        solid="rgba(160,178,202,0.14)",
+        channel="rgba(109,161,255,0.055)",
+        guide="rgba(128,183,255,0.58)",
+    ),
+}
+
+
+def apply_plot_theme(fig, theme="light"):
+    """Restyle an existing figure without changing scientific data or axis ranges.
+
+    The app can call this on retained results when switching themes, without
+    recalculating the turbine. Colored series retain their scientific identity;
+    formerly black/white framing and reference lines follow the selected theme.
+    """
+    if theme not in _PLOT_THEMES:
+        raise ValueError("theme must be 'light' or 'dark'.")
+    palette = _PLOT_THEMES[theme]
+    fig.update_layout(
+        template="plotly_dark" if theme == "dark" else "simple_white",
+        paper_bgcolor=palette["surface"],
+        plot_bgcolor=palette["surface"],
+        font=dict(color=palette["text"], family="Arial, sans-serif"),
+        legend=dict(
+            bgcolor=palette["surface"],
+            bordercolor=palette["axis"],
+            font=dict(color=palette["text"]),
+            borderwidth=0,
+        ),
+        hoverlabel=dict(
+            bgcolor=palette["surface"],
+            bordercolor=palette["axis"],
+            font=dict(color=palette["text"]),
+        ),
+    )
+    for update in (fig.update_xaxes, fig.update_yaxes):
+        update(
+            linecolor=palette["axis"],
+            gridcolor=palette["grid"],
+            zerolinecolor=palette["axis"],
+            color=palette["text"],
+            linewidth=1,
+            title_font=dict(size=14),
+            tickfont=dict(size=12),
+        )
+    scene_axis = dict(
+        backgroundcolor=palette["surface"],
+        color=palette["text"],
+        gridcolor=palette["grid"],
+        zerolinecolor=palette["axis"],
+    )
+    fig.update_scenes(
+        bgcolor=palette["surface"], xaxis=scene_axis, yaxis=scene_axis, zaxis=scene_axis
+    )
+    # Use metadata for endwalls so repeated light/dark toggles remain reversible.
+    for trace in fig.data:
+        role = trace.meta.get("theme_role") if isinstance(trace.meta, dict) else None
+        if role == "endwall":
+            trace.line.color = palette["wall"]
+        elif role == "solid":
+            trace.fillcolor = palette["solid"]
+        elif role == "channel":
+            trace.fillcolor = palette["channel"]
+        elif role == "flow_guide":
+            trace.line.color = palette["guide"]
+        for part_name in ("line", "marker"):
+            part = getattr(trace, part_name, None)
+            color = getattr(part, "color", None)
+            neutral = {"black", "#000000", *[p["text"] for p in _PLOT_THEMES.values()]}
+            if isinstance(color, str) and color in neutral:
+                part.color = palette["text"]
+            elif isinstance(color, str) and color in {
+                "white",
+                "#ffffff",
+                *[p["surface"] for p in _PLOT_THEMES.values()],
+            }:
+                part.color = palette["surface"]
+            border = getattr(part, "line", None)
+            if (
+                border is not None
+                and isinstance(border.color, str)
+                and border.color in neutral
+            ):
+                border.color = palette["text"]
+    for shape in fig.layout.shapes:
+        if shape.line.color in {
+            "black",
+            "#000000",
+            *[p["axis"] for p in _PLOT_THEMES.values()],
+        }:
+            shape.line.color = palette["axis"]
+    for annotation in fig.layout.annotations:
+        annotation.font.color = palette["text"]
+        if annotation.showarrow:
+            annotation.arrowcolor = palette["text"]
+    return fig
+
+
+def _axial_row_layout(stages):
+    """Lightweight nominal row placements shared by channel and cascade views.
+
+    Units remain metres here. Unlike physical assembly/export placement this
+    uses the meanline chords and the established 1.5-opening nominal gaps.
+    """
+    rows, cursor = [], 0.0
+    for stage_number, stage in enumerate(stages, 1):
+        for row_name, station_index in (("stator", 0), ("rotor", 2)):
+            geometry = get_blade_row_geometry(stage, row_name)
+            end = cursor + geometry["chord_meridional"]
+            rows.append(
+                dict(
+                    stage=stage,
+                    stage_number=stage_number,
+                    row=row_name,
+                    station_index=station_index,
+                    geometry=geometry,
+                    start=cursor,
+                    end=end,
+                )
+            )
+            cursor = end + INTERCASCADE_GAP_FACTOR * geometry["opening"]
+    return rows
+
+
+def _axial_view_range(rows):
+    start = -CHANNEL_EXTENSION_CHORDS * rows[0]["geometry"]["chord_meridional"]
+    end = rows[-1]["end"] + CHANNEL_EXTENSION_CHORDS * rows[-1]["geometry"]["chord_meridional"]
+    padding = 0.05 * (end - start)
+    return [1000 * (start - padding), 1000 * (end + padding)]
+
+
+def _extend_channel(hub, shroud, rows, turbine_type):
+    """Add display-only inlet/outlet passages at constant endpoint dimensions."""
+    first = get_blade_row_geometry(rows[0]["stage"], rows[0]["row"])
+    last = get_blade_row_geometry(rows[-1]["stage"], rows[-1]["row"])
+    inlet_length = CHANNEL_EXTENSION_CHORDS * first["chord_meridional"]
+    outlet_length = CHANNEL_EXTENSION_CHORDS * last["chord_meridional"]
+    if turbine_type == "axial":
+        inlet_delta, outlet_delta = [-inlet_length, 0], [outlet_length, 0]
+    else:
+        radial_steps = np.diff(hub[:, 1])
+        nonzero = radial_steps[np.abs(radial_steps) > np.finfo(float).eps]
+        inlet_direction = np.sign(nonzero[0]) if len(nonzero) else 1.0
+        outlet_direction = np.sign(nonzero[-1]) if len(nonzero) else inlet_direction
+        inlet_delta = [0, -inlet_direction * inlet_length]
+        outlet_delta = [0, outlet_direction * outlet_length]
+        # Keep every displayed radial station strictly above the rotation axis.
+        inlet_delta[1] = max(inlet_delta[1], -0.9 * hub[0, 1])
+        outlet_delta[1] = max(outlet_delta[1], -0.9 * hub[-1, 1])
+    return tuple(np.vstack((points[0] + inlet_delta, points, points[-1] + outlet_delta))
+                 for points in (hub, shroud))
+
+
+def _channel_guides(hub, shroud, turbine_type):
+    """Smooth illustrative paths constrained within station-derived endwalls.
+
+    Parameterize in flow order, so inward and outward radial designs work alike.
+    PCHIP gives gentle transitions; clipping to the local channel preserves the
+    physical walls even across very sharp expansions or contractions. These
+    curves illustrate passage shape, not a solved velocity field.
+    """
+    center = (hub + shroud) / 2
+    distance = np.linalg.norm(np.diff(center, axis=0), axis=1)
+    # Coincident stations can occur at a row interface. Retain a positive
+    # parameter increment without moving either physical station.
+    parameter = np.r_[0, np.cumsum(np.maximum(distance, 1e-12))]
+    samples = np.unique(np.r_[parameter, np.linspace(0, parameter[-1], 241)])
+    inner = np.column_stack([np.interp(samples, parameter, hub[:, axis]) for axis in (0, 1)])
+    outer = np.column_stack([np.interp(samples, parameter, shroud[:, axis]) for axis in (0, 1)])
+    span_axis = 1 if turbine_type == "axial" else 0
+    for fraction in np.linspace(.16, .84, 5):
+        guide = inner * (1 - fraction) + outer * fraction
+        station_values = hub[:, span_axis] * (1 - fraction) + shroud[:, span_axis] * fraction
+        smooth = PchipInterpolator(parameter, station_values)(samples)
+        height = outer[:, span_axis] - inner[:, span_axis]
+        guide[:, span_axis] = np.clip(smooth, inner[:, span_axis] + .035 * height,
+                                      outer[:, span_axis] - .035 * height)
+        yield guide
+
 
 def _style_axes(fig, *, xtitle, ytitle, equal=False, row=None, col=None):
     """Apply the shared simple_white axis styling used across the module."""
@@ -53,121 +255,177 @@ def _style_axes(fig, *, xtitle, ytitle, equal=False, row=None, col=None):
 # =============================================================================
 # Plot turbine meridional channel (multistage)
 # =============================================================================
-def plot_turbine_meridional_channel(results):
-    """
-    Meridional channel for a full multistage turbine, axial or radial.
-    Mirror of the mpl function of the same name.
+def plot_turbine_meridional_channel(results, *, theme="light"):
+    """Plot the station-derived meanline channel, not a generated mesh.
 
-    Returns
-    -------
-    fig : plotly.graph_objects.Figure
+    Piecewise-linear hub/shroud boundaries connect every row and stage gap.
+    Constant-section inlet/outlet extensions frame the blade rows. Smooth guide
+    streamlines illustrate passage shape; they are not computed CFD results.
+    Coordinates are in millimetres with physical aspect ratio preserved. The
+    initial/reset radial range includes zero; users remain free to zoom in.
     """
-    stages = [dict(stage, geometry={row: get_blade_row_geometry(stage, row)
-              for row in ("stator", "rotor")}) for stage in results["stages_performance"]]
+    stages = results["stages_performance"]
+    if not stages:
+        raise ValueError("A solved turbine with at least one stage is required.")
     turbine_type = results["inputs"]["turbine_type"]
+    if turbine_type not in ("axial", "radial"):
+        raise ValueError(f"Invalid stage type: {turbine_type!r}")
+    palette = _PLOT_THEMES[theme]
     fig = go.Figure()
+    if turbine_type == "axial":
+        rows = _axial_row_layout(stages)
+    else:
+        rows = [
+            dict(stage=stage, stage_number=number, row=row, station_index=index)
+            for number, stage in enumerate(stages, 1)
+            for row, index in (("stator", 0), ("rotor", 2))
+        ]
 
-    def _line(x, y, color):
+    hub, shroud, row_points = [], [], []
+    for row in rows:
+        stations = row["stage"]["flow_stations"][
+            row["station_index"] : row["station_index"] + 2
+        ]
+        if turbine_type == "axial":
+            inner = [
+                (x, station["r"] - station["H"] / 2)
+                for x, station in zip((row["start"], row["end"]), stations)
+            ]
+            outer = [
+                (x, station["r"] + station["H"] / 2)
+                for x, station in zip((row["start"], row["end"]), stations)
+            ]
+        else:
+            # Radial span is axial width; r +/- H/2 would invent wrong radii.
+            inner = [(-station["H"] / 2, station["r"]) for station in stations]
+            outer = [(+station["H"] / 2, station["r"]) for station in stations]
+        hub.extend(inner)
+        shroud.extend(outer)
+        row_points.append((row, np.asarray(inner), np.asarray(outer)))
+    hub, shroud = _extend_channel(np.asarray(hub), np.asarray(shroud), rows, turbine_type)
+
+    def polygon(
+        points, *, color, name, role=None, linecolor=None, showlegend=False, hover=None
+    ):
+        points = np.vstack((points, points[0])) * 1000.0
         fig.add_trace(
             go.Scatter(
-                x=[1000.0 * xi for xi in x],
-                y=[1000.0 * yi for yi in y],
+                x=points[:, 0],
+                y=points[:, 1],
                 mode="lines",
-                line=dict(color=color, width=LINE_WIDTH),
-                showlegend=False,
+                fill="toself",
+                fillcolor=color,
+                line=dict(color=linecolor or color, width=1 if linecolor else 0),
+                name=name,
+                legendgroup=name,
+                showlegend=showlegend,
+                meta=dict(theme_role=role),
+                hoverinfo="skip" if hover is None else None,
+                hovertemplate=hover,
             )
         )
 
+    polygon(
+        np.vstack((hub, shroud[::-1])),
+        color=palette["channel"],
+        name="Meanline channel",
+        role="channel",
+    )
+    r_max = max(hub[:, 1].max(), shroud[:, 1].max())
     if turbine_type == "axial":
-
-        def draw_stage(out, x_offset):
-            fs = out["flow_stations"]
-            r = [fs[k]["r"] for k in range(4)]
-            H = [fs[k]["H"] for k in range(4)]
-            x1 = x_offset
-            x2 = x1 + out["geometry"]["stator"]["chord_meridional"]
-            x3 = x2 + out["geometry"]["stator"]["opening"] * INTERCASCADE_GAP_FACTOR
-            x4 = x3 + out["geometry"]["rotor"]["chord_meridional"]
-            hub = [r[k] - H[k] / 2 for k in range(4)]
-            tip = [r[k] + H[k] / 2 for k in range(4)]
-            _line([x1, x2], [hub[0], hub[1]], COLOR_STATOR)
-            _line([x1, x2], [tip[0], tip[1]], COLOR_STATOR)
-            _line([x1, x1], [hub[0], tip[0]], COLOR_STATOR)
-            _line([x2, x2], [hub[1], tip[1]], COLOR_STATOR)
-            _line([x3, x4], [hub[2], hub[3]], COLOR_ROTOR)
-            _line([x3, x4], [tip[2], tip[3]], COLOR_ROTOR)
-            _line([x3, x3], [hub[2], tip[2]], COLOR_ROTOR)
-            _line([x4, x4], [hub[3], tip[3]], COLOR_ROTOR)
-            return x4
-
-        x_cursor, r_max = 0.0, 0.0
-        for st in stages:
-            x_exit = draw_stage(st, x_offset=x_cursor)
-            last = st["flow_stations"][-1]
-            r_max = max(r_max, last["r"] + last["H"] / 2)
-            x_cursor = (
-                x_exit + INTERCASCADE_GAP_FACTOR * st["geometry"]["rotor"]["opening"]
-            )
-        x_end = (
-            x_cursor
-            - INTERCASCADE_GAP_FACTOR * stages[-1]["geometry"]["rotor"]["opening"]
+        # Restrained solid-surface shading ends at the physical channel walls.
+        polygon(
+            np.vstack((hub, [[hub[-1, 0], 0], [hub[0, 0], 0]])),
+            color=palette["solid"],
+            name="Hub surface",
+            role="solid",
         )
-
-        # Shared axial extent (mm), identical formula in plot_turbine_blades so
-        # both figures use the SAME x-range. Small symmetric margin around it.
-        x_lo = 0.0
-        x_hi = x_end
-        dx = 0.25 * (x_hi - x_lo)
-        _style_axes(
-            fig, xtitle="Axial direction [mm]", ytitle="Radial direction [mm]", equal=True
+        wall_thickness = 0.035 * r_max
+        polygon(
+            np.vstack((shroud, shroud[::-1] + [0, wall_thickness])),
+            color=palette["solid"],
+            name="Shroud surface",
+            role="solid",
         )
-        fig.update_yaxes(range=[0.0, 1000.0 * (1.05 * r_max)])
-        fig.update_xaxes(range=[1000.0 * (x_lo - dx), 1000.0 * (x_hi + dx)], constrain="domain", tickangle=-90)
-
-    elif turbine_type == "radial":
-
-        def draw_stage(out):
-            fs = out["flow_stations"]
-            r = [fs[k]["r"] for k in range(4)]
-            H = [fs[k]["H"] for k in range(4)]
-            xspan = [[-H[k] / 2, +H[k] / 2] for k in range(4)]
-            _line(xspan[0], [r[0], r[0]], COLOR_STATOR)
-            _line(xspan[1], [r[1], r[1]], COLOR_STATOR)
-            _line([xspan[0][0], xspan[1][0]], [r[0], r[1]], COLOR_STATOR)
-            _line([xspan[0][1], xspan[1][1]], [r[0], r[1]], COLOR_STATOR)
-            _line(xspan[2], [r[2], r[2]], COLOR_ROTOR)
-            _line(xspan[3], [r[3], r[3]], COLOR_ROTOR)
-            _line([xspan[2][0], xspan[3][0]], [r[2], r[3]], COLOR_ROTOR)
-            _line([xspan[2][1], xspan[3][1]], [r[2], r[3]], COLOR_ROTOR)
-
-        r_min, r_max, x_min, x_max = np.inf, 0.0, 0.0, 0.0
-        for st in stages:
-            draw_stage(st)
-            for fs in st["flow_stations"]:
-                r_min = min(r_min, fs["r"])
-                r_max = max(r_max, fs["r"])
-                x_min = min(x_min, -fs["H"] / 2)
-                x_max = max(x_max, fs["H"] / 2)
-
-        x_pad = 2.00 * (x_max - x_min)
-        r_pad = 0.25 * (r_max - r_min)
-        _style_axes(
-            fig, xtitle="Spanwise direction [mm]", ytitle="Radial direction [mm]", equal=True
-        )
-        fig.update_xaxes(range=[1000.0 * (x_min - x_pad), 1000.0 * (x_max + x_pad)], constrain="domain", tickangle=-90)
-        fig.update_yaxes(range=[0.0, 1000.0 * (r_max + r_pad)], constrain="domain")
-
+        xrange = _axial_view_range(rows)
+        radial_top = 1.08 * r_max
+        xtitle = "Axial direction [mm]"
     else:
-        raise ValueError(f"Invalid stage type: {turbine_type!r}")
+        wall_thickness = 0.10 * np.max(shroud[:, 0] - hub[:, 0])
+        polygon(
+            np.vstack((hub, hub[::-1] - [wall_thickness, 0])),
+            color=palette["solid"],
+            name="Hub surface",
+            role="solid",
+        )
+        polygon(
+            np.vstack((shroud, shroud[::-1] + [wall_thickness, 0])),
+            color=palette["solid"],
+            name="Shroud surface",
+            role="solid",
+        )
+        width = shroud[:, 0].max() - hub[:, 0].min()
+        xrange = [
+            1000 * (hub[:, 0].min() - 2 * width),
+            1000 * (shroud[:, 0].max() + 2 * width),
+        ]
+        radial_top = r_max + max(0.05 * r_max, 0.25 * np.ptp(hub[:, 1]))
+        xtitle = "Spanwise direction [mm]"
 
-    fig.update_layout(template="simple_white", margin=dict(l=30, r=30, t=30, b=30))
-    return fig
+    for row, inner, outer in row_points:
+        is_stator = row["row"] == "stator"
+        color = COLOR_STATOR if is_stator else COLOR_ROTOR
+        label = row["row"].title()
+        stage_name = row["stage"].get("name") or f"Stage {row['stage_number']}"
+        polygon(
+            np.vstack((inner, outer[::-1])),
+            color=_ROW_FILLS[label],
+            linecolor=color,
+            name=label,
+            showlegend=row["stage_number"] == 1,
+            hover=f"{stage_name} · {label}<br>Meanline channel<extra></extra>",
+        )
+
+    for index, guide in enumerate(_channel_guides(hub, shroud, turbine_type)):
+        fig.add_trace(go.Scatter(
+            x=1000 * guide[:, 0], y=1000 * guide[:, 1], mode="lines",
+            name="Flow guides", legendgroup="Flow guides", showlegend=index == 0,
+            line=dict(color=palette["guide"], width=1.15),
+            meta=dict(theme_role="flow_guide"),
+            hovertemplate="Geometry-based guide streamline<br>Illustrative passage path; not a CFD solution<extra></extra>",
+        ))
+
+    for points, label, dash in ((hub, "Hub", "solid"), (shroud, "Shroud", "dash")):
+        fig.add_trace(
+            go.Scatter(
+                x=1000 * points[:, 0],
+                y=1000 * points[:, 1],
+                mode="lines",
+                name=label,
+                line=dict(color=palette["wall"], width=2, dash=dash),
+                meta=dict(theme_role="endwall"),
+                hovertemplate=f"{label}<br>%{{x:.3f}} mm, %{{y:.3f}} mm<extra></extra>",
+            )
+        )
+    _style_axes(fig, xtitle=xtitle, ytitle="Radial direction [mm]", equal=True)
+    fig.update_xaxes(range=xrange, constrain="domain", tickangle=0)
+    fig.update_yaxes(
+        range=[0.0, 1000.0 * radial_top],
+        rangemode="tozero",
+        fixedrange=False,
+        constrain="domain",
+    )
+    fig.update_layout(
+        margin=dict(l=45, r=20, t=20, b=55),
+        legend=dict(orientation="h", x=0.5, xanchor="center", y=1.12),
+    )
+    return apply_plot_theme(fig, theme)
 
 
 # =============================================================================
 # Plot turbine blades (multistage)
 # =============================================================================
-def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
+def plot_turbine_blades(results, N_points=201, N_blades_plot=8, *, theme="light"):
     """
     Blade cascades for a full multistage turbine, axial or radial.
     Mirror of the mpl function of the same name.
@@ -179,8 +437,17 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
     -------
     fig : plotly.graph_objects.Figure
     """
-    stages = [dict(stage, geometry={row: get_blade_row_geometry(stage, row)
-              for row in ("stator", "rotor")}) for stage in results["stages_performance"]]
+    stages = [
+        dict(
+            stage,
+            geometry={
+                row: get_blade_row_geometry(stage, row) for row in ("stator", "rotor")
+            },
+        )
+        for stage in results["stages_performance"]
+    ]
+    if not stages:
+        raise ValueError("A solved turbine with at least one stage is required.")
     turbine_type = results["inputs"]["turbine_type"]
     fig = go.Figure()
 
@@ -190,12 +457,17 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
     def _blade_trace(x, y, color, label):
         show = not _legend_shown[label]
         _legend_shown[label] = True
+        x, y = np.asarray(x), np.asarray(y)
+        if len(x) and (x[-1] != x[0] or y[-1] != y[0]):
+            x, y = np.r_[x, x[0]], np.r_[y, y[0]]
         fig.add_trace(
             go.Scatter(
-                x=1000.0 * np.asarray(x),
-                y=1000.0 * np.asarray(y),
+                x=1000.0 * x,
+                y=1000.0 * y,
                 mode="lines",
                 line=dict(color=color, width=LINE_WIDTH),
+                fill="toself",
+                fillcolor=_ROW_FILLS[label],
                 name=label,
                 legendgroup=label,
                 showlegend=show,
@@ -204,7 +476,7 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
 
     if turbine_type == "axial":
 
-        def draw_stage(out, x_offset):
+        def draw_stage(out, stator_position, rotor_position):
             def draw_row(*, geom, x0, beta_in, beta_out, color, label):
                 x_b, y_b, *_ = compute_blade_coordinates_cartesian(
                     camberline_type="curvature_based",
@@ -228,7 +500,7 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
             rotor_geom = out["geometry"]["rotor"]
             draw_row(
                 geom=stator_geom,
-                x0=x_offset,
+                x0=stator_position["start"],
                 beta_in=out["flow_stations"][0]["alpha"],
                 beta_out=out["flow_stations"][1]["alpha"],
                 color=COLOR_STATOR,
@@ -236,43 +508,24 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
             )
             draw_row(
                 geom=rotor_geom,
-                x0=x_offset
-                + stator_geom["chord_meridional"]
-                + INTERCASCADE_GAP_FACTOR * stator_geom["opening"],
+                x0=rotor_position["start"],
                 beta_in=out["flow_stations"][2]["beta"],
                 beta_out=out["flow_stations"][3]["beta"],
                 color=COLOR_ROTOR,
                 label="Rotor",
             )
-            return (
-                x_offset
-                + stator_geom["chord_meridional"]
-                + INTERCASCADE_GAP_FACTOR * stator_geom["opening"]
-                + rotor_geom["chord_meridional"]
-            )
 
-        x_cursor = 0.0
-        for st in stages:
-            x_cursor = draw_stage(st, x_offset=x_cursor)
-            x_cursor += INTERCASCADE_GAP_FACTOR * st["geometry"]["rotor"]["opening"]
-
-        # Shared axial extent (mm): identical formula to
-        # plot_turbine_meridional_channel so both figures use the SAME x-range.
-        x_mer = 0.0
-        for st in stages:
-            x_mer += st["geometry"]["stator"]["chord_meridional"]
-            x_mer += st["geometry"]["stator"]["opening"] * INTERCASCADE_GAP_FACTOR
-            x_mer += st["geometry"]["rotor"]["chord_meridional"]
-            x_mer += INTERCASCADE_GAP_FACTOR * st["geometry"]["rotor"]["opening"]
-        x_end = x_mer - INTERCASCADE_GAP_FACTOR * stages[-1]["geometry"]["rotor"]["opening"]
-        x_lo = 0.0
-        x_hi = x_end
-        dx = 0.25 * (x_hi - x_lo)
+        rows = _axial_row_layout(stages)
+        for index, st in enumerate(stages):
+            draw_stage(st, rows[2 * index], rows[2 * index + 1])
         y_top = N_blades_plot * stages[0]["geometry"]["stator"]["spacing"]
         _style_axes(
-            fig, xtitle="Axial direction [mm]", ytitle="Tangential direction [mm]", equal=True
+            fig,
+            xtitle="Axial direction [mm]",
+            ytitle="Tangential direction [mm]",
+            equal=True,
         )
-        fig.update_xaxes(range=[1000.0 * (x_lo - dx), 1000.0 * (x_hi + dx)], constrain="domain", tickangle=-90)
+        fig.update_xaxes(range=_axial_view_range(rows), constrain="domain", tickangle=0)
         fig.update_yaxes(range=[0, 1000.0 * y_top])
 
     elif turbine_type == "radial":
@@ -322,8 +575,20 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
                         ct * x_b - st_ * y_b, st_ * x_b + ct * y_b, color, label
                     )
 
-            draw_row(get_blade_row_geometry(out, "stator", turbine_type="radial", discrete=True), COLOR_STATOR, "Stator")
-            draw_row(get_blade_row_geometry(out, "rotor", turbine_type="radial", discrete=True), COLOR_ROTOR, "Rotor")
+            draw_row(
+                get_blade_row_geometry(
+                    out, "stator", turbine_type="radial", discrete=True
+                ),
+                COLOR_STATOR,
+                "Stator",
+            )
+            draw_row(
+                get_blade_row_geometry(
+                    out, "rotor", turbine_type="radial", discrete=True
+                ),
+                COLOR_ROTOR,
+                "Rotor",
+            )
 
         r_min, r_max = np.inf, 0.0
         for st in stages:
@@ -333,7 +598,9 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
                 r_max = max(r_max, fs["r"])
 
         r_pad = 0.25 * (r_max - r_min)
-        _style_axes(fig, xtitle="x direction [mm]", ytitle="y direction [mm]", equal=True)
+        _style_axes(
+            fig, xtitle="x direction [mm]", ytitle="y direction [mm]", equal=True
+        )
         fig.update_xaxes(range=[0.0, 1000.0 * r_max], constrain="domain")
         fig.update_yaxes(range=[0.0, 1000.0 * (r_max + r_pad)], constrain="domain")
 
@@ -341,7 +608,7 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8):
         raise ValueError(f"Invalid stage type: {turbine_type!r}")
 
     fig.update_layout(template="simple_white", margin=dict(l=30, r=30, t=30, b=30))
-    return fig
+    return apply_plot_theme(fig, theme)
 
 
 # =============================================================================
@@ -654,8 +921,8 @@ def plot_turbine_loss_distribution(results):
 # palette used elsewhere in the module).
 COLOR_ETA_TT = sample_colorscale("Magma", 0.35)[0]
 COLOR_ETA_TS = sample_colorscale("Magma", 0.70)[0]
- 
- 
+
+
 def plot_turbine_efficiency_trends(trends, results=None):
     """
     Single plot of the overall total-to-total and total-to-static efficiency

@@ -47,6 +47,7 @@ def configure(module, filename, kind):
         stages = []
         for stage in values["stages"]:
             flattened = module.stage_defaults_for(overall["turbine_type"])
+            flattened["name"] = stage.get("name", f"stage_{len(stages) + 1}")
             flattened.update({key: stage[key] for key in flattened if key in stage})
             for row in ("stator", "rotor"):
                 for key, value in stage.get("blade_geometry", {}).get(row, {}).items():
@@ -57,6 +58,8 @@ def configure(module, filename, kind):
             if isinstance(identity, dict) and identity.get("scope") == "overall":
                 control.value = overall[identity["key"]]
         fixed["stage_data_store"].data = stages
+        if "td-inlet-pair" in fixed:
+            fixed["td-inlet-pair"].value = overall["inlet_property_pair"]
         rendered = module.render_stage_accordion(stages, overall["turbine_type"])
         accordion, count = rendered[:2]
         fixed["stages_accordion_container"].children = accordion

@@ -11,10 +11,12 @@ from pathlib import Path
 import numpy as np
 import plotly.graph_objects as go
 
-
 BOUNDARY_COLORS = {
-    "blade": "#1f77b4", "inlet": "#17a2b8", "outlet": "#9467bd",
-    "periodic_left": "#ffb347", "periodic_right": "#ffb347",
+    "blade": "#1f77b4",
+    "inlet": "#17a2b8",
+    "outlet": "#9467bd",
+    "periodic_left": "#ffb347",
+    "periodic_right": "#ffb347",
 }
 
 
@@ -83,25 +85,42 @@ def plot_profile_preview(payload):
     return figure
 
 
-def _meridional_style(figure, metadata, *, mesh=False):
+def _meridional_style(
+    figure, metadata, *, mesh=False, start_at_zero=False, show_note=True
+):
     """Focus an individual row while retaining physical radius coordinates."""
     hub = float(metadata["hub_radius_mm"])
     shroud = float(metadata["shroud_radius_mm"])
-    padding = .08 * (shroud - hub)
+    padding = 0.08 * (shroud - hub)
     figure.update_layout(
-        height=520, margin={"l": 65, "r": 20, "t": 45, "b": 60},
-        xaxis_title="Axial coordinate Z [mm]", yaxis_title="Radius [mm]",
+        height=520,
+        margin={"l": 65, "r": 20, "t": 45, "b": 60},
+        xaxis_title="Axial coordinate Z [mm]",
+        yaxis_title="Radius [mm]",
         uirevision=f"turbodash-meridional-{'mesh' if mesh else 'geometry'}-{metadata.get('source_fingerprint', '')}",
     )
-    figure.update_yaxes(range=[max(0., hub - padding), shroud + padding],
-                        scaleanchor="x", scaleratio=1, autorange=False)
+    figure.update_yaxes(
+        range=[0.0 if start_at_zero else max(0.0, hub - padding), shroud + padding],
+        scaleanchor="x",
+        scaleratio=1,
+        autorange=False,
+    )
+    if start_at_zero:
+        figure.update_yaxes(rangemode="tozero", fixedrange=False)
     _axis_fonts(figure)
-    _annotation(figure, "Projection of actual swept mesh stations." if mesh else
-                "Cylindrical row; shaded blade envelope.")
+    if show_note:
+        _annotation(
+            figure,
+            (
+                "Projection of actual swept mesh stations."
+                if mesh
+                else "Cylindrical row; shaded blade envelope."
+            ),
+        )
     return figure
 
 
-def plot_geometry_meridional(preview):
+def plot_geometry_meridional(preview, *, start_at_zero=False, show_note=True):
     """Show the selected row's physical meridional geometry, without meshing.
 
     ``preview_blade_row`` prepares this figure with TurboMoC's
@@ -109,11 +128,18 @@ def plot_geometry_meridional(preview):
     inputs remain immutable, including when the preview is cached by the app.
     """
     if not preview or not preview.get("meridional_figure"):
-        return _empty_figure("Generate a blade-row preview to view its meridional geometry.")
-    return _meridional_style(go.Figure(preview["meridional_figure"]), preview["metadata"])
+        return _empty_figure(
+            "Generate a blade-row preview to view its meridional geometry."
+        )
+    return _meridional_style(
+        go.Figure(preview["meridional_figure"]),
+        preview["metadata"],
+        start_at_zero=start_at_zero,
+        show_note=show_note,
+    )
 
 
-def mesh_figures(directory, *, edge_width=0.35):
+def mesh_figures(directory, *, edge_width=0.35, start_at_zero=False, show_notes=True):
     """Return actual reference-mesh and meridional-grid figures for one job.
 
     Loading the saved section does not initialize Gmsh or regenerate anything.
@@ -130,29 +156,61 @@ def mesh_figures(directory, *, edge_width=0.35):
 
     directory = Path(directory)
     section, design = load_section(directory)
-    config = json.loads((directory / "mesh_configuration.json").read_text(encoding="utf-8"))
-    metadata = json.loads((directory / "geometry_metadata.json").read_text(encoding="utf-8"))
+    config = json.loads(
+        (directory / "mesh_configuration.json").read_text(encoding="utf-8")
+    )
+    metadata = json.loads(
+        (directory / "geometry_metadata.json").read_text(encoding="utf-8")
+    )
     reference = section_mesh_figure(section, design, edge_width=edge_width)
-    scale = 1. if design.meridional_channel.is_linear else design.meridional_channel.reference_radius
+    scale = (
+        1.0
+        if design.meridional_channel.is_linear
+        else design.meridional_channel.reference_radius
+    )
     for trace in reference.data:
-        pitchwise, downstream_negative = np.asarray(trace.x, float), np.asarray(trace.y, float)
+        pitchwise, downstream_negative = np.asarray(trace.x, float), np.asarray(
+            trace.y, float
+        )
         trace.x = -downstream_negative * scale
         trace.y = pitchwise * scale
     reference.update_layout(
-        height=520, margin={"l": 60, "r": 20, "t": 45, "b": 60},
-        xaxis_title="Axial reference [mm]", yaxis_title="Tangential reference [mm]",
+        height=520,
+        margin={"l": 60, "r": 20, "t": 45, "b": 60},
+        xaxis_title="Axial reference [mm]",
+        yaxis_title="Tangential reference [mm]",
         uirevision=f"turbodash-reference-mesh-{metadata.get('source_fingerprint', '')}",
-        meta={"coordinate_units": "mm", "coordinate_basis": "annular_conformal_reference",
-              "section_nodes": len(section["xy"]),
-              "section_cells": sum(len(cells) for cells in section["cells"].values())},
+        meta={
+            "coordinate_units": "mm",
+            "coordinate_basis": "annular_conformal_reference",
+            "section_nodes": len(section["xy"]),
+            "section_cells": sum(len(cells) for cells in section["cells"].values()),
+        },
     )
     _axis_fonts(reference)
-    _annotation(reference, "Reference mesh in millimetres.")
+    if show_notes:
+        _annotation(reference, "Reference mesh in millimetres.")
     meridional, grid = meridional_figure(
-        design, config["mesh"]["numerics"], section, edge_width=edge_width)
-    meridional.update_layout(meta={name: grid[name] for name in
-                                  ("basis", "coordinate_basis", "span_layers", "streamwise_stations")})
-    return reference, _meridional_style(meridional, metadata, mesh=True)
+        design, config["mesh"]["numerics"], section, edge_width=edge_width
+    )
+    meridional.update_layout(
+        meta={
+            name: grid[name]
+            for name in (
+                "basis",
+                "coordinate_basis",
+                "span_layers",
+                "streamwise_stations",
+            )
+        }
+    )
+    return reference, _meridional_style(
+        meridional,
+        metadata,
+        mesh=True,
+        start_at_zero=start_at_zero,
+        show_note=show_notes,
+    )
 
 
 def plot_reference_mesh(directory, *, edge_width=0.35):
@@ -163,4 +221,3 @@ def plot_reference_mesh(directory, *, edge_width=0.35):
 def plot_mesh_meridional(directory, *, edge_width=0.35):
     """Show the saved meridional projection; use ``mesh_figures`` for both views."""
     return mesh_figures(directory, edge_width=edge_width)[1]
-

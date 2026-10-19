@@ -21,7 +21,6 @@ from turbodash.apps.app_turbine_optimization.model import (
 from turbodash.apps.app_turbine_optimization.panel import collect_rows, reconcile_editor, variable_row, constraint_row
 from turbodash.core.turbine import compute_turbine_performance
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -136,6 +135,27 @@ class EditorTests(unittest.TestCase):
         for snapshot in snapshots:
             self.assertEqual(snapshot["config"]["inputs"], snapshot["turbine_results"]["inputs"])
 
+    def test_saving_without_variables_preserves_settings_but_start_still_requires_one(
+        self,
+    ):
+        arguments = dict(
+            config=case(),
+            variables=[],
+            constraints=[],
+            objective="$overall_performance.efficiency_ts",
+            direction="maximize",
+            tolerance=1e-8,
+            iterations=150,
+            feasibility=1e-6,
+        )
+        saved = build_settings(**arguments, require_variables=False)
+        self.assertEqual(saved["design_variables"], {})
+        self.assertEqual(
+            saved["objective_function"]["variable"], arguments["objective"]
+        )
+        with self.assertRaisesRegex(ValueError, "Add at least one design variable"):
+            build_settings(**arguments)
+
 
 class JobTests(unittest.TestCase):
     def setUp(self):
@@ -206,6 +226,49 @@ class JobTests(unittest.TestCase):
 
 
 class WorkspaceTests(unittest.TestCase):
+    def test_application_timeout_retains_edits_made_after_optimized_controls_arrive(self):
+        from dash import Dash
+        from dash._callback_context import context_value
+        from dash._utils import AttributeDict
+        from turbodash.apps.app_turbine_optimization import panel as ui
+
+        source = case()
+        optimized = deepcopy(source)
+        optimized["inputs"]["blade_velocity_ratio"] = .62
+        edited = deepcopy(optimized)
+        edited["inputs"]["blade_velocity_ratio"] = .612345678901
+        before = deepcopy(edited)
+        app = Dash(__name__, suppress_callback_exceptions=True)
+        ui.register_callbacks(app, lambda *args: edited, lambda *args: None)
+        poll = next(entry["callback"].__wrapped__ for entry in app.callback_map.values()
+                    if entry["callback"].__wrapped__.__name__ == "poll_job")
+        handle = dict(id="a" * 32, applying=True, target=jobs.fingerprint(optimized),
+                      applied_at=100, message="Optimization applied")
+        # The displayed result may already be optimized, or may still be the
+        # preceding result while callbacks settle. Neither permits a rollback.
+        for displayed in (optimized, source):
+            with self.subTest(displayed=jobs.fingerprint(displayed)):
+                arguments = [1, handle, [], [], [], [], []]
+                arguments += [[] for _ in range(10)]
+                arguments += ["$overall_performance.efficiency_ts", "maximize",
+                              1e-8, 150, 1e-6, displayed]
+                token = context_value.set(AttributeDict(triggered_inputs=[
+                    dict(prop_id="opt-poll.n_intervals", value=1)]))
+                try:
+                    with patch.object(jobs, "session_owner", return_value="owner"), \
+                            patch.object(ui.time, "time", return_value=146), \
+                            patch.object(jobs, "source_config") as original:
+                        result = poll(*arguments)
+                    original.assert_not_called()
+                    self.assertIsNone(result[0])
+                    self.assertIn("not confirmed", result[1])
+                    self.assertIn("Current inputs retained", result[1])
+                    self.assertIs(result[5], no_update)
+                    self.assertIs(result[6], no_update)
+                    self.assertEqual(edited, before)
+                finally:
+                    context_value.reset(token)
+
     def test_success_updates_all_controls_and_outputs_before_acknowledgement(self):
         from dash._callback_context import context_value
         from dash._utils import AttributeDict
@@ -213,7 +276,11 @@ class WorkspaceTests(unittest.TestCase):
         from turbodash.apps.app_turbine_optimization import app as module
 
         def invoke(prop_id, callback, *arguments):
-            token = context_value.set(AttributeDict(triggered_inputs=[dict(prop_id=prop_id, value=1)]))
+            token = context_value.set(
+                AttributeDict(
+                    triggered_inputs=[dict(prop_id=prop_id, value=1)], updated_props={}
+                )
+            )
             try:
                 return callback(*arguments)
             finally:
@@ -241,11 +308,31 @@ class WorkspaceTests(unittest.TestCase):
             self.assertNotEqual(opt.read_path(config["inputs"], variable["path"]),
                                 opt.read_path(optimized.config["inputs"], variable["path"]))
 
-        overall_ids = [component.id for component in components(module.controls)
-                       if isinstance(getattr(component, "id", None), dict)
-                       and component.id.get("scope") == "overall"]
-        initial_stages, initial_overall = invoke("loaded_cfg_store.data", module.update_stage_store,
-            0, 0, nested_config(config), "axial", [], overall_ids, [], [])
+        overall_controls = [
+            component
+            for component in components(module.app.layout)
+            if isinstance(getattr(component, "id", None), dict)
+            and component.id.get("scope") == "overall"
+        ]
+        overall_ids = [component.id for component in overall_controls]
+        initial_stages, initial_overall, inlet_pair, error = invoke(
+            "loaded_cfg_store.data",
+            module.update_stage_store,
+            0,
+            0,
+            nested_config(config),
+            "axial",
+            config["inputs"]["inlet_property_pair"],
+            "actual",
+            [],
+            overall_ids,
+            [],
+            [],
+            [component.value for component in overall_controls],
+            None,
+        )
+        self.assertEqual(inlet_pair, config["inputs"]["inlet_property_pair"])
+        self.assertEqual(error, "")
         initial_controls, _, _ = module.render_stage_accordion(initial_stages, "axial")
         initial_inputs = [component for component in components(initial_controls)
                           if isinstance(getattr(component, "id", None), dict)
@@ -266,8 +353,16 @@ class WorkspaceTests(unittest.TestCase):
                     *[[] for _ in range(10)], "$overall_performance.efficiency_ts", "maximize",
                     1e-8, 150, 1e-6, displayed]
 
-        with module.server.test_request_context("/"), patch.object(jobs, "read_job", return_value=(
-                dict(state="complete", message=optimized.message), "SUCCESS", None, payload)):
+        with module.server.test_request_context("/"), patch.object(
+            jobs,
+            "read_job",
+            return_value=(
+                dict(state="complete", message=optimized.message),
+                "SUCCESS",
+                None,
+                payload,
+            ),
+        ):
             delivered = invoke("opt-poll.n_intervals", poll,
                 *poll_arguments({"id": "a" * 32}, initial_overall, initial_values, initial_stages, config))
             self.assertTrue(delivered[0]["applying"])
@@ -276,8 +371,24 @@ class WorkspaceTests(unittest.TestCase):
                 invoke("opt-poll.n_intervals", poll, *poll_arguments(
                     delivered[0], initial_overall, initial_values, initial_stages, config))
             loaded, applied = delivered[5:7]
-            stages, overall = invoke("loaded_cfg_store.data", module.update_stage_store,
-                0, 0, loaded, "axial", initial_stages, overall_ids, initial_values, stage_ids)
+            stages, overall, inlet_pair, error = invoke(
+                "loaded_cfg_store.data",
+                module.update_stage_store,
+                0,
+                0,
+                loaded,
+                "axial",
+                loaded["inputs"]["inlet_property_pair"],
+                "actual",
+                initial_stages,
+                overall_ids,
+                initial_values,
+                stage_ids,
+                initial_overall,
+                None,
+            )
+            self.assertEqual(inlet_pair, loaded["inputs"]["inlet_property_pair"])
+            self.assertEqual(error, "")
             accordion, count, geometry = module.render_stage_accordion(stages, "axial")
             self.assertEqual(count, "2")
 
@@ -296,11 +407,27 @@ class WorkspaceTests(unittest.TestCase):
                         value = stage[key]
                     expected_stage_values[index, key] = value
             rebuilt = list(components([accordion, geometry]))
-            for representation in ("input", "slider", "geometry"):
-                observed = {(component.id["stage"], component.id["key"]): component.value
-                            for component in rebuilt if isinstance(getattr(component, "id", None), dict)
-                            and component.id.get("elem") == representation}
-                self.assertEqual(observed, expected_stage_values, representation)
+            inputs = [
+                component
+                for component in rebuilt
+                if isinstance(getattr(component, "id", None), dict)
+                and component.id.get("elem") == "input"
+            ]
+            observed = {
+                (component.id["stage"], component.id["key"]): component.value
+                for component in inputs
+            }
+            self.assertEqual(observed, expected_stage_values)
+            self.assertEqual(len(inputs), len(expected_stage_values))
+            self.assertTrue(all(component.step == "any" for component in inputs))
+            self.assertEqual(geometry, [])
+            self.assertFalse(
+                any(
+                    isinstance(getattr(component, "id", None), dict)
+                    and component.id.get("elem") in ("slider", "geometry")
+                    for component in rebuilt
+                )
+            )
             values = [expected_stage_values[identity["stage"], identity["key"]] for identity in stage_ids]
             with self.assertRaises(PreventUpdate):
                 invoke("opt-poll.n_intervals", poll,

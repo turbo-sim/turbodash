@@ -27,9 +27,13 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--chromium", help="Optional installed Chromium executable")
-    parser.add_argument("--output", type=Path, default=ROOT / "development/optimization/output_browser")
+    parser.add_argument("--output", type=Path, default=ROOT / "development/app_design/output_optimization_browser")
     args = parser.parse_args()
+    args.output = args.output.resolve()
     args.output.mkdir(parents=True, exist_ok=True)
+    for folder in ("temp", "profile", "downloads", "cache"):
+        (args.output / folder).mkdir(parents=True, exist_ok=True)
+    os.environ.update(TEMP=str(args.output / "temp"), TMP=str(args.output / "temp"), PYTHONDONTWRITEBYTECODE="1")
     with socket.socket() as listener:
         listener.bind(("127.0.0.1", 0))
         port = listener.getsockname()[1]
@@ -49,11 +53,17 @@ def main():
                         raise RuntimeError("Browser test server did not start")
                     time.sleep(.1)
             with sync_playwright() as playwright:
-                browser = playwright.chromium.launch(headless=True, **({"executable_path": args.chromium} if args.chromium else {}))
+                context = playwright.chromium.launch_persistent_context(
+                    str(args.output / "profile"), headless=True,
+                    viewport={"width": 1700, "height": 1100},
+                    downloads_path=str(args.output / "downloads"), accept_downloads=True,
+                    args=["--disable-background-networking", "--no-first-run", "--disable-component-update",
+                          "--disable-crash-reporter", f"--disk-cache-dir={args.output / 'cache'}"],
+                    **({"executable_path": args.chromium} if args.chromium else {}))
                 try:
-                    report = exercise(browser, address, args.output)
+                    report = exercise(context, address, args.output)
                 finally:
-                    browser.close()
+                    context.close()
             (args.output / "report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
             print(json.dumps(report, indent=2))
         finally:
@@ -61,8 +71,7 @@ def main():
             server.wait(timeout=10)
 
 
-def exercise(browser, address, output):
-    context = browser.new_context(viewport={"width": 1700, "height": 1100})
+def exercise(context, address, output):
     page = context.new_page()
     errors, results, applied_results, rendered_results = [], [], [], []
     page.on("pageerror", lambda error: errors.append(str(error)))
@@ -89,10 +98,16 @@ def exercise(browser, address, output):
     assert page.evaluate("""() => {
         const stages = document.getElementById('stages_accordion_container');
         const panel = document.getElementById('opt-panel');
-        return panel.parentElement.id === 'design-controls'
+        return panel.closest('#design-controls') !== null
             && !!(stages.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING);
     }"""), "Optimization must follow every stage's controls in the left sidebar"
-    page.locator("#opt-panel > summary").click()
+    def open_section(identity):
+        section = page.locator(f"#{identity}")
+        if section.get_attribute("open") is None:
+            section.locator(":scope > summary").click()
+        expect(section).to_have_attribute("open", "")
+
+    open_section("opt-panel")
     page.get_by_role("tab", name="Design variables", exact=True).click()
     page.locator("#opt-add-variable").click()
     expect(page.locator('#opt-variable-rows .td-opt-row')).to_have_count(1)
@@ -105,7 +120,7 @@ def exercise(browser, address, output):
     numbers.nth(2).blur()
     page.locator("#opt-add-variable").click()
     expect(page.locator('#opt-variable-rows .td-opt-row')).to_have_count(2)
-    expect(numbers.nth(1)).to_have_value("0.9")
+    expect(numbers.nth(1)).to_have_js_property("valueAsNumber", 0.9)
     page.get_by_role("button", name="Remove variable", exact=True).last.click()
     expect(page.locator('#opt-variable-rows .td-opt-row')).to_have_count(1)
     page.get_by_role("tab", name="Constraints", exact=True).click()
@@ -129,11 +144,11 @@ def exercise(browser, address, output):
             .flatMap(input => {
                 try {
                     const id = JSON.parse(input.id);
-                    return id.scope === 'overall' || (id.scope === 'stage' && ['input', 'geometry'].includes(id.elem))
+                    return id.scope === 'overall' || (id.scope === 'stage' && id.elem === 'input')
                         ? [{id, value: input.value}] : [];
                 } catch (_) { return []; }
             })""")
-        stage_fields = {"input": set(), "geometry": set()}
+        stage_fields = set()
         for control in controls:
             identity = control["id"]
             key = identity["key"]
@@ -143,10 +158,16 @@ def exercise(browser, address, output):
                 stage = expected["stages"][identity["stage"]]
                 row, _, parameter = key.partition(".")
                 value = stage["blade_geometry"][row][parameter] if parameter else stage[key]
-                stage_fields[identity["elem"]].add((identity["stage"], key))
+                stage_fields.add((identity["stage"], key))
             assert np.isclose(float(control["value"]), value, rtol=1e-10, atol=1e-12), control
-        assert stage_fields["input"] == stage_fields["geometry"]
-        assert {index for index, _ in stage_fields["input"]} == set(range(len(expected["stages"])))
+        assert {index for index, _ in stage_fields} == set(range(len(expected["stages"])))
+        for index, stage in enumerate(expected["stages"]):
+            expected_fields = {key for key, value in stage.items() if isinstance(value, (int, float))}
+            expected_fields.update(f"{row}.{key}" for row in ("stator", "rotor")
+                                   for key in stage["blade_geometry"][row]
+                                   if key != "aspect_ratio" or expected["turbine_type"] != "radial")
+            assert {key for stage_index, key in stage_fields if stage_index == index} == expected_fields
+        assert page.locator('#stages_accordion_container .rc-slider').count() == 0
 
         # Check the rendered traces, including all velocity triangles, against
         # the same callback response that published the optimized result store.
@@ -196,16 +217,17 @@ def exercise(browser, address, output):
         }""", arg=samples)
 
     def run(expected_success=True):
+        open_section("opt-panel")
         page.locator("#opt-start").click()
         try:
             expect(page.locator("#opt-start")).to_be_disabled(timeout=10000)
         except AssertionError:
-            raise AssertionError(page.locator("#opt-status").inner_text())
+            raise AssertionError(page.locator("#opt-status").text_content())
         # The other panes stay interactive while the numerical worker runs.
-        page.get_by_text("Turbine geometry", exact=True).first.click()
-        page.get_by_text("Meanline", exact=True).first.click()
+        page.locator('.td-workspace-rail [data-workspace="geometry"]').click()
+        page.locator('.td-workspace-rail [data-workspace="meanline"]').click()
         expect(page.locator("#opt-start")).to_be_enabled(timeout=60000)
-        status = page.locator("#opt-status").inner_text()
+        status = page.locator("#opt-status").text_content()
         if expected_success:
             assert "Optimization applied" in status, status
             expect(page.locator("#opt-log")).to_contain_text("Infeasibility")
@@ -216,30 +238,43 @@ def exercise(browser, address, output):
     run()
     expect(page.locator("#opt-log")).to_contain_text("clipped from 0.9 to 0.65")
     ratio = page.locator('input[id*=blade_velocity_ratio]')
-    expect(ratio).to_have_value("0.65")
+    expect(ratio).to_have_js_property("valueAsNumber", 0.65)
     page.wait_for_timeout(700)
     assert abs(results[-1]["inputs"]["blade_velocity_ratio"] - .65) < 1e-8
     assert len(results[-1]["stages_performance"]) == 1
     # A manual edit still feeds the same plots, table and source-of-truth store.
+    open_section("td-section-speed")
     ratio.fill("0.61")
     ratio.blur()
     expect(page.locator('#opt-variable-rows input[placeholder="Current: 0.61"]')).to_have_count(1, timeout=15000)
     assert abs(results[-1]["inputs"]["blade_velocity_ratio"] - .61) < 1e-8
 
     # Two scalar equality constraints with one free variable must fail safely.
+    open_section("opt-panel")
     page.get_by_role("tab", name="Constraints", exact=True).click()
     page.locator("#opt-add-constraint").click()
     before = deepcopy(results[-1]["inputs"])
     failed_status = run(False)
     expect(page.locator("#opt-log")).to_contain_text("more scalar equality constraints")
     assert results[-1]["inputs"] == before
-    expect(ratio).to_have_value("0.61")
+    expect(ratio).to_have_js_property("valueAsNumber", 0.61)
     page.get_by_role("button", name="Remove constraint", exact=True).click()
 
     def upload(config, filename):
+        before = len(results)
         page.locator('#load_button input[type="file"]').set_input_files({
             "name": filename, "mimeType": "text/yaml", "buffer": yaml.safe_dump(config).encode(),
         })
+        deadline = time.monotonic() + 30
+        expected = config["inputs"]
+        while (len(results) <= before or results[-1]["inputs"]["turbine_type"] != expected["turbine_type"]
+               or len(results[-1]["inputs"]["stages"]) != len(expected["stages"])
+               or flat_speed(results[-1]["inputs"]) != flat_speed(expected)):
+            if time.monotonic() > deadline:
+                raise AssertionError("Loaded design did not calculate: " + page.locator("#td-load-error").inner_text()
+                                     + page.locator("#td-calculation-status").inner_text())
+            page.wait_for_timeout(100)
+        open_section("opt-panel")
 
     axial = yaml.safe_load((ROOT / "development/optimization/case_axial.yaml").read_text())
     axial["inputs"].update(rotational_speed_type="actual", rotational_speed=30000)
@@ -248,7 +283,7 @@ def exercise(browser, address, output):
     upload(axial, "actual-speed.yaml")
     page.get_by_role("tab", name="Design variables", exact=True).click()
     expect(page.locator('#opt-variable-rows')).to_contain_text("Rotational speed [rpm]")
-    expect(page.locator('#opt-variable-rows input[type="number"]').first).to_have_value("25000")
+    expect(page.locator('#opt-variable-rows input[type="number"]').first).to_have_js_property("valueAsNumber", 25000)
     run()
     page.wait_for_timeout(700)
     actual = results[-1]
@@ -256,7 +291,7 @@ def exercise(browser, address, output):
     assert 25000 <= flat_speed(actual["inputs"])[1] <= 35000
 
     # Force global, stage and blade values to change across two stages, then
-    # verify every main input, geometry mirror and plotted result after apply.
+    # verify every mounted numeric input and plotted result after apply.
     multiple = deepcopy(axial)
     multiple["inputs"].update(rotational_speed_type="specific", rotational_speed=.7)
     multiple["inputs"]["stages"].append(deepcopy(multiple["inputs"]["stages"][0]))
@@ -276,7 +311,7 @@ def exercise(browser, address, output):
     radial = yaml.safe_load((ROOT / "development/optimization/case_radial.yaml").read_text())
     upload(radial, "radial.yaml")
     expect(page.locator('#opt-variable-rows .td-opt-row')).to_have_count(12)
-    expect(page.locator('#opt-variable-rows input[type="number"]').first).to_have_value("0.5")
+    expect(page.locator('#opt-variable-rows input[type="number"]').first).to_have_js_property("valueAsNumber", 0.5)
     run()
     page.wait_for_timeout(700)
     final = results[-1]
@@ -289,7 +324,7 @@ def exercise(browser, address, output):
     page.screenshot(path=output / "radial-terminal.png")
 
     # Independent browser contexts get distinct cookie-backed owners and editors.
-    other = browser.new_context()
+    other = context.browser.new_context()
     second = other.new_page()
     second.goto(address)
     second.wait_for_selector("#perf_table .dash-table-container")
@@ -298,7 +333,6 @@ def exercise(browser, address, output):
     assert context.cookies()[0]["value"] != other.cookies()[0]["value"]
     other.close()
     assert not errors, errors
-    context.close()
     return dict(checks=["add/remove editors", "current defaults", "numeric override retention", "clipping log",
                         "responsive panes and duplicate-start prevention", "optimization below every stage",
                         "all input boxes and plotted traces after apply", "two-stage global/stage/blade apply", "manual editing",

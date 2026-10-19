@@ -1,6 +1,8 @@
 # Turbodash: a clearer place to think
 
-The current direction is **Blueprint Workbench light with a selectable dark theme**. Start with the [implementation prompt](implementation_prompt.md) and [interactive review 02](review_v2/index.html). Its **Review choices** panel contains editable placeholders, recommendations and a feedback export. [Logo studies](review_v2/logo_studies.html) and [review instructions](review_v2/README.md) accompany it.
+The approved **Blueprint light / Graphite dark** workbench is implemented in the optimization edition. Start with the [implementation notes and screenshots](implemented/README.md), [approved decisions](approved_feedback.json), and [resolved implementation brief](implementation_prompt.md). Run `poetry run app_turbine_optimization --open-browser` from the repository root to use the real Dash app.
+
+The [interactive review 02](review_v2/index.html), [logo studies](review_v2/logo_studies.html), and concepts below are earlier design studies. Their plots and example data are illustrative; the implementation uses calculated turbine results.
 
 The four concepts below are the earlier exploration. The new brief supersedes their original Nordic recommendation and seven-section layout with the user's five-section structure.
 

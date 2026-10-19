@@ -668,10 +668,10 @@ controls = html.Div(
         # changes on +/- or load, so editing a value never rebuilds (and never
         # collapses) the per-stage accordion.
         dcc.Store(id="stage_data_store", data=[dict(STAGE_DEFAULTS)]),
-        optimization_panel(),
         overall_accordion(),
         # Rebuilt only when the stage count or a loaded config changes.
         html.Div(id="stages_accordion_container", style={"marginTop": "12px"}),
+        optimization_panel(),
     ],
     style=CONTROLS_STYLE,
     id="design-controls",

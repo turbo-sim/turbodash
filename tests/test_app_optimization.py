@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 from io import StringIO
+import json
 import logging
 from pathlib import Path
 import tempfile
@@ -10,6 +11,7 @@ import unittest
 from unittest.mock import patch
 
 from dash import no_update
+from plotly.utils import PlotlyJSONEncoder
 
 from turbodash import optimization as opt
 from turbodash.apps.turbine_optimization import jobs as jobs
@@ -204,6 +206,127 @@ class JobTests(unittest.TestCase):
 
 
 class WorkspaceTests(unittest.TestCase):
+    def test_success_updates_all_controls_and_outputs_before_acknowledgement(self):
+        from dash._callback_context import context_value
+        from dash._utils import AttributeDict
+        from dash.exceptions import PreventUpdate
+        from turbodash.apps.turbine_optimization import app as module
+
+        def invoke(prop_id, callback, *arguments):
+            token = context_value.set(AttributeDict(triggered_inputs=[dict(prop_id=prop_id, value=1)]))
+            try:
+                return callback(*arguments)
+            finally:
+                context_value.reset(token)
+
+        def components(value):
+            if isinstance(value, (list, tuple)):
+                for child in value:
+                    yield from components(child)
+            elif hasattr(value, "to_plotly_json"):
+                yield value
+                yield from components(getattr(value, "children", None))
+
+        config = case()
+        second_stage = deepcopy(config["inputs"]["stages"][0])
+        second_stage["name"] = "stage_2"
+        config["inputs"]["stages"].append(second_stage)
+        config["inputs"].update(rotational_speed_type="actual", rotational_speed=30000)
+        variables = [dict(path="blade_velocity_ratio", lower=.62, upper=.64),
+                     dict(path="stages.0.degree_reaction", lower=.55, upper=.6),
+                     dict(path="stages.1.blade_geometry.rotor.solidity_chord", lower=1.3, upper=1.4)]
+        optimized = opt.optimize_turbine(config, settings(config, variables))
+        self.assertTrue(optimized.success, optimized.message)
+        for variable in variables:
+            self.assertNotEqual(opt.read_path(config["inputs"], variable["path"]),
+                                opt.read_path(optimized.config["inputs"], variable["path"]))
+
+        overall_ids = [component.id for component in components(module.controls)
+                       if isinstance(getattr(component, "id", None), dict)
+                       and component.id.get("scope") == "overall"]
+        initial_stages, initial_overall = invoke("loaded_cfg_store.data", module.update_stage_store,
+            0, 0, nested_config(config), "axial", [], overall_ids, [], [])
+        initial_controls, _, _ = module.render_stage_accordion(initial_stages, "axial")
+        initial_inputs = [component for component in components(initial_controls)
+                          if isinstance(getattr(component, "id", None), dict)
+                          and component.id.get("elem") == "input"]
+        stage_ids = [component.id for component in initial_inputs]
+        initial_values = [component.value for component in initial_inputs]
+        self.assertEqual(jobs.fingerprint(module.live_config(initial_overall, initial_values,
+            overall_ids, stage_ids, initial_stages)), jobs.fingerprint(config))
+
+        payload = dict(config=optimized.config, turbine_results=optimized.turbine_results,
+                       success=True, objective=optimized.objective, message=optimized.message,
+                       fingerprint=jobs.fingerprint(config))
+        poll = next(value["callback"].__wrapped__ for value in module.app.callback_map.values()
+                    if any(item["id"] == "opt-poll" for item in value["inputs"]))
+
+        def poll_arguments(handle, overall, values, stages, displayed):
+            return [1, handle, overall, values, overall_ids, stage_ids, stages,
+                    *[[] for _ in range(10)], "$overall_performance.efficiency_ts", "maximize",
+                    1e-8, 150, 1e-6, displayed]
+
+        with module.server.test_request_context("/"), patch.object(jobs, "read_job", return_value=(
+                dict(state="complete", message=optimized.message), "SUCCESS", None, payload)):
+            delivered = invoke("opt-poll.n_intervals", poll,
+                *poll_arguments({"id": "a" * 32}, initial_overall, initial_values, initial_stages, config))
+            self.assertTrue(delivered[0]["applying"])
+            self.assertIn("Applying", delivered[1])
+            with self.assertRaises(PreventUpdate):
+                invoke("opt-poll.n_intervals", poll, *poll_arguments(
+                    delivered[0], initial_overall, initial_values, initial_stages, config))
+            loaded, applied = delivered[5:7]
+            stages, overall = invoke("loaded_cfg_store.data", module.update_stage_store,
+                0, 0, loaded, "axial", initial_stages, overall_ids, initial_values, stage_ids)
+            accordion, count, geometry = module.render_stage_accordion(stages, "axial")
+            self.assertEqual(count, "2")
+
+            expected_overall = dict(loaded["inputs"])
+            rotation = expected_overall.pop("rotational_speed")
+            expected_overall.update(rotational_speed_type=rotation["type"], rotational_speed_value=rotation["value"])
+            self.assertEqual({identity["key"]: value for identity, value in zip(overall_ids, overall)},
+                             {identity["key"]: expected_overall[identity["key"]] for identity in overall_ids})
+            expected_stage_values = {}
+            for index, stage in enumerate(optimized.config["inputs"]["stages"]):
+                for key in module.STAGE_DEFAULTS:
+                    if "." in key:
+                        row, parameter = key.split(".", 1)
+                        value = stage["blade_geometry"][row][parameter]
+                    else:
+                        value = stage[key]
+                    expected_stage_values[index, key] = value
+            rebuilt = list(components([accordion, geometry]))
+            for representation in ("input", "slider", "geometry"):
+                observed = {(component.id["stage"], component.id["key"]): component.value
+                            for component in rebuilt if isinstance(getattr(component, "id", None), dict)
+                            and component.id.get("elem") == representation}
+                self.assertEqual(observed, expected_stage_values, representation)
+            values = [expected_stage_values[identity["stage"], identity["key"]] for identity in stage_ids]
+            with self.assertRaises(PreventUpdate):
+                invoke("opt-poll.n_intervals", poll,
+                    *poll_arguments(delivered[0], overall, values, stages, config))
+            rendered = invoke("opt-applied-result.data", module.update_turbine,
+                overall, values, applied, overall_ids, stage_ids, stages)
+            self.assertEqual(jobs.fingerprint(rendered[8]), delivered[0]["target"])
+            expected_results = dict(optimized.turbine_results, optimization=optimized.config["optimization"])
+            expected = module.render_results(expected_results, rendered[9])
+            self.assertEqual(json.dumps(rendered, cls=PlotlyJSONEncoder),
+                             json.dumps(expected, cls=PlotlyJSONEncoder))
+            self.assertEqual(len(rendered[2]), 2)
+            acknowledged = invoke("opt-poll.n_intervals", poll,
+                *poll_arguments(delivered[0], overall, values, stages, rendered[8]))
+            self.assertIsNone(acknowledged[0])
+            self.assertIn("Optimization applied", acknowledged[1])
+
+        edited = list(overall)
+        ratio_index = next(index for index, identity in enumerate(overall_ids)
+                           if identity["key"] == "blade_velocity_ratio")
+        edited[ratio_index] = .61
+        prop_id = json.dumps(overall_ids[ratio_index], sort_keys=True, separators=(",", ":")) + ".value"
+        updated = invoke(prop_id, module.update_turbine, edited, values, applied, overall_ids, stage_ids, stages)
+        self.assertEqual(updated[8]["inputs"]["blade_velocity_ratio"], .61)
+        self.assertNotEqual(updated[9], rendered[9])
+
     def test_failed_or_infeasible_result_never_changes_loaded_design(self):
         from dash._callback_context import context_value
         from dash._utils import AttributeDict

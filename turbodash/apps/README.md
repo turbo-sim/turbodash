@@ -65,7 +65,8 @@ Install `python -m pip install -e ".[optimization]"`, then run
 It is a separate app based on the experimental workspace. Both earlier app
 entrypoints retain their behavior. Optional meshing still uses the `mesh` extra.
 
-Expand **Optimization** in the left sidebar. Settings select a scalar objective,
+Expand **Optimization** at the bottom of the left sidebar, below the overall
+parameters and every stage's initial inputs. Settings select a scalar objective,
 maximize/minimize, solver tolerance, iteration limit, and feasibility tolerance.
 Add inputs under **Design variables**, then set physical lower/upper bounds.
 Leave Initial blank to use the current design, or enter an explicit override;

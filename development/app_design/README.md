@@ -1,5 +1,11 @@
 # Turbodash: a clearer place to think
 
+The current direction is **Blueprint Workbench light with a selectable dark theme**. Start with the [implementation prompt](implementation_prompt.md) and [interactive review 02](review_v2/index.html). Its **Review choices** panel contains editable placeholders, recommendations and a feedback export. [Logo studies](review_v2/logo_studies.html) and [review instructions](review_v2/README.md) accompany it.
+
+The four concepts below are the earlier exploration. The new brief supersedes their original Nordic recommendation and seven-section layout with the user's five-section structure.
+
+## Initial concept exploration
+
 Four design studies for the left inspector and its relationship to the plots. These are review mockups, not changes to the running app. Every concept starts with all expandable sections closed; the expanded images show a deliberate user action. Plots, results and solver histories are illustrative, not solver-certified calculations.
 
 **Recommendation: Nordic Studio.** Its quiet light surfaces, teal emphasis and concise section summaries make a dense scientific model feel approachable without hiding its precision. Start with this structure; borrow Graphite's convergence dock when optimization is active. Keep Graphite as a possible dark edition, rather than making a dark interface mandatory for everybody.

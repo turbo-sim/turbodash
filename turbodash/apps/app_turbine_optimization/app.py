@@ -1,6 +1,7 @@
 """Optimization edition of the experimental workspace; existing apps stay independent."""
 
 from turbodash.apps.shared.paths import SHARED_ASSETS_DIRECTORY, DOCUMENTATION_FILE
+from turbodash.apps.shared.cli import run_app, run_cli
 
 from pathlib import Path
 import os
@@ -71,10 +72,14 @@ def configure(config_path):
     return configure_case(sys.modules[__name__], config_path, "turbine")
 
 
-def main(config_path=None):
+def main(config_path=None, *, open_browser=False):
     if config_path is not None:
         configure(config_path)
-    app.run(debug=False)
+    return run_app(app, open_browser=open_browser)
+
+
+def cli(argv=None):
+    return run_cli(main, argv)
 
 
 # =========================
@@ -1269,4 +1274,4 @@ register_optimization_callbacks(app, live_config, render_results)
 
 
 if __name__ == "__main__":
-    main()
+    cli()

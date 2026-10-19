@@ -15,14 +15,16 @@ import turbodash
 
 
 @pytest.mark.parametrize("name", ["app_turbine", "app_turbine_experimental", "app_turbine_optimization", "app_stage", "app_stage_efficiency"])
-def test_app_package_entrypoints_call_their_own_main(name, monkeypatch):
+@pytest.mark.parametrize("open_browser", [False, True])
+def test_app_package_entrypoints_forward_browser_option(name, open_browser, monkeypatch):
     import runpy
 
     module = importlib.import_module(f"turbodash.apps.{name}.app")
-    main = Mock()
-    monkeypatch.setattr(module, "main", main)
+    run = Mock()
+    monkeypatch.setattr(module, "run_app", run)
+    monkeypatch.setattr(sys, "argv", [name, *(["--open-browser"] if open_browser else [])])
     runpy.run_module(f"turbodash.apps.{name}", run_name="__main__")
-    main.assert_called_once_with()
+    run.assert_called_once_with(module.app, open_browser=open_browser)
 
 
 def test_optimization_assets_belong_to_the_optimization_app():

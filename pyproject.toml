@@ -10,12 +10,17 @@ documentation = "https://github.com/turbo-sim/turbodash"
 packages = [{ include = "turbodash" }]
 
 [tool.poetry.scripts]
-turbodash = "turbodash.apps.app_turbine.app:main"
-turbodash-experimental = "turbodash.apps.app_turbine_experimental.app:main"
+turbodash = "turbodash.apps.app_turbine.app:cli"
+turbodash-experimental = "turbodash.apps.app_turbine_experimental.app:cli"
 
-turbodash-optimization = "turbodash.apps.app_turbine_optimization.app:main"
-app_turbine_optimization = "turbodash.apps.app_turbine_optimization.app:main"
-turbodash-stage = "turbodash.apps.app_stage.app:main"
+turbodash-optimization = "turbodash.apps.app_turbine_optimization.app:cli"
+turbodash-stage = "turbodash.apps.app_stage.app:cli"
+
+app_turbine = "turbodash.apps.app_turbine.app:cli"
+app_turbine_experimental = "turbodash.apps.app_turbine_experimental.app:cli"
+app_turbine_optimization = "turbodash.apps.app_turbine_optimization.app:cli"
+app_stage = "turbodash.apps.app_stage.app:cli"
+app_stage_efficiency = "turbodash.apps.app_stage_efficiency.app:cli"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"

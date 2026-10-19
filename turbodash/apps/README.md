@@ -20,23 +20,45 @@ Each app folder has an `app_` prefix and contains `app.py`, `__init__.py`, and
 target `turbodash.apps.app_<name>.app:server`.
 
 
-| Application | Module | Existing launch command | YAML demo |
+| Application | Module | Launch command | YAML demo |
 | --- | --- | --- | --- |
-| Turbine meanline, stable/default | `turbodash.apps.app_turbine` | `turbodash` | [Runner](../../demos/apps/turbine/run.py), [case](../../demos/apps/turbine/case.yaml) |
-| Turbine geometry and meshing workspace | `turbodash.apps.app_turbine_experimental` | `turbodash-experimental` | [Runner](../../demos/apps/turbine_experimental/run.py), [case](../../demos/apps/turbine_experimental/case.yaml) |
+| Turbine meanline, stable/default | `turbodash.apps.app_turbine` | `app_turbine` or `turbodash` | [Runner](../../demos/apps/turbine/run.py), [case](../../demos/apps/turbine/case.yaml) |
+| Turbine geometry and meshing workspace | `turbodash.apps.app_turbine_experimental` | `app_turbine_experimental` or `turbodash-experimental` | [Runner](../../demos/apps/turbine_experimental/run.py), [case](../../demos/apps/turbine_experimental/case.yaml) |
 | Experimental workspace with optimization | `turbodash.apps.app_turbine_optimization` | `app_turbine_optimization` or `turbodash-optimization` | Uses the current design or an uploaded YAML case |
-| Original constant-loss stage calculator | `turbodash.apps.app_stage` | `turbodash-stage` | [Runner](../../demos/apps/stage/run.py), [case](../../demos/apps/stage/case.yaml) |
-| Dimensionless stage efficiency explorer | `turbodash.apps.app_stage_efficiency` | Use its demo runner or `main()` | [Runner](../../demos/apps/stage_efficiency/run.py), [case](../../demos/apps/stage_efficiency/case.yaml) |
+| Original constant-loss stage calculator | `turbodash.apps.app_stage` | `app_stage` or `turbodash-stage` | [Runner](../../demos/apps/stage/run.py), [case](../../demos/apps/stage/case.yaml) |
+| Dimensionless stage efficiency explorer | `turbodash.apps.app_stage_efficiency` | `app_stage_efficiency` | [Runner](../../demos/apps/stage_efficiency/run.py), [case](../../demos/apps/stage_efficiency/case.yaml) |
 
 The existing `turbodash.launch_app_turbine()`, `launch_app_experimental()` and
 `launch_app_stage()` helpers still open the selected app with their original
 browser/reloader behavior. The console commands run with `debug=False`.
+
+All five apps support an optional `--open-browser` flag. After registering the
+commands with `poetry install --only-root`, run any of these from the repository
+root:
+
+```powershell
+poetry run app_turbine --open-browser
+poetry run app_turbine_experimental --open-browser
+poetry run app_turbine_optimization --open-browser
+poetry run app_stage --open-browser
+poetry run app_stage_efficiency --open-browser
+```
+
+Omit the flag to start the server without opening a browser. The flag also works
+with the existing `turbodash*` commands and `python -m turbodash.apps.app_<name>`.
+It opens one browser tab after the app's layout endpoint responds successfully.
+The browser URL follows the server's `HOST` and `PORT` environment settings,
+using a local address when the server binds to all interfaces. Use `--help` to
+see the launch options. If no browser is available, the server still runs and
+logs its URL for manual opening.
 
 Each application also accepts an optional startup case:
 
 ```python
 from turbodash.apps.app_turbine import app as turbine
 turbine.main("case.yaml")
+# Or open a browser after starting the configured app:
+turbine.main("case.yaml", open_browser=True)
 ```
 
 `configure("case.yaml")` applies the YAML to the initial controls and stage
@@ -58,6 +80,7 @@ registration. `shared/mesh_jobs.py` manages isolated worker processes and artifa
 `shared/assets/` provide common configuration loading, launch helpers, resource
 paths, and styling. Version-specific resources stay with their app. The former
 flat implementation modules and the old `components/` folder have been removed.
+`shared/cli.py` owns the common command-line options and optional browser opening.
 
 ## Optimization edition
 

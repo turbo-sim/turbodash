@@ -14,6 +14,7 @@ turbodash = "turbodash.apps.app_turbine.app:main"
 turbodash-experimental = "turbodash.apps.app_turbine_experimental.app:main"
 
 turbodash-optimization = "turbodash.apps.app_turbine_optimization.app:main"
+app_turbine_optimization = "turbodash.apps.app_turbine_optimization.app:main"
 turbodash-stage = "turbodash.apps.app_stage.app:main"
 
 [tool.poetry.dependencies]

@@ -24,7 +24,7 @@ target `turbodash.apps.app_<name>.app:server`.
 | --- | --- | --- | --- |
 | Turbine meanline, stable/default | `turbodash.apps.app_turbine` | `turbodash` | [Runner](../../demos/apps/turbine/run.py), [case](../../demos/apps/turbine/case.yaml) |
 | Turbine geometry and meshing workspace | `turbodash.apps.app_turbine_experimental` | `turbodash-experimental` | [Runner](../../demos/apps/turbine_experimental/run.py), [case](../../demos/apps/turbine_experimental/case.yaml) |
-| Experimental workspace with optimization | `turbodash.apps.app_turbine_optimization` | `turbodash-optimization` | Uses the current design or an uploaded YAML case |
+| Experimental workspace with optimization | `turbodash.apps.app_turbine_optimization` | `app_turbine_optimization` or `turbodash-optimization` | Uses the current design or an uploaded YAML case |
 | Original constant-loss stage calculator | `turbodash.apps.app_stage` | `turbodash-stage` | [Runner](../../demos/apps/stage/run.py), [case](../../demos/apps/stage/case.yaml) |
 | Dimensionless stage efficiency explorer | `turbodash.apps.app_stage_efficiency` | Use its demo runner or `main()` | [Runner](../../demos/apps/stage_efficiency/run.py), [case](../../demos/apps/stage_efficiency/case.yaml) |
 
@@ -61,8 +61,24 @@ flat implementation modules and the old `components/` folder have been removed.
 
 ## Optimization edition
 
-Install `python -m pip install -e ".[optimization]"`, then run
-`python -m turbodash.apps.app_turbine_optimization` or `turbodash-optimization`.
+From the repository root, install the optimization dependencies and register the
+launch commands once:
+
+```powershell
+poetry install -E optimization
+```
+
+Then start the app with:
+
+```powershell
+poetry run app_turbine_optimization
+```
+
+If dependencies are already installed, `poetry install --only-root` registers
+the new command. The existing `poetry run turbodash-optimization` and
+`poetry run python -m turbodash.apps.app_turbine_optimization` also work.
+For a Linux WSGI deployment, the corresponding target is
+`gunicorn turbodash.apps.app_turbine_optimization.app:server`.
 It is a separate app based on the experimental workspace. Both earlier app
 entrypoints retain their behavior. Optional meshing still uses the `mesh` extra.
 

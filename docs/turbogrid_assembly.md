@@ -76,7 +76,7 @@ does not configure boundary conditions, fluid properties, or solver settings.
 Use the project's Python environment and a YAML containing `stages_performance`:
 
 ```text
-python -m turbodash.apps.assembly_preview demos/cyclopentane_case/cyclopentane_8.yaml --row-gaps 0.01 --output-dir demos/cyclopentane_case/output/assembly_preview
+python -m turbodash.apps.turbine_experimental.assembly_preview demos/cyclopentane_case/cyclopentane_8.yaml --row-gaps 0.01 --output-dir demos/cyclopentane_case/output/assembly_preview
 ```
 
 The 0.01 m clearance is an example, not a recommended aerodynamic spacing.

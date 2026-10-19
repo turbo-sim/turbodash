@@ -114,7 +114,7 @@ and separate integer geometry for physical visualization, meshing and export.
 Axial and radial rows take true-chord solidity (`solidity_chord = chord / pitch`)
 as their spacing input. Existing Zweifel inputs remain supported for archived
 cases; the apps convert them at the loaded design point.
-The [loss audit](<loss_model_analysis/loss_model_audit/readme.md>) separates individual
+The [loss audit](<development/loss_model_analysis/loss_model_audit/readme.md>) separates individual
 loss-function diagnostics from full stage/turbine loss and efficiency sweeps.
 All analyses and turbine solvers use the production models in
 `turbodash/loss_models/`, selected by `benner`, `kacker_okapuu`, `moustapha`,
@@ -125,7 +125,7 @@ the same continuous geometry, true-chord solidity and Benner half-height cap.
 Each section includes the scripts and inputs needed to regenerate its figures,
 using the existing model functions in this repository.
 
-The [Arianna reproduction prompt](<loss_model_analysis/arianna_comparison/prompt.md>)
+The [Arianna reproduction prompt](<development/loss_model_analysis/arianna_comparison/prompt.md>)
 describes how to reproduce the original analyses and distinguish historical
 whole-model changes from a controlled comparison of loss correlations.
 

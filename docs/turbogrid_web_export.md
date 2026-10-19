@@ -27,8 +27,8 @@ the archive is prepared, and export errors are displayed beside the button.
 If an input change has failed to calculate, the stored results still represent
 the last successful design; resolve the calculation error before exporting.
 
-The panel and download callbacks live in `turbodash/apps/components/turbogrid.py`.
-`apps/turbine.py` only registers them and appends the panel to the results layout.
+The panel and download callbacks live in `turbodash/apps/shared/components/turbogrid.py`.
+`apps/turbine/app.py` only registers them and appends the panel to the results layout.
 Existing calculation, plotting, and YAML save/load callbacks are unchanged.
 
 ## Python API

@@ -1,7 +1,7 @@
 # Refactor evaluation
 
 The package refactor and the subsequent compatibility cleanup are complete.
-Turbodash is organized by responsibility, all four applications remain available,
+Turbodash is organized by responsibility, all four original applications remain available,
 and repository callers use the current module paths. The numerical implementations
 and saved analysis results were preserved during these changes.
 
@@ -9,6 +9,12 @@ This document replaces the proposal with a summary of the completed work and an
 evaluation against your requests. Detailed results are recorded in the
 [verification report](docs/refactoring_validation.md) and its
 [machine-readable evidence](docs/refactoring_validation.json).
+
+The validation totals below record the original scientific-package refactor and
+release checks. The later app split adds a separate optimization edition; its
+current package layout and usage are documented in the
+[application guide](turbodash/apps/README.md). Studies and reference papers now
+live together under [development](development/README.md).
 
 ## Checklist against your requests
 
@@ -54,7 +60,7 @@ Calculation code and report generation now have separate owners. Shared blade
 row-section construction belongs to geometry and is used by exporters and
 assembly construction. Assembly layout, plotting and command-line handling
 are also separated. Apps retain their own servers and callbacks; reusable
-meshing and TurboGrid panels live under `apps/components/`.
+meshing and TurboGrid panels live under `apps/shared/components/`.
 
 ```text
 turbodash/
@@ -67,10 +73,10 @@ turbodash/
     visualization/           # Matplotlib, Plotly, VTK adapters and assets
     reporting/               # stage and turbine reports
     io/                      # TurboGrid exports and Excel interfaces
-    apps/                    # four apps, startup configuration, workers, panels
-    assets/
+    apps/                    # app packages, version-specific and shared resources
+    optimization/            # reusable turbine optimization API
     docs/
-loss_model_analysis/         # research, numerical evidence and SVG reports
+development/                # research, numerical evidence, SVG reports and papers
 tests/
 demos/
 docs/
@@ -97,12 +103,12 @@ launch commands to the corresponding current modules.
 | `visualization_vtk`, `vtk_assets` | `visualization.vtk`, `visualization.vtk_assets` |
 | `reporting_utils` | `reporting.turbine` |
 | `export_turbogrid`, `export_turbogrid_assembly` | `io.turbogrid`, `io.turbogrid_assembly` |
-| `turbogrid_assembly` | `geometry.assembly` for layout; `visualization.matplotlib_assembly` for plots; `apps.assembly_preview` for the CLI |
+| `turbogrid_assembly` | `geometry.assembly` for layout; `visualization.matplotlib_assembly` for plots; `apps.turbine_experimental.assembly_preview` for the CLI |
 | `excel_interface_stage`, `excel_interface_turbine` | `io.excel_stage`, `io.excel_turbine` |
-| `app`, `app_lite` | `apps.stage`, `apps.stage_efficiency` |
-| `app_turbine`, `app_experimental` | `apps.turbine`, `apps.turbine_experimental` |
-| `app_meshing`, `app_turbogrid` | `apps.components.meshing`, `apps.components.turbogrid` |
-| `mesh_jobs` | `apps.mesh_jobs` |
+| `app`, `app_lite` | `apps.stage.app`, `apps.stage_efficiency.app` |
+| `app_turbine`, `app_experimental` | `apps.turbine.app`, `apps.turbine_experimental.app` |
+| `app_meshing`, `app_turbogrid` | `apps.shared.components.meshing`, `apps.shared.components.turbogrid` |
+| `mesh_jobs` | `apps.shared.mesh_jobs` |
 
 All names are relative to `turbodash`. Direct functions formerly forwarded by
 `turbodash.geometry` now live in `geometry.blade`; those formerly forwarded by
@@ -128,8 +134,8 @@ from turbodash.visualization import matplotlib_turbine
 | Original stage | `turbodash.apps.stage` | `turbodash-stage` | 4 plots; no browser errors |
 | Dimensionless efficiency | `turbodash.apps.stage_efficiency` | Its demo runner or `main()` | 2 plots; no browser errors |
 
-Deployment uses `gunicorn turbodash.apps.turbine:server`. Isolated meshing jobs
-use `python -m turbodash.apps.mesh_jobs REQUEST_JSON`. The stable app continues
+Deployment uses `gunicorn turbodash.apps.turbine.app:server`. Isolated meshing jobs
+use `python -m turbodash.apps.shared.mesh_jobs REQUEST_JSON`. The stable app continues
 to start without the optional meshing/VTK stack. See the
 [application guide](turbodash/apps/README.md) for resources and startup cases.
 External workbooks or scripts importing the removed Excel modules must select

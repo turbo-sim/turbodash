@@ -31,4 +31,6 @@ and actual worker module execution from outside the checkout. Tests import the
 implementation modules directly; tests of removed compatibility paths are gone.
 `test_core.py` remains unchanged and commented out.
 
-Study-specific tests remain alongside their analyses in `loss_model_analysis/`.
+Study-specific tests remain alongside their analyses in `development/loss_model_analysis/`.
+`test_development_layout.py` checks their repository roots from another working
+directory, local report links, and source-paper availability after relocation.

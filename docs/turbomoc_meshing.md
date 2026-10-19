@@ -16,7 +16,7 @@ characteristics nozzle calculation to construct a turbine blade.
 | 3D surface models | `turbo_moc.visualization.geometry_preview.preview_geometry` | Reuse closed surfaces for previews and binary STL download. Version 1.2.0 caps the blade at its physical endwalls; export its coordinates directly. |
 | Quality and cell inspection | `turbo_moc.meshing.inspection` | Reuse saved cell quality, physical slicing, spanwise layer extraction, threshold filtering and worst-cell selection. |
 | 3D rendering | TurboMoC's `studio.js` and `mesh_edges.js`, using Dash VTK | Serve the installed package's renderer directly, including actor reuse, camera controls, original polygon edges, and cell-quality colors. Keep Plotly for the 2D and meanline plots. |
-| Experimental app runtime | `turbodash/apps/turbine_experimental.py` | Keep meanline controls mounted across three tabs; use a separate subprocess for each Gmsh job. The stable meanline app remains in `apps/turbine.py`. |
+| Experimental app runtime | `turbodash/apps/turbine_experimental/app.py` | Keep meanline controls mounted across three tabs; use a separate subprocess for each Gmsh job. The stable meanline app remains in `apps/turbine/app.py`. |
 
 The current TurboMoC checkout already has general spline-based meridional
 channels and flared passage support. This first Turbodash adapter deliberately

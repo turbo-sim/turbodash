@@ -1,1 +1,1 @@
-web: gunicorn turbodash.apps.turbine.app:server
+web: gunicorn turbodash.apps.app_turbine.app:server

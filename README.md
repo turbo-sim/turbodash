@@ -84,14 +84,14 @@ Or use the Python launcher, which also opens your browser:
 python -c "import turbodash; turbodash.launch_app_experimental()"
 ```
 
-The stable app lives in `turbodash/apps/turbine/app.py`; the experimental workspace
-lives in `turbodash/apps/turbine_experimental/app.py` so it can be refined independently
+The stable app lives in `turbodash/apps/app_turbine/app.py`; the experimental workspace
+lives in `turbodash/apps/app_turbine_experimental/app.py` so it can be refined independently
 before becoming the default. The original single-stage app is also available
 with `turbodash-stage` or `turbodash.launch_app_stage()`.
 
 Render and the Procfile continue to launch the stable turbine app. To host the
 experimental app separately, install the `mesh` extra and use
-`gunicorn turbodash.apps.turbine_experimental.app:server`.
+`gunicorn turbodash.apps.app_turbine_experimental.app:server`.
 
 ## Application examples and package organization
 

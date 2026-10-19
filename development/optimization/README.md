@@ -10,7 +10,7 @@ experimental apps are unchanged. A separate optimization edition is available:
 
 ```powershell
 python -m pip install -e ".[optimization]"
-python -m turbodash.apps.turbine_optimization
+python -m turbodash.apps.app_turbine_optimization
 ```
 
 See [the app guide](../../turbodash/apps/README.md) for controls and execution details.

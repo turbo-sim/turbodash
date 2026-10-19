@@ -103,10 +103,10 @@ launch commands to the corresponding current modules.
 | `visualization_vtk`, `vtk_assets` | `visualization.vtk`, `visualization.vtk_assets` |
 | `reporting_utils` | `reporting.turbine` |
 | `export_turbogrid`, `export_turbogrid_assembly` | `io.turbogrid`, `io.turbogrid_assembly` |
-| `turbogrid_assembly` | `geometry.assembly` for layout; `visualization.matplotlib_assembly` for plots; `apps.turbine_experimental.assembly_preview` for the CLI |
+| `turbogrid_assembly` | `geometry.assembly` for layout; `visualization.matplotlib_assembly` for plots; `apps.app_turbine_experimental.assembly_preview` for the CLI |
 | `excel_interface_stage`, `excel_interface_turbine` | `io.excel_stage`, `io.excel_turbine` |
-| `app`, `app_lite` | `apps.stage.app`, `apps.stage_efficiency.app` |
-| `app_turbine`, `app_experimental` | `apps.turbine.app`, `apps.turbine_experimental.app` |
+| `app`, `app_lite` | `apps.app_stage.app`, `apps.app_stage_efficiency.app` |
+| `app_turbine`, `app_experimental` | `apps.app_turbine.app`, `apps.app_turbine_experimental.app` |
 | `app_meshing`, `app_turbogrid` | `apps.shared.components.meshing`, `apps.shared.components.turbogrid` |
 | `mesh_jobs` | `apps.shared.mesh_jobs` |
 
@@ -129,12 +129,12 @@ from turbodash.visualization import matplotlib_turbine
 
 | Application | Module | Launch command | Browser check |
 | --- | --- | --- | --- |
-| Stable turbine | `turbodash.apps.turbine` | `turbodash` | 5 plots; no browser errors |
-| Experimental turbine workspace | `turbodash.apps.turbine_experimental` | `turbodash-experimental` | 8 plots; no browser errors |
-| Original stage | `turbodash.apps.stage` | `turbodash-stage` | 4 plots; no browser errors |
-| Dimensionless efficiency | `turbodash.apps.stage_efficiency` | Its demo runner or `main()` | 2 plots; no browser errors |
+| Stable turbine | `turbodash.apps.app_turbine` | `turbodash` | 5 plots; no browser errors |
+| Experimental turbine workspace | `turbodash.apps.app_turbine_experimental` | `turbodash-experimental` | 8 plots; no browser errors |
+| Original stage | `turbodash.apps.app_stage` | `turbodash-stage` | 4 plots; no browser errors |
+| Dimensionless efficiency | `turbodash.apps.app_stage_efficiency` | Its demo runner or `main()` | 2 plots; no browser errors |
 
-Deployment uses `gunicorn turbodash.apps.turbine.app:server`. Isolated meshing jobs
+Deployment uses `gunicorn turbodash.apps.app_turbine.app:server`. Isolated meshing jobs
 use `python -m turbodash.apps.shared.mesh_jobs REQUEST_JSON`. The stable app continues
 to start without the optional meshing/VTK stack. See the
 [application guide](turbodash/apps/README.md) for resources and startup cases.

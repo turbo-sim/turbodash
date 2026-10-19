@@ -5,7 +5,7 @@ def launch_app_stage():
     import os
     import webbrowser
     from threading import Timer
-    from turbodash.apps.stage.app import app
+    from turbodash.apps.app_stage.app import app
 
     if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         Timer(1, lambda: webbrowser.open("http://127.0.0.1:8050/")).start()
@@ -18,7 +18,7 @@ def launch_app_turbine():
     import os
     import webbrowser
     from threading import Timer
-    from turbodash.apps.turbine.app import app
+    from turbodash.apps.app_turbine.app import app
 
     if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         Timer(1, lambda: webbrowser.open("http://127.0.0.1:8050/")).start()
@@ -31,7 +31,7 @@ def launch_app_experimental():
     import os
     import webbrowser
     from threading import Timer
-    from turbodash.apps.turbine_experimental.app import app
+    from turbodash.apps.app_turbine_experimental.app import app
 
     if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         Timer(1, lambda: webbrowser.open("http://127.0.0.1:8050/")).start()

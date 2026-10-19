@@ -5,7 +5,7 @@ import sys
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO))
 
-from turbodash.apps.stage_efficiency import app as application
+from turbodash.apps.app_stage_efficiency import app as application
 
 
 def main():

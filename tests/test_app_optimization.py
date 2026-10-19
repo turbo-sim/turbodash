@@ -14,11 +14,11 @@ from dash import no_update
 from plotly.utils import PlotlyJSONEncoder
 
 from turbodash import optimization as opt
-from turbodash.apps.turbine_optimization import jobs as jobs
-from turbodash.apps.turbine_optimization.model import (
+from turbodash.apps.app_turbine_optimization import jobs as jobs
+from turbodash.apps.app_turbine_optimization.model import (
     build_settings, flat_config, nested_config, output_catalog, variable_catalog,
 )
-from turbodash.apps.turbine_optimization.panel import collect_rows, reconcile_editor, variable_row, constraint_row
+from turbodash.apps.app_turbine_optimization.panel import collect_rows, reconcile_editor, variable_row, constraint_row
 from turbodash.core.turbine import compute_turbine_performance
 
 
@@ -210,7 +210,7 @@ class WorkspaceTests(unittest.TestCase):
         from dash._callback_context import context_value
         from dash._utils import AttributeDict
         from dash.exceptions import PreventUpdate
-        from turbodash.apps.turbine_optimization import app as module
+        from turbodash.apps.app_turbine_optimization import app as module
 
         def invoke(prop_id, callback, *arguments):
             token = context_value.set(AttributeDict(triggered_inputs=[dict(prop_id=prop_id, value=1)]))
@@ -330,7 +330,7 @@ class WorkspaceTests(unittest.TestCase):
     def test_failed_or_infeasible_result_never_changes_loaded_design(self):
         from dash._callback_context import context_value
         from dash._utils import AttributeDict
-        from turbodash.apps.turbine_optimization import app as module
+        from turbodash.apps.app_turbine_optimization import app as module
 
         callback = next(value["callback"].__wrapped__ for key, value in module.app.callback_map.items()
                         if "opt-job.data" in key)
@@ -352,7 +352,7 @@ class WorkspaceTests(unittest.TestCase):
             context_value.reset(token)
 
     def test_multiple_stages_optimize_and_render_together(self):
-        from turbodash.apps.turbine_optimization import app as module
+        from turbodash.apps.app_turbine_optimization import app as module
         config = case()
         config["inputs"]["stages"].append(deepcopy(config["inputs"]["stages"][0]))
         variables = [dict(path=f"stages.{index}.degree_reaction", lower=.3, upper=.7) for index in range(2)]
@@ -364,9 +364,9 @@ class WorkspaceTests(unittest.TestCase):
         self.assertEqual(rendered[8]["inputs"], result.config["inputs"])
 
     def test_new_app_is_independent_and_success_renders_every_output(self):
-        from turbodash.apps.turbine import app as turbine
-        from turbodash.apps.turbine_experimental import app as turbine_experimental
-        from turbodash.apps.turbine_optimization import app as module
+        from turbodash.apps.app_turbine import app as turbine
+        from turbodash.apps.app_turbine_experimental import app as turbine_experimental
+        from turbodash.apps.app_turbine_optimization import app as module
         self.assertIsNot(module.app, turbine.app)
         self.assertIsNot(module.app, turbine_experimental.app)
         client = module.server.test_client()

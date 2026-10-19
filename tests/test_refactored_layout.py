@@ -17,7 +17,7 @@ from turbodash.reporting import stage as reports
 
 ROOT = Path(__file__).resolve().parents[1]
 STAGE_REFERENCE = json.loads((ROOT / "tests/fixtures/stage_refactor_reference.json").read_text())
-APPLICATIONS = ("turbine", "turbine_experimental", "stage", "stage_efficiency")
+APPLICATIONS = ("app_turbine", "app_turbine_experimental", "app_stage", "app_stage_efficiency")
 
 
 def compare(actual, expected):
@@ -58,9 +58,9 @@ def dispatch_calculation(module):
     """Use the endpoint payload produced by Dash for fixed and pattern inputs."""
     controls = list(components(module.app.layout))
     fixed = {c.id: c for c in controls if isinstance(getattr(c, "id", None), str)}
-    if module.__name__.endswith("stage_efficiency.app"):
+    if module.__name__.endswith(".app_stage_efficiency.app"):
         target = "efficiency_ts_plot"
-    elif module.__name__.endswith(".stage.app"):
+    elif module.__name__.endswith(".app_stage.app"):
         target = "stage_result_store"
     else:
         target = "result_store"
@@ -101,16 +101,16 @@ def test_four_yaml_cases_serve_and_calculate_via_dash(name, monkeypatch):
     original = module.app.layout
     from copy import deepcopy
     monkeypatch.setattr(module.app, "layout", deepcopy(original))
-    case = module.configure(ROOT / "demos/apps" / name / "case.yaml")
+    case = module.configure(ROOT / "demos/apps" / name.removeprefix("app_") / "case.yaml")
     client = module.server.test_client()
     for route in ("/", "/_dash-layout", "/_dash-dependencies"):
         assert client.get(route).status_code == 200
     assert Path(module.app.config.assets_folder) == ROOT / "turbodash/apps/shared/assets"
     response = dispatch_calculation(module)
-    if name == "stage_efficiency":
+    if name == "app_stage_efficiency":
         for identity in ("efficiency_ts_plot", "efficiency_tt_plot"):
             assert len(response[identity]["figure"]["data"]) == len(case["inputs"]["R_values"])
-    elif name == "stage":
+    elif name == "app_stage":
         result = response["stage_result_store"]["data"]
         assert np.isfinite(result["stage_performance"]["efficiency_ts"])
         assert result["inputs"]["degree_reaction"] == case["inputs"]["degree_reaction"]
@@ -128,7 +128,7 @@ def test_demo_runner_passes_its_adjacent_yaml_to_the_app(name, monkeypatch):
     module = importlib.import_module("turbodash.apps." + name + ".app")
     observed = []
     monkeypatch.setattr(module, "main", lambda path: observed.append(path))
-    runner = ROOT / "demos/apps" / name / "run.py"
+    runner = ROOT / "demos/apps" / name.removeprefix("app_") / "run.py"
     runpy.run_path(str(runner), run_name="__main__")
     assert observed == [runner.with_name("case.yaml")]
 

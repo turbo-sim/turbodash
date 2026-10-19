@@ -163,7 +163,7 @@ def start_job(config, settings, owner):
         try:
             with (folder / "worker.log").open("w", encoding="utf-8") as log:
                 process = subprocess.Popen(
-                    [sys.executable, "-m", "turbodash.apps.turbine_optimization.jobs", str(folder / "request.json")],
+                    [sys.executable, "-m", "turbodash.apps.app_turbine_optimization.jobs", str(folder / "request.json")],
                     cwd=PROJECT_ROOT, stdin=subprocess.DEVNULL,
                     stdout=log, stderr=subprocess.STDOUT,
                     creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)

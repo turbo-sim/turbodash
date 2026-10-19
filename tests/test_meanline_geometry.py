@@ -238,7 +238,7 @@ def test_meanline_table_displays_fractional_counts(reference):
     assert data[0]["s1"] == round(result["stages_performance"][0]["geometry_meanline"]["stator"]["blade_count"], 3)
 
 
-@pytest.mark.parametrize("app_name", ["turbine", "turbine_experimental"])
+@pytest.mark.parametrize("app_name", ["app_turbine", "app_turbine_experimental"])
 @pytest.mark.parametrize("profile_failure", [False, True])
 def test_app_callback_retains_meanline_result_when_physical_plot_fails(monkeypatch, app_name, profile_failure):
     app = importlib.import_module(f"turbodash.apps.{app_name}.app")

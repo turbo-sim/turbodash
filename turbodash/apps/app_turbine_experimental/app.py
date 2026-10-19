@@ -1,6 +1,6 @@
 """Experimental turbine workspace with meanline, geometry and meshing tabs.
 
-The stable meanline app lives in turbodash.apps.turbine; keep workspace changes here
+The stable meanline app lives in turbodash.apps.app_turbine; keep workspace changes here
 until they are ready to become the default.
 """
 

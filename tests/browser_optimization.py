@@ -34,7 +34,7 @@ def main():
         listener.bind(("127.0.0.1", 0))
         port = listener.getsockname()[1]
     address = f"http://127.0.0.1:{port}"
-    code = f"from turbodash.apps.turbine_optimization.app import app; app.run(port={port}, debug=False)"
+    code = f"from turbodash.apps.app_turbine_optimization.app import app; app.run(port={port}, debug=False)"
     with (args.output / "server.log").open("w", encoding="utf-8") as log:
         server = subprocess.Popen([sys.executable, "-c", code], cwd=ROOT, stdout=log, stderr=subprocess.STDOUT,
                                   creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)

@@ -1,8 +1,8 @@
 {
   "checks": [
-    "Sequential add variable",
-    "Five rapid variable clicks remain five additions",
-    "Five rapid constraint clicks remain five additions",
+    "Sequential checkbox selection adds named variables",
+    "Five rapid variable checkbox selections survive delayed responses",
+    "Five rapid constraint checkbox selections survive delayed responses",
     "Rapid removal of four distinct constraints",
     "Rapid removal of seven distinct variables",
     "Adding a row commits and preserves unblurred precision edits",
@@ -12,7 +12,9 @@
     "Catalog refresh preserves the focused uncommitted numeric edit",
     "Simultaneous variable and constraint additions retain both actions",
     "Simultaneous additions and removals preserve live numeric bounds",
-    "Add control remains stationary as rows grow",
+    "Opening and closing the stationary Add menu does not add rows",
+    "Optimize all adds missing paths, shows partial selection and preserves precise bounds",
+    "Rapid repeated checkbox toggles retain their final selected state",
     "Blank target, blank scale, and zero scale give recoverable validation errors",
     "Removing all rows and correcting validation errors permits a successful fresh run",
     "Repeated loading with unchanged turbine inputs applies new bounds before pending Add",

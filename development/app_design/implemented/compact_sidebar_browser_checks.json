@@ -1,0 +1,323 @@
+{
+  "checks": [
+    {
+      "check": "variable compact rows",
+      "viewport": 1440,
+      "rows": 4,
+      "minControlWidth": 87.65625
+    },
+    {
+      "check": "menu geometry",
+      "viewport": 1440,
+      "theme": "light",
+      "top": 362.296875,
+      "bottom": 522.296875,
+      "height": 160,
+      "inspectorTop": 193.5,
+      "inspectorBottom": 846.8125,
+      "clipped": false,
+      "left": 115,
+      "right": 406,
+      "scrollHeight": 158,
+      "clientHeight": 158
+    },
+    {
+      "check": "constraint compact rows",
+      "viewport": 1440,
+      "rows": 2,
+      "minControlWidth": 87.65625
+    },
+    {
+      "check": "constraint menu geometry",
+      "viewport": 1440,
+      "theme": "light",
+      "top": 614.296875,
+      "bottom": 741.796875,
+      "height": 127.5,
+      "inspectorTop": 193.5,
+      "inspectorBottom": 846.8125,
+      "clipped": false,
+      "left": 115,
+      "right": 406,
+      "scrollHeight": 126,
+      "clientHeight": 126
+    },
+    {
+      "check": "variable compact rows",
+      "viewport": 1440,
+      "rows": 4,
+      "minControlWidth": 87.65625
+    },
+    {
+      "check": "menu geometry",
+      "viewport": 1440,
+      "theme": "dark",
+      "top": 362.296875,
+      "bottom": 489.796875,
+      "height": 127.5,
+      "inspectorTop": 193.5,
+      "inspectorBottom": 846.8125,
+      "clipped": false,
+      "left": 115,
+      "right": 406,
+      "scrollHeight": 126,
+      "clientHeight": 126
+    },
+    {
+      "check": "constraint compact rows",
+      "viewport": 1440,
+      "rows": 3,
+      "minControlWidth": 87.65625
+    },
+    {
+      "check": "constraint menu geometry",
+      "viewport": 1440,
+      "theme": "dark",
+      "top": 432.296875,
+      "bottom": 559.796875,
+      "height": 127.5,
+      "inspectorTop": 193.5,
+      "inspectorBottom": 846.8125,
+      "clipped": false,
+      "left": 115,
+      "right": 406,
+      "scrollHeight": 126,
+      "clientHeight": 126
+    },
+    {
+      "check": "variable compact rows",
+      "viewport": 390,
+      "rows": 4,
+      "minControlWidth": 81
+    },
+    {
+      "check": "menu geometry",
+      "viewport": 390,
+      "theme": "light",
+      "top": 502.59375,
+      "bottom": 630.09375,
+      "height": 127.5,
+      "inspectorTop": 248.5,
+      "inspectorBottom": 714.65625,
+      "clipped": false,
+      "left": 85,
+      "right": 356,
+      "scrollHeight": 126,
+      "clientHeight": 126
+    },
+    {
+      "check": "constraint compact rows",
+      "viewport": 390,
+      "rows": 3,
+      "minControlWidth": 81
+    },
+    {
+      "check": "constraint menu geometry",
+      "viewport": 390,
+      "theme": "light",
+      "top": 488.296875,
+      "bottom": 615.796875,
+      "height": 127.5,
+      "inspectorTop": 248.5,
+      "inspectorBottom": 714.65625,
+      "clipped": false,
+      "left": 85,
+      "right": 356,
+      "scrollHeight": 126,
+      "clientHeight": 126
+    },
+    {
+      "check": "variable compact rows",
+      "viewport": 390,
+      "rows": 4,
+      "minControlWidth": 81
+    },
+    {
+      "check": "menu geometry",
+      "viewport": 390,
+      "theme": "dark",
+      "top": 502.59375,
+      "bottom": 630.09375,
+      "height": 127.5,
+      "inspectorTop": 248.5,
+      "inspectorBottom": 714.65625,
+      "clipped": false,
+      "left": 85,
+      "right": 356,
+      "scrollHeight": 126,
+      "clientHeight": 126
+    },
+    {
+      "check": "constraint compact rows",
+      "viewport": 390,
+      "rows": 3,
+      "minControlWidth": 81
+    },
+    {
+      "check": "constraint menu geometry",
+      "viewport": 390,
+      "theme": "dark",
+      "top": 488.296875,
+      "bottom": 615.796875,
+      "height": 127.5,
+      "inspectorTop": 248.5,
+      "inspectorBottom": 714.65625,
+      "clipped": false,
+      "left": 85,
+      "right": 356,
+      "scrollHeight": 126,
+      "clientHeight": 126
+    },
+    {
+      "check": "variable compact rows",
+      "viewport": 320,
+      "rows": 4,
+      "minControlWidth": 57.65625
+    },
+    {
+      "check": "menu geometry",
+      "viewport": 320,
+      "theme": "light",
+      "top": 451,
+      "bottom": 578.5,
+      "height": 127.5,
+      "inspectorTop": 248.5,
+      "inspectorBottom": 610.65625,
+      "clipped": false,
+      "left": 85,
+      "right": 286,
+      "scrollHeight": 126,
+      "clientHeight": 126
+    },
+    {
+      "check": "constraint compact rows",
+      "viewport": 320,
+      "rows": 3,
+      "minControlWidth": 57.65625
+    },
+    {
+      "check": "constraint menu geometry",
+      "viewport": 320,
+      "theme": "light",
+      "top": 451,
+      "bottom": 578.5,
+      "height": 127.5,
+      "inspectorTop": 248.5,
+      "inspectorBottom": 610.65625,
+      "clipped": false,
+      "left": 85,
+      "right": 286,
+      "scrollHeight": 126,
+      "clientHeight": 126
+    },
+    {
+      "check": "variable compact rows",
+      "viewport": 320,
+      "rows": 4,
+      "minControlWidth": 57.65625
+    },
+    {
+      "check": "menu geometry",
+      "viewport": 320,
+      "theme": "dark",
+      "top": 451,
+      "bottom": 578.5,
+      "height": 127.5,
+      "inspectorTop": 248.5,
+      "inspectorBottom": 610.65625,
+      "clipped": false,
+      "left": 85,
+      "right": 286,
+      "scrollHeight": 126,
+      "clientHeight": 126
+    },
+    {
+      "check": "constraint compact rows",
+      "viewport": 320,
+      "rows": 3,
+      "minControlWidth": 57.65625
+    },
+    {
+      "check": "constraint menu geometry",
+      "viewport": 320,
+      "theme": "dark",
+      "top": 451,
+      "bottom": 578.5,
+      "height": 127.5,
+      "inspectorTop": 248.5,
+      "inspectorBottom": 610.65625,
+      "clipped": false,
+      "left": 85,
+      "right": 286,
+      "scrollHeight": 126,
+      "clientHeight": 126
+    },
+    {
+      "check": "variable compact rows",
+      "viewport": "desktop inspector 280",
+      "rows": 4,
+      "minControlWidth": 65
+    },
+    {
+      "check": "inline fields and expanded cards",
+      "viewport": 1440,
+      "fields": 33,
+      "cards": 5
+    },
+    {
+      "check": "near-bottom menu",
+      "viewport": 1440,
+      "top": 713.296875,
+      "bottom": 840.796875,
+      "height": 127.5,
+      "inspectorTop": 193.5,
+      "inspectorBottom": 846.8125,
+      "clipped": false,
+      "left": 115,
+      "right": 406,
+      "scrollHeight": 126,
+      "clientHeight": 126
+    },
+    {
+      "check": "inline fields and expanded cards",
+      "viewport": 390,
+      "fields": 33,
+      "cards": 5
+    },
+    {
+      "check": "near-bottom menu",
+      "viewport": 390,
+      "top": 349.59375,
+      "bottom": 709.09375,
+      "height": 359.5,
+      "inspectorTop": 248.5,
+      "inspectorBottom": 714.65625,
+      "clipped": false,
+      "left": 85,
+      "right": 356,
+      "scrollHeight": 750,
+      "clientHeight": 358
+    },
+    {
+      "check": "inline fields and expanded cards",
+      "viewport": 320,
+      "fields": 33,
+      "cards": 5
+    },
+    {
+      "check": "near-bottom menu",
+      "viewport": 320,
+      "top": 349,
+      "bottom": 604.5,
+      "height": 255.5,
+      "inspectorTop": 248.5,
+      "inspectorBottom": 610.65625,
+      "clipped": false,
+      "left": 85,
+      "right": 286,
+      "scrollHeight": 832,
+      "clientHeight": 254
+    }
+  ],
+  "errors": []
+}

@@ -10,6 +10,7 @@ import json
 import yaml
 import numpy as np
 from turbodash.core import turbine as core
+from turbodash.io.yaml import dump_turbine_yaml
 from turbodash.visualization import plotly_turbine as _plotting
 from turbodash.reporting import turbine as reporting
 import dash_bootstrap_components as dbc
@@ -947,7 +948,7 @@ def download_yaml(n_clicks, cfg, signature, ov, sv, oi, si, stages, *editor):
     cfg = dict(cfg, inputs=current["inputs"], optimization=settings)
     set_props("td-load-error", {"children": ""})
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    yaml_str = yaml.safe_dump(cfg, sort_keys=False, default_flow_style=False)
+    yaml_str = dump_turbine_yaml(cfg)
     return dict(
         content=yaml_str, filename=f"turbine_{timestamp}.yaml", type="text/yaml"
     )

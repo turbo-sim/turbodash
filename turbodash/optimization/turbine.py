@@ -15,6 +15,8 @@ import numpy as np
 import pysolver_view as psv
 import yaml
 
+from turbodash.io.yaml import dump_turbine_yaml
+
 
 # =============================================================================
 # Numeric result selectors and ThermOpt-style objectives / constraints
@@ -642,6 +644,6 @@ def save_optimization_results(result, output_directory):
     paths = {}
     for name, document in documents.items():
         path = output_directory / name
-        path.write_text(yaml.safe_dump(_plain(document), sort_keys=False), encoding="utf-8")
+        path.write_text(dump_turbine_yaml(_plain(document)), encoding="utf-8")
         paths[name] = path
     return paths

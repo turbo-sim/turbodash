@@ -584,6 +584,8 @@ def test_load_rejects_invalid_stage_number_before_replacing_controls(live_form, 
 
 
 def test_save_exports_current_named_design_and_optimization_editor(live_form):
+    edit(live_form, "inlet_property_2", 600)
+    edit(live_form, "rotor.aspect_ratio", 2, stage=0)
     edit(live_form, "degree_reaction", 0.3123456789123, stage=1)
     config = application.live_config(**live_form)
     # Dash's result_store round trip converts solver NumPy scalars to JSON numbers.
@@ -613,6 +615,10 @@ def test_save_exports_current_named_design_and_optimization_editor(live_form):
         *optimization_editor(),
     )
     saved = yaml.safe_load(download["content"])
+    assert "inlet_property_2: 600.00" in download["content"]
+    assert "aspect_ratio: 2.00" in download["content"]
+    assert "max_iterations: 123\n" in download["content"]
+    assert type(saved["inputs"]["inlet_property_2"]) is float
     assert saved["inputs"] == config["inputs"]
     assert saved["overall_performance"] == solved["overall_performance"]
     assert saved["optimization"]["design_variables"]["blade_velocity_ratio"] == {

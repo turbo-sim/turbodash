@@ -16,6 +16,7 @@ import time
 from urllib.request import urlopen
 
 import yaml
+from browser_picker_helpers import choose_path
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -199,7 +200,7 @@ def main():
                     checks.append("Tiny scientific-notation tolerances keep their exponent and all supplied mantissa digits")
 
                     page.get_by_role("tab", name="Design variables", exact=True).click()
-                    page.locator("#opt-add-variable").click()
+                    choose_path(page, "variable", "blade_velocity_ratio")
                     expect(page.locator("#opt-variable-rows .td-opt-row")).to_have_count(1)
                     first = page.locator("#opt-variable-rows .td-opt-row").first
                     numbers = first.locator('input[type="number"]')
@@ -207,7 +208,7 @@ def main():
                     expect(numbers.nth(0)).to_have_value(re.compile(r"-?\d+\.\d{3,}(?:[eE][+-]?\d+)?"))
                     numbers.nth(1).fill("0.6200007000")
                     numbers.nth(1).blur()
-                    page.locator("#opt-add-variable").click()
+                    choose_path(page, "variable", "rotational_speed")
                     expect(page.locator("#opt-variable-rows .td-opt-row")).to_have_count(2)
                     expect(numbers.nth(1)).to_have_value("0.6200007000")
                     page.get_by_role("button", name="Remove variable", exact=True).last.click()

@@ -142,6 +142,15 @@
             if (shape.line && neutral.test(shape.line.color)) update["shapes[" + index + "].line.color"] = ink;
         });
         const traceUpdates = new Map();
+        const lossColors = {
+            loss_profile: ["#2462D1", "#88B7FF"],
+            loss_trailing: ["#4B84E5", "#6D9DE8"],
+            loss_secondary: ["#7AA6EC", "#B3CEFF"],
+            loss_clearance: ["#FF7F0E", "#FFAD5C"],
+            loss_incidence: ["#F5AD66", "#F3C48F"],
+            loss_exit_kinetic: ["#647892", "#A0B2CA"],
+            loss_unallocated: ["#8995A5", "#BCC6D4"]
+        };
         (graph.data || []).forEach((trace, index) => {
             const role = trace.meta && trace.meta.theme_role, colors = {};
             if (role === "endwall") colors["line.color"] = currentTheme === "dark" ? "#a0b2ca" : "#647892";
@@ -149,6 +158,12 @@
             else if (trace.line && ["#1f77b4", "#69a9e2"].includes(trace.line.color)) colors["line.color"] = currentTheme === "dark" ? "#69a9e2" : "#1f77b4";
             else if (trace.line && ["#ff7f0e", "#ffad5c"].includes(trace.line.color)) colors["line.color"] = currentTheme === "dark" ? "#ffad5c" : "#ff7f0e";
             if (trace.marker && typeof trace.marker.color === "string" && neutral.test(trace.marker.color)) colors["marker.color"] = ink;
+            else if (trace.marker && ["#1f77b4", "#69a9e2"].includes(trace.marker.color)) colors["marker.color"] = currentTheme === "dark" ? "#69a9e2" : "#1f77b4";
+            else if (trace.marker && ["#ff7f0e", "#ffad5c"].includes(trace.marker.color)) colors["marker.color"] = currentTheme === "dark" ? "#ffad5c" : "#ff7f0e";
+            if (lossColors[role]) {
+                colors["marker.color"] = lossColors[role][currentTheme === "dark" ? 1 : 0];
+                colors["marker.line.color"] = panel;
+            }
             if (role === "solid") colors.fillcolor = currentTheme === "dark" ? "rgba(160,178,202,0.12)" : "rgba(100,120,146,0.12)";
             if (role === "channel") colors.fillcolor = currentTheme === "dark" ? "rgba(136,183,255,0.08)" : "rgba(36,98,209,0.05)";
             if (role === "flow_guide") colors["line.color"] = currentTheme === "dark" ? "rgba(128,183,255,0.58)" : "rgba(68,118,188,0.48)";
@@ -192,6 +207,15 @@
             }
             themeFigure(graph);
         });
+    }
+    function setupHeader() {
+        const header = root.querySelector(".td-header");
+        const measure = () => {
+            root.style.setProperty("--td-inspector-top", header.getBoundingClientRect().bottom + "px");
+        };
+        const observer = new ResizeObserver(measure);
+        observer.observe(header);
+        measure();
     }
     function setWorkspace(workspace) {
         if (!root || !["meanline", "geometry", "mesh"].includes(workspace)) return;
@@ -401,7 +425,7 @@
         const next = document.getElementById("td-workbench");
         if (!next || next === root) return;
         root = next; root.dataset.workspace = root.dataset.workspace || "meanline";
-        applyTheme(currentTheme, false); applyScope(); setupResize();
+        applyTheme(currentTheme, false); applyScope(); setupResize(); setupHeader();
         formatNumericInputs();
         root.addEventListener("input", event => {
             const input = event.target;
@@ -460,6 +484,13 @@
         root.addEventListener("toggle", event => {
             const details = event.target;
             if (details.matches("details.td-section[id]")) setProps(details.id, { open: details.open });
+            if (details.matches("details.td-results-disclosure") && details.open) {
+                requestAnimationFrame(() => {
+                    if (window.Plotly) details.querySelectorAll(".js-plotly-plot").forEach(graph => {
+                        if (graph._fullLayout) window.Plotly.Plots.resize(graph);
+                    });
+                });
+            }
         }, true);
         new MutationObserver(records => {
             if (records.some(record => ["data-stage-index", "data-blade-row", "data-workspace"].includes(record.attributeName))) applyScope();

@@ -10,15 +10,21 @@ import dash_bootstrap_components as dbc
 from . import jobs
 from .model import (
     build_settings, flat_config, nested_config, output_catalog, variable_catalog,
+    variable_groups, constraint_groups,
 )
+from .selection import apply_selection_operations, picker_signature, picker_tree, selector_menu
 
 
 DEFAULT_OBJECTIVE = "$overall_performance.efficiency_ts"
 DEFAULT_CONSTRAINT = "$stages_performance.*.geometry_meanline.*.flaring_angle"
 
 
-def field(label, component):
-    return html.Label([html.Span(label), component], className="td-opt-field")
+def field(label, component, help_text=None):
+    return html.Label([
+        html.Span(label, className="td-opt-field-label", title=help_text,
+                  **({"tabIndex": 0} if help_text else {})),
+        component,
+    ], className="td-opt-field")
 
 
 def panel():
@@ -26,7 +32,7 @@ def panel():
         html.Summary(["Optimization", html.Span("SLSQP", className="td-opt-badge")]),
         html.Div([
             dbc.Tabs(id="opt-tabs", active_tab="settings", children=[
-                dbc.Tab(label="Settings", tab_id="settings", children=html.Div([
+                dbc.Tab(label="Configuration", tab_id="settings", children=html.Div([
                     field("Objective", dcc.Dropdown(id="opt-objective", value=DEFAULT_OBJECTIVE, clearable=False)),
                     field("Goal", dbc.RadioItems(id="opt-direction", value="maximize", inline=True,
                                                 options=[{"label": "Maximize", "value": "maximize"},
@@ -38,24 +44,28 @@ def panel():
                     ], className="td-opt-settings-grid"),
                 ], className="td-opt-tab")),
                 dbc.Tab(label="Design variables", tab_id="variables", children=html.Div([
-                    html.Span("About design variables", title="Only selected inputs are free. A blank initial value uses the current design; values outside bounds are clipped and logged.", tabIndex=0, className="td-help"),
-                    dbc.Button("+ Add variable", id="opt-add-variable", outline=True, color="primary", size="sm", n_clicks=0, className="mb-3"),
+                    html.Span("?", title="Only selected inputs are free. A blank initial value uses the current design; values outside bounds are clipped and logged.", tabIndex=0, className="td-help",
+                              **{"aria-label": "About design variables"}),
+                    html.Div([selector_menu("variable"), selector_menu("variable", groups=True)],
+                             className="td-opt-picker-actions"),
                     html.Div(id="opt-variable-rows"),
                 ], className="td-opt-tab")),
                 dbc.Tab(label="Constraints", tab_id="constraints", children=html.Div([
-                    html.Span("About constraint scaling", title="Scale divides the residual into dimensionless units. Use a positive physical scale, even for a zero target.", tabIndex=0, className="td-help"),
-                    dbc.Button("+ Add constraint", id="opt-add-constraint", outline=True, color="primary", size="sm", n_clicks=0, className="mb-3"),
+                    html.Span("?", title="Scale divides the residual into dimensionless units. Use a positive physical scale, even for a zero target.", tabIndex=0, className="td-help",
+                              **{"aria-label": "About constraint scaling"}),
+                    html.Div([selector_menu("constraint"), selector_menu("constraint", groups=True)],
+                             className="td-opt-picker-actions"),
                     html.Div(id="opt-constraint-rows"),
                 ], className="td-opt-tab")),
             ]),
-            dbc.Button("Start optimization", id="opt-start", color="primary", className="td-opt-start", n_clicks=0),
-            html.Div(id="opt-status", role="status", children="Ready · optimization uses your current design."),
-            html.Div(id="opt-progress", className="td-opt-progress", **{"aria-live": "polite"}),
         ], className="td-opt-body"),
         dcc.Store(id="opt-launching", data=False), dcc.Store(id="opt-catalog"), dcc.Store(id="opt-editor-state", data={"variables": [], "constraints": []}),
         dcc.Store(id="opt-editor-load"),
+        dcc.Store(id="opt-selection-request", data={"revision": 0, "operations": []}),
+        dcc.Store(id="opt-picker-signature"),
         dcc.Store(id="opt-job", storage_type="session"), dcc.Store(id="opt-applied-result"),
         dcc.Store(id="opt-progress-snapshot"),
+        dcc.Store(id="opt-outcome-state", data="ready"),
         dcc.Interval(id="opt-poll", interval=750),
     ], className="td-opt-panel", id="opt-panel")
 
@@ -68,14 +78,59 @@ def terminal():
     ], id="opt-terminal", className="td-opt-terminal")
 
 
+def actions():
+    """Keep the run action and its status outside the collapsible editor."""
+    return html.Footer([
+        html.Div([
+            html.Strong("Optimization"),
+            html.Span("Ready", id="opt-state-label", className="td-opt-outcome td-opt-outcome-neutral",
+                      role="status", **{"aria-live": "polite", "aria-atomic": "true"}),
+            html.Div(id="opt-status", role="status", children="Optimization uses your current design.",
+                     **{"aria-live": "polite", "aria-atomic": "true"}),
+            html.Div(id="opt-progress", className="td-opt-progress", **{"aria-live": "polite"}),
+        ], className="td-optimization-status"),
+        dbc.Button("Start optimization", id="opt-start", color="primary", className="td-opt-start", n_clicks=0),
+    ], id="opt-actions", className="td-optimization-dock td-opt-state-ready",
+        **{"aria-label": "Optimization controls", "aria-busy": "false"})
+
+
+def outcome_presentation(state, launching=False):
+    """Present explicit job outcomes without interpreting solver messages."""
+    states = {
+        "ready": ("Ready", "neutral", "primary"),
+        "running": ("Running", "info", "primary"),
+        "applying": ("Applying design", "info", "primary"),
+        "success": ("Applied successfully", "success", "success"),
+        "design_changed": ("Design changed · result not applied", "warning", "warning"),
+        "unconfirmed": ("Application unconfirmed", "warning", "warning"),
+        "failed": ("Optimization failed", "danger", "danger"),
+    }
+    state = "running" if launching else state
+    if state not in states:
+        state = "ready"
+    label, tone, color = states[state]
+    button = {
+        "running": "Optimizing…",
+        "applying": "Applying design…",
+    }.get(state, "Start optimization")
+    return (
+        f"td-optimization-dock td-opt-state-{state.replace('_', '-')}",
+        "true" if state in ("running", "applying") else "false",
+        label,
+        f"td-opt-outcome td-opt-outcome-{tone}",
+        button,
+        color,
+    )
+
+
 def _dropdown_options(catalog):
     return [dict(value=path, label=item["label"]) for path, item in catalog.items()]
 
 
-def _numeric(kind, row, key, label, value=None, placeholder=None):
+def _numeric(kind, row, key, label, value=None, placeholder=None, help_text=None):
     return field(label, dbc.Input(id={"type": f"opt-{kind}-number", "row": row, "field": key},
                                  type="number", value=value, step="any", placeholder=placeholder,
-                                 size="sm", debounce=True))
+                                 size="sm", debounce=True), help_text)
 
 
 def variable_row(row, catalog):
@@ -88,13 +143,14 @@ def variable_row(row, catalog):
         html.Div([
             dcc.Dropdown(id={"type": "opt-variable-path", "row": key}, options=options, value=path,
                          searchable=True, clearable=False, placeholder="Choose a model input…"),
-            html.Button("×", id={"type": "opt-remove-variable", "row": key}, n_clicks=0, className="btn btn-link",
-                        title="Remove variable", **{"aria-label": "Remove variable"}),
+            html.Button("×", id={"type": "opt-remove-variable", "row": key}, n_clicks=0, className="btn btn-link td-opt-remove",
+                        title="Remove variable", **{"aria-label": "Remove variable", "data-opt-kind": "variable", "data-opt-row": key}),
         ], className="td-opt-row-head"),
         html.Div([
-            _numeric("variable", key, "lower", "Lower", row.get("lower")),
-            _numeric("variable", key, "initial", "Initial", row.get("initial"), f"Current: {choice['value']:g}" if choice else "Current design"),
-            _numeric("variable", key, "upper", "Upper", row.get("upper")),
+            _numeric("variable", key, "lower", "Lower", row.get("lower"), help_text="Minimum allowed value, in the quantity's displayed units."),
+            _numeric("variable", key, "initial", "Initial", row.get("initial"), f"Current: {choice['value']:g}" if choice else "Current design",
+                     help_text="Starting value. Leave blank to use the current design; values outside the bounds are clipped and logged."),
+            _numeric("variable", key, "upper", "Upper", row.get("upper"), help_text="Maximum allowed value, greater than the lower bound."),
         ], className="td-opt-bounds"),
     ], className="td-opt-row", key=key)
 
@@ -108,15 +164,16 @@ def constraint_row(row, catalog):
         html.Div([
             dcc.Dropdown(id={"type": "opt-constraint-path", "row": key}, options=options, value=path,
                          searchable=True, clearable=False, placeholder="Choose a calculated quantity…"),
-            html.Button("×", id={"type": "opt-remove-constraint", "row": key}, n_clicks=0, className="btn btn-link",
-                        title="Remove constraint", **{"aria-label": "Remove constraint"}),
+            html.Button("×", id={"type": "opt-remove-constraint", "row": key}, n_clicks=0, className="btn btn-link td-opt-remove",
+                        title="Remove constraint", **{"aria-label": "Remove constraint", "data-opt-kind": "constraint", "data-opt-row": key}),
         ], className="td-opt-row-head"),
         html.Div([
             field("Comparison", dcc.Dropdown(id={"type": "opt-comparison", "row": key}, value=row.get("comparison", "<="),
                                             clearable=False, searchable=False,
-                                            options=[{"label": label, "value": value} for label, value in (("≤", "<="), ("=", "="), ("≥", ">="))])),
-            _numeric("constraint", key, "target", "Target", row.get("target", 0)),
-            _numeric("constraint", key, "scale", "Scale", row.get("scale", 1)),
+                                            options=[{"label": label, "value": value} for label, value in (("≤", "<="), ("=", "="), ("≥", ">="))]),
+                  "Choose whether the calculated quantity must be below, equal to or above the target."),
+            _numeric("constraint", key, "target", "Target", row.get("target", 0), help_text="Required value, in the quantity's displayed units."),
+            _numeric("constraint", key, "scale", "Scale", row.get("scale", 1), help_text="Positive physical scale that divides the constraint residual. Use a positive scale even when the target is zero."),
         ], className="td-opt-bounds"),
     ], className="td-opt-row", key=key)
 
@@ -169,7 +226,8 @@ def reconcile_editor(rows, previous, catalog, kind, trigger, loaded=None, *,
             if kind == "variable":
                 row.update(lower=choice.get("lower"), upper=choice.get("upper"), initial=None)
             else:
-                row.update(target=0, comparison="=", scale=choice.get("scale", 1))
+                row.update(target=choice.get("target", 0), comparison=choice.get("comparison", "="),
+                           scale=choice.get("scale", 1))
             row.update(kept)
         row["label"] = choice.get("label")
     return rows
@@ -197,18 +255,45 @@ def register_callbacks(app, live_config, render_results):
             raise PreventUpdate
         config = dict(inputs=results["inputs"])
         variables, outputs = variable_catalog(config), output_catalog(config, results)
-        return dict(variables=variables, constraints=outputs, fingerprint=jobs.fingerprint(config)), _dropdown_options({k: v for k, v in outputs.items() if v["objective"]})
+        return dict(
+            variables=variables, constraints=outputs, fingerprint=jobs.fingerprint(config),
+            groups=dict(variable=variable_groups(config, variables),
+                        constraint=constraint_groups(config, outputs)),
+        ), _dropdown_options({k: v for k, v in outputs.items() if v["objective"]})
 
     app.clientside_callback(
-        """function(config, variables, constraints, previous) {
-            return config ? {config: config, revision: (previous?.revision || 0) + 1, add_clicks: {
-                variable: variables || 0, constraint: constraints || 0
-            }} : null;
+        """function(config, selection, previous) {
+            return config ? {config: config, revision: (previous?.revision || 0) + 1,
+                selection_revision: selection?.revision || 0} : null;
         }""",
         Output("opt-editor-load", "data"), Input("loaded_cfg_store", "data"),
-        State("opt-add-variable", "n_clicks"), State("opt-add-constraint", "n_clicks"),
+        State("opt-selection-request", "data"),
         State("opt-editor-load", "data"),
     )
+
+    @app.callback(
+        Output("opt-variable-picker", "children"), Output("opt-constraint-picker", "children"),
+        Output("opt-variable-group-picker", "children"), Output("opt-constraint-group-picker", "children"),
+        Output("opt-picker-signature", "data"),
+        Input("opt-catalog", "data"), Input("opt-editor-state", "data"),
+        State("opt-picker-signature", "data"),
+    )
+    def render_pickers(catalog, editor, signature):
+        if not catalog:
+            raise PreventUpdate
+        editor = editor or dict(variables=[], constraints=[])
+        current = picker_signature(catalog, editor)
+        if current == signature:
+            raise PreventUpdate
+        revision = editor.get("selection_revision", 0)
+        groups = catalog.get("groups", {})
+        return (
+            picker_tree(catalog["variables"], editor["variables"], "variable", revision),
+            picker_tree(catalog["constraints"], editor["constraints"], "constraint", revision),
+            picker_tree(catalog["variables"], editor["variables"], "variable", revision, groups.get("variable", {})),
+            picker_tree(catalog["constraints"], editor["constraints"], "constraint", revision, groups.get("constraint", {})),
+            current,
+        )
 
     @app.callback(Output("opt-variable-rows", "children"), Output("opt-constraint-rows", "children"),
                   Output("opt-editor-state", "data"),
@@ -218,10 +303,11 @@ def register_callbacks(app, live_config, render_results):
                   Input(var_path, "value"), Input(con_path, "value"),
                   Input(var_num, "value"), Input(con_num, "value"), Input(comparison, "value"),
                   Input("opt-catalog", "data"), Input("opt-editor-load", "data"),
+                  Input("opt-selection-request", "data"),
                   State({"type": "opt-remove-variable", "row": ALL}, "id"),
                   State({"type": "opt-remove-constraint", "row": ALL}, "id"),
                   State("opt-editor-state", "data"), *editor_states)
-    def edit_rows(_addv, _addc, _removev, _removec, _vp, _cp, _vn, _cn, _comparisons, catalog, load_transition,
+    def edit_rows(_addv, _addc, _removev, _removec, _vp, _cp, _vn, _cn, _comparisons, catalog, load_transition, selection_request,
                   remove_variable_ids, remove_constraint_ids, previous, *values):
         if not catalog:
             raise PreventUpdate
@@ -241,7 +327,13 @@ def register_callbacks(app, live_config, render_results):
         if load_pending:
             # Loading also changes turbine/speed type. Derive choices from that
             # configuration immediately, without waiting on downstream plots.
-            catalog = dict(variables=variable_catalog(loaded_config), constraints=output_catalog(loaded_config))
+            variables_catalog = variable_catalog(loaded_config)
+            constraints_catalog = output_catalog(loaded_config)
+            catalog = dict(
+                variables=variables_catalog, constraints=constraints_catalog,
+                groups=dict(variable=variable_groups(loaded_config, variables_catalog),
+                            constraint=constraint_groups(loaded_config, constraints_catalog)),
+            )
             settings = loaded_config.get("optimization", {})
             loaded_variables = [dict(id=uuid4().hex, path=spec.get("path", path).removeprefix("$"),
                                      lower=spec.get("lower_value"), upper=spec.get("upper_value"), initial=spec.get("initial_value"))
@@ -251,18 +343,25 @@ def register_callbacks(app, live_config, render_results):
                                        scale=(abs(spec.get("value", 0)) if spec.get("normalize") is True else
                                               1 if spec.get("normalize") in (False, None) else spec["normalize"]))
                                   for spec in settings.get("constraints", [])]
-        # Dash may coalesce rapid clicks, and a catalog refresh can arrive in
-        # the same request as a button action. Reconcile the cumulative click
-        # counts, rather than applying only the first triggered event. Removal
-        # buttons belong to stable row IDs, so all clicked rows can be removed
-        # together without confusing array positions after another deletion.
-        clicks = dict(variable=_addv or 0, constraint=_addc or 0)
-        # A new design intentionally replaces the old editor. The browser
-        # snapshots the click counters when that load arrives, so actions made
-        # after loading started survive even if its first response is delayed.
-        previous_clicks = (load_transition if load_pending else previous).get("add_clicks", {})
-        additions = {kind: max(0, clicks[kind] - previous_clicks.get(kind, 0))
-                     for kind in clicks}
+        # The browser journals selections cumulatively so rapid toggles and
+        # overlapping replies cannot lose actions. A load replaces earlier
+        # selections; only operations after its captured baseline are replayed.
+        baseline = (load_transition if load_pending else previous).get("selection_revision", 0)
+        operations = sorted(
+            (operation for operation in (selection_request or {}).get("operations", [])
+             if operation.get("revision", 0) > baseline),
+            key=lambda operation: operation["revision"],
+        )
+        selection_revision = max(
+            baseline, (selection_request or {}).get("revision", 0),
+        )
+        if (
+            not load_pending and not operations
+            and all(identity in ("opt-add-variable", "opt-add-constraint")
+                    for identity in ctx.triggered_prop_ids.values())
+        ):
+            # Native menu opening changes no editor state or numeric focus.
+            raise PreventUpdate
         edited_fields = {}
         for identity in ctx.triggered_prop_ids.values():
             if isinstance(identity, dict) and identity.get("type") in (
@@ -270,27 +369,27 @@ def register_callbacks(app, live_config, render_results):
                 edited_fields.setdefault(identity["row"], set()).add(identity.get("field", "comparison"))
         variables = reconcile_editor(
             variables, previous["variables"], catalog["variables"], "variable", None,
-            loaded_variables, add_count=additions["variable"],
+            loaded_variables, add_count=0,
             removed=[identity["row"] for count, identity in zip(_removev or [], remove_variable_ids or []) if count],
             edited_fields=edited_fields,
         )
         constraints = reconcile_editor(
             constraints, previous["constraints"], catalog["constraints"], "constraint", None,
-            loaded_constraints, add_count=additions["constraint"],
+            loaded_constraints, add_count=0,
             removed=[identity["row"] for count, identity in zip(_removec or [], remove_constraint_ids or []) if count],
             edited_fields=edited_fields,
         )
-        if load_pending:
-            variables = reconcile_editor(variables, variables, catalog["variables"], "variable", None,
-                                         add_count=additions["variable"])
-            constraints = reconcile_editor(constraints, constraints, catalog["constraints"], "constraint", None,
-                                           add_count=additions["constraint"])
+        groups = catalog.get("groups", {})
+        variables = apply_selection_operations(
+            variables, catalog["variables"], groups.get("variable", {}), "variable", operations)
+        constraints = apply_selection_operations(
+            constraints, catalog["constraints"], groups.get("constraint", {}), "constraint", operations)
         # New children can trigger the path inputs once more; stop the cycle.
         if isinstance(trigger, dict):
             if variables == previous["variables"] and constraints == previous["constraints"]:
                 raise PreventUpdate
         state = dict(variables=variables, constraints=constraints, loaded_revision=loaded_revision,
-                     add_clicks=clicks)
+                     selection_revision=selection_revision)
         return ([variable_row(row, catalog["variables"]) for row in variables] or html.P("No free inputs yet. Add a variable to begin.", className="td-opt-empty"),
                 [constraint_row(row, catalog["constraints"]) for row in constraints] or html.P("No constraints · bounds still apply to every free input.", className="td-opt-empty"), state)
 
@@ -309,6 +408,7 @@ def register_callbacks(app, live_config, render_results):
         Output("opt-progress-snapshot", "data"), Output("opt-progress", "children"),
         Output("loaded_cfg_store", "data", allow_duplicate=True), Output("opt-applied-result", "data"),
         Output("opt-terminal", "open"),
+        Output("opt-outcome-state", "data"),
     ]
     job_states = [
         State("opt-job", "data"), overall_values, stage_values, overall_ids, stage_ids,
@@ -343,11 +443,11 @@ def register_callbacks(app, live_config, render_results):
                 constraints = collect_rows(*values[4:10])
                 settings = build_settings(config, variables, constraints, *values[10:15], results=values[15])
                 handle = jobs.start_job(config, settings, owner)
-                return handle, "Optimizing turbine…", "Starting a fresh optimization run…", None, "Preparing initial design…", no_update, no_update, True
+                return handle, "Optimizing turbine…", "Starting a fresh optimization run…", None, "Preparing initial design…", no_update, no_update, True, "running"
             except PreventUpdate:
                 raise
             except Exception as error:
-                return None, f"Could not start: {error}", f"ERROR: {error}", None, "", no_update, no_update, True
+                return None, f"Could not start: {error}", f"ERROR: {error}", None, "", no_update, no_update, True, "failed"
         if not handle:
             raise PreventUpdate
         try:
@@ -356,23 +456,25 @@ def register_callbacks(app, live_config, render_results):
                 displayed = values[15]
                 if (displayed and jobs.fingerprint(displayed) == handle["target"]
                         and jobs.fingerprint(current) == handle["target"]):
-                    return None, handle["message"], no_update, no_update, no_update, no_update, no_update, no_update
+                    return None, handle["message"], no_update, no_update, no_update, no_update, no_update, no_update, "success"
                 if time.time() - handle["applied_at"] > 45:
                     # The inspector remains editable while jobs run. A user may
                     # have changed the design after the optimized values arrived;
                     # never overwrite those edits with the pre-run configuration.
-                    return None, "Optimization application was not confirmed. Current inputs retained.", no_update, no_update, "", no_update, no_update, True
+                    return None, "Optimization application was not confirmed. Current inputs retained.", no_update, no_update, "", no_update, no_update, True, "unconfirmed"
                 raise PreventUpdate
             status, log, progress, result = jobs.read_job(handle, owner)
             summary = (f"Update {progress['iteration']} · objective {progress['objective']:.7g} · violation {progress['max_constraint_violation']:.3g}" if progress else "Preparing initial design…")
             if status["state"] == "running":
-                return no_update, "Optimizing turbine…", log, progress, summary, no_update, no_update, no_update
+                return no_update, "Optimizing turbine…", log, progress, summary, no_update, no_update, no_update, "running"
             config, applied = no_update, no_update
             message = status["message"]
+            outcome = "failed"
             if result and result["success"]:
                 current = live_config(ov, sv, oi, si, stages)
                 if jobs.fingerprint(current) != result["fingerprint"]:
                     message = "Design changed during the run. Result was not applied; start again from the current inputs."
+                    outcome = "design_changed"
                 else:
                     # Validate all plots/tables before publishing new inputs.
                     render_results(result["turbine_results"], None)
@@ -380,14 +482,23 @@ def register_callbacks(app, live_config, render_results):
                     message = f"Optimization applied · objective {result['objective']:.7g}. {result['message']}"
                     pending = dict(handle, applying=True, target=jobs.fingerprint(result["config"]),
                                    applied_at=time.time(), message=message)
-                    return pending, "Applying optimized design…", log, progress, summary, config, applied, no_update
+                    return pending, "Applying optimized design…", log, progress, summary, config, applied, no_update, "applying"
             elif result:
                 message = f"Result not applied · {result['message']}"
-            return None, message, log, progress, summary, config, applied, no_update
+            return None, message, log, progress, summary, config, applied, no_update, outcome
         except PreventUpdate:
             raise
         except Exception as error:
-            return None, f"Optimization stopped: {error}", f"ERROR: {error}", no_update, "", no_update, no_update, True
+            return None, f"Optimization stopped: {error}", f"ERROR: {error}", no_update, "", no_update, no_update, True, "failed"
+
+    @app.callback(
+        Output("opt-actions", "className"), Output("opt-actions", "aria-busy"),
+        Output("opt-state-label", "children"), Output("opt-state-label", "className"),
+        Output("opt-start", "children"), Output("opt-start", "color"),
+        Input("opt-outcome-state", "data"), Input("opt-launching", "data"),
+    )
+    def present_outcome(state, launching):
+        return outcome_presentation(state, launching)
 
     app.clientside_callback(
         """function(job, launching, style) {

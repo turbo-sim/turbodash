@@ -39,14 +39,26 @@ The optimization workbench has focused state/precision tests in
 `test_app_workbench.py`, thermodynamic pair-transition tests in
 `test_app_fluid_inputs.py`, and channel/mesh presentation tests in
 `test_plotting_turbine.py` and `test_mesh_workbench.py`.
+`test_app_optimization.py` covers explicit outcome states and confirms that
+success is shown only after optimized controls and displayed results agree.
+It also checks selection journals, preset overlap, load baselines and preserved
+numeric edits. `test_optimization_presets.py` verifies the hierarchical catalogs,
+applicable geometry variables, radial bounds, the fixed reference work weight
+and two-sided flaring constraints against real model outputs.
+The turbine plotting tests check the percentage-point efficiency-penalty budget,
+including the final exit kinetic energy and the total `100 * (1 - efficiency_ts)`,
+and arrowed velocity triangles in Mach and m/s.
 
 Optional real-browser checks use an existing Playwright installation and Chrome
 or Chromium. `browser_optimization.py` starts and stops its own app server and
 checks clipping, successful/failed workers, multistage application, radial
-constraints and session isolation. `browser_workbench.py` checks the redesign
+constraints and session isolation. Its triangle checks match the independent
+plot response to the published result and retain velocity-mode selection across
+optimized application. `browser_workbench.py` checks the redesign
 against a separately running local app:
 
 ```powershell
+poetry run python docs/build_docs.py --no-autobuild
 python tests/browser_workbench.py --url http://127.0.0.1:8050 --browser "C:/Program Files/Google/Chrome/Application/chrome.exe"
 ```
 
@@ -54,6 +66,24 @@ The workbench script saves actual-app PNGs and a JSON report under
 `development/app_design/implemented/`; browser profiles and downloads stay in
 its ignored `output_browser/` directory. Keep the server's temporary directory
 inside the checkout when running repository-confined development checks.
+It also checks the three independent plot groups, solid endwalls and hidden
+geometry legends, velocity-triangle display modes, and the row/final-exit loss
+budget in Δη [%] with the app's blue/orange/gray palette. Documentation opens in
+a new tab without changing the calculation.
+Narrow-screen checks confirm that efficiency, loss and triangle charts scroll
+inside their cards without horizontal page overflow.
+The optimization action stays at the bottom of the Meanline inspector; tests
+check its workspace scope, mobile-drawer visibility and confirmed success state.
+The collapsible terminal remains at the bottom of the results column.
+`test_documentation.py` verifies same-app Sphinx serving, static assets, route
+prefixes and path containment.
+
+The published theory and analytical pages include the original repository notes
+verbatim. Check their source fidelity separately:
+
+```powershell
+python docs/verify_source_fidelity.py
+```
 
 `browser_numeric_format.py` starts its own server and checks three-decimal
 display padding, additional entered digits, tiny tolerances, focused editing,
@@ -75,3 +105,15 @@ conversion, and out-of-order responses. Browser profiles, logs and downloads sta
 in ignored `development/app_design/output_stress_*` directories. Relevant Python
 tests also exercise Dash's HTTP dispatch so wildcard-output serialization errors
 cannot hide behind direct callback calls.
+
+The optimization browser scripts use `browser_picker_helpers.py` to select
+quantities and groups through the hierarchical checkbox menus. Opening an Add
+menu does not itself create an editor row. The editor stress suite verifies
+rapid selection and removal while earlier updates are still pending.
+
+`browser_compact_sidebar.py --url http://127.0.0.1:8050` uses a running app and
+checks contained sections, inline fields, compact optimization rows and both
+themes at desktop, 390 px and 320 px. It also checks a resized 280 px inspector
+and menus opened near the bottom of the scrolling area. It saves three
+optimization screenshots and `compact_sidebar_browser_checks.json` in the
+implemented design folder, with scratch output in `output_compact_sidebar/`.

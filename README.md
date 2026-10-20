@@ -17,6 +17,8 @@
 - Experimental app with three tabs: meanline calculation, turbine geometry, and mesh generation/inspection.
 - Optional TurboMoC integration in the experimental app for cylindrical axial blade models (STL), periodic 3D passage meshes (Gmsh/CGNS), and VTK geometry/mesh visualization with cell-quality inspection.
 - Documentation describing the derivation of governing equations.  
+- Optimization workbench with light/dark themes, collapsible geometry, efficiency/loss and velocity-triangle plots, and explicit optimization outcome states.
+- Loss budgets in efficiency percentage points, with blade-row contributions and the final exit kinetic energy shown in the app's blue/orange palette.
 
 ## 🛠️ Installation
 

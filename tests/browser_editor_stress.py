@@ -8,14 +8,16 @@ import json
 
 import yaml
 
-from playwright.sync_api import expect
+from playwright.sync_api import Error as PlaywrightError, expect
 
 import browser_optimization
+from browser_picker_helpers import choose_group, choose_next, choose_path, open_picker
 
 
 def exercise(context, address, output):
     page = context.new_page()
     errors, requests, responses, checks = [], [], [], []
+    closing = False
     page.on("pageerror", lambda error: errors.append(str(error)))
 
     def response_received(response):
@@ -25,7 +27,11 @@ def exercise(context, address, output):
         if "opt-variable-rows" in body.get("output", ""):
             requests.append(body)
             if response.status == 200:
-                responses.append(response.json())
+                try:
+                    responses.append(response.json())
+                except PlaywrightError:
+                    if not closing:
+                        raise
         if response.status >= 400:
             errors.append(f"Callback HTTP {response.status}: {body.get('output')}")
 
@@ -36,26 +42,46 @@ def exercise(context, address, output):
         page.locator("#opt-panel > summary").click()
         page.get_by_role("tab", name="Design variables", exact=True).click()
         variables = page.locator("#opt-variable-rows .td-opt-row")
-        for _ in range(4):
-            page.locator("#opt-add-variable").click()
-            page.wait_for_timeout(250)
+        initial_paths = ["blade_velocity_ratio", "rotational_speed",
+                         "stages.0.degree_reaction", "stages.0.stator_exit_angle"]
+        for index, path in enumerate(initial_paths, 1):
+            choose_path(page, "variable", path)
+            expect(variables).to_have_count(index)
         expect(variables).to_have_count(4)
-        checks.append("Sequential add variable")
+        checks.append("Sequential checkbox selection adds named variables")
         network = context.new_cdp_session(page)
         network.send("Network.enable")
         network.send("Network.emulateNetworkConditions", {
             "offline": False, "latency": 350, "downloadThroughput": -1, "uploadThroughput": -1,
         })
-        for _ in range(5):
-            page.locator("#opt-add-variable").click()
+        def rapid_selection(kind, paths):
+            menu = open_picker(page, kind)
+            menu.locator(".td-opt-picker-filter").fill("")
+            menu.evaluate("""(menu, paths) => {
+                for (const path of paths) {
+                    const button = Array.from(menu.querySelectorAll('[data-opt-path]'))
+                        .find(item => item.dataset.optPath === path);
+                    button.click();
+                }
+            }""", paths)
+            menu.locator(":scope > summary").press("Escape")
+
+        rapid_selection("variable", [
+            "stages.0.meridional_velocity_ratio_12", "stages.0.meridional_velocity_ratio_23",
+            "stages.0.meridional_velocity_ratio_34", "stages.0.blade_geometry.stator.solidity_chord",
+            "stages.0.blade_geometry.stator.trailing_edge_thickness_to_opening",
+        ])
         expect(variables).to_have_count(9)
-        checks.append("Five rapid variable clicks remain five additions")
+        checks.append("Five rapid variable checkbox selections survive delayed responses")
         page.get_by_role("tab", name="Constraints", exact=True).click()
         constraints = page.locator("#opt-constraint-rows .td-opt-row")
-        for _ in range(5):
-            page.locator("#opt-add-constraint").click()
+        rapid_selection("constraint", [
+            "$overall_performance.efficiency_ts", "$overall_performance.efficiency_tt",
+            "$overall_performance.power_actual", "$overall_performance.shaft_torque",
+            "$overall_performance.maximum_mach_number",
+        ])
         expect(constraints).to_have_count(5)
-        checks.append("Five rapid constraint clicks remain five additions")
+        checks.append("Five rapid constraint checkbox selections survive delayed responses")
 
         # Each removal keeps its row identity even when preceding rows vanish.
         remove = constraints.get_by_role("button", name="Remove constraint").evaluate_all(
@@ -77,7 +103,7 @@ def exercise(context, address, output):
         first = variables.first.locator('input[type="number"]')
         for box, value in zip([first.nth(i) for i in range(3)], ["0.52", "0.6123456", "0.65"]):
             box.fill(value)
-        page.locator("#opt-add-variable").click()
+        choose_next(page, "variable")
         expect(variables).to_have_count(3)
         for index, value in enumerate([.52, .6123456, .65]):
             expect(first.nth(index)).to_have_js_property("valueAsNumber", value)
@@ -87,7 +113,7 @@ def exercise(context, address, output):
         # State. The late response must not restore that superseded number.
         with page.expect_request(lambda request: "_dash-update-component" in request.url
                                  and "opt-variable-rows" in (request.post_data or "")):
-            page.locator("#opt-add-variable").click()
+            choose_next(page, "variable")
         first.nth(0).fill("0.53216789")
         first.nth(0).blur()
         expect(variables).to_have_count(4)
@@ -130,10 +156,10 @@ def exercise(context, address, output):
         first.nth(0).blur()
         checks.append("Catalog refresh preserves the focused uncommitted numeric edit")
 
-        # Add both kinds in one event batch; no trigger can take precedence.
+        # Select both kinds in one event batch; neither may take precedence.
         page.evaluate("""() => {
-            document.getElementById('opt-add-variable').click();
-            document.getElementById('opt-add-constraint').click();
+            document.querySelector('[data-opt-kind="variable"][data-opt-path][aria-checked="false"]').click();
+            document.querySelector('[data-opt-kind="constraint"][data-opt-path][aria-checked="false"]').click();
         }""")
         expect(variables).to_have_count(4)
         expect(constraints).to_have_count(2)
@@ -144,19 +170,41 @@ def exercise(context, address, output):
         page.evaluate("""() => {
             document.querySelector('#opt-variable-rows .td-opt-row:last-child button').click();
             document.querySelector('#opt-constraint-rows .td-opt-row:last-child button').click();
-            document.getElementById('opt-add-variable').click();
+            document.querySelector('[data-opt-kind="variable"][data-opt-path][aria-checked="false"]').click();
         }""")
         expect(variables).to_have_count(4)
         expect(constraints).to_have_count(1)
         expect(first.nth(0)).to_have_js_property("valueAsNumber", .5456789)
         checks.append("Simultaneous additions and removals preserve live numeric bounds")
 
-        # All clicks are delivered to the same fixed screen position.
+        # Opening the selector is navigation only and leaves the editors alone.
+        page.locator("#opt-add-variable").scroll_into_view_if_needed()
         location = page.locator("#opt-add-variable").bounding_box()
         page.locator("#opt-add-variable").click(click_count=3, delay=75)
-        expect(variables).to_have_count(7)
+        expect(variables).to_have_count(4)
+        page.locator("#opt-add-variable").press("Escape")
         assert page.locator("#opt-add-variable").bounding_box() == location
-        checks.append("Add control remains stationary as rows grow")
+        checks.append("Opening and closing the stationary Add menu does not add rows")
+
+        group = page.locator('[data-opt-kind="variable"][data-opt-group="all"]')
+        expected_paths = set(member["path"] for member in json.loads(group.get_attribute("data-opt-members")))
+        current_paths = set(member["path"] for member in json.loads(
+            page.locator('#opt-variable-picker .td-opt-picker-tree').get_attribute("data-opt-selection")))
+        expected_count = len(expected_paths | current_paths)
+        choose_group(page, "variable", "all")
+        expect(variables).to_have_count(expected_count)
+        expect(first.nth(0)).to_have_js_property("valueAsNumber", .5456789)
+        choose_path(page, "variable", "rotational_speed", selected=False)
+        expect(variables).to_have_count(expected_count - 1)
+        expect(group).to_have_attribute("aria-checked", "mixed")
+        choose_group(page, "variable", "all")
+        expect(variables).to_have_count(expected_count)
+        expect(first.nth(0)).to_have_js_property("valueAsNumber", .5456789)
+        checks.append("Optimize all adds missing paths, shows partial selection and preserves precise bounds")
+        rapid_selection("variable", ["rotational_speed", "rotational_speed", "rotational_speed", "rotational_speed"])
+        expect(variables).to_have_count(expected_count)
+        expect(page.locator('[data-opt-kind="variable"][data-opt-path="rotational_speed"]')).to_have_attribute("aria-checked", "true")
+        checks.append("Rapid repeated checkbox toggles retain their final selected state")
 
         network.send("Network.emulateNetworkConditions", {
             "offline": False, "latency": 0, "downloadThroughput": -1, "uploadThroughput": -1,
@@ -185,7 +233,7 @@ def exercise(context, address, output):
             expect(variables).to_have_count(count - 1)
         page.locator("#opt-start").click()
         expect(page.locator("#opt-status")).to_contain_text("Add at least one design variable")
-        page.locator("#opt-add-variable").click()
+        choose_path(page, "variable", "blade_velocity_ratio")
         expect(variables).to_have_count(1)
         fields = variables.first.locator('input[type="number"]')
         fields.nth(0).fill("0.5")
@@ -247,7 +295,7 @@ def exercise(context, address, output):
         page.evaluate("window.tdEditorLoadDelay = 750")
         config["optimization"]["design_variables"]["blade_velocity_ratio"]["lower_value"] = .57
         upload("changed-bounds-same-turbine.yaml")
-        page.locator("#opt-add-variable").click()
+        choose_path(page, "variable", "rotational_speed")
         expect(variables).to_have_count(2)
         expect(variables.first.locator('input[type="number"]').first).to_have_js_property("valueAsNumber", .57)
         checks.append("Repeated loading with unchanged turbine inputs applies new bounds before pending Add")
@@ -258,13 +306,15 @@ def exercise(context, address, output):
             lower.fill("0.53")
             lower.blur()
         upload("reset-identical-design.yaml")
-        page.locator("#opt-add-variable").click()
+        choose_path(page, "variable", "rotational_speed")
         expect(variables).to_have_count(2)
         expect(variables.first.locator('input[type="number"]').first).to_have_js_property("valueAsNumber", .57)
         checks.append("Reloading identical settings resets manual bounds and retains a later Add")
         assert not errors, errors
         return {"checks": checks, "errors": errors}
     finally:
+        closing = True
+        page.remove_listener("response", response_received)
         (output / "editor_requests.json").write_text(json.dumps(requests, indent=2), encoding="utf-8")
         (output / "editor_responses.json").write_text(json.dumps(responses, indent=2), encoding="utf-8")
         page.screenshot(path=output / "editor_stress.png")

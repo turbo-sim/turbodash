@@ -283,6 +283,43 @@ def test_layout_has_five_numbered_closed_sections_and_no_studio_brand():
     assert "Save design" in text_content(header)
 
 
+def test_results_disclosures_keep_live_graphs_and_optimization_action_mounted():
+    mounted = list(components(application.app.layout))
+    by_id = {
+        item.id: item for item in mounted
+        if isinstance(getattr(item, "id", None), str)
+    }
+    reports = by_id["tables_container"]
+    assert isinstance(reports, html.Details) and reports.open
+    for group, graphs in (
+        ("td-geometry-plots", ["meridional_plot", "blades_plot"]),
+        ("td-efficiency-plots", ["efficiency_trends_plot", "loss_plot"]),
+        ("td-triangle-plots", []),
+    ):
+        plots = by_id[group]
+        assert isinstance(plots, html.Details) and plots.open
+        assert [
+            item.id for item in components(plots) if isinstance(item, dcc.Graph)
+        ] == graphs
+    assert by_id["triangles_container"] in list(components(by_id["td-triangle-plots"]))
+    assert by_id["td-triangle-mode"].value == "mach"
+    assert by_id["td-report-tabs"] in list(components(reports))
+    # Closing the editor must not hide the only launch button or its live status.
+    dock = next(item for item in mounted if isinstance(item, html.Footer))
+    assert by_id["opt-start"] in list(components(dock))
+    assert by_id["opt-status"] in list(components(dock))
+    assert by_id["opt-start"] not in list(components(by_id["opt-panel"]))
+    assert dock in list(components(by_id["design-controls"]))
+    assert by_id["opt-terminal"] in list(components(by_id["meanline_pane"]))
+    assert sum(getattr(item, "id", None) == "opt-start" for item in mounted) == 1
+    assert by_id["td-documentation-link"].href == "/docs/"
+    assert by_id["td-documentation-link"].target == "_blank"
+    assert by_id["td-documentation-link"].rel == "noopener noreferrer"
+    assert "td-documentation-pane" not in by_id
+    assert "td-documentation-frame" not in by_id
+    assert "td-documentation-back" not in by_id
+
+
 def test_invalid_draft_retains_all_results_and_displays_essential_error(
     live_form, monkeypatch
 ):
@@ -299,11 +336,11 @@ def test_invalid_draft_retains_all_results_and_displays_essential_error(
         live_form["stage_ids"],
         live_form["store_stages"],
     )
-    assert all(value is no_update for value in result[:10])
-    assert len(result) == 13
+    assert all(value is no_update for value in result[:9])
+    assert len(result) == 12
     compute.assert_not_called()
-    assert result[11]["valid"] is False
-    assert "Low-pressure stage" in result[10]
+    assert result[10]["valid"] is False
+    assert "Low-pressure stage" in result[9]
     assert changes == {}, "Calculation status must use ordered callback outputs"
 
 

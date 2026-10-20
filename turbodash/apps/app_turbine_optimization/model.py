@@ -50,27 +50,57 @@ def nested_config(config):
     return result
 
 
+def _stage_title(index, stage):
+    """Keep stage identity visible even when names are repeated."""
+    title = f"Stage {index + 1}"
+    name = str(stage.get("name", "")).strip()
+    return f"{title} · {name}" if name else title
+
+
+def _radius_bounds(value, blade_row):
+    """Keep a radial blade row on its current side of zero radial chord."""
+    if not blade_row:
+        return min(.9, .8 * value), max(1.4, 1.2 * value)
+    if value < 1:
+        return min(.7, .8 * value), max(.99, (1 + value) / 2)
+    if value == 1:
+        return 1.01, 1.4
+    return min(1.01, (1 + value) / 2), max(1.4, 1.2 * value)
+
+
 def variable_catalog(config):
-    """Offer only effective independent inputs for every current stage/row."""
+    """Offer bounded continuous inputs, with hierarchy and preset applicability.
+
+    ``preset_active`` excludes inputs that cannot affect supported outputs for
+    this model configuration. Individual choices retain existing geometry paths
+    so imported optimization settings remain editable.
+    """
     inputs = flat_config(config)["inputs"]
     catalog = {}
 
-    def add(path, label, lower, upper):
+    def add(path, label, lower, upper, short_label, hierarchy, *, preset_active=True):
         try:
             current = finite(read_path(inputs, path), label)
-        except (ValueError, KeyError, TypeError):
+        except (ValueError, KeyError, TypeError, IndexError):
             return
-        catalog[path] = dict(label=label, value=current, lower=lower, upper=upper)
+        catalog[path] = dict(label=label, short_label=short_label, hierarchy=hierarchy,
+                             value=current, lower=lower, upper=upper,
+                             preset_active=preset_active)
 
-    add("blade_velocity_ratio", "Global · Blade velocity ratio [-]", .25, 1)
+    add("blade_velocity_ratio", "Global · Blade velocity ratio [-]", .25, 1,
+        "Blade velocity ratio [-]", ["Overall"])
     actual = inputs.get("rotational_speed_type") == "actual"
     speed = inputs.get("rotational_speed", .7)
-    add("rotational_speed", "Global · Rotational speed [rpm]" if actual else "Global · Specific speed [-]",
-        max(1, speed * .5) if actual else .2, speed * 1.5 if actual else 1.5)
-    radial = inputs.get("turbine_type") == "radial"
+    speed_label = "Rotational speed [rpm]" if actual else "Specific speed [-]"
+    add("rotational_speed", f"Global · {speed_label}",
+        max(1, speed * .5) if actual else .2, speed * 1.5 if actual else 1.5,
+        speed_label, ["Overall"])
+    radial = inputs.get("turbine_type") in ("radial", "radial_inflow", "radial_outflow")
+    empirical = inputs.get("loss_model", "benner") in ("benner", "moustapha", "kacker_okapuu")
     for i, stage in enumerate(inputs.get("stages", [])):
         prefix = f"stages.{i}."
         title = f"Stage {i + 1}"
+        hierarchy_title = _stage_title(i, stage)
         for key, label, lo, hi in (
             ("degree_reaction", "Reaction [-]", 0, .75),
             ("stator_exit_angle", "Stator exit flow angle [deg]", 50, 80),
@@ -79,51 +109,200 @@ def variable_catalog(config):
               for pair in ("12", "23", "34")),
         ):
             if key != "work_fraction_split" or len(inputs["stages"]) > 1:
-                add(prefix + key, f"{title} · {label}", lo, hi)
+                if key == "work_fraction_split":
+                    weight = stage.get(key, 1)
+                    if isinstance(weight, (int, float)) and weight > 0 and math.isfinite(weight):
+                        lo, hi = .1 * weight, 2 * weight
+                category = "Meridional velocity ratios" if key.startswith("meridional_") else "Stage inputs"
+                add(prefix + key, f"{title} · {label}", lo, hi, label,
+                    [hierarchy_title, category])
         # Axial row radii are fixed by that model; radial radius changes set chord.
         if radial:
             for pair in ("01", "12", "23", "34"):
-                add(prefix + f"radius_ratio_{pair}", f"{title} · Radius ratio {pair} [-]",
-                    1.01 if pair in ("12", "34") else .9, 1.4)
+                # The first stage is anchored at station 3; its station 0 radius
+                # is unused. In later stages 01 connects to the preceding rotor.
+                if i == 0 and pair == "01":
+                    continue
+                path = prefix + f"radius_ratio_{pair}"
+                try:
+                    ratio = finite(read_path(inputs, path), path)
+                except (ValueError, KeyError, TypeError, IndexError):
+                    continue
+                lo, hi = _radius_bounds(ratio, pair in ("12", "34"))
+                label = f"Radius ratio {pair} [-]"
+                add(path, f"{title} · {label}", lo, hi, label,
+                    [hierarchy_title, "Radius ratios"])
         for row in ("stator", "rotor"):
             row_title = f"{title} · {row.title()}"
             row_path = prefix + f"blade_geometry.{row}."
-            add(row_path + "solidity_chord", f"{row_title} · Solidity [-]", .5, 2)
-            add(row_path + "trailing_edge_thickness_to_opening", f"{row_title} · Trailing thickness / opening [-]", .02, .1)
+            hierarchy = [hierarchy_title, f"{row.title()} geometry"]
+            add(row_path + "solidity_chord", f"{row_title} · Solidity [-]", .5, 2,
+                "Solidity [-]", hierarchy)
+            add(row_path + "trailing_edge_thickness_to_opening",
+                f"{row_title} · Trailing thickness / opening [-]", .02, .1,
+                "Trailing thickness / opening [-]", hierarchy, preset_active=empirical)
+            # The profile thickness exponent is zero for a first stator with
+            # nonnegative inlet flow: its entire preset exit-angle range is
+            # positive. Later-stage inlet flow and rotor turning can vary.
+            thickness_active = empirical and not (
+                i == 0 and row == "stator" and inputs.get("inlet_flow_angle", 0) >= 0
+            )
+            add(row_path + "maximum_thickness_to_chord",
+                f"{row_title} · Maximum thickness / meridional chord [-]", .15, .35,
+                "Maximum thickness / meridional chord [-]", hierarchy,
+                preset_active=thickness_active)
             if not radial:
-                add(row_path + "aspect_ratio", f"{row_title} · Axial aspect ratio [-]", 1, 4)
+                add(row_path + "aspect_ratio", f"{row_title} · Axial aspect ratio [-]", 1, 4,
+                    "Axial aspect ratio [-]", hierarchy)
     return catalog
+
+
+def variable_groups(config, catalog=None):
+    """Return applicable presets without changing the caller's inputs/catalog.
+
+    Work fractions are normalized by the solver. Presets vary N-1 weights and
+    hold the final stage's weight fixed, removing the common scaling freedom.
+    """
+    catalog = variable_catalog(config) if catalog is None else catalog
+    stages = config["inputs"].get("stages", [])
+    groups = {}
+
+    def add(key, label, description, paths, hierarchy):
+        paths = list(dict.fromkeys(path for path in paths
+                                   if path in catalog and catalog[path].get("preset_active", True)))
+        if paths:
+            groups[key] = dict(label=label, description=description, paths=paths, hierarchy=hierarchy)
+
+    add("overall", "Shaft speed and blade velocity ratio",
+        "Vary the selected shaft-speed definition and overall blade velocity ratio.",
+        ["blade_velocity_ratio", "rotational_speed"], ["Overall"])
+    stage_design = [f"stages.{i}.{key}" for i in range(len(stages))
+                    for key in ("degree_reaction", "stator_exit_angle")]
+    add("stage_design", "Reaction and stator angle · all stages",
+        "Vary reaction and stator exit flow angle in every stage.", stage_design, ["All stages"])
+    for i, stage in enumerate(stages):
+        title = _stage_title(i, stage)
+        add(f"stage_{i}_design", "Reaction and stator angle",
+            f"Vary reaction and stator exit flow angle in {title}.",
+            [f"stages.{i}.degree_reaction", f"stages.{i}.stator_exit_angle"], [title])
+    add("work_split", "Stage work split",
+        "Vary the first N−1 relative work weights; keep the final stage's weight fixed.",
+        [f"stages.{i}.work_fraction_split" for i in range(len(stages) - 1)], ["All stages"])
+    add("radial_radii", "Radial passage radii",
+        "Vary effective radial radius ratios while preserving each blade row's radial direction.",
+        [path for path in catalog if ".radius_ratio_" in path], ["All stages"])
+    add("meridional_ratios", "Meridional velocity ratios",
+        "Vary the inlet-to-exit meridional velocity ratios of each row and inter-row gap.",
+        [path for path in catalog if ".meridional_velocity_ratio_" in path], ["All stages"])
+    add("blade_geometry", "Blade geometry · all stages",
+        "Vary applicable solidity, axial aspect ratio and loss-sensitive thickness ratios.",
+        [path for path in catalog if ".blade_geometry." in path], ["All stages"])
+    for i, stage in enumerate(stages):
+        for row in ("stator", "rotor"):
+            add(f"stage_{i}_{row}_geometry", f"{row.title()} geometry",
+                "Vary applicable solidity, axial aspect ratio and loss-sensitive thickness ratios.",
+                [path for path in catalog if path.startswith(f"stages.{i}.blade_geometry.{row}.")],
+                [_stage_title(i, stage)])
+    reference = f"stages.{len(stages) - 1}.work_fraction_split"
+    add("all", "Optimize all applicable variables",
+        "Combine all applicable presets; keep operating conditions, inactive geometry inputs "
+        "and the final stage's reference work weight fixed.",
+        [path for path in catalog if path != reference], ["Overall"])
+    return groups
+
+
+def _constraint_default(path, scale):
+    """Useful editable starting targets, rather than zero for every quantity."""
+    quantity = path.rsplit(".", 1)[-1]
+    if quantity in ("maximum_mach_number", "Ma_abs", "Ma_rel"):
+        return "<=", 1
+    if quantity == "flaring_angle":
+        return "<=", 10
+    if quantity == "height":
+        return ">=", .001
+    if quantity in ("efficiency_ts", "efficiency_tt"):
+        return ">=", .8
+    return "=", scale
 
 
 def output_catalog(config, results=None):
     """Scalar objectives and scalar/wildcard constraints with physical scales."""
     catalog = {}
 
-    def add(path, label, scale, objective=False):
+    def add(path, label, scale, short_label, hierarchy, objective=False):
         if results:
             try:
                 read_path(results, path)
             except (KeyError, ValueError, TypeError, IndexError):
                 return
-        catalog[path] = dict(label=label, scale=scale, objective=objective)
+        comparison, target = _constraint_default(path, scale)
+        catalog[path] = dict(label=label, short_label=short_label, hierarchy=hierarchy,
+                             scale=scale, objective=objective, comparison=comparison, target=target)
 
     for key, (label, scale) in PERFORMANCE.items():
-        add(f"$overall_performance.{key}", f"Overall · {label}", scale, True)
-    scopes = [("*", "All stages")]
-    scopes += [(str(i), f"Stage {i + 1}") for i, _ in enumerate(config["inputs"]["stages"])]
-    for index, title in scopes:
+        add(f"$overall_performance.{key}", f"Overall · {label}", scale, label, ["Overall"], True)
+    scopes = [("*", "All stages", "All stages")]
+    scopes += [(str(i), f"Stage {i + 1}", _stage_title(i, stage))
+               for i, stage in enumerate(config["inputs"]["stages"])]
+    for index, title, hierarchy_title in scopes:
         for key, (label, scale) in PERFORMANCE.items():
-            add(f"$stages_performance.{index}.stage_performance.{key}", f"{title} · {label}", scale)
+            add(f"$stages_performance.{index}.stage_performance.{key}", f"{title} · {label}",
+                scale, label, [hierarchy_title, "Performance"])
         for row in ("*", "stator", "rotor"):
+            row_title = "Both rows" if row == "*" else row.title()
             for key, (label, scale) in GEOMETRY.items():
                 add(f"$stages_performance.{index}.geometry_meanline.{row}.{key}",
-                    f"{title} · {'Both rows' if row == '*' else row.title()} · {label}", scale)
+                    f"{title} · {row_title} · {label}", scale, label,
+                    [hierarchy_title, f"{row_title} geometry"])
         for station in ("1", "2", "3", "4"):
             for key, label, scale in (("Ma_abs", "Absolute Mach [-]", 1), ("Ma_rel", "Relative Mach [-]", 1),
                                       ("p", "Pressure [Pa]", 1e5), ("T", "Temperature [K]", 500)):
                 add(f"$stages_performance.{index}.flow_stations.{int(station) - 1}.{key}",
-                    f"{title} · Station {station} · {label}", scale)
+                    f"{title} · Station {station} · {label}", scale, label,
+                    [hierarchy_title, f"Station {station}"])
     return catalog
+
+
+def constraint_groups(config, catalog=None):
+    """Editable engineering limits; two-sided bounds use distinct row specs."""
+    catalog = output_catalog(config) if catalog is None else catalog
+    groups = {}
+
+    def row(path, comparison=None, target=None):
+        entry = catalog.get(path)
+        if entry is None:
+            return None
+        return dict(path=path, comparison=comparison or entry["comparison"],
+                    target=entry["target"] if target is None else target, scale=entry["scale"])
+
+    def add(key, label, description, rows, hierarchy):
+        rows = [spec for spec in rows if spec is not None]
+        if rows:
+            groups[key] = dict(label=label, description=description, rows=rows,
+                               paths=list(dict.fromkeys(spec["path"] for spec in rows)),
+                               hierarchy=hierarchy)
+
+    def geometry_limits(scope):
+        prefix = f"$stages_performance.{scope}.geometry_meanline.*."
+        return [row(prefix + "flaring_angle", ">=", -10),
+                row(prefix + "flaring_angle", "<=", 10),
+                row(prefix + "height", ">=", .001)]
+
+    add("subsonic", "Maximum Mach number",
+        "Keep blade-row Mach numbers at or below 1: absolute in stators, relative in rotors.",
+        [row("$overall_performance.maximum_mach_number")], ["Overall"])
+    add("flaring_limits", "Flaring angle ±10°",
+        "Bound both positive and negative flaring in every blade row; edit either limit as needed.",
+        geometry_limits("*")[:2], ["All stages"])
+    add("minimum_height", "Minimum blade height",
+        "Require at least 1 mm mean blade height in every row; edit this allowance as needed.",
+        geometry_limits("*")[2:], ["All stages"])
+    for i, stage in enumerate(config["inputs"].get("stages", [])):
+        add(f"stage_{i}_limits", "Mach, flaring and blade-height limits",
+            "Use editable starting limits: maximum Mach 1, flaring ±10° and blade height at least 1 mm.",
+            [row(f"$stages_performance.{i}.stage_performance.maximum_mach_number"),
+             *geometry_limits(str(i))], [_stage_title(i, stage)])
+    return groups
 
 
 def finite(value, label):

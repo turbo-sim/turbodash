@@ -15,7 +15,11 @@ from turbodash.apps.shared.fluid_inputs import (
     pair_fields,
 )
 from turbodash.apps.shared.components.meshing import geometry_panel, mesh_panel
-from .panel import panel as optimization_panel, terminal as optimization_terminal
+from .panel import (
+    actions as optimization_actions,
+    panel as optimization_panel,
+    terminal as optimization_terminal,
+)
 
 
 def identity_id(identity):
@@ -32,19 +36,24 @@ def field(label, control, *, aliases="", hint=None, label_id=None):
         props["id"] = label_id
     return html.Div(
         [
-            html.Label(label, **props),
-            (
-                html.Span(
-                    "?",
-                    title=hint,
-                    tabIndex=0,
-                    className="td-help",
-                    **{"aria-label": hint},
-                )
-                if hint
-                else None
+            html.Div(
+                [
+                    html.Label(label, **props),
+                    (
+                        html.Span(
+                            "?",
+                            title=hint,
+                            tabIndex=0,
+                            className="td-help",
+                            **{"aria-label": hint},
+                        )
+                        if hint
+                        else None
+                    ),
+                ],
+                className="td-field-label",
             ),
-            control,
+            html.Div(control, className="td-field-control"),
         ],
         className="td-field",
         **{
@@ -84,7 +93,7 @@ def section(number, title, children, key):
             html.Summary(
                 [
                     html.Span(f"{number:02}", className="td-section-number"),
-                    html.Span(title),
+                    html.Span(title, className="td-section-title"),
                 ]
             ),
             html.Div(children, className="td-section-body"),
@@ -137,11 +146,17 @@ def stage_editor(stages, turbine_type, stage_fields, blade_fields, defaults):
             html.Div(
                 [
                     html.Details(
-                        [html.Summary("Aerodynamic design"), *design],
+                        [
+                            html.Summary("Aerodynamic design"),
+                            html.Div(design, className="td-subsection-body"),
+                        ],
                         className="td-subsection",
                     ),
                     html.Details(
-                        [html.Summary("Blade geometry"), *rows],
+                        [
+                            html.Summary("Blade geometry"),
+                            html.Div(rows, className="td-subsection-body"),
+                        ],
                         className="td-subsection",
                     ),
                 ],
@@ -281,7 +296,7 @@ def _logo(theme):
     )
 
 
-def build_layout(defaults, stage_defaults, loss_models, docs_layout):
+def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs/"):
     pair = pair_fields(defaults["inlet_property_pair"])
     setup = [
         field(
@@ -510,6 +525,7 @@ def build_layout(defaults, stage_defaults, loss_models, docs_layout):
                 ],
                 className="td-inspector-scroll",
             ),
+            optimization_actions(),
             html.Div(
                 id="td-inspector-resize",
                 role="separator",
@@ -600,6 +616,14 @@ def build_layout(defaults, stage_defaults, loss_models, docs_layout):
                             html.A(
                                 "GitHub ↗",
                                 href="https://github.com/turbo-sim/turbodash",
+                                target="_blank",
+                                rel="noopener noreferrer",
+                                className="td-project-link",
+                            ),
+                            html.A(
+                                "Documentation",
+                                id="td-documentation-link",
+                                href=documentation_url,
                                 target="_blank",
                                 rel="noopener noreferrer",
                                 className="td-project-link",
@@ -704,44 +728,76 @@ def build_layout(defaults, stage_defaults, loss_models, docs_layout):
                                         id="td-metrics",
                                         className="td-metrics",
                                     ),
-                                    html.Div(
+                                    html.Details(
                                         [
-                                            plot_card(
-                                                "Meridional channel", "meridional_plot"
-                                            ),
-                                            plot_card(
-                                                "Blade-to-blade view", "blades_plot"
+                                            html.Summary("Turbine geometry"),
+                                            html.Div(
+                                                [
+                                                    plot_card(
+                                                        "Meridional channel view", "meridional_plot"
+                                                    ),
+                                                    plot_card(
+                                                        "Blade-to-blade view", "blades_plot"
+                                                    ),
+                                                ],
+                                                className="td-plot-pair",
                                             ),
                                         ],
-                                        className="td-plot-pair",
+                                        id="td-geometry-plots",
+                                        className="td-results-disclosure",
+                                        open=True,
                                     ),
-                                    html.Section(
-                                        [html.H2("Performance reports"), report_tabs],
-                                        id="tables_container",
-                                        className="td-report-card",
-                                    ),
-                                    html.Div(
+                                    html.Details(
                                         [
-                                            plot_card(
-                                                "Efficiency trends",
-                                                "efficiency_trends_plot",
+                                            html.Summary("Efficiency and loss distribution"),
+                                            html.Div(
+                                                [
+                                                    plot_card(
+                                                        "Efficiency vs blade velocity ratio",
+                                                        "efficiency_trends_plot",
+                                                    ),
+                                                    plot_card("Efficiency penalties by loss mechanism", "loss_plot"),
+                                                ],
+                                                className="td-plot-pair",
                                             ),
-                                            plot_card("Loss distribution", "loss_plot"),
                                         ],
-                                        className="td-plot-pair",
+                                        id="td-efficiency-plots",
+                                        className="td-results-disclosure",
+                                        open=True,
                                     ),
-                                    html.Section(
+                                    html.Details(
                                         [
-                                            html.H2("Velocity triangles"),
+                                            html.Summary("Velocity triangles"),
+                                            html.Div(
+                                                [
+                                                    html.Span("Display"),
+                                                    dcc.RadioItems(
+                                                        id="td-triangle-mode",
+                                                        options=[
+                                                            {"label": "Mach numbers", "value": "mach"},
+                                                            {"label": "Velocity [m/s]", "value": "velocity"},
+                                                        ],
+                                                        value="mach",
+                                                        className="td-segmented",
+                                                        persistence=True,
+                                                        persistence_type="session",
+                                                    ),
+                                                ],
+                                                className="td-plot-toolbar",
+                                            ),
                                             html.Div(id="triangles_container"),
                                         ],
-                                        className="td-triangles",
+                                        id="td-triangle-plots",
+                                        className="td-results-disclosure",
+                                        open=True,
+                                    ),
+                                    html.Details(
+                                        [html.Summary("Performance reports"), report_tabs],
+                                        id="tables_container",
+                                        className="td-report-card td-results-disclosure",
+                                        open=True,
                                     ),
                                     optimization_terminal(),
-                                    html.Details(
-                                        [html.Summary("Documentation"), docs_layout],
-                                        className="td-documentation",
-                                    ),
                                 ],
                                 id="meanline_pane",
                                 style={"display": "block"},

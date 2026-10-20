@@ -19,6 +19,9 @@ from urllib.request import urlopen
 import yaml
 import numpy as np
 from playwright.sync_api import sync_playwright, expect
+from browser_picker_helpers import choose_path
+
+from turbodash.visualization import plotly_turbine
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -109,7 +112,7 @@ def exercise(context, address, output):
 
     open_section("opt-panel")
     page.get_by_role("tab", name="Design variables", exact=True).click()
-    page.locator("#opt-add-variable").click()
+    choose_path(page, "variable", "blade_velocity_ratio")
     expect(page.locator('#opt-variable-rows .td-opt-row')).to_have_count(1)
     first = page.locator('#opt-variable-rows .td-opt-row').first
     numbers = first.locator('input[type="number"]')
@@ -118,15 +121,15 @@ def exercise(context, address, output):
     numbers.nth(1).fill("0.9")
     numbers.nth(2).fill("0.65")
     numbers.nth(2).blur()
-    page.locator("#opt-add-variable").click()
+    choose_path(page, "variable", "rotational_speed")
     expect(page.locator('#opt-variable-rows .td-opt-row')).to_have_count(2)
     expect(numbers.nth(1)).to_have_js_property("valueAsNumber", 0.9)
     page.get_by_role("button", name="Remove variable", exact=True).last.click()
     expect(page.locator('#opt-variable-rows .td-opt-row')).to_have_count(1)
     page.get_by_role("tab", name="Constraints", exact=True).click()
-    page.locator("#opt-add-constraint").click()
+    choose_path(page, "constraint", "$stages_performance.*.geometry_meanline.*.flaring_angle")
     expect(page.locator('#opt-constraint-rows .td-opt-row')).to_have_count(1)
-    page.locator("#opt-add-constraint").click()
+    choose_path(page, "constraint", "$overall_performance.maximum_mach_number")
     expect(page.locator('#opt-constraint-rows .td-opt-row')).to_have_count(2)
     page.get_by_role("button", name="Remove constraint", exact=True).last.click()
     page.get_by_role("button", name="Remove constraint", exact=True).last.click()
@@ -169,24 +172,23 @@ def exercise(context, address, output):
             assert {key for stage_index, key in stage_fields if stage_index == index} == expected_fields
         assert page.locator('#stages_accordion_container .rc-slider').count() == 0
 
-        # Check the rendered traces, including all velocity triangles, against
-        # the same callback response that published the optimized result store.
+        # The primary callback publishes the model and overview figures; the
+        # independent triangle callback renders that model in the selected units.
+        # Derive its expected figures from the published model, avoiding a stale
+        # triangle callback snapshot while the optimized design is being applied.
         figures = {}
-
-        def find_figures(node):
-            if isinstance(node, list):
-                for child in node:
-                    find_figures(child)
-            elif isinstance(node, dict):
-                props = node.get("props", {})
-                if "figure" in props:
-                    figures[props["id"]] = props["figure"]
-                find_figures(props.get("children"))
-
-        for identity, props in rendered_results[-1].items():
+        published = rendered_results[-1]
+        for identity, props in published.items():
             if "figure" in props:
                 figures[identity] = props["figure"]
-        find_figures(rendered_results[-1]["triangles_container"]["children"])
+        selected_units = page.locator("#td-triangle-mode label:has(input:checked)").inner_text()
+        mode = {"Mach numbers": "mach", "Velocity [m/s]": "velocity"}[selected_units.strip()]
+        for index, figure in enumerate(
+            plotly_turbine.plot_velocity_triangles_turbine(
+                published["result_store"]["data"], mode=mode
+            )
+        ):
+            figures[f"triangles_plot_{index}"] = json.loads(figure.to_json())
         assert len(figures) == 4 + len(expected["stages"])
         samples = {}
         for identity, figure in figures.items():
@@ -252,7 +254,10 @@ def exercise(context, address, output):
     # Two scalar equality constraints with one free variable must fail safely.
     open_section("opt-panel")
     page.get_by_role("tab", name="Constraints", exact=True).click()
-    page.locator("#opt-add-constraint").click()
+    choose_path(page, "constraint", "$stages_performance.*.geometry_meanline.*.flaring_angle")
+    comparison = page.locator('#opt-constraint-rows [id*="opt-comparison"]')
+    comparison.click()
+    comparison.get_by_text("=", exact=True).click()
     before = deepcopy(results[-1]["inputs"])
     failed_status = run(False)
     expect(page.locator("#opt-log")).to_contain_text("more scalar equality constraints")
@@ -305,8 +310,13 @@ def exercise(context, address, output):
     upload(multiple, "two-stages.yaml")
     expect(page.locator('#stage_count_label')).to_have_text("2")
     expect(page.locator('#opt-variable-rows .td-opt-row')).to_have_count(4)
+    page.locator("#td-triangle-mode").get_by_text("Velocity [m/s]", exact=True).click()
+    page.wait_for_function(
+        "document.querySelector('#triangles_plot_0 .js-plotly-plot').layout.xaxis.title.text.includes('m/s')"
+    )
     run()
     assert len(results[-1]["stages_performance"]) == 2
+    expect(page.locator("#td-triangle-mode label:has(input:checked)")).to_have_text("Velocity [m/s]")
 
     radial = yaml.safe_load((ROOT / "development/optimization/case_radial.yaml").read_text())
     upload(radial, "radial.yaml")
@@ -335,7 +345,8 @@ def exercise(context, address, output):
     assert not errors, errors
     return dict(checks=["add/remove editors", "current defaults", "numeric override retention", "clipping log",
                         "responsive panes and duplicate-start prevention", "optimization below every stage",
-                        "all input boxes and plotted traces after apply", "two-stage global/stage/blade apply", "manual editing",
+                        "all input boxes and plotted traces after apply", "two-stage global/stage/blade apply",
+                        "velocity unit selection retained across apply", "manual editing",
                         "failed-worker recovery", "actual rpm", "radial zero-flaring solve", "YAML bounds retained", "browser session isolation"],
                 failed_run_diagnostic=failed_status, browser_errors=errors,
                 radial_efficiency=final["overall_performance"]["efficiency_ts"])

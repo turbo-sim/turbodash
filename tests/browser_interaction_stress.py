@@ -7,6 +7,7 @@ stops its own server; every browser artifact stays inside the repository.
 import argparse
 import base64
 import json
+from browser_picker_helpers import choose_path
 import os
 from pathlib import Path
 import socket
@@ -453,13 +454,14 @@ def exercise(context, address, output):
         })
         page.wait_for_function("window.tdTestEditorLoadPending")
         open_variables()
-        page.locator("#opt-add-variable").click()
-        page.wait_for_function("window.tdTestEditorRequests.some(p => p.changedPropIds.includes('opt-add-variable.n_clicks'))")
+        choose_path(page, "variable", "rotational_speed")
+        page.wait_for_function("window.tdTestEditorRequests.some(p => p.changedPropIds.includes('opt-selection-request.data'))")
         requests = page.evaluate("window.tdTestEditorRequests")
-        clicked = [request for request in requests if "opt-add-variable.n_clicks" in request["changedPropIds"]]
+        clicked = [request for request in requests if "opt-selection-request.data" in request["changedPropIds"]]
 
-        clicks = next(item["value"] for item in flatten(clicked[-1]["inputs"]) if item["id"] == "opt-add-variable")
-        assert clicks == 1, "The actual Add click must reach the editor callback"
+        selection = next(item["value"] for item in flatten(clicked[-1]["inputs"]) if item["id"] == "opt-selection-request")
+        assert any(operation.get("path") == "rotational_speed" and operation["selected"]
+                   for operation in selection["operations"]), "The checkbox action must reach the editor callback"
         expect(page.locator("#opt-variable-rows .td-opt-row")).to_have_count(2, timeout=15000)
         wait_result("inlet_property_pair", "PT_INPUTS")
         compare_figures()

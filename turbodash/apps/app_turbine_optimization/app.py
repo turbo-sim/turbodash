@@ -1,10 +1,10 @@
 """Optimization edition of the experimental workspace; existing apps stay independent."""
 
-from turbodash.apps.shared.paths import SHARED_ASSETS_DIRECTORY, DOCUMENTATION_FILE
+from turbodash.apps.shared.paths import SHARED_ASSETS_DIRECTORY
+from turbodash.apps.shared.documentation import register_documentation
 from turbodash.apps.shared.cli import run_app, run_cli
 
 from pathlib import Path
-import os
 import base64
 import json
 import yaml
@@ -69,6 +69,7 @@ register_app_assets(
     app, Path(__file__).resolve().parent / "assets", "turbine-optimization"
 )
 server = app.server
+documentation_url = register_documentation(app)
 optimization_jobs.configure_sessions(server)
 
 
@@ -261,38 +262,8 @@ BLADE_GEOMETRY_FIELDS = [
 ]
 
 
-# =========================
-# Documentation layout
-# =========================
-docs_path = str(DOCUMENTATION_FILE)
-if os.path.exists(docs_path):
-    with open(docs_path, "r", encoding="utf-8") as f:
-        theory_md = f.read()
-else:
-    theory_md = "Documentation not found."
-
-docs_layout = html.Div(
-    style={"maxWidth": "1000px", "margin": "auto", "padding": "30px"},
-    children=[
-        dcc.Markdown(
-            theory_md,
-            mathjax=True,
-            style={
-                "whiteSpace": "pre-wrap",
-                "padding": "40px",
-                "fontFamily": "Segoe UI, Roboto, Helvetica, Arial, sans-serif",
-                "fontSize": "16px",
-                "lineHeight": "1.6",
-                "color": "var(--td-text)",
-                "backgroundColor": "var(--td-surface)",
-            },
-        ),
-    ],
-)
-
-
 app.layout = build_layout(
-    OVERALL_DEFAULTS, STAGE_DEFAULTS, LOSS_MODEL_OPTIONS, docs_layout
+    OVERALL_DEFAULTS, STAGE_DEFAULTS, LOSS_MODEL_OPTIONS, documentation_url
 )
 
 app.clientside_callback(
@@ -423,10 +394,11 @@ def calculation_label(state):
 
 
 app.clientside_callback(
-    """function(job, status) {return job ? status : (status && !status.startsWith('Ready') ? status : '');}""",
+    """function(job, status, outcome) {return job || (outcome && outcome !== 'ready') ? status : '';}""",
     Output("td-job-status", "children"),
     Input("opt-job", "data"),
     Input("opt-status", "children"),
+    Input("opt-outcome-state", "data"),
 )
 
 
@@ -696,7 +668,6 @@ def stage_choices(stages, active):
 @app.callback(
     Output("meridional_plot", "figure"),
     Output("blades_plot", "figure"),
-    Output("triangles_container", "children"),
     Output("efficiency_trends_plot", "figure"),
     Output("loss_plot", "figure"),
     Output("perf_table", "children"),
@@ -747,7 +718,7 @@ def update_turbine(
         raise
     except Exception as error:
         return (
-            *((no_update,) * 10),
+            *((no_update,) * 9),
             f"Results retained from the last valid design. {error}",
             {"valid": False, "message": str(error)},
             no_update,
@@ -815,10 +786,10 @@ def render_results(out, signature):
             "text": f"Blade geometry unavailable: {error}", "showarrow": False,
             "xref": "paper", "yref": "paper", "x": 0.5, "y": 0.5,
         }]}}
-    # Now returns a LIST of figures, one per stage.
-    triangle_figs = _plotting.plot_velocity_triangles_turbine(
-        out, mode="mach"
-    )
+    # Validate every output before an optimized design can be applied. The
+    # displayed triangles have their own callback so changing units never solves
+    # the model or races with a pending calculation's previous unit selection.
+    _plotting.plot_velocity_triangles_turbine(out, mode="mach")
     fig_loss = _plotting.plot_turbine_loss_distribution(out)
 
     # Overall efficiency trends vs blade velocity ratio (kinematic sweep).
@@ -827,12 +798,6 @@ def render_results(out, signature):
     fig_efficiency_trends = (
         _plotting.plot_turbine_efficiency_trends(trends, out)
     )
-
-    # Wrap each per-stage figure in its own card row.
-    triangles_children = [
-        triangle_card(f"triangles_plot_{i}", fig)
-        for i, fig in enumerate(triangle_figs)
-    ]
 
     # Build the three result tables from the same `out` structure.
     perf_cols, perf_data = reporting.overall_performance_table(out)
@@ -845,7 +810,6 @@ def render_results(out, signature):
     return (
         fig_meridional,
         fig_blades,
-        triangles_children,
         fig_efficiency_trends,
         fig_loss,
         perf_tbl,
@@ -854,6 +818,22 @@ def render_results(out, signature):
         out,
         signature,
     )
+
+
+@app.callback(
+    Output("triangles_container", "children"),
+    Input("result_store", "data"),
+    Input("td-triangle-mode", "value"),
+)
+def update_triangles(results, mode):
+    """Redraw the latest valid result without changing the calculation."""
+    if not results:
+        return []
+    figures = _plotting.plot_velocity_triangles_turbine(results, mode=mode)
+    return [
+        triangle_card(f"triangles_plot_{index}", figure)
+        for index, figure in enumerate(figures)
+    ]
 
 
 def _assemble_cfg(overall, stages):

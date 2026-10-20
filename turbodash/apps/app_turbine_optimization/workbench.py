@@ -289,7 +289,7 @@ def metric_cards(results):
     ]
 
 
-def _logo(theme):
+def logo_data_uri(theme):
     path = Path(__file__).parent / "assets" / f"blade-ring-{theme}.svg"
     return "data:image/svg+xml;base64," + base64.b64encode(path.read_bytes()).decode(
         "ascii"
@@ -572,10 +572,10 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
                     html.Button(
                         [
                             html.Img(
-                                src=_logo("light"), className="td-logo-light", alt=""
+                                src=logo_data_uri("light"), className="td-logo-light", alt=""
                             ),
                             html.Img(
-                                src=_logo("dark"), className="td-logo-dark", alt=""
+                                src=logo_data_uri("dark"), className="td-logo-dark", alt=""
                             ),
                             html.Span("turbodash"),
                         ],
@@ -621,7 +621,7 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
                                 className="td-project-link",
                             ),
                             html.A(
-                                "Documentation",
+                                "Documentation ↗",
                                 id="td-documentation-link",
                                 href=documentation_url,
                                 target="_blank",

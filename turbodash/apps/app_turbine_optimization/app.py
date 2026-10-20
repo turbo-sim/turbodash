@@ -53,6 +53,7 @@ from .workbench import (
     triangle_card,
     make_data_table,
     metric_cards,
+    logo_data_uri,
 )
 
 # =========================
@@ -64,6 +65,14 @@ app = Dash(
     assets_folder=str(SHARED_ASSETS_DIRECTORY),
     suppress_callback_exceptions=True,
     external_stylesheets=[dbc.themes.BOOTSTRAP],
+)
+app.index_string = app.index_string.replace(
+    "{%favicon%}",
+    "\n        ".join(
+        f'<link rel="icon" type="image/svg+xml" href="{logo_data_uri(theme)}" '
+        f'media="(prefers-color-scheme: {theme})">'
+        for theme in ("light", "dark")
+    ),
 )
 register_app_assets(
     app, Path(__file__).resolve().parent / "assets", "turbine-optimization"

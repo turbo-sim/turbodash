@@ -2,7 +2,6 @@ import numpy as np
 import plotly.graph_objects as go
 from scipy.interpolate import PchipInterpolator
 from plotly.subplots import make_subplots
-from plotly.colors import sample_colorscale
 from turbodash.core.turbine import get_blade_row_geometry
 
 from turbodash.geometry.blade import (
@@ -110,6 +109,10 @@ def apply_plot_theme(fig, theme="light"):
             trace.fillcolor = palette["channel"]
         elif role == "flow_guide":
             trace.line.color = palette["guide"]
+        elif role in _LOSS_COLORS:
+            trace.marker.color = (
+                _LOSS_COLORS_DARK if theme == "dark" else _LOSS_COLORS
+            )[role]
         for part_name in ("line", "marker"):
             part = getattr(trace, part_name, None)
             color = getattr(part, "color", None)
@@ -304,9 +307,7 @@ def plot_turbine_meridional_channel(results, *, theme="light"):
         row_points.append((row, np.asarray(inner), np.asarray(outer)))
     hub, shroud = _extend_channel(np.asarray(hub), np.asarray(shroud), rows, turbine_type)
 
-    def polygon(
-        points, *, color, name, role=None, linecolor=None, showlegend=False, hover=None
-    ):
+    def polygon(points, *, color, name, role=None, linecolor=None, hover=None):
         points = np.vstack((points, points[0])) * 1000.0
         fig.add_trace(
             go.Scatter(
@@ -318,7 +319,7 @@ def plot_turbine_meridional_channel(results, *, theme="light"):
                 line=dict(color=linecolor or color, width=1 if linecolor else 0),
                 name=name,
                 legendgroup=name,
-                showlegend=showlegend,
+                showlegend=False,
                 meta=dict(theme_role=role),
                 hoverinfo="skip" if hover is None else None,
                 hovertemplate=hover,
@@ -382,27 +383,27 @@ def plot_turbine_meridional_channel(results, *, theme="light"):
             color=_ROW_FILLS[label],
             linecolor=color,
             name=label,
-            showlegend=row["stage_number"] == 1,
             hover=f"{stage_name} · {label}<br>Meanline channel<extra></extra>",
         )
 
-    for index, guide in enumerate(_channel_guides(hub, shroud, turbine_type)):
+    for guide in _channel_guides(hub, shroud, turbine_type):
         fig.add_trace(go.Scatter(
             x=1000 * guide[:, 0], y=1000 * guide[:, 1], mode="lines",
-            name="Flow guides", legendgroup="Flow guides", showlegend=index == 0,
+            name="Flow guides", legendgroup="Flow guides", showlegend=False,
             line=dict(color=palette["guide"], width=1.15),
             meta=dict(theme_role="flow_guide"),
             hovertemplate="Geometry-based guide streamline<br>Illustrative passage path; not a CFD solution<extra></extra>",
         ))
 
-    for points, label, dash in ((hub, "Hub", "solid"), (shroud, "Shroud", "dash")):
+    for points, label in ((hub, "Hub"), (shroud, "Shroud")):
         fig.add_trace(
             go.Scatter(
                 x=1000 * points[:, 0],
                 y=1000 * points[:, 1],
                 mode="lines",
                 name=label,
-                line=dict(color=palette["wall"], width=2, dash=dash),
+                line=dict(color=palette["wall"], width=2, dash="solid"),
+                showlegend=False,
                 meta=dict(theme_role="endwall"),
                 hovertemplate=f"{label}<br>%{{x:.3f}} mm, %{{y:.3f}} mm<extra></extra>",
             )
@@ -417,7 +418,7 @@ def plot_turbine_meridional_channel(results, *, theme="light"):
     )
     fig.update_layout(
         margin=dict(l=45, r=20, t=20, b=55),
-        legend=dict(orientation="h", x=0.5, xanchor="center", y=1.12),
+        showlegend=False,
     )
     return apply_plot_theme(fig, theme)
 
@@ -451,12 +452,7 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8, *, theme="light"
     turbine_type = results["inputs"]["turbine_type"]
     fig = go.Figure()
 
-    # Track which legend entries have been shown so each appears once only.
-    _legend_shown = {"Stator": False, "Rotor": False}
-
     def _blade_trace(x, y, color, label):
-        show = not _legend_shown[label]
-        _legend_shown[label] = True
         x, y = np.asarray(x), np.asarray(y)
         if len(x) and (x[-1] != x[0] or y[-1] != y[0]):
             x, y = np.r_[x, x[0]], np.r_[y, y[0]]
@@ -470,7 +466,7 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8, *, theme="light"
                 fillcolor=_ROW_FILLS[label],
                 name=label,
                 legendgroup=label,
-                showlegend=show,
+                showlegend=False,
             )
         )
 
@@ -607,7 +603,9 @@ def plot_turbine_blades(results, N_points=201, N_blades_plot=8, *, theme="light"
     else:
         raise ValueError(f"Invalid stage type: {turbine_type!r}")
 
-    fig.update_layout(template="simple_white", margin=dict(l=30, r=30, t=30, b=30))
+    fig.update_layout(
+        template="simple_white", margin=dict(l=30, r=30, t=30, b=30), showlegend=False
+    )
     return apply_plot_theme(fig, theme)
 
 
@@ -643,22 +641,37 @@ def _add_triangle(fig, v_t, v_m, w_t, w_m, color, show_legend, name):
     meridional Mach increasing downward.
     """
 
-    def seg(x0, y0, x1, y1, legend):
+    def seg(x0, y0, x1, y1, legend, vector):
+        # Screen-sized heads remain readable when toggling Mach/m/s or zooming.
+        # Plotly derives their direction from the preceding point, including
+        # the reversed meridional axis. A zero vector has no direction to draw.
+        head_size = 12 if np.hypot(x1 - x0, y1 - y0) > np.finfo(float).eps else 0
         fig.add_trace(
             go.Scatter(
                 x=[x0, x1],
                 y=[y0, y1],
-                mode="lines",
+                mode="lines+markers",
                 line=dict(color=color, width=2),
+                marker=dict(
+                    symbol="arrow",
+                    angleref="previous",
+                    size=[0, head_size],
+                    color=color,
+                ),
                 name=name,
                 legendgroup=name,
                 showlegend=legend,
+                meta=dict(vector=vector),
+                hovertemplate=(
+                    f"{name} · {vector}<br>Tangential: %{{x:.3f}}"
+                    "<br>Meridional: %{y:.3f}<extra></extra>"
+                ),
             )
         )
 
-    seg(0.0, 0.0, v_t, v_m, show_legend)  # absolute v (carries legend)
-    seg(0.0, 0.0, w_t, w_m, False)  # relative w
-    seg(w_t, w_m, v_t, v_m, False)  # blade u (closes triangle)
+    seg(0.0, 0.0, v_t, v_m, show_legend, "Absolute velocity")  # v
+    seg(0.0, 0.0, w_t, w_m, False, "Relative velocity")  # w
+    seg(w_t, w_m, v_t, v_m, False, "Blade velocity")  # u closes w -> v
 
 
 def plot_velocity_triangle_stage(st, scale_tangen, scale_merid, use_mach, title=None):
@@ -821,6 +834,7 @@ _LOSS_COMPONENTS = [
     "loss_trailing",
     "loss_secondary",
     "loss_clearance",
+    "loss_incidence",
 ]
 
 _LOSS_LABELS = {
@@ -828,71 +842,145 @@ _LOSS_LABELS = {
     "loss_trailing": "Trailing edge",
     "loss_secondary": "Secondary",
     "loss_clearance": "Tip clearance",
+    "loss_incidence": "Incidence",
 }
 
-# Magma samples in [0.15, 0.85], matching the mpl module.
-_pts = np.linspace(0.15, 0.85, len(_LOSS_COMPONENTS))
 _LOSS_COLORS = {
-    comp: sample_colorscale("Magma", float(p))[0]
-    for comp, p in zip(_LOSS_COMPONENTS, _pts)
+    "loss_profile": "#2462D1",
+    "loss_trailing": "#4B84E5",
+    "loss_secondary": "#7AA6EC",
+    "loss_clearance": "#FF7F0E",
+    "loss_incidence": "#F5AD66",
+    "loss_exit_kinetic": "#647892",
+    "loss_unallocated": "#8995A5",
+}
+_LOSS_COLORS_DARK = {
+    "loss_profile": "#88B7FF",
+    "loss_trailing": "#6D9DE8",
+    "loss_secondary": "#B3CEFF",
+    "loss_clearance": "#FFAD5C",
+    "loss_incidence": "#F3C48F",
+    "loss_exit_kinetic": "#A0B2CA",
+    "loss_unallocated": "#BCC6D4",
 }
 
 
 def plot_turbine_loss_distribution(results):
-    """
-    Stacked bar plot of the loss-coefficient breakdown for every blade row.
-    One bar per blade row in flow order (S1, R1, S2, R2, ...). Mirror of the
-    mpl function.
+    r"""Plot contributions to the overall total-to-static efficiency deficit.
+
+    Every component uses the same overall isentropic enthalpy drop, so the
+    blade-row columns are directly comparable across stages:
+
+    ``delta_eta = loss_component * 0.5 * row_exit_speed**2 / dh_is_total``.
+
+    Stators use absolute exit speed and rotors use relative exit speed, exactly
+    as in ``compute_stage_performance``. Only the final rotor's absolute exit
+    kinetic energy is unrecovered overall; intermediate exit kinetic energy is
+    carried into the next stage and must not be counted again. The sum of all
+    columns therefore equals ``100 * (1 - overall efficiency_ts)`` in efficiency
+    percentage points for the solved model. Coefficients and energies in the
+    result dictionary retain their original units.
+
+    The five named components include incidence and already contain any Benner
+    penetration weighting. Diagnostic/unweighted values are not added again.
+    If a custom or tuned row total differs from the named component sum, show
+    that signed difference explicitly as ``Other / unallocated`` rather than
+    silently rescaling the available components.
 
     Returns
     -------
     fig : plotly.graph_objects.Figure
     """
     stages = results["stages_performance"]
+    if not stages:
+        raise ValueError("A solved turbine with at least one stage is required.")
+    reference_drop = float(results["overall_performance"]["isentropic_enthalpy_drop"])
+    if not np.isfinite(reference_drop) or reference_drop <= 0:
+        raise ValueError("The overall isentropic enthalpy drop must be positive and finite.")
 
-    labels, row_losses = [], []
+    labels, row_losses, row_energy = [], [], []
     for i, st in enumerate(stages, 1):
-        labels.append(f"S{i}")
-        row_losses.append(st["losses"]["stator"])
-        labels.append(f"R{i}")
-        row_losses.append(st["losses"]["rotor"])
+        for label, row, station, velocity in (
+            (f"S{i}", "stator", 1, "v"), (f"R{i}", "rotor", 3, "w")
+        ):
+            labels.append(label)
+            row_losses.append(st["losses"][row])
+            row_energy.append(0.5 * float(st["flow_stations"][station][velocity]) ** 2)
+    labels.append("Exit kinetic energy")
+    component_energy = {
+        component: [
+            float(losses.get(component, 0.0)) * energy
+            for losses, energy in zip(row_losses, row_energy)
+        ] + [0.0]
+        for component in _LOSS_COMPONENTS
+    }
+    remainder = [
+        float(losses["loss_total"]) * energy
+        - sum(component_energy[component][index] for component in _LOSS_COMPONENTS)
+        for index, (losses, energy) in enumerate(zip(row_losses, row_energy))
+    ] + [0.0]
+    # Ignore floating-point summation noise only; custom totals remain explicit.
+    has_remainder = any(abs(value / reference_drop) > 1e-12 for value in remainder)
+    leaving_energy = 0.5 * float(stages[-1]["flow_stations"][3]["v"]) ** 2
 
     fig = go.Figure()
-    for comp in _LOSS_COMPONENTS:
-        heights = [float(rl.get(comp, 0.0)) for rl in row_losses]
+
+    def add_component(name, energy, role):
         fig.add_trace(
             go.Bar(
                 x=labels,
-                y=heights,
-                name=_LOSS_LABELS[comp],
+                y=100.0 * np.asarray(energy) / reference_drop,
+                customdata=energy,
+                name=name,
+                meta=dict(theme_role=role),
                 marker=dict(
-                    color=_LOSS_COLORS[comp],
+                    color=_LOSS_COLORS[role],
                     line=dict(color="black", width=0.75),
+                ),
+                hovertemplate=(
+                    "%{x}<br>Δη: %{y:.2f}% (efficiency percentage points)"
+                    "<br>Specific energy: %{customdata:.3f} J/kg"
+                    "<extra>%{fullData.name}</extra>"
                 ),
             )
         )
 
-    totals = [sum(float(rl.get(c, 0.0)) for c in _LOSS_COMPONENTS) for rl in row_losses]
-    y_top = 1.2 * max(totals) if totals else 1.0
+    for component in _LOSS_COMPONENTS:
+        add_component(
+            _LOSS_LABELS[component], component_energy[component], component
+        )
+    if has_remainder:
+        add_component("Other / unallocated", remainder, "loss_unallocated")
+    add_component(
+        "Exit kinetic energy",
+        [0.0] * len(row_losses) + [leaving_energy],
+        "loss_exit_kinetic",
+    )
+    contributions = np.asarray([trace.y for trace in fig.data])
+    positive_totals = np.maximum(contributions, 0).sum(axis=0)
+    negative_totals = np.minimum(contributions, 0).sum(axis=0)
+    y_top = max(1.2 * positive_totals.max(), 1.0)
+    y_bottom = 1.2 * negative_totals.min()
 
     fig.update_layout(
-        barmode="stack",
+        barmode="relative",
         template="simple_white",
-        margin=dict(l=70, r=20, t=30, b=60),
+        margin=dict(l=70, r=20, t=75, b=60),
         bargap=0.5,
         legend=dict(
-            orientation="v",
-            x=0.98,
-            y=0.98,
-            xanchor="right",
-            yanchor="top",
+            orientation="h",
+            x=0.0,
+            y=1.03,
+            xanchor="left",
+            yanchor="bottom",
+            font=dict(size=11),
             bgcolor="rgba(255,255,255,0.85)",
             bordercolor="black",
             borderwidth=1,
         ),
     )
     fig.update_xaxes(
-        title_text="Blade row",
+        title_text="Blade row / final exit",
         title_font=dict(size=AXIS_FONT_SIZE),
         tickfont=dict(size=TICK_FONT_SIZE),
         showline=True,
@@ -901,8 +989,8 @@ def plot_turbine_loss_distribution(results):
         linecolor="black",
     )
     fig.update_yaxes(
-        title_text="Loss coefficient [-]",
-        range=[0.0, y_top],
+        title_text="Efficiency penalty Δη [%]",
+        range=[y_bottom, y_top],
         title_font=dict(size=AXIS_FONT_SIZE),
         tickfont=dict(size=TICK_FONT_SIZE),
         showline=True,
@@ -917,16 +1005,16 @@ def plot_turbine_loss_distribution(results):
 # =============================================================================
 # Plot overall efficiency trends vs blade velocity ratio
 # =============================================================================
-# Two distinct colors for the two efficiency lines (Magma samples, matching the
-# palette used elsewhere in the module).
-COLOR_ETA_TT = sample_colorscale("Magma", 0.35)[0]
-COLOR_ETA_TS = sample_colorscale("Magma", 0.70)[0]
+# Use the same blue/orange series colors as the blade and velocity views.
+COLOR_ETA_TT = COLOR_ROTOR
+COLOR_ETA_TS = COLOR_STATOR
 
 
 def plot_turbine_efficiency_trends(trends, results=None):
     """
     Single plot of the overall total-to-total and total-to-static efficiency
-    trends as a function of the (overall) blade-velocity ratio.
+    trends in percent as a function of the (overall) blade-velocity ratio.
+    Input efficiencies remain fractions; only plotted values are multiplied by 100.
 
     Parameters
     ----------
@@ -944,8 +1032,8 @@ def plot_turbine_efficiency_trends(trends, results=None):
     fig : plotly.graph_objects.Figure
     """
     nu = np.asarray(trends["blade_velocity_ratio"], dtype=float)
-    eta_tt = np.asarray(trends["eta_tt"], dtype=float)
-    eta_ts = np.asarray(trends["eta_ts"], dtype=float)
+    eta_tt = 100.0 * np.asarray(trends["eta_tt"], dtype=float)
+    eta_ts = 100.0 * np.asarray(trends["eta_ts"], dtype=float)
 
     fig = go.Figure()
 
@@ -956,6 +1044,8 @@ def plot_turbine_efficiency_trends(trends, results=None):
             mode="lines",
             line=dict(color=COLOR_ETA_TT, width=2),
             name="Total-to-total",
+            hovertemplate="Blade velocity ratio: %{x:.3f}<br>Efficiency: %{y:.2f}%"
+                          "<extra>%{fullData.name}</extra>",
         )
     )
 
@@ -966,6 +1056,8 @@ def plot_turbine_efficiency_trends(trends, results=None):
             mode="lines",
             line=dict(color=COLOR_ETA_TS, width=2),
             name="Total-to-static",
+            hovertemplate="Blade velocity ratio: %{x:.3f}<br>Efficiency: %{y:.2f}%"
+                          "<extra>%{fullData.name}</extra>",
         )
     )
 
@@ -973,8 +1065,8 @@ def plot_turbine_efficiency_trends(trends, results=None):
     if results is not None:
 
         nu0 = float(results["inputs"]["blade_velocity_ratio"])
-        eta_tt0 = float(results["overall_performance"]["efficiency_tt"])
-        eta_ts0 = float(results["overall_performance"]["efficiency_ts"])
+        eta_tt0 = 100.0 * float(results["overall_performance"]["efficiency_tt"])
+        eta_ts0 = 100.0 * float(results["overall_performance"]["efficiency_ts"])
 
         # Vertical line at design blade velocity ratio
         fig.add_vline(
@@ -993,6 +1085,8 @@ def plot_turbine_efficiency_trends(trends, results=None):
                     line=dict(color="black", width=1.5),
                 ),
                 name="Design point",
+                hovertemplate="Blade velocity ratio: %{x:.3f}<br>Efficiency: %{y:.2f}%"
+                              "<extra>Design point</extra>",
             )
         )
 
@@ -1025,10 +1119,10 @@ def plot_turbine_efficiency_trends(trends, results=None):
     )
 
     fig.update_yaxes(
-        title_text="Efficiency [-]",
+        title_text="Efficiency [%]",
         title_font=dict(size=AXIS_FONT_SIZE),
         tickfont=dict(size=TICK_FONT_SIZE),
-        range=[0.0, 1.0],
+        range=[0.0, 100.0],
         showline=True,
         mirror=True,
         linewidth=AXIS_LINE_WIDTH,

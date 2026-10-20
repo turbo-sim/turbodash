@@ -269,7 +269,7 @@ def test_layout_has_five_numbered_closed_sections_and_no_studio_brand():
         "Turbine setup",
         "Operating point",
         "Shaft speed",
-        "Stage design & geometry",
+        "Stage design",
         "Optimization",
     ]
     for index, (section, title) in enumerate(zip(sections, expected), 1):

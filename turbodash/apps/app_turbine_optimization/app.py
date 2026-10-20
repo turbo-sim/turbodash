@@ -61,7 +61,8 @@ from .workbench import (
 # =========================
 app = Dash(
     __name__,
-    title="Turbodash · Optimization",
+    title="Turbodash",
+    update_title=None,  # Keep background polling from flashing the browser tab.
     assets_folder=str(SHARED_ASSETS_DIRECTORY),
     suppress_callback_exceptions=True,
     external_stylesheets=[dbc.themes.BOOTSTRAP],
@@ -129,8 +130,8 @@ OVERALL_DEFAULTS = dict(
 )
 
 BLADE_GEOMETRY_DEFAULTS = {
-    "stator.solidity_chord": 1.1209982569657782,
-    "rotor.solidity_chord": 1.0493781455466982,
+    "stator.solidity_chord": 1.1,
+    "rotor.solidity_chord": 1.1,
     "stator.aspect_ratio": 2.0,
     "stator.maximum_thickness_to_chord": 0.30,
     "stator.maximum_thickness_location": 0.30,
@@ -166,7 +167,6 @@ STAGE_DEFAULTS_RADIAL = dict(
 
 STAGE_DEFAULTS_AXIAL = dict(
     STAGE_DEFAULTS_RADIAL,
-    **{"rotor.solidity_chord": 1.137411139662947},
     radius_ratio_01=1.0,
     radius_ratio_12=1.0,
     radius_ratio_23=1.0,
@@ -355,7 +355,7 @@ app.clientside_callback(
 
 
 def inlet_labels(pair):
-    return [f"{field['label']} [{field['unit']}]" for field in pair_fields(pair)]
+    return [f"Inlet {field['label'].lower()} [{field['unit']}]" for field in pair_fields(pair)]
 
 
 def speed_label(mode):

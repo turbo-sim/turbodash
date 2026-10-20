@@ -41,12 +41,12 @@ Five numbered sections start closed on a fresh visit or newly loaded design. Ope
 | **1. Turbine setup** | Axial/radial type, integer stage count with add/remove controls, and loss model. |
 | **2. Operating point** | Searchable working fluid, readable inlet property pair and both values, exit pressure, mass flow and inlet flow angle. Labels and units follow the selected properties. |
 | **3. Shaft speed** | Specific/actual speed mode, the corresponding value and units, and the global blade velocity ratio. |
-| **4. Stage design & geometry** | Named stage selection, work split, angles, reaction, velocity/radius ratios and blade geometry, with explicit **Stator / Rotor** scope. Axial/radial applicability is retained. |
+| **4. Stage design** | Named stage selection, work split, angles, reaction, velocity/radius ratios and blade geometry, with explicit **Stator / Rotor** scope. Axial/radial applicability is retained. |
 | **5. Optimization** | Configuration, Design variables and Constraints, including objective, solver settings, precise bounds and targets, background job status, convergence and successful-result application. |
 
 All stage controls stay mounted while inactive editors are hidden. Stage/row selection changes the editing context without losing values. Adding/removing stages preserves retained-stage values and names. Changing turbine type initializes stage parameters from the selected type's defaults while retaining stage count and names.
 
-Aerodynamic design and Blade geometry expand inline within the Stage design & geometry section. Their headings and controls use a compact shared alignment inside the parent section. Optimization tabs and their editors are similarly contained within the numbered Optimization section.
+Aerodynamic design and Blade geometry expand inline within the Stage design section. Their headings and controls use a compact shared alignment inside the parent section. Optimization tabs and their editors are similarly contained within the numbered Optimization section.
 
 Find a parameter searches names, aliases, symbols and stage/row/workspace context, including collapsed controls. Choosing a match selects its workspace and scope, opens the containing sections, scrolls to the field, focuses it and briefly highlights it. Keyboard controls include Ctrl/Cmd+K, arrows, Enter and Escape. Search and navigation do not edit the model.
 

@@ -105,8 +105,7 @@
 .td-workbench .td-search-result:is(:hover,[aria-selected="true"]) { background: var(--td-tint); }
 .td-workbench .td-search-empty { font-size: 12px; padding: 13px 10px; color: var(--td-muted); }
 .td-workbench .td-inspector-scroll { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 0 12px 20px; scrollbar-width: thin; scrollbar-color: var(--td-line) transparent; scrollbar-gutter: stable; }
-.td-workbench .td-section { border: 1px solid transparent; border-bottom-color: var(--td-line); border-radius: 7px; margin: 0 0 6px; background: transparent; box-shadow: none; }
-.td-workbench .td-section[open] { border-color: var(--td-line); background: var(--td-panel); }
+.td-workbench .td-section { border: 1px solid var(--td-line); border-radius: 7px; margin: 0 0 6px; background: var(--td-panel); box-shadow: none; }
 .td-workbench .td-section > summary { display: flex; align-items: center; gap: 8px; min-height: 49px; padding: 11px 10px; color: var(--td-ink); background: transparent; border-radius: 6px; cursor: pointer; list-style: none; font-size: 12px; font-weight: 600; }
 .td-workbench .td-section-title { min-width: 0; }
 .td-workbench .td-section > summary::-webkit-details-marker { display: none; }

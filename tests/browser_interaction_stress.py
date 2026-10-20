@@ -409,7 +409,7 @@ def exercise(context, address, output):
         pair.click()
         pair.locator("input").fill("PT")
         pair.locator("input").press("Enter")
-        expect(page.locator("#td-inlet-label-1")).to_contain_text("Pressure")
+        expect(page.locator("#td-inlet-label-1")).to_have_text("Inlet pressure [Pa]")
         expect(first).to_have_value("")
         expect(field("inlet_property_2")).to_have_value("")
         expect(page.locator("#td-fluid-error")).to_contain_text("Enter both inlet values")

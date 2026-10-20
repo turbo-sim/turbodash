@@ -378,7 +378,7 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
         ),
         *[
             number(
-                f"{spec['label']} [{spec['unit']}]",
+                f"Inlet {spec['label'].lower()} [{spec['unit']}]",
                 f"inlet_property_{index}",
                 defaults[f"inlet_property_{index}"],
                 label_id=f"td-inlet-label-{index}",
@@ -519,7 +519,7 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
                     section(1, "Turbine setup", setup, "setup"),
                     section(2, "Operating point", operating, "operating"),
                     section(3, "Shaft speed", speed, "speed"),
-                    section(4, "Stage design & geometry", stage, "stage"),
+                    section(4, "Stage design", stage, "stage"),
                     opt,
                     *extras,
                 ],

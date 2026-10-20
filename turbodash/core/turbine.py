@@ -3,6 +3,68 @@ from copy import deepcopy
 import numpy as np
 import jaxprop as jxp
 
+from .errors import (
+    ModelDomainError, ModelConsistencyError, model_context,
+    require_positive, require_nonzero, require_consistent,
+)
+
+
+def _triangle_divide(numerator, denominator, quantity, *, station=None):
+    """Reject scalar singularities; skip invalid points in plotting arrays."""
+    numerator, denominator = np.broadcast_arrays(numerator, denominator)
+    valid = np.isfinite(numerator) & np.isfinite(denominator) & (denominator != 0)
+    if numerator.ndim == 0:
+        require_nonzero(denominator, quantity, station=station)
+        if not np.isfinite(numerator):
+            raise ModelDomainError(f"Non-finite {quantity} numerator.", code="nonfinite_quantity",
+                                   quantity=quantity, value=numerator, station=station)
+        return numerator / denominator
+    result = np.full(numerator.shape, np.nan)
+    return np.divide(numerator, denominator, out=result, where=valid)
+
+
+def _triangle_sqrt(value, quantity, *, station=None, positive=False):
+    value = np.asarray(value)
+    valid = np.isfinite(value) & ((value > 0) if positive else (value >= 0))
+    if value.ndim == 0:
+        if not valid:
+            raise ModelDomainError(
+                f"No real velocity triangle: {quantity} = {value}.",
+                code="invalid_radicand", quantity=quantity, value=value,
+                station=station, margin=value,
+            )
+        return np.sqrt(value)
+    return np.sqrt(value, out=np.full(value.shape, np.nan), where=valid)
+
+
+def _thermodynamic_state(fluid, input_pair, property_1, property_2, *, station=None):
+    """Recognize EOS-domain errors without treating arbitrary bugs as recoverable.
+
+    Jaxprop wraps CoolProp's ValueError in RuntimeError. Only known failures
+    of the state flash are classified here; unsupported APIs and programming
+    exceptions retain their original exception types and tracebacks.
+    """
+    try:
+        state = fluid.get_state(input_pair, property_1, property_2)
+    except RuntimeError as error:
+        cause = error.__cause__ or error.__context__
+        message = str(cause).lower()
+        domain_markers = ("unable to solve", "out of range", "below the minimum",
+                          "above the maximum", "could not find a solution",
+                          "not a valid number", "inputs in brent",
+                          "is not a valid number", "temperature to qt_flash")
+        if not isinstance(cause, ValueError) or not any(word in message for word in domain_markers):
+            raise
+        raise ModelDomainError(
+            f"Thermodynamic state outside the EOS domain: {cause}",
+            code="thermodynamic_state", quantity="thermodynamic_inputs",
+            value={"input_pair": int(input_pair), "property_1": property_1,
+                   "property_2": property_2}, station=station,
+        ) from error
+    for name in ("d", "a", "viscosity"):
+        require_positive(getattr(state, name), f"thermodynamic_{name}", station=station)
+    return state
+
 
 # Per-stage vars expected in each entry of the YAML `stages:` list.
 _STAGE_REQUIRED_VARS = (
@@ -93,6 +155,8 @@ def compute_stage_velocity_triangles(
         (absolute v, relative w, meridional v_m, and blade speed u) at
         stations 1 through 4. Station-0 (stage inlet) kinematics are handled
         by the caller via the interstage duct.
+        ``domain_valid`` identifies valid samples. Scalar domain failures
+        raise ``ModelDomainError``; plotting arrays retain NaN masking.
     """
 
     # ------------------------------------------------------------------
@@ -102,6 +166,33 @@ def compute_stage_velocity_triangles(
     # Rename variables
     R = degree_reaction
     nu = blade_velocity_ratio
+    supplied_inlet_angle = stator_inlet_angle
+    supplied_exit_angle = stator_exit_angle
+    # These quantities are divisors or positive physical scales. Array calls
+    # are plotting sweeps: invalid samples stay NaN, never repaired values.
+    vector_call = any(np.ndim(value) for value in (
+        nu, stage_spouting_velocity, stator_inlet_angle, stator_exit_angle, R,
+        meridional_velocity_ratio_12, meridional_velocity_ratio_23,
+        meridional_velocity_ratio_34, radius_ratio_23, radius_ratio_34,
+    ))
+    if vector_call:
+        # Broadcast the scale so every domain-dependent operation sees the
+        # sweep shape; independent angle outputs keep their original shapes.
+        nu = np.broadcast_arrays(
+            nu, stage_spouting_velocity, stator_inlet_angle, stator_exit_angle, R,
+            meridional_velocity_ratio_12, meridional_velocity_ratio_23,
+            meridional_velocity_ratio_34, radius_ratio_23, radius_ratio_34,
+        )[0]
+    positive_inputs = {
+        "blade_velocity_ratio": nu, "stage_spouting_velocity": stage_spouting_velocity,
+        "meridional_velocity_ratio_12": meridional_velocity_ratio_12,
+        "meridional_velocity_ratio_23": meridional_velocity_ratio_23,
+        "meridional_velocity_ratio_34": meridional_velocity_ratio_34,
+        "radius_ratio_23": radius_ratio_23, "radius_ratio_34": radius_ratio_34,
+    }
+    if not vector_call:
+        for quantity, value in positive_inputs.items():
+            require_positive(value, quantity)
     limit = 90.0 - 1e-3
     alpha1 = np.clip(stator_inlet_angle, -limit, limit)
     alpha2 = np.clip(stator_exit_angle, -limit, limit)
@@ -123,25 +214,34 @@ def compute_stage_velocity_triangles(
 
     # Compute flow coefficient φ
     temp = (1 + tan_alpha3**2) * m_34**2 - R * (1 + tan_alpha1**2) * m_14**2
-    phi_sq = (1 - R) / (nu**2 * temp) + 1e-12
-    phi = np.sqrt(phi_sq)
+    phi_sq = _triangle_divide(1 - R, nu**2 * temp, "flow_coefficient_denominator") + 1e-12
+    # Preserve the existing valid-point equation, including its existing
+    # regularization term. A negative/zero radicand is never clipped.
+    phi = _triangle_sqrt(phi_sq, "flow_coefficient_squared", positive=True)
+    if vector_call:
+        positive_domain = np.logical_and.reduce(np.broadcast_arrays(*[
+            np.isfinite(value) & (np.asarray(value) > 0) for value in positive_inputs.values()
+        ]))
+        phi = np.where(positive_domain, phi, np.nan)
 
     # Compute relative flow angle at rotor inlet
-    tan_beta3 = tan_alpha3 - rr_34 / m_34 / phi
+    tan_beta3 = tan_alpha3 - _triangle_divide(
+        _triangle_divide(rr_34, np.broadcast_to(m_34, np.shape(phi)), "meridional_velocity_ratio_34"), phi,
+        "flow_coefficient", station=3)
     beta3 = np.arctan(tan_beta3)
 
     # Compute relative flow angle at rotor exit
     # Use the negative root of the second order equation
     tan_beta4_sq = (
-        +1 / (nu**2 * phi**2)
-        + (1 - rr_34**2) / phi**2
+        +_triangle_divide(1, nu**2 * phi**2, "rotor_exit_velocity_scale", station=4)
+        + _triangle_divide(1 - rr_34**2, phi**2, "flow_coefficient_squared", station=4)
         + (tan_beta3**2 - tan_alpha3**2) * m_34**2
         - 1
     )
 
     # Skip point beyond first invalid condition
     if np.ndim(tan_beta4_sq) == 1:
-        bad = tan_beta4_sq < 0
+        bad = (tan_beta4_sq < 0) | ~np.isfinite(tan_beta4_sq)
         if np.any(bad):
             i_bad = np.argmax(bad)  # first invalid index
             mask = np.zeros_like(tan_beta4_sq, dtype=bool)
@@ -151,13 +251,16 @@ def compute_stage_velocity_triangles(
 
     elif np.ndim(tan_beta4_sq) == 0:
         mask = tan_beta4_sq < 0  # scalar → True or False
+    else:
+        mask = (tan_beta4_sq < 0) | ~np.isfinite(tan_beta4_sq)
 
     # Apply mask to invalid points
-    tan_beta4 = np.where(~mask, -np.sqrt(tan_beta4_sq), np.nan)
+    root_beta4 = _triangle_sqrt(tan_beta4_sq, "rotor_exit_radicand", station=4)
+    tan_beta4 = np.where(~mask, -root_beta4, np.nan)
     beta4 = np.arctan(tan_beta4)
 
     # Compute absolute flow angle at rotor exit
-    tan_alpha4 = tan_beta4 + 1 / phi
+    tan_alpha4 = tan_beta4 + _triangle_divide(1, phi, "flow_coefficient", station=4)
     alpha4 = np.arctan(tan_alpha4)
 
     # Compute work coefficient ψ
@@ -179,7 +282,8 @@ def compute_stage_velocity_triangles(
     delta_eta_ke = nu**2 * phi**2 * (1 + tan_alpha4**2)
     loss_stator = (1 + tan_alpha2**2) * m_24**2 * loss_coeff_stator
     loss_rotor = (1 + tan_beta4**2) * loss_coeff_rotor
-    eta_tt = psi / (psi + 0.5 * phi**2 * (loss_stator + loss_rotor))
+    eta_tt = _triangle_divide(psi, psi + 0.5 * phi**2 * (loss_stator + loss_rotor),
+                              "total_to_total_efficiency_denominator")
     # eta_ts = (1 / eta_tt + 0.5 * phi**2 / psi * (1 + tan_alpha4**2)) ** -1
     eta_ts = (1 - delta_eta_ke) * eta_tt
 
@@ -203,8 +307,8 @@ def compute_stage_velocity_triangles(
     vm_3 = vm_4 * m_34
 
     # Absolute velocities from the meridional component and the flow angle
-    alpha_1 = stator_inlet_angle
-    alpha_2 = stator_exit_angle
+    alpha_1 = supplied_inlet_angle
+    alpha_2 = supplied_exit_angle
     alpha_3 = np.rad2deg(alpha3)
     alpha_4 = np.rad2deg(alpha4)
     v_1 = vm_1 / np.cos(np.deg2rad(alpha_1))
@@ -229,6 +333,7 @@ def compute_stage_velocity_triangles(
     # assert_velocity_triangle(v_4, w_4, u_4, alpha_4, beta_4, "Station 4")
 
     return {
+        "domain_valid": ~np.asarray(mask) & np.isfinite(phi),
         # Dimensionless coefficients
         "phi": phi,
         "psi": psi,
@@ -271,16 +376,12 @@ def assert_velocity_triangle(v, w, u, alpha_deg, beta_deg, label, rtol=1e-8):
     lhs = v * np.sin(np.deg2rad(alpha_deg))
     rhs = w * np.sin(np.deg2rad(beta_deg)) + u
 
-    assert np.isfinite(lhs) and np.isfinite(rhs), (
-        f"{label}: non-finite velocity triangle terms " f"(lhs={lhs}, rhs={rhs})"
-    )
+    require_consistent(np.isfinite(lhs) and np.isfinite(rhs), (f"{label}: non-finite velocity triangle terms " f"(lhs={lhs}, rhs={rhs})"))
 
-    assert np.isclose(lhs, rhs, rtol=rtol, atol=1e-5), (
-        f"{label}: velocity triangle not closed\n"
+    require_consistent(np.isclose(lhs, rhs, rtol=rtol, atol=1e-5), (f"{label}: velocity triangle not closed\n"
         f"  v*sin(alpha) = {lhs}\n"
         f"  w*sin(beta)+u = {rhs}\n"
-        f"  alpha = {alpha_deg} deg, beta = {beta_deg} deg, u = {u}"
-    )
+        f"  alpha = {alpha_deg} deg, beta = {beta_deg} deg, u = {u}"))
 
 
 # =============================================================================
@@ -324,6 +425,9 @@ def compute_loss_coefficient(
     pressure equals the actual one, so p0_rel_is defaults to p0_rel_out.
     """
     from turbodash.loss_models.loss_model import evaluate_loss_model
+    station = 2 if cascade_type == "stator" else 4
+    for quantity, value in (("Re_in", Re_in), ("Re_out", Re_out), ("w_out", w_out)):
+        require_positive(value, quantity, station=station)
  
     if p0_rel_is is None:
         p0_rel_is = p0_rel_out
@@ -367,7 +471,19 @@ def compute_loss_coefficient(
     }
  
     loss_inputs = {"flow": flow, "geometry": geometry, "loss_model": loss_model}
-    return evaluate_loss_model(loss_model, loss_inputs)
+    losses = evaluate_loss_model(loss_model, loss_inputs)
+    # The correlation/conversion helpers explicitly return NaN outside their
+    # domains. Preserve this rejection rather than letting NaNs become an
+    # optimizer objective. Extrapolation diagnostics (such as Benner's raw
+    # penetration flag) retain their existing documented meaning.
+    for quantity, value in losses.items():
+        if quantity.startswith("loss_") and not np.all(np.isfinite(value)):
+            raise ModelDomainError(
+                f"{loss_model['model']} {cascade_type} loss model is outside its domain: {quantity} = {value}.",
+                code="loss_model_domain", quantity=quantity, value=value,
+                station=station, row=cascade_type,
+            )
+    return losses
 
 # def compute_blade_row_geometry(
 #     turbine_type,
@@ -408,6 +524,9 @@ def compute_blade_row_geometry(
     """
 
     validate_blade_spacing(blade_geometry, zweiffel)
+    for quantity, value in (("radius_in", r_in), ("radius_out", r_out),
+                            ("height_in", H_in), ("height_out", H_out)):
+        require_positive(value, quantity)
     maximum_thickness_to_chord = blade_geometry["maximum_thickness_to_chord"]
     maximum_thickness_location = blade_geometry["maximum_thickness_location"]
     leading_edge_radius_to_max_thickness = blade_geometry["leading_edge_radius_to_max_thickness"]
@@ -419,11 +538,12 @@ def compute_blade_row_geometry(
     if turbine_type == "radial":
         meridional_chord = abs(r_out - r_in)
         if not np.isfinite(meridional_chord) or meridional_chord <= 0:
-            raise ValueError("A radial blade row needs distinct finite inlet and outlet radii.")
+            raise ModelDomainError("A radial blade row needs distinct finite inlet and outlet radii.",
+                                   code="degenerate_geometry", quantity="meridional_chord",
+                                   value=meridional_chord, margin=meridional_chord)
     elif turbine_type == "axial":
         aspect_ratio = blade_geometry["aspect_ratio"]
-        if not np.isfinite(aspect_ratio) or aspect_ratio <= 0:
-            raise ValueError("blade_geometry.aspect_ratio must be finite and positive")
+        require_positive(aspect_ratio, "blade_geometry.aspect_ratio")
         meridional_chord = 0.5 * (H_in + H_out) / aspect_ratio
     else:
         raise ValueError(f"Invalid stage type: {turbine_type}")
@@ -433,9 +553,11 @@ def compute_blade_row_geometry(
     angle_in = np.deg2rad(angle_in_deg)
     angle_out = np.deg2rad(angle_out_deg)
     stagger_angle = 0.5 * (angle_in + angle_out)
+    require_positive(np.cos(stagger_angle), "stagger_angle_cosine")
     chord = meridional_chord / np.cos(stagger_angle)
     if not np.isfinite(chord) or chord <= 0:
-        raise ValueError("True chord must be finite and positive.")
+        raise ModelDomainError("True chord must be finite and positive.",
+                               code="degenerate_geometry", quantity="chord", value=chord)
     if "solidity_chord" in blade_geometry:
         s_mean = chord / float(blade_geometry["solidity_chord"])
         spacing_method = "solidity_chord"
@@ -443,7 +565,8 @@ def compute_blade_row_geometry(
         # Explicit compatibility path for archived configurations only.
         turning = np.cos(angle_out) ** 2 * abs(np.tan(angle_in) - np.tan(angle_out))
         if not np.isfinite(turning) or turning <= 0:
-            raise ValueError("Legacy Zweifel sizing is undefined at zero turning; prescribe solidity_chord.")
+            raise ModelDomainError("Legacy Zweifel sizing is undefined at zero turning; prescribe solidity_chord.",
+                                   code="degenerate_geometry", quantity="turning", value=turning)
         s_mean = 0.5 * float(zweiffel) * meridional_chord / turning
         spacing_method = "zweifel_legacy"
     N_blades = float(np.pi * (r_in + r_out) / s_mean)
@@ -520,6 +643,8 @@ def _geometry_with_blade_count(geometry, turbine_type, blade_count, *, discrete)
         opening = spacing_out * np.cos(angle_out)
     else:
         raise ValueError(f"Invalid stage type: {turbine_type}")
+    if not discrete:
+        require_positive(opening, "blade_opening")
     result.update(
         blade_count=int(count) if discrete else count,
         blade_count_integer=int(count) if discrete else None,
@@ -732,6 +857,11 @@ def compute_stage_performance(
     s_1 = state_in_0["s"]
     h_01 = state_in_0["h"]
     h_4s = state_out_s["h"]
+    require_positive(h_01 - h_4s, "stage_isentropic_enthalpy_drop", station=4)
+    require_positive(omega, "angular_velocity")
+    require_positive(mass_flow_rate, "mass_flow_rate")
+    for station, radius in enumerate((radius_1, radius_2, radius_3, radius_4), start=1):
+        require_positive(radius, "radius", station=station)
     v0 = np.sqrt(2.0 * (h_01 - h_4s))
 
     # ------------------------------------------------------------------
@@ -815,27 +945,22 @@ def compute_stage_performance(
     # ------------------------------------------------------------------
 
     # Degree of reaction from enthalpy definition
+    require_nonzero(h_1 - h_4, "reaction_enthalpy_denominator", station=4)
     R_check = (h_3 - h_4) / (h_1 - h_4)
 
-    assert np.isclose(R_check, degree_reaction, rtol=1e-6), (
-        f"Degree of reaction check failed:\n"
-        f"Computed = {R_check:.6e}, Target = {degree_reaction:.6e}"
-    )
+    require_consistent(np.isclose(R_check, degree_reaction, rtol=1e-6), (f"Degree of reaction check failed:\n"
+        f"Computed = {R_check:.6e}, Target = {degree_reaction:.6e}"))
 
     # Work coefficient from enthalpy definition
     psi_check = (h_01 - h_04) / u_4**2
-    assert np.isclose(psi_check, triangles["psi"], rtol=1e-6), (
-        f"Work coefficient check failed:\n"
-        f"Computed = {psi_check:.6e}, Target = {triangles['psi']:.6e}"
-    )
+    require_consistent(np.isclose(psi_check, triangles["psi"], rtol=1e-6), (f"Work coefficient check failed:\n"
+        f"Computed = {psi_check:.6e}, Target = {triangles['psi']:.6e}"))
 
     # 1. Inlet: stagnation → static (0 → 1)
     lhs_01_1 = (h_01 - h_1) / u_4**2
     rhs_01_1 = 0.5 * phi**2 * m_14**2 * (1.0 + np.tan(np.deg2rad(alpha_1)) ** 2)
 
-    assert np.isclose(lhs_01_1, rhs_01_1, rtol=1e-6), (
-        f"Inlet enthalpy check failed:\n" f"LHS = {lhs_01_1:.6e}, RHS = {rhs_01_1:.6e}"
-    )
+    require_consistent(np.isclose(lhs_01_1, rhs_01_1, rtol=1e-6), (f"Inlet enthalpy check failed:\n" f"LHS = {lhs_01_1:.6e}, RHS = {rhs_01_1:.6e}"))
 
     # 2. Stator: 1 → 2
     lhs_1_2 = (h_1 - h_2) / u_4**2
@@ -848,9 +973,7 @@ def compute_stage_performance(
         )
     )
 
-    assert np.isclose(lhs_1_2, rhs_1_2, rtol=1e-6), (
-        f"Stator enthalpy check failed:\n" f"LHS = {lhs_1_2:.6e}, RHS = {rhs_1_2:.6e}"
-    )
+    require_consistent(np.isclose(lhs_1_2, rhs_1_2, rtol=1e-6), (f"Stator enthalpy check failed:\n" f"LHS = {lhs_1_2:.6e}, RHS = {rhs_1_2:.6e}"))
 
     # 3. Interspace: 2 → 3
     lhs_2_3 = (h_2 - h_3) / u_4**2
@@ -863,10 +986,8 @@ def compute_stage_performance(
         )
     )
 
-    assert np.isclose(lhs_2_3, rhs_2_3, rtol=1e-6), (
-        f"Interspace enthalpy check failed:\n"
-        f"LHS = {lhs_2_3:.6e}, RHS = {rhs_2_3:.6e}"
-    )
+    require_consistent(np.isclose(lhs_2_3, rhs_2_3, rtol=1e-6), (f"Interspace enthalpy check failed:\n"
+        f"LHS = {lhs_2_3:.6e}, RHS = {rhs_2_3:.6e}"))
 
     # 4. Rotor: 3 → 4 (rothalpy conservation)
     lhs_3_4 = (h_3 - h_4) / u_4**2
@@ -875,19 +996,17 @@ def compute_stage_performance(
         - (1.0 + np.tan(np.deg2rad(beta_3)) ** 2) * m_34**2
     ) - 0.5 * (1.0 - (u_3 / u_4) ** 2)
 
-    assert np.isclose(lhs_3_4, rhs_3_4, rtol=1e-6), (
-        f"Rotor enthalpy check failed:\n" f"LHS = {lhs_3_4:.6e}, RHS = {rhs_3_4:.6e}"
-    )
+    require_consistent(np.isclose(lhs_3_4, rhs_3_4, rtol=1e-6), (f"Rotor enthalpy check failed:\n" f"LHS = {lhs_3_4:.6e}, RHS = {rhs_3_4:.6e}"))
 
 
     # ------------------------------------------------------------------
     # EOS states (isentropic, using (h, s_01))
     # ------------------------------------------------------------------
     # Station states (1 to 4): (h_i, s_01)
-    state_1 = fluid.get_state(jxp.HmassSmass_INPUTS, h_1, s_1)
-    state_2 = fluid.get_state(jxp.HmassSmass_INPUTS, h_2, s_1)
-    state_3 = fluid.get_state(jxp.HmassSmass_INPUTS, h_3, s_1)
-    state_4 = fluid.get_state(jxp.HmassSmass_INPUTS, h_4, s_1)
+    state_1 = _thermodynamic_state(fluid, jxp.HmassSmass_INPUTS, h_1, s_1, station=1)
+    state_2 = _thermodynamic_state(fluid, jxp.HmassSmass_INPUTS, h_2, s_1, station=2)
+    state_3 = _thermodynamic_state(fluid, jxp.HmassSmass_INPUTS, h_3, s_1, station=3)
+    state_4 = _thermodynamic_state(fluid, jxp.HmassSmass_INPUTS, h_4, s_1, station=4)
  
     # Convenience aliases
     d_1, a_1 = state_1.d, state_1.a
@@ -905,6 +1024,8 @@ def compute_stage_performance(
     # The radii are imposed by the driver; the blade heights and the inlet
     # height-to-radius ratio follow from continuity at each station.
     r_1, r_2, r_3, r_4 = radius_1, radius_2, radius_3, radius_4
+    for station, vm in enumerate((vm_1, vm_2, vm_3, vm_4), start=1):
+        require_positive(vm, "meridional_velocity", station=station)
  
     # Compute blade heights
     H_1 = mass_flow_rate / (2.0 * np.pi * r_1 * d_1 * vm_1)
@@ -975,7 +1096,7 @@ def compute_stage_performance(
     for i, (st, w, c) in enumerate(zip(states, w_rel, chords)):
         Re[i] = st.d * w * c / st.viscosity
         h0_rel = st.h + 0.5 * w**2
-        st0 = fluid.get_state(jxp.HmassSmass_INPUTS, h0_rel, s_1)
+        st0 = _thermodynamic_state(fluid, jxp.HmassSmass_INPUTS, h0_rel, s_1, station=i + 1)
         p0_rel[i] = float(st0.p)
  
     # ------------------------------------------------------------------
@@ -1047,6 +1168,7 @@ def compute_stage_performance(
     efficiency_ts = delta_h0 / delta_h_s
  
     # Total-to-total: only the row losses appear in the denominator.
+    require_nonzero(delta_h_s - kinetic_energy_exit, "total_to_total_enthalpy_drop", station=4)
     efficiency_tt = delta_h0 / (delta_h_s - kinetic_energy_exit)
 
     # Derived quantities for the stage report
@@ -1296,6 +1418,9 @@ def compute_turbine_performance(cfg):
     mass_flow_rate = float(inp["mass_flow_rate"])
     p_exit = float(inp["exit_pressure"])
     nu_global = float(inp["blade_velocity_ratio"])
+    require_positive(mass_flow_rate, "mass_flow_rate")
+    require_positive(p_exit, "exit_pressure", station="exit")
+    require_positive(nu_global, "blade_velocity_ratio")
 
     if "inlet_property_pair" in inp:
         inlet_pair = inp["inlet_property_pair"]
@@ -1316,11 +1441,9 @@ def compute_turbine_performance(cfg):
     #    (e.g. [1, 1, 1] for three equal stages, or [2, 1] for a 2:1 split).
     # ---------------------------------------------------------------
     wfs_weights = np.array([float(sc["work_fraction_split"]) for sc in stages_cfg])
-    if np.any(wfs_weights <= 0):
-        raise ValueError(
-            f"work_fraction_split must be positive in every stage; "
-            f"got {wfs_weights.tolist()}"
-        )
+    for i, weight in enumerate(wfs_weights):
+        with model_context(stage_index=i, stage_name=str(stages_cfg[i]["name"])):
+            require_positive(weight, "work_fraction_split")
     wfs = wfs_weights / wfs_weights.sum()  # normalize -> fractions summing to 1
 
     # ---------------------------------------------------------------
@@ -1328,15 +1451,9 @@ def compute_turbine_performance(cfg):
     # ---------------------------------------------------------------
     fluid = jxp.Fluid(fluid_name, backend="HEOS")
     ip_code = jxp.INPUT_PAIRS[inlet_pair]
-    state_01 = fluid.get_state(ip_code, inlet_prop1, inlet_prop2)  # inlet
-    state_4s = fluid.get_state(jxp.PSmass_INPUTS, p_exit, state_01.s)
-    if state_01.h <= state_4s.h:
-        raise ValueError(
-            "Non-positive overall isentropic enthalpy drop: "
-            f"h_01 = {state_01.h:.4e}, "
-            f"h_4s = {state_4s.h:.4e}. "
-            "Check that the inlet state and exit pressure describe an expansion process"
-        )
+    state_01 = _thermodynamic_state(fluid, ip_code, inlet_prop1, inlet_prop2, station="inlet")
+    state_4s = _thermodynamic_state(fluid, jxp.PSmass_INPUTS, p_exit, state_01.s, station="exit")
+    require_positive(state_01.h - state_4s.h, "overall_isentropic_enthalpy_drop", station="exit")
     h_01 = state_01.h
     s_01 = state_01.s
     dh_is_total = h_01 - state_4s.h
@@ -1375,6 +1492,7 @@ def compute_turbine_performance(cfg):
             "expected 'actual' or 'specific'."
         )
 
+    require_positive(omega, "angular_velocity")
     rotational_speed = omega * 60.0 / (2.0 * np.pi)  # rpm, for reporting
 
     # ---------------------------------------------------------------
@@ -1397,6 +1515,10 @@ def compute_turbine_performance(cfg):
         RR_12 = float(stg_current["radius_ratio_12"])
         RR_23 = float(stg_current["radius_ratio_23"])
         RR_34 = float(stg_current["radius_ratio_34"])
+        with model_context(stage_index=i, stage_name=str(stg_current["name"])):
+            for quantity, value in (("radius_ratio_01", RR_01), ("radius_ratio_12", RR_12),
+                                    ("radius_ratio_23", RR_23), ("radius_ratio_34", RR_34)):
+                require_positive(value, quantity)
 
         if i == 0:
             # Anchor at station 3, then expand/contract to the rest.
@@ -1443,49 +1565,50 @@ def compute_turbine_performance(cfg):
         stg_current = stages_cfg[i]
         radii = per_stage_radii[i]
 
-        # Isentropic static exit state at the current cursor pressure, on s_01.
-        h_cursor = h_cursor - float(dh_is_per_stage[i])
-        state_out_s = fluid.get_state(jxp.HmassSmass_INPUTS, h_cursor, s_01)
+        with model_context(stage_index=i, stage_name=str(stg_current["name"])):
+            # Isentropic static exit state at the current cursor pressure, on s_01.
+            h_cursor = h_cursor - float(dh_is_per_stage[i])
+            state_out_s = _thermodynamic_state(fluid, jxp.HmassSmass_INPUTS, h_cursor, s_01, station=4)
 
-        # Define aliases
-        m_12 = float(stg_current["meridional_velocity_ratio_12"])
-        m_23 = float(stg_current["meridional_velocity_ratio_23"])
-        m_34 = float(stg_current["meridional_velocity_ratio_34"])
+            # Define aliases
+            m_12 = float(stg_current["meridional_velocity_ratio_12"])
+            m_23 = float(stg_current["meridional_velocity_ratio_23"])
+            m_34 = float(stg_current["meridional_velocity_ratio_34"])
 
-        # Call the single-stage solver with the current stage's inlet stagnation state,
-        stage_result = compute_stage_performance(
-            fluid=fluid,
-            state_in_0=state_in_0,
-            state_out_s=state_out_s,
-            mass_flow_rate=mass_flow_rate,
-            omega=omega,
-            radius_1=radii[1],
-            radius_2=radii[2],
-            radius_3=radii[3],
-            radius_4=radii[4],
-            stator_inlet_angle=alpha_in,
-            stator_exit_angle=float(stg_current["stator_exit_angle"]),
-            degree_reaction=float(stg_current["degree_reaction"]),
-            meridional_velocity_ratio_12=m_12,
-            meridional_velocity_ratio_23=m_23,
-            meridional_velocity_ratio_34=m_34,
-            zweiffel_stator=stg_current.get("zweiffel_stator"),
-            zweiffel_rotor=stg_current.get("zweiffel_rotor"),
-            turbine_type=turbine_type,
-            loss_model=inp["loss_model"],
-            blade_geometry=stg_current["blade_geometry"],
-        )
-        # Label the stage. The only per-stage identifier carried in the output;
-        stage_result["name"] = str(stg_current["name"])
-        stages_output.append(stage_result)
-        p_stage_boundaries.append(float(state_out_s.p))
+            # Call the single-stage solver with the current stage's inlet stagnation state,
+            stage_result = compute_stage_performance(
+                fluid=fluid,
+                state_in_0=state_in_0,
+                state_out_s=state_out_s,
+                mass_flow_rate=mass_flow_rate,
+                omega=omega,
+                radius_1=radii[1],
+                radius_2=radii[2],
+                radius_3=radii[3],
+                radius_4=radii[4],
+                stator_inlet_angle=alpha_in,
+                stator_exit_angle=float(stg_current["stator_exit_angle"]),
+                degree_reaction=float(stg_current["degree_reaction"]),
+                meridional_velocity_ratio_12=m_12,
+                meridional_velocity_ratio_23=m_23,
+                meridional_velocity_ratio_34=m_34,
+                zweiffel_stator=stg_current.get("zweiffel_stator"),
+                zweiffel_rotor=stg_current.get("zweiffel_rotor"),
+                turbine_type=turbine_type,
+                loss_model=inp["loss_model"],
+                blade_geometry=stg_current["blade_geometry"],
+            )
+            # Label the stage. The only per-stage identifier carried in the output;
+            stage_result["name"] = str(stg_current["name"])
+            stages_output.append(stage_result)
+            p_stage_boundaries.append(float(state_out_s.p))
 
-        # Carry stagnation state into the next stage using conservation
-        # of stagnation enthalpy and angulrar momentum across the interstage duct.
-        st4 = stage_result["flow_stations"][3]
-        h0_next = st4["h"] + 0.5 * st4["v"] ** 2
-        state_in_0 = fluid.get_state(jxp.HmassSmass_INPUTS, h0_next, st4["s"])
-        alpha_in = st4["alpha"]
+            # Carry stagnation state into the next stage using conservation
+            # of stagnation enthalpy and angulrar momentum across the interstage duct.
+            st4 = stage_result["flow_stations"][3]
+            h0_next = st4["h"] + 0.5 * st4["v"] ** 2
+            state_in_0 = _thermodynamic_state(fluid, jxp.HmassSmass_INPUTS, h0_next, st4["s"], station=4)
+            alpha_in = st4["alpha"]
 
     # ---------------------------------------------------------------
     # 8. Aggregate overall turbine performance
@@ -1509,6 +1632,7 @@ def compute_turbine_performance(cfg):
     # The t-t ideal drop is the t-s ideal drop minus the unrecovered leaving
     # kinetic energy at the last rotor exit (the only KE t-t does not charge).
     dh_is_tt = dh_is_total - 0.5 * v_4_out**2
+    require_nonzero(dh_is_tt, "overall_total_to_total_enthalpy_drop", station="exit")
     power_isentropic_tt = mass_flow_rate * dh_is_tt
     efficiency_tt = power_actual / power_isentropic_tt
 

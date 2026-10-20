@@ -3,6 +3,9 @@ from scipy.optimize import root_scalar
 
 import jaxprop as jxp
 
+from .errors import require_positive, require_consistent
+from .turbine import compute_stage_velocity_triangles
+
 
 def compute_performance_stage(
     stator_inlet_angle,
@@ -57,101 +60,19 @@ def compute_performance_stage(
 
     """
 
-    # Rename variables
-    R = degree_reaction
-    nu = blade_velocity_ratio
-    limit = 90.0 - 1e-3
-    alpha1 = np.clip(stator_inlet_angle, -limit, limit)
-    alpha2 = np.clip(stator_exit_angle, -limit, limit)
-    alpha1 = np.deg2rad(alpha1)
-    alpha2 = np.deg2rad(alpha2)
-    tan_alpha1 = np.tan(alpha1)
-    tan_alpha2 = np.tan(alpha2)
-    rr_23 = radius_ratio_23
-    rr_34 = radius_ratio_34
-    m_12 = meridional_velocity_ratio_12
-    m_23 = meridional_velocity_ratio_23
-    m_34 = meridional_velocity_ratio_34
-    m_14 = m_12 * m_23 * m_34
-    m_24 = m_23 * m_34
-
-    # Compute absolute flow angle at rotor inlet
-    tan_alpha3 = rr_23 * m_23 * tan_alpha2
-    alpha3 = np.arctan(tan_alpha3)
-
-    # Compute flow coefficient φ
-    temp = (1 + tan_alpha3**2) * m_34**2 - R * (1 + tan_alpha1**2) * m_14**2
-    phi_sq = (1 - R) / (nu**2 * temp) + 1e-12
-    phi = np.sqrt(phi_sq)
-
-    # Compute relative flow angle at rotor inlet
-    tan_beta3 = tan_alpha3 - rr_34 / m_34 / phi
-    beta3 = np.arctan(tan_beta3)
-
-    # Compute relative flow angle at rotor exit
-    # Use the negative root of the second order equation
-    tan_beta4_sq = (
-        +1 / (nu**2 * phi**2)
-        + (1 - rr_34**2) / phi**2
-        + (tan_beta3**2 - tan_alpha3**2) * m_34**2
-        - 1
+    result = compute_stage_velocity_triangles(
+        blade_velocity_ratio=blade_velocity_ratio, stage_spouting_velocity=1.0,
+        stator_inlet_angle=stator_inlet_angle, stator_exit_angle=stator_exit_angle,
+        degree_reaction=degree_reaction,
+        meridional_velocity_ratio_12=meridional_velocity_ratio_12,
+        meridional_velocity_ratio_23=meridional_velocity_ratio_23,
+        meridional_velocity_ratio_34=meridional_velocity_ratio_34,
+        radius_ratio_23=radius_ratio_23, radius_ratio_34=radius_ratio_34,
+        loss_coeff_stator=loss_coeff_stator, loss_coeff_rotor=loss_coeff_rotor,
     )
-
-    # Skip point beyond first invalid condition
-    if np.ndim(tan_beta4_sq) == 1:
-        bad = tan_beta4_sq < 0
-        if np.any(bad):
-            i_bad = np.argmax(bad)  # first invalid index
-            mask = np.zeros_like(tan_beta4_sq, dtype=bool)
-            mask[i_bad:] = True  # mask everything from here onward
-        else:
-            mask = np.zeros_like(tan_beta4_sq, dtype=bool)
-
-    elif np.ndim(tan_beta4_sq) == 0:
-        mask = tan_beta4_sq < 0  # scalar → True or False
-
-    # Apply mask to invalid points
-    tan_beta4 = np.where(~mask, -np.sqrt(tan_beta4_sq), np.nan)
-    beta4 = np.arctan(tan_beta4)
-
-    # Compute absolute flow angle at rotor exit
-    tan_alpha4 = tan_beta4 + 1 / phi
-    alpha4 = np.arctan(tan_alpha4)
-
-    # Compute work coefficient ψ
-    psi = phi * (rr_34 * m_34 * tan_alpha3 - tan_alpha4) + 1e-12
-    # psi_2 = 0.5 / (nu**2) - 0.5 * phi**2 * (1 + tan_alpha4**2) + 1e-12
-    # assert np.allclose(
-    #     psi,
-    #     psi_2,
-    #     rtol=1e-9,
-    #     atol=1e-12,
-    # ), (
-    #     "Work coefficient definitions are not numerically consistent\n"
-    #     f"psi (def 1) = {psi}\n"
-    #     f"psi (def 2) = {psi_2}\n"
-    #     f"psi (diff) = {psi - psi_2}\n"
-    # )
-
-    # Compute losses and efficiency in a decoupled way
-    delta_eta_ke = nu**2 * phi**2 * (1 + tan_alpha4**2)
-    loss_stator = (1 + tan_alpha2**2) * m_24**2 * loss_coeff_stator
-    loss_rotor = (1 + tan_beta4**2) * loss_coeff_rotor
-    eta_tt = psi / (psi + 0.5 * phi**2 * (loss_stator + loss_rotor))
-    # eta_ts = (1 / eta_tt + 0.5 * phi**2 / psi * (1 + tan_alpha4**2)) ** -1
-    eta_ts = (1 - delta_eta_ke) * eta_tt
-
-    return {
-        "phi": phi,
-        "psi": psi,
-        "alpha3": np.rad2deg(alpha3),
-        "alpha4": np.rad2deg(alpha4),
-        "beta3": np.rad2deg(beta3),
-        "beta4": np.rad2deg(beta4),
-        "eta_ts": eta_ts,
-        "eta_tt": eta_tt,
-        "delta_eta_ke": delta_eta_ke,
-    }
+    return {key: result[key] for key in (
+        "phi", "psi", "alpha3", "alpha4", "beta3", "beta4", "eta_ts", "eta_tt", "delta_eta_ke",
+    )}
 
 
 def compute_performance_repeating_stage(alpha2_deg, R, nu):
@@ -240,16 +161,12 @@ def assert_velocity_triangle(v, w, u, alpha_deg, beta_deg, label, rtol=1e-8):
     lhs = v * np.sin(np.deg2rad(alpha_deg))
     rhs = w * np.sin(np.deg2rad(beta_deg)) + u
 
-    assert np.isfinite(lhs) and np.isfinite(rhs), (
-        f"{label}: non-finite velocity triangle terms " f"(lhs={lhs}, rhs={rhs})"
-    )
+    require_consistent(np.isfinite(lhs) and np.isfinite(rhs), (f"{label}: non-finite velocity triangle terms " f"(lhs={lhs}, rhs={rhs})"))
 
-    assert np.isclose(lhs, rhs, rtol=rtol, atol=1e-5), (
-        f"{label}: velocity triangle not closed\n"
+    require_consistent(np.isclose(lhs, rhs, rtol=rtol, atol=1e-5), (f"{label}: velocity triangle not closed\n"
         f"  v*sin(alpha) = {lhs}\n"
         f"  w*sin(beta)+u = {rhs}\n"
-        f"  alpha = {alpha_deg} deg, beta = {beta_deg} deg, u = {u}"
-    )
+        f"  alpha = {alpha_deg} deg, beta = {beta_deg} deg, u = {u}"))
 
 
 def compute_stage_meanline(
@@ -322,7 +239,7 @@ def compute_stage_meanline(
     state_4s = fluid.get_state(jxp.PSmass_INPUTS, exit_pressure, state_01.s)
     h_01 = state_01.h
     h_4s = state_4s.h
-    assert h_01 > h_4s, "Non-positive isentropic enthalpy drop"
+    require_positive(h_01 - h_4s, "isentropic_enthalpy_drop")
     v0 = np.sqrt(2.0 * (h_01 - h_4s))
 
     # ------------------------------------------------------------------
@@ -385,25 +302,19 @@ def compute_stage_meanline(
     # Degree of reaction from enthalpy definition
     R_check = (h_3 - h_4) / (h_1 - h_4)
 
-    assert np.isclose(R_check, degree_reaction, rtol=1e-6), (
-        f"Degree of reaction check failed:\n"
-        f"Computed = {R_check:.6e}, Target = {degree_reaction:.6e}"
-    )
+    require_consistent(np.isclose(R_check, degree_reaction, rtol=1e-6), (f"Degree of reaction check failed:\n"
+        f"Computed = {R_check:.6e}, Target = {degree_reaction:.6e}"))
 
     # Work coefficient from enthalpy definition
     psi_check = (h_01 - h_04) / u_4**2
-    assert np.isclose(psi_check, perf["psi"], rtol=1e-6), (
-        f"Work coefficient check failed:\n"
-        f"Computed = {psi_check:.6e}, Target = {perf['psi']:.6e}"
-    )
+    require_consistent(np.isclose(psi_check, perf["psi"], rtol=1e-6), (f"Work coefficient check failed:\n"
+        f"Computed = {psi_check:.6e}, Target = {perf['psi']:.6e}"))
 
     # 1. Inlet: stagnation → static (0 → 1)
     lhs_01_1 = (h_01 - h_1) / u_4**2
     rhs_01_1 = 0.5 * phi**2 * m_14**2 * (1.0 + np.tan(np.deg2rad(alpha_1)) ** 2)
 
-    assert np.isclose(lhs_01_1, rhs_01_1, rtol=1e-6), (
-        f"Inlet enthalpy check failed:\n" f"LHS = {lhs_01_1:.6e}, RHS = {rhs_01_1:.6e}"
-    )
+    require_consistent(np.isclose(lhs_01_1, rhs_01_1, rtol=1e-6), (f"Inlet enthalpy check failed:\n" f"LHS = {lhs_01_1:.6e}, RHS = {rhs_01_1:.6e}"))
 
     # 2. Stator: 1 → 2
     lhs_1_2 = (h_1 - h_2) / u_4**2
@@ -416,9 +327,7 @@ def compute_stage_meanline(
         )
     )
 
-    assert np.isclose(lhs_1_2, rhs_1_2, rtol=1e-6), (
-        f"Stator enthalpy check failed:\n" f"LHS = {lhs_1_2:.6e}, RHS = {rhs_1_2:.6e}"
-    )
+    require_consistent(np.isclose(lhs_1_2, rhs_1_2, rtol=1e-6), (f"Stator enthalpy check failed:\n" f"LHS = {lhs_1_2:.6e}, RHS = {rhs_1_2:.6e}"))
 
     # 3. Interspace: 2 → 3
     lhs_2_3 = (h_2 - h_3) / u_4**2
@@ -431,10 +340,8 @@ def compute_stage_meanline(
         )
     )
 
-    assert np.isclose(lhs_2_3, rhs_2_3, rtol=1e-6), (
-        f"Interspace enthalpy check failed:\n"
-        f"LHS = {lhs_2_3:.6e}, RHS = {rhs_2_3:.6e}"
-    )
+    require_consistent(np.isclose(lhs_2_3, rhs_2_3, rtol=1e-6), (f"Interspace enthalpy check failed:\n"
+        f"LHS = {lhs_2_3:.6e}, RHS = {rhs_2_3:.6e}"))
 
     # 4. Rotor: 3 → 4 (rothalpy conservation)
     lhs_3_4 = (h_3 - h_4) / u_4**2
@@ -443,9 +350,7 @@ def compute_stage_meanline(
         - (1.0 + np.tan(np.deg2rad(beta_3)) ** 2) * m_34**2
     ) - 0.5 * (1.0 - (u_3 / u_4) ** 2)
 
-    assert np.isclose(lhs_3_4, rhs_3_4, rtol=1e-6), (
-        f"Rotor enthalpy check failed:\n" f"LHS = {lhs_3_4:.6e}, RHS = {rhs_3_4:.6e}"
-    )
+    require_consistent(np.isclose(lhs_3_4, rhs_3_4, rtol=1e-6), (f"Rotor enthalpy check failed:\n" f"LHS = {lhs_3_4:.6e}, RHS = {rhs_3_4:.6e}"))
 
     # ------------------------------------------------------------------
     # EOS states (isentropic, using (h, s_01))
@@ -481,15 +386,13 @@ def compute_stage_meanline(
     H_4 = mass_flow_rate / (2.0 * np.pi * r_4 * d_4 * vm_4)
 
     # Asset inlet height-to-radius ratio
-    assert np.isclose(
+    require_consistent(np.isclose(
         height_radius_ratio,
         H_1 / r_1,
         rtol=1e-6,
         atol=0.0,
-    ), (
-        f"Height-to-radius ratio mismatch: "
-        f"target={height_radius_ratio}, computed={H_1 / r_1}"
-    )
+    ), (f"Height-to-radius ratio mismatch: "
+        f"target={height_radius_ratio}, computed={H_1 / r_1}"))
 
     # ------------------------------------------------------------------
     # Compute actual and specific rotational speeds
@@ -510,13 +413,13 @@ def compute_stage_meanline(
         K * phi * nu**3 * RR_14**2 * height_radius_ratio * VR14 * m_14
     ) ** 0.5
 
-    assert np.isclose(
+    require_consistent(np.isclose(
         omega_3, omega_4, rtol=1e-6
-    ), f"Inconsistent rotational speed: omega_3={omega_3:0.2f}, omega_4={omega_4:0.2f}"
+    ), (f"Inconsistent rotational speed: omega_3={omega_3:0.2f}, omega_4={omega_4:0.2f}"))
 
-    assert np.isclose(
+    require_consistent(np.isclose(
         specific_speed, specific_speed_bis, rtol=1e-6
-    ), f"Inconsistent specific speed: def_1={specific_speed:0.2f}, def_2={specific_speed_bis:0.2f}"
+    ), (f"Inconsistent specific speed: def_1={specific_speed:0.2f}, def_2={specific_speed_bis:0.2f}"))
 
     # ------------------------------------------------------------------
     # Stator and rotor geometry

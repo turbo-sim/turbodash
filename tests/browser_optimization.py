@@ -220,6 +220,7 @@ def exercise(context, address, output):
 
     def run(expected_success=True):
         open_section("opt-panel")
+        active_tab = page.locator("#opt-tabs .nav-link.active").inner_text()
         page.locator("#opt-start").click()
         try:
             expect(page.locator("#opt-start")).to_be_disabled(timeout=10000)
@@ -229,6 +230,8 @@ def exercise(context, address, output):
         page.locator('.td-workspace-rail [data-workspace="geometry"]').click()
         page.locator('.td-workspace-rail [data-workspace="meanline"]').click()
         expect(page.locator("#opt-start")).to_be_enabled(timeout=60000)
+        expect(page.locator("#opt-panel")).to_have_js_property("open", True)
+        expect(page.locator("#opt-tabs .nav-link.active")).to_have_text(active_tab)
         status = page.locator("#opt-status").text_content()
         if expected_success:
             assert "Optimization applied" in status, status
@@ -279,6 +282,7 @@ def exercise(context, address, output):
                 raise AssertionError("Loaded design did not calculate: " + page.locator("#td-load-error").inner_text()
                                      + page.locator("#td-calculation-status").inner_text())
             page.wait_for_timeout(100)
+        expect(page.locator("#opt-panel")).to_have_js_property("open", False)
         open_section("opt-panel")
 
     axial = yaml.safe_load((ROOT / "development/optimization/case_axial.yaml").read_text())
@@ -347,7 +351,9 @@ def exercise(context, address, output):
                         "responsive panes and duplicate-start prevention", "optimization below every stage",
                         "all input boxes and plotted traces after apply", "two-stage global/stage/blade apply",
                         "velocity unit selection retained across apply", "manual editing",
-                        "failed-worker recovery", "actual rpm", "radial zero-flaring solve", "YAML bounds retained", "browser session isolation"],
+                        "failed-worker recovery", "actual rpm", "radial zero-flaring solve", "YAML bounds retained", "browser session isolation",
+                        "optimization panel and active tab stay open after successful and failed runs",
+                        "explicit YAML loads still collapse the optimization panel"],
                 failed_run_diagnostic=failed_status, browser_errors=errors,
                 radial_efficiency=final["overall_performance"]["efficiency_ts"])
 

@@ -820,5 +820,6 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
             "data-blade-row": "stator",
             "data-workspace": "meanline",
             "data-design-revision": "0",
+            "data-preserve-optimization-panel": "false",
         },
     )

@@ -417,15 +417,19 @@ app.clientside_callback(
 # rebuild/collapse the accordion.
 # =========================================
 app.clientside_callback(
-    """function(plus, minus, loaded, request, stages) {
+    """function(plus, minus, loaded, request, stages, job) {
         const changed = dash_clientside.callback_context.triggered.map(item => item.prop_id);
         plus = plus || 0; minus = minus || 0;
         if (changed.includes('loaded_cfg_store.data') && loaded && loaded.inputs) {
+            const preserveOptimization = !!job?.applying;
             ['setup', 'operating', 'speed', 'stage'].forEach(section =>
                 dash_clientside.set_props('td-section-' + section, {open: false}));
-            dash_clientside.set_props('opt-panel', {open: false});
+            if (!preserveOptimization) dash_clientside.set_props('opt-panel', {open: false});
             dash_clientside.set_props('td-stage-selector', {value: 0});
-            dash_clientside.set_props('td-workbench', {'data-design-revision': String(Date.now())});
+            dash_clientside.set_props('td-workbench', {
+                'data-preserve-optimization-panel': String(preserveOptimization),
+                'data-design-revision': String(Date.now())
+            });
             return {count: loaded.inputs.stages.length, plus: plus, minus: minus};
         }
         const previous = request || {count: (stages || [{}]).length, plus: 0, minus: 0};
@@ -438,6 +442,7 @@ app.clientside_callback(
     Input("loaded_cfg_store", "data"),
     State("td-stage-count-request", "data"),
     State("stage_data_store", "data"),
+    State("opt-job", "data"),
     prevent_initial_call=True,
 )
 

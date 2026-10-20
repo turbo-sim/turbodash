@@ -36,6 +36,8 @@ Documentation beside GitHub opens the Sphinx site served at `/docs/` in a new br
 
 Five numbered sections start closed on a fresh visit or newly loaded design. Opening one does not close another. Collapse all closes them together; ordinary edits preserve disclosure state.
 
+Applying an optimization result preserves the Optimization section's expanded state and selected tab. Explicit YAML imports still reset the section disclosures.
+
 | Section | Controls and scope |
 | --- | --- |
 | **1. Turbine setup** | Axial/radial type, integer stage count with add/remove controls, and loss model. |

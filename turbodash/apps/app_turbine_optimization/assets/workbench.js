@@ -496,7 +496,10 @@
             if (records.some(record => ["data-stage-index", "data-blade-row", "data-workspace"].includes(record.attributeName))) applyScope();
             if (records.some(record => record.attributeName === "data-design-revision")) {
                 typedNumbers.clear();
-                root.querySelectorAll(".td-inspector details").forEach(details => { details.open = false; });
+                const preserveOptimization = root.dataset.preserveOptimizationPanel === "true";
+                root.querySelectorAll(".td-inspector details").forEach(details => {
+                    if (!preserveOptimization || !details.closest("#opt-panel")) details.open = false;
+                });
                 closeSearch();
                 formatNumericInputs();
             }

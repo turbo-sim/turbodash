@@ -188,6 +188,7 @@ def excel_meanline_calculator(names, values):
     -------
     list of [str, float, str]
         A three-column table with one row per output variable:
+
         - Column 1: variable name (dot notation for nested quantities,
           e.g. 'stator.radius_in', 'station.0.p')
         - Column 2: scaled numerical value in display units

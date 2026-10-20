@@ -109,6 +109,24 @@ Python app launchers remain available. See the [refactor evaluation and migratio
 
 ## Documentation
 
+The optimization workbench includes a Sphinx documentation site with installation
+instructions, a calculation workflow, and the original meanline derivation,
+efficiency definitions, analytical cases and novel-aspects notes. All five
+original notes are preserved byte-for-byte in the documentation source. Build
+the site from the checkout, then launch the workbench:
+
+```bash
+poetry install --with dev -E optimization
+poetry run python docs/build_docs.py --no-autobuild
+poetry run app_turbine_optimization --open-browser
+```
+
+**Documentation** beside GitHub opens the site served by the same app at `/docs/`
+in a new browser tab. The calculation tab retains the current inputs and results.
+See the
+[documentation build and hosting guide](docs/README.md) and
+[documentation landing page](docs/source/index.md).
+
 The turbine apps use continuous blade counts for meanline losses and efficiency,
 and separate integer geometry for physical visualization, meshing and export.
 Axial and radial rows take true-chord solidity (`solidity_chord = chord / pitch`)
@@ -129,7 +147,13 @@ The [Arianna reproduction prompt](<development/loss_model_analysis/arianna_compa
 describes how to reproduce the original analyses and distinguish historical
 whole-model changes from a controlled comparison of loss correlations.
 
-The theoretical derivation of the governing equations, efficiency definitions, and validation against analytical special cases are available in the stable app's Documentation tab and the experimental app's expandable Documentation section in the Meanline tab.
+The [meanline derivation](docs/source/theory/meanline.md) and
+[analytical cases](docs/source/validation/index.md) publish the original notes
+without rewriting their derivations or adding benchmarks. The analytical note
+contains its original pure impulse and 50% reaction cases and embedded figure.
+Run `python docs/verify_source_fidelity.py` to check the copied notes and page
+includes against their originals. The other app editions retain their existing
+inline documentation.
 
 ## License
 This project is released under the MIT License.

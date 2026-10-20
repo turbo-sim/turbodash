@@ -750,7 +750,7 @@ def get_trailing_edge_kinetic_energy_loss(flow_parameters, geometry):
 
         d=(1-z^2)R+z^2 I.
 
-    For |z|<0.05, replace z*abs(z) by the odd C2 polynomial
+    For ``|z|<0.05``, replace z*abs(z) by the odd C2 polynomial
     W=w^2*(3*q/8+3*q^3/4-q^5/8), q=z/w, w=0.05. It preserves both
     reference endpoints and a small nonzero slope at z=0. For W<0 use
     d=R+0.2*R*S((R-I)*(-W)/(0.2*R)); for W>1 use

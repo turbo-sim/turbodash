@@ -5,7 +5,8 @@ Implementations live under `core/`, `geometry/`, `meshing/`, `visualization/`,
 `reporting/`, `io/` and `apps/`. The user approved removing module compatibility
 on 18 October 2026. The package root now contains only `__init__.py` and `math.py`.
 The 23 forwarding modules and `_compat.py` have been deleted; geometry and meshing
-are ordinary packages. See the [refactor evaluation and migration map](../REFACTOR_EVALUATION.md).
+are ordinary packages. See the current [repository overview](../../README.md) for package ownership.
+This report records historical verification; it is not a check of the current revision.
 
 Root scientific functions, plotting-style functions and Python app launchers
 remain direct exports. Flat module imports and root module aliases such as
@@ -48,7 +49,7 @@ detected. The experimental workspace's tabs were also exercised.
 | Original stage | 4 | 0 |
 | Dimensionless efficiency explorer | 2 | 0 |
 
-Use the [four app runners](../demos/apps/README.md) to reproduce these cases.
+Use the [four app runners](../../demos/apps/README.md) to reproduce these cases.
 Each resolves `case.yaml` beside its own file. Startup configuration initializes
 controls without replacing equations or calculation callbacks.
 

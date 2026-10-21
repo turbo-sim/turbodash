@@ -52,7 +52,7 @@ Alternatively, `poetry install -E mesh` installs the published TurboMoC 1.2.0
 recorded in `poetry.lock`. With pip, use `python -m pip install -e ".[mesh]"`;
 for the published Turbodash package, use `python -m pip install "turbodash-core[mesh]"`.
 The stable meanline app does not require this optional dependency.
-See [the integration assessment and mesh workflow](docs/turbomoc_meshing.md)
+See [the integration assessment and mesh workflow](docs/development/turbomoc_meshing.md)
 for assumptions, outputs, and the Python API.
 
 ## 🚀 Run the app locally
@@ -112,7 +112,7 @@ in `visualization/`, report generation in `reporting/`, and external-format
 adapters in `io/`. Production loss models remain in `turbodash/loss_models/`.
 Import implementations from these packages directly. The former flat module
 paths and root module aliases have been removed. Root scientific functions and
-Python app launchers remain available. See the [refactor evaluation and migration map](REFACTOR_EVALUATION.md).
+Python app launchers remain available.
 
 ## Documentation
 
@@ -158,8 +158,8 @@ The [meanline derivation](docs/source/theory/meanline.md) and
 [analytical cases](docs/source/validation/index.md) publish the original notes
 without rewriting their derivations or adding benchmarks. The analytical note
 contains its original pure impulse and 50% reaction cases and embedded figure.
-Run `python docs/verify_source_fidelity.py` to check the copied notes and page
-includes against their originals. The other app editions retain their existing
+Run `python docs/development/verify_source_fidelity.py` to check the retained notes
+against their original hashes and verify the page includes. The other app editions retain their existing
 inline documentation.
 
 ## License

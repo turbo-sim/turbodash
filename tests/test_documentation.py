@@ -11,7 +11,7 @@ from turbodash.apps.shared.documentation import register_documentation
 
 def test_derivation_pages_preserve_complete_original_notes_and_figure():
     check = runpy.run_path(
-        str(Path(__file__).resolve().parents[1] / "docs" / "verify_source_fidelity.py")
+        str(Path(__file__).resolve().parents[1] / "docs" / "development" / "verify_source_fidelity.py")
     )
     check["verify"]()
 

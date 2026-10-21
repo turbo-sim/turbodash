@@ -8,6 +8,10 @@ readme = "README.md"
 repository = "https://github.com/turbo-sim/turbodash"
 documentation = "https://github.com/turbo-sim/turbodash"
 packages = [{ include = "turbodash" }]
+include = [
+    # Older app editions display the same canonical meanline note as Sphinx.
+    { path = "docs/source/notes/documentation.md", format = ["sdist", "wheel"] },
+]
 
 [tool.poetry.scripts]
 turbodash = "turbodash.apps.app_turbine.app:cli"

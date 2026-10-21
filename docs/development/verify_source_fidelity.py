@@ -1,4 +1,9 @@
-"""Verify that the Sphinx derivations reproduce the original notes exactly."""
+"""Verify preserved note hashes and the complete Sphinx rendering of those notes.
+
+The canonical notes live in docs/source/notes, with the unpublished placeholder
+in docs/development. Their recorded hashes preserve the original baseline after
+the duplicate copies formerly inside the Python package have been removed.
+"""
 
 from pathlib import Path
 import argparse
@@ -8,8 +13,8 @@ import json
 import re
 
 
-ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / "docs" / "source_fidelity.json"
+ROOT = Path(__file__).resolve().parents[2]
+MANIFEST = Path(__file__).with_name("source_fidelity.json")
 
 
 def rendering_wrapper(entry, original):
@@ -44,7 +49,7 @@ def rendering_wrapper(entry, original):
             starts.update((index, index + 1))
             images[index] = (image[1], base64.b64decode(image[2]))
     if math_start is not None:
-        raise AssertionError(f"Unpaired display delimiters: {entry['original']}")
+        raise AssertionError(f"Unpaired display delimiters: {entry['source']}")
     starts.add(len(lines))
     boundaries = sorted(starts)
     output = entry.get("page_title", "")
@@ -54,12 +59,12 @@ def rendering_wrapper(entry, original):
             output += "```{math}\n:nowrap:\n\n\\[\n" + maths[first] + "\\]\n```\n\n"
         elif first in images:
             alt, svg = images[first]
-            name = f"{Path(entry['original']).stem}_{first + 1}.svg"
+            name = f"{Path(entry['source']).stem}_{first + 1}.svg"
             assets[name] = svg
             output += f"```{{image}} ../assets/{name}\n:alt: {alt}\n```\n\n"
         else:
             output += (
-                f"```{{include}} ../notes/{Path(entry['original']).name}\n"
+                f"```{{include}} ../notes/{Path(entry['source']).name}\n"
                 f":start-line: {first}\n:end-line: {last}\n```\n\n"
             )
     return output, assets
@@ -69,13 +74,10 @@ def verify(write_wrappers=False):
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     failures = []
     for entry in manifest["files"]:
-        original = (ROOT / entry["original"]).read_bytes()
-        published = (ROOT / entry["published"]).read_bytes()
-        if original != published:
-            failures.append(f"Content differs: {entry['published']}")
+        original = (ROOT / entry["source"]).read_bytes()
         normalized = original.replace(b"\r\n", b"\n")
         if hashlib.sha256(normalized).hexdigest() != entry["sha256_lf"]:
-            failures.append(f"Original source hash changed: {entry['original']}")
+            failures.append(f"Original source hash changed: {entry['source']}")
         if entry.get("page"):
             expected, assets = rendering_wrapper(entry, original)
             page = ROOT / entry["page"]
@@ -94,7 +96,7 @@ def verify(write_wrappers=False):
     if failures:
         raise AssertionError("\n".join(failures))
     print(
-        f"Verified {len(manifest['files'])} byte-identical original-note copies, "
+        f"Verified {len(manifest['files'])} preserved original-note hashes, "
         "complete rendering wrappers, and original SVG bytes."
     )
 

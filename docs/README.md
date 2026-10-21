@@ -28,29 +28,33 @@ deployment configuration is independent of this workbench hosting option.
 ## Source structure
 
 - `source/installation.md`: installation, application launchers, and builds.
-- `source/guides/`: calculation workflow and SLSQP optimization controls,
-  recovery, and maintenance.
+- `source/guides/`: calculation workflow, optimization controls, recovery,
+  and interpretation of convergence reports.
 - `source/theory/`: verbatim meanline derivation, efficiency definitions, and
   novel-aspects notes.
 - `source/validation/`: the original analytical-cases note, including its
   original embedded figure.
-- `source/notes/`: exact copies of all five original notes.
+- `source/notes/`: the four original notes used by the published pages.
 - `source/references/`: cited bibliography.
-- `verify_source_fidelity.py`: byte-for-byte comparison with the original notes.
+- `development/`: unpublished integration notes, refactoring reports, the
+  original blank placeholder, and the source-fidelity checker and hash manifest.
+- `build_docs.py` and `conf.py`: documentation build infrastructure.
 
 ## Original source mapping
 
-All five files in `turbodash/docs/` remain untouched. The Sphinx copies preserve
-every byte, including wording, mathematical expressions, intermediate
-derivation steps, whitespace, and the inline SVG in `analytic_cases.md`.
+The original notes have one canonical location in the documentation tree.
+Their duplicate copies inside the Python package were removed only after
+confirming exact byte equality and the recorded original hashes. The retained
+notes preserve wording, mathematical expressions, intermediate derivation
+steps, whitespace, and the inline SVG in `analytic_cases.md`.
 
-| Original file in `turbodash/docs/` | Exact copy in `docs/source/` | Published page |
+| Original note | Canonical location relative to `docs/` | Published page in `source/` |
 | --- | --- | --- |
-| `documentation.md` | `notes/documentation.md` | `theory/meanline.md` |
-| `efficiency_definition.md` | `notes/efficiency_definition.md` | `theory/efficiency_definition.md` |
-| `analytic_cases.md` | `notes/analytic_cases.md` | `validation/index.md` |
-| `novel_aspects.md` | `notes/novel_aspects.md` | `theory/novel_aspects.md` |
-| `equations_meanline.md` | `notes/equations_meanline.md` | Source only; no page |
+| `documentation.md` | `source/notes/documentation.md` | `theory/meanline.md` |
+| `efficiency_definition.md` | `source/notes/efficiency_definition.md` | `theory/efficiency_definition.md` |
+| `analytic_cases.md` | `source/notes/analytic_cases.md` | `validation/index.md` |
+| `novel_aspects.md` | `source/notes/novel_aspects.md` | `theory/novel_aspects.md` |
+| `equations_meanline.md` | `development/equations_meanline.md` | Unpublished blank placeholder |
 
 The published pages preserve all original prose through consecutive include
 ranges. Each original display-math body is copied unchanged into a `nowrap`
@@ -60,22 +64,24 @@ decoded into an identical SVG asset. Two notes start at heading level 2; their
 wrappers supply a level-1 page title. These wrappers address parsing without
 editing the original notes.
 
-`equations_meanline.md` contains whitespace only and remains a source file.
+`equations_meanline.md` contains whitespace only and remains a development note.
 The analytical note contains the original pure impulse and 50% reaction cases.
 
 Run the fidelity check after editing documentation:
 
 ```bash
-python docs/verify_source_fidelity.py
+python docs/development/verify_source_fidelity.py
 ```
 
-The check compares all five files byte-for-byte, checks complete include
-coverage and the original SVG bytes, and verifies recorded source hashes in
-`source_fidelity.json`.
-The hashes normalize CRLF to LF only so Git line-ending conversion is portable;
-the original-to-copy comparison still requires exact bytes. The original
-integration and refactoring reports at the
-root of `docs/` remain development records outside the published source tree.
+The check verifies all five original note hashes, complete include coverage,
+and the original SVG bytes against `development/source_fidelity.json`.
+The hashes normalize CRLF to LF only so Git line-ending conversion is portable.
+The [development documentation](development/README.md) holds integration and
+refactoring records outside the published source tree.
+
+Older app editions read `source/notes/documentation.md` for their inline
+documentation. The same canonical file is included in source and wheel
+distributions, so those editions also work outside a repository checkout.
 
 `build_docs.py` is copied byte-for-byte from
 `method_of_characteristics/docs/build_docs.py`. `conf.py` retains the same

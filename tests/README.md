@@ -87,7 +87,7 @@ The published theory and analytical pages include the original repository notes
 verbatim. Check their source fidelity separately:
 
 ```powershell
-python docs/verify_source_fidelity.py
+python docs/development/verify_source_fidelity.py
 ```
 
 `browser_numeric_format.py` starts its own server and checks three-decimal

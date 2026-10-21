@@ -7,8 +7,8 @@ shaft-speed specification, and blade velocity ratio. Add the required stages,
 then set reaction, stator exit angle, radius ratios, meridional velocity ratios,
 and blade geometry for each stage.
 
-The numbered sidebar sections expand in place. Within **Stage design &
-geometry**, choose a named stage, then expand **Aerodynamic design** or
+The numbered sidebar sections expand in place. Within **Stage design**,
+choose a named stage, then expand **Aerodynamic design** or
 **Blade geometry**. The **Stator / Rotor** selector changes the row being
 edited. These controls remain inside the stage section, and changing the
 editing context preserves the other stage and row values.
@@ -72,7 +72,7 @@ zero-loss velocity-triangle comparisons.
 Open **Optimization** and use its three tabs:
 
 - **Configuration** selects the objective, maximize/minimize direction, solver
-  tolerance, iteration limit, and feasibility tolerance.
+  tolerances, iteration limit, and SLSQP step and recovery controls.
 - **Design variables** selects inputs that the optimizer may change.
 - **Constraints** sets limits on calculated results.
 
@@ -156,4 +156,9 @@ Inspect the termination status, constraint residuals, and resulting design.
 **Applied successfully** means both the sidebar inputs and displayed results
 match the optimized design. If the design changed during the run, the older
 optimization result does not overwrite those edits.
+
+The [SLSQP optimization guide](optimization.md) explains the YAML controls,
+model-domain recovery, and final acceptance checks. Invalid model trials are
+reported explicitly; the driver can retry shorter steps without changing the
+meanline equations.
 

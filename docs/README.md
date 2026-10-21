@@ -28,7 +28,8 @@ deployment configuration is independent of this workbench hosting option.
 ## Source structure
 
 - `source/installation.md`: installation, application launchers, and builds.
-- `source/guides/`: calculation workflow.
+- `source/guides/`: calculation workflow and SLSQP optimization controls,
+  recovery, and maintenance.
 - `source/theory/`: verbatim meanline derivation, efficiency definitions, and
   novel-aspects notes.
 - `source/validation/`: the original analytical-cases note, including its

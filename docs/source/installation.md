@@ -29,6 +29,12 @@ python -m pip install -e ".[optimization]"
 turbodash-optimization
 ```
 
+The optimization driver requires SciPy 1.17.1 because its additional step
+controls use a checked private SLSQP interface. Install the project's declared
+dependencies together; the [optimization guide](guides/optimization.md)
+describes the controls and compatibility requirements. PySolverView remains
+available through `jaxprop` but is not the optimization driver.
+
 The single-stage constant-loss application remains available with
 `turbodash-stage`.
 

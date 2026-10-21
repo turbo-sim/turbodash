@@ -1,8 +1,10 @@
 # Turbine optimization example
 
-This development API optimizes axial and radial turbines using the existing
-Turbodash meanline model. It follows ThermOpt's problem definition and solves with
-`pysolver_view` (PSV), including its convergence history and progress callbacks.
+These examples optimize axial and radial turbines using the production
+Turbodash meanline model and its SLSQP driver around SciPy 1.17.1. The driver
+supports step fractions, recovery from recognized invalid model trials, and
+bounded finite-difference probes. PySolverView remains a dependency through
+`jaxprop` but does not drive the optimization.
 The reusable API lives in `turbodash/optimization/turbine.py` and is exported
 by `turbodash.optimization`. This directory contains only examples, inputs, and
 tests; it has no copy or compatibility shim of the optimization implementation. The stable and existing
@@ -14,6 +16,8 @@ python -m turbodash.apps.app_turbine_optimization
 ```
 
 See [the app guide](../../turbodash/apps/README.md) for controls and execution details.
+The [SLSQP guide](../../docs/source/guides/optimization.md) documents every
+solver control, failure metadata, and the private SciPy maintenance boundary.
 
 ## Running the example
 
@@ -31,7 +35,6 @@ There are no command-line arguments. Set the globals at the top of `run.py`:
 CASE_FILES = ("case_axial.yaml",)  # Or ("case_radial.yaml",), or both filenames.
 SHOW_PLOTS = True
 PLOT_TURBINE_EACH_ITERATION = False
-PLOT_CONVERGENCE_LIVE = False
 ```
 
 `OUTPUT_DIRECTORY` selects the output parent folder. The default is `output/`
@@ -48,9 +51,10 @@ beside the runner. Each case has its own subdirectory: `output/axial/` or `outpu
 
 The runner plots the initial and final turbines and the convergence history.
 Live plotting is optional. All numeric output is YAML; no JSON files are written.
-The result's progress history uses physical variables. The native solver history
-uses normalized coordinates and the signed minimized objective, so maximizing
-efficiency produces a negative objective in the convergence plot.
+The result's progress history and convergence plot use the accepted physical
+objective and constraint violations. The solver report and solver diagnostics
+use normalized coordinates and the signed minimized objective, so maximizing
+efficiency gives a negative solver objective.
 The result YAML records `solver_elapsed_seconds` and `model_evaluations`; the
 runner also prints these. Solver time excludes the initial/final figure exports.
 Live plots inside solver callbacks add to this time, so disable them when
@@ -107,9 +111,35 @@ Constraint `normalize` is `False` for native residual units, a positive scale, o
 `True` to divide by the absolute target. Use an explicit scale for zero targets.
 The separate `optimization.feasibility_tolerance` applies to normalized residuals;
 with scale 10 degrees, tolerance `1e-6` permits `1e-5` degrees of flaring.
-`solver_options` passes PSV options such as `library`, `method`, `update_on`,
-derivative settings, tolerance, and iteration limit. The example uses SciPy SLSQP
-through PSV, with numerical derivatives and bounded normalized design variables.
+`solver_options` configures the Turbodash SLSQP driver. Both examples show all
+numerical controls with comments:
+
+```yaml
+solver_options:
+  ftol: 1.0e-9
+  maxiter: 150
+  finite_diff_step: 1.0e-6
+  first_step_fraction: 1.0
+  max_step_fraction: 1.0
+  step_growth_factor: null
+  domain_backtracking: true
+  backtrack_factor: 0.5
+  max_backtracks: 20
+  max_fd_backtracks: 12
+  optimality_tol: 1.0e-4
+```
+
+Step fractions apply to SLSQP's computed QP direction, not to absolute
+physical distances. Keep adaptive recovery enabled to shorten only recognized
+invalid trials; use `first_step_fraction: 0.5` if you also want a smaller first
+trial. Set `step_growth_factor: 1.5` to restore a reduced first fraction or a
+recovered fraction gradually; `null` disables the schedule. Derivative probes
+have their own distance and retry budget. These examples retain their explicit
+iteration limits, derivative steps, and immediate restoration; current app
+defaults are 200, 1e-7, and a growth factor of 1.5 after recovery.
+The old `tolerance`, `max_iterations`, and `derivative_abs_step` names remain
+accepted aliases. Existing `library: scipy` and `method: slsqp` fields also
+remain accepted; they select the new driver.
 
 ## Python API and progress callbacks
 
@@ -132,23 +162,26 @@ save_optimization_results(result, "development/optimization/output/custom")
 `optimize_turbine(config, optimization=None, *, evaluator=None, callback=None)`
 uses `config["optimization"]` unless given a separate dictionary. Results expose
 `config`, `turbine_results`, `geometry`, physical `design_variables`, objectives,
-constraint diagnostics, and `history`. `solver` is the actual PSV solver instance.
-`solver_success` records convergence; `feasible` records constraint acceptance;
-`success` requires both. Check these before using the design. Invalid model trials
-raise an error with the offending variables rather than artificial penalties.
+constraint diagnostics, and `history`. `solver` is a SciPy `OptimizeResult`
+containing native termination information, recovery events, counts, and final
+optimality checks. `solver_success` records native convergence; `feasible`
+records constraint acceptance; `success` also requires the independent final
+first-order check. Check these before using the design. Recognized invalid
+model trials carry failure metadata and can be retried at a shorter step.
+The model equations are not changed and no artificial penalties are returned.
 
 Callbacks receive independent copies of `iteration`, `objective`,
 `max_constraint_violation`, `design_variables`, `config`, and `turbine_results`.
-Physical values are recovered from PSV's normalized vector, and duplicate
-gradient updates are filtered. The runner uses this hook for optional live turbine
+Physical values are recovered from the normalized solver vector; rejected
+trials and derivative probes do not produce progress snapshots. The runner uses this hook for optional live turbine
 plots. `plot_turbine(results, title=None, figure=None)` can update an existing
 figure; `plot_convergence(result, show=False)` plots the recorded solver history.
 
-A future app could run the optimizer in a background worker and use callbacks to
-publish geometry. A button could release a waiting callback to continue execution.
-PSV does not expose a native step iterator; repeatedly restarting with one allowed
-iteration would discard the optimizer's accumulated state. No app stepping is
-implemented here.
+The workbench runs this API in an isolated background worker and publishes
+progress through the callback. It applies the final design only after all
+acceptance checks pass. A physically invalid initial design or exhausted
+recovery budget ends the run with a diagnostic. Model consistency errors and
+unexpected exceptions are not converted into recoverable domain failures.
 
 ## Choosing variables and interpreting results
 

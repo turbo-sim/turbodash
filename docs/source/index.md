@@ -4,7 +4,8 @@ Turbodash is an interactive tool for preliminary meanline design of axial and
 radial turbines.
 
 Start with [installation](installation.md), then use the
-[calculation workflow](guides/calculations.md). The
+[calculation workflow](guides/calculations.md) and
+[SLSQP optimization guide](guides/optimization.md). The
 [meanline derivation](theory/meanline.md),
 [efficiency definitions](theory/efficiency_definition.md),
 [analytical cases](validation/index.md), and
@@ -17,6 +18,7 @@ verbatim.
 
 installation
 guides/calculations
+guides/optimization
 theory/meanline
 theory/efficiency_definition
 validation/index

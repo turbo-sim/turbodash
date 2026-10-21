@@ -112,7 +112,7 @@ remembers an explicit choice. The left rail switches between **Meanline**,
 returns to Meanline. Load YAML and Save design remain in the header.
 
 Five numbered sections start collapsed: **Turbine setup**, **Operating point**,
-**Shaft speed**, **Stage design & geometry**, and **Optimization**. The stage
+**Shaft speed**, **Stage design**, and **Optimization**. The stage
 selector uses saved names; Stator/Rotor switches the visible blade fields while
 all stage inputs remain mounted. Continuous inputs accept full floating-point
 precision and display at least three decimal places, preserving extra supplied
@@ -136,8 +136,18 @@ streamlines constrained within the hub/shroud passage. These illustrate the
 channel shape, rather than a computed CFD velocity field. Stator/rotor profiles
 use orange/blue outlines with matching translucent fills.
 
-Expand **Optimization** at the bottom of the left sidebar. Settings select a scalar objective,
-maximize/minimize, solver tolerance, iteration limit, and feasibility tolerance.
+Expand **Optimization** at the bottom of the left sidebar. **Configuration**
+selects a scalar objective, maximize/minimize, solver tolerance, iteration limit,
+and feasibility tolerance. **Step control and recovery** exposes first-step and
+maximum step fractions, optional gradual step restoration, domain backtracking,
+trial and derivative retry budgets,
+the derivative step, and the final optimality tolerance. Loaded and saved YAML
+preserve these controls. See the [SLSQP guide](../../docs/source/guides/optimization.md)
+for their meanings and defaults.
+The iteration limit defaults to 200 and **Step growth factor (optional)** to
+`1.5`. After domain recovery, the next starting fraction grows from the accepted
+reduced fraction by 50%, then continues growing toward the maximum. Leave the
+field blank to disable gradual restoration.
 Add inputs under **Design variables**, then set physical lower/upper bounds.
 Leave Initial blank to use the current design, or enter an explicit override;
 out-of-bounds guesses are clipped and reported. Every unselected input stays
@@ -156,12 +166,12 @@ as many independent design variables.
 **Start optimization** uses the live design. The sidebar stays busy while a
 subprocess solves and while the successful design is applied to all controls
 and plots. Other panes remain interactive. The expandable **Optimization
-terminal** below the meanline results shows the native PSV report, clipping,
-physical progress, evaluation counts, and completion/errors. PSV's Func-value
-is signed and normalized for minimization; the progress summary shows the
-physical objective. The terminal follows new output until you scroll up.
+terminal** below the meanline results shows one SLSQP report, plus any
+clipping, recovery, or error diagnostics. Its objective is signed and normalized for
+minimization; the separate progress summary shows the physical objective.
+The terminal follows new output until you scroll up.
 
-Only converged, feasible results update the inputs, geometry, performance,
+Only converged results that pass final feasibility and first-order checks update the inputs, geometry, performance,
 tables, and downstream geometry/mesh signatures. Failed solves retain the last
 displayed design. Normal manual editing remains available afterward. Loading
 YAML also restores its optimization editors and bounds; both flat and older
@@ -176,9 +186,17 @@ includes its optimization settings without reapplying old initial overrides.
 progress, and logs. Its CSS/JavaScript live in `app_turbine_optimization/assets/` and
 are loaded only by this version. Numerical code lives in the
 `turbodash.optimization` package, independently of Dash. Its optional `logger`
-receives clipping and native PSV output without redirecting server stdout.
+receives the single SLSQP report and diagnostics without redirecting server stdout.
 Public callback snapshots remain in physical units and include the matching
 configuration and turbine results for future live geometry rendering.
+
+The optimizer uses Turbodash's driver around SciPy 1.17.1; PySolverView remains
+a `jaxprop` dependency but does not run the optimization. Recognized meanline
+domain failures carry metadata so the driver can reject a trial and retry a
+shorter step. Invalid roots are not clipped and no artificial objective penalty
+is introduced. Invalid starting designs, exhausted recovery budgets, and
+nonrecoverable model consistency errors produce a failed job while retaining
+the displayed design.
 
 Jobs use a local temporary cache, signed session cookies, atomic progress files,
 a 10 minute worker limit, and at most two concurrent solves per host. Completed

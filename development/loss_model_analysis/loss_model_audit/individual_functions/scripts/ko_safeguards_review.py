@@ -18,9 +18,11 @@ THICKNESSES = (.05, .15, .2, .25, .4)
 
 
 def source_hashes():
-    names = ("loss_model_kacker_okapuu.py", "_numerics.py", "_trailing_edge.py", "_blade_loading.py", "_backend.py")
-    return {"turbodash/loss_models/"+name:
-            sha256(REPO / "turbodash/loss_models" / name) for name in names}
+    names = ("turbodash/loss_models/loss_model_kacker_okapuu.py",
+             "turbodash/loss_models/_trailing_edge.py",
+             "turbodash/loss_models/_blade_loading.py",
+             "turbodash/loss_models/_backend.py", "turbodash/math.py")
+    return {name: sha256(REPO / name) for name in names}
 
 
 def inputs(beta=60., theta=-30., tau=.2, spacing=.7, reynolds=5e5):

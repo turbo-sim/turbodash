@@ -39,7 +39,7 @@ def assert_c2(fun, x, h=1e-4, atol=2e-4):
 
 
 def test_compact_extrema_bounds_and_outer_identity():
-    from turbodash.loss_models import _numerics as n
+    from turbodash import math as n
 
     x = np.linspace(-1, 1, 2001)
     p = n.positive_part(x, 0.1)
@@ -49,7 +49,7 @@ def test_compact_extrema_bounds_and_outer_identity():
     np.testing.assert_array_equal(p[x >= 0.1], x[x >= 0.1])
     assert_c2(lambda value: n.positive_part(value, 0.1), -0.1)
     assert_c2(lambda value: n.positive_part(value, 0.1), 0.1)
-    assert n.smooth_maximum(0, 0, half_width=0) == 0
+    assert n.smooth_maximum(0, 0, method="compact", half_width=0) == 0
 
 
 def test_reynolds_factor_monotone_and_outer_exponents():

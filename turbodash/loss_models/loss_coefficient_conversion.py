@@ -6,7 +6,7 @@ the definition of either loss coefficient. Array operations use NumPy.
 """
 
 from ._backend import jnp
-from . import _numerics
+from .. import math
 
 
 def convert_stagnation_pressure_to_kinetic_energy_loss(Ma, gamma, Y):
@@ -153,7 +153,7 @@ def convert_kinetic_energy_to_stagnation_pressure_loss(
     The Mach guard retains the 0.95 safety factor. The arbitrary
     :math:`d+10^{-4}` denominator offset is removed using masked safe
     arithmetic; the guard is inactive for :math:`d\leq0`. The numerical
-    compact minimum from :mod:`turbodash.loss_models._numerics` is C2,
+    compact minimum from :mod:`turbodash.math` is C2,
     enforces its bound, and is exactly its smaller argument outside the
     transition. The Mach transition is :math:`[0.98L,1.02L]` and the raw-Y
     transition is [0.98,1.02]. These widths are numerical choices, not
@@ -171,7 +171,7 @@ def convert_kinetic_energy_to_stagnation_pressure_loss(
         Ma = _guard_conversion_mach(Ma, gamma, delta_phi2)
     Y = _unrestricted_kinetic_to_pressure(Ma, gamma, delta_phi2)
     if limit_output:
-        Y = _numerics.smooth_minimum(Y, 1.0, half_width=0.02)
+        Y = math.smooth_minimum(Y, 1.0, method="compact", half_width=0.02)
     return Y
 
 
@@ -190,7 +190,7 @@ def _guard_conversion_mach(Ma, gamma, delta_phi2):
     safe_gamma = jnp.where(active, gamma, 1.4)
     safe_loss = jnp.where(active, delta_phi2, 0.5)
     limit = 0.95 * jnp.sqrt(2 * (1 - safe_loss) / ((safe_gamma - 1) * safe_loss))
-    guarded = _numerics.smooth_minimum(Ma, limit, half_width=0.02 * limit)
+    guarded = math.smooth_minimum(Ma, limit, method="compact", half_width=0.02 * limit)
     return jnp.where(active, guarded, Ma)
 
 
@@ -245,7 +245,7 @@ def get_kinetic_energy_conversion_diagnostics(Ma, gamma, delta_phi2):
     return dict(
         Y_raw=raw,
         Y_guarded=guarded,
-        Y_limited=_numerics.smooth_minimum(guarded, 1.0, half_width=0.02),
+        Y_limited=math.smooth_minimum(guarded, 1.0, method="compact", half_width=0.02),
         Mach_effective=mach,
         domain_margin=1
         - jnp.asarray(delta_phi2)

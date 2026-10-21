@@ -19,7 +19,6 @@ analysis scripts can inspect the settings used by the production models.
 """
 
 from ._backend import jnp
-from . import _numerics as numerics
 from . import _trailing_edge as trailing_edge
 from . import _blade_loading as blade_loading
 from .. import math
@@ -433,8 +432,8 @@ def get_reynolds_correction_factor(reynolds):
     """
     reynolds = get_effective_reynolds_number(reynolds)
     half_width = jnp.log(REYNOLDS_TRANSITION_FACTOR)
-    low = numerics.positive_part(-jnp.log(reynolds / 200000.0), half_width)
-    high = numerics.positive_part(jnp.log(reynolds / 1000000.0), half_width)
+    low = math.positive_part(-jnp.log(reynolds / 200000.0), half_width)
+    high = math.positive_part(jnp.log(reynolds / 1000000.0), half_width)
     return jnp.exp(0.4 * low - 0.2 * high)
 
 
@@ -653,7 +652,7 @@ def get_secondary_aspect_ratio_factor(aspect_ratio):
     dn, d2n = .125/jnp.sqrt(q), .0625/q**1.5
     y0, dy0 = n/a, dn/a-n/a**2
     d2y0 = d2n/a-2*dn/a**2+2*n/a**3
-    patch = numerics.quintic_hermite(A, a, b, y0, 1/b, dy0, -1/b**2, d2y0, 2/b**3)
+    patch = math.quintic_hermite(A, a, b, y0, 1/b, dy0, -1/b**2, d2y0, 2/b**3)
     low_ar = jnp.where(valid & (jnp.real(A) <= a), A, a)
     numerator = 1-.25*jnp.sqrt(2-low_ar)
     capped = jnp.real(numerator) > .8*jnp.real(low_ar)
@@ -1196,7 +1195,7 @@ def get_compressible_correction_factors(Ma_rel_in, Ma_rel_out):
     # Restrict inactive operands as well as selecting the final branches.
     low_mach = jnp.where(valid & (b <= .15), m2, 0.)
     low = 1 - .005*(low_mach/.2)**2
-    join = numerics.quintic_hermite(
+    join = math.quintic_hermite(
         m2, .15, .25, .9971875, .9375, -.0375, -1.25, -.25, 0.)
     middle_mach = jnp.where(valid & (b >= .25) & (b <= .9), m2, .5)
     middle = 1-1.25*(middle_mach-.2)

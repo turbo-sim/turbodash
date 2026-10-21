@@ -47,7 +47,7 @@ def check_bundle():
             if not resolved.exists() and resolved != HERE / "validation.json":
                 failures.append(f"Broken link in {page.relative_to(HERE)}: {target}")
     copied_model_names = {p.name for p in (REPO / "turbodash/loss_models").glob("*.py")} - {"__init__.py"}
-    copied_model_names |= {"core_turbine.py", "math.py", "_numerics.py"}
+    copied_model_names |= {"core_turbine.py", "math.py"}
     for file in HERE.rglob("*.py"):
         if file.name in copied_model_names:
             failures.append(f"Unexpected production-source copy: {file.relative_to(HERE)}")

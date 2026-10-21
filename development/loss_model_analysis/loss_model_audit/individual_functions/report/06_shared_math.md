@@ -14,7 +14,7 @@ The shared Boltzmann min/max are smooth weighted averages rather than strict bou
 
 ## Implemented formulation
 
-`turbodash/math.py` contains the shared mathematical utilities. The production loss models use `turbodash/loss_models/_numerics.py` for a compact C2 positive-part envelope, strict min/max, quintic Hermite joins and C1 shape-preserving cubic tables. Each caller documents its transition parameters and purpose.
+`turbodash/math.py` contains the shared mathematical utilities. The production loss models also use this module for a compact C2 positive-part envelope, strict min/max (`method="compact"` with an explicit `half_width`), quintic Hermite joins and C1 shape-preserving cubic tables. The quintic transition reuses `sigmoid_smootherstep`. Each caller documents its transition parameters and purpose.
 
 ## Current values and derivatives
 

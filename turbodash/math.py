@@ -1,72 +1,55 @@
+"""Shared array-based mathematics, smoothing and interpolation utilities.
+
+These helpers currently execute with NumPy. Compact transitions preserve exact
+outer branches and bounds; the legacy smooth-extrema methods retain their
+existing defaults and numerical behavior.
+"""
+
 import numpy as np
-# import jax.numpy as jnp
 import numpy as jnp
 
 
-def smooth_maximum(x1, x2, method="boltzmann", alpha=10):
-    r"""
-    Element-wise smoooth maximum approximation of array elements. Smoothed version of numpy.maximum().
-
-    The :math:`p`-norm approximation to the maximum is given by :cite:p:`weisstein_vector_2023`:
-
-    .. math::
-
-       f_{\alpha}(x) = \left( \sum_i x_i^\alpha \right)^{\frac{1}{\alpha}}
-
-    The Boltzmann approximation is given by :cite:p:`blanchard_accurately_2021`:
-
-    .. math::
-
-       f_{\alpha}(x) = \frac{1}{\alpha} \log \left( \sum_i e^{\alpha \,(x_i - \hat{x})} \right) + \hat{x}
-
-
-    This LogSumExp approximation is given by :cite:p:`blanchard_accurately_2021`:
-
-    .. math::
-
-       f_{\alpha}(x) = \frac{1}{\alpha} \log \left( \sum_i e^{\alpha \,(x_i - \hat{x})} \right) + \hat{x}
-
-    where the shift :math:`\hat{x}` is defined as:
-
-    .. math::
-
-       \hat{x} = \text{sign}(\alpha) \cdot \max(\text{sign}(\alpha) \cdot x)
-
-    Shifting `x` prevents numerical overflow due to the finite precision of floating-point operations
+def smooth_maximum(x1, x2, method="boltzmann", alpha=10, *, half_width=None):
+    r"""Return an elementwise smooth maximum of two broadcastable inputs.
 
     Parameters
     ----------
-    x : array_like
-        Input data.
-    method : str, optional
-        Method to be used for the approximation. Supported methods are:
-
-        - ``boltzmann`` (default)
-        - ``logsumexp``
-        - ``p-norm``
-
+    x1, x2 : array_like
+        Input values.
+    method : {"boltzmann", "logsumexp", "p-norm", "compact"}, optional
+        Boltzmann uses a smooth weighted average (the default); log-sum-exp
+        and p-norm use their respective smooth-extremum approximations.
+        Compact uses a C2 upper envelope that equals the exact maximum
+        when the inputs differ by at least ``half_width``. See
+        :func:`positive_part` for its approximation error and regularity.
     alpha : float, optional
-        Sharpness parameter. Large values produce a tight approximation to the
-        maximum function
-    axis : None or int or tuple of ints, optional
-        Axis or axes along which to operate. By default, flattened input is
-        used. If this is a tuple of ints, the maximum is selected over
-        multiple axes, instead of a single axis or all the axes as before.
-    keepdims : bool, optional
-        If this is set to True, the axes which are reduced are left
-        in the result as dimensions with size one. With this option,
-        the result will broadcast correctly against the input array.
+        Sharpness of the noncompact methods. Default is 10. Ignored by the
+        compact method, which instead uses a width in the input's units.
+    half_width : array_like, optional
+        Required nonnegative transition half-width for ``method="compact"``.
+        May broadcast with the inputs. Zero gives the exact maximum.
+        Must be omitted for other methods.
 
     Returns
     -------
-    max_approx : ndarray or scalar
-        Approximate maximum of `x` using the specified method.
+    ndarray or scalar
+        Smooth maximum with the broadcast shape of the inputs.
 
     Raises
     ------
     ValueError
-        If an unsupported method is specified.
+        If the method is unsupported or its width argument is missing or
+        supplied to a noncompact method.
     """
+    if method == "compact":
+        if half_width is None:
+            raise ValueError("half_width is required for method='compact'")
+        a, b, half_width = jnp.broadcast_arrays(x1, x2, half_width)
+        patch = b + positive_part(a - b, half_width)
+        return jnp.where(a <= b - half_width, b, jnp.where(a >= b + half_width, a, patch))
+    if half_width is not None:
+        raise ValueError("half_width is only supported for method='compact'")
+
     # Ensure x1 and x2 have the same shape by broadcasting
     x1, x2 = jnp.broadcast_arrays(x1, x2)
 
@@ -85,52 +68,52 @@ def smooth_maximum(x1, x2, method="boltzmann", alpha=10):
             f"Unsupported method '{method}'. Supported methods are:\n"
             "- 'logsumexp'\n"
             "- 'boltzmann'\n"
-            "- 'p-norm'"
+            "- 'p-norm'\n"
+            "- 'compact'"
         )
 
 
-def smooth_minimum(x1, x2, method="boltzmann", alpha=10):
-    r"""
-    Element-wise smoooth minimum approximation of array elements. Smoothed version of numpy.minimum().
-
-    The smooth minimum approximation is equivalent to the smooth maximum with a
-    negative value of the sharpness parameter :math:`\alpha`. See documentation
-    of the ```smooth_max()`` function for more information about the smoothing
-    methods available.
+def smooth_minimum(x1, x2, method="boltzmann", alpha=10, *, half_width=None):
+    r"""Return an elementwise smooth minimum of two broadcastable inputs.
 
     Parameters
     ----------
-    x : array_like
-        Input data.
-    method : str, optional
-        Method to be used for the approximation. Supported methods are:
-
-        - ``boltzmann`` (default)
-        - ``logsumexp``
-        - ``p-norm``
-
+    x1, x2 : array_like
+        Input values.
+    method : {"boltzmann", "logsumexp", "p-norm", "compact"}, optional
+        Boltzmann uses a smooth weighted average (the default); log-sum-exp
+        and p-norm use their respective smooth-extremum approximations.
+        Compact uses a C2 lower envelope that equals the exact minimum
+        when the inputs differ by at least ``half_width``. See
+        :func:`positive_part` for its approximation error and regularity.
     alpha : float, optional
-        Sharpness parameter.Large values produce a tight approximation to the
-        minimum function
-    axis : None or int or tuple of ints, optional
-        Axis or axes along which to operate. By default, flattened input is
-        used. If this is a tuple of ints, the minimum is selected over
-        multiple axes, instead of a single axis or all the axes as before.
-    keepdims : bool, optional
-        If this is set to True, the axes which are reduced are left
-        in the result as dimensions with size one. With this option,
-        the result will broadcast correctly against the input array.
+        Sharpness of the noncompact methods. Default is 10. Ignored by the
+        compact method, which instead uses a width in the input's units.
+    half_width : array_like, optional
+        Required nonnegative transition half-width for ``method="compact"``.
+        May broadcast with the inputs. Zero gives the exact minimum.
+        Must be omitted for other methods.
 
     Returns
     -------
-    min_approx : ndarray or scalar
-        Approximate minimum of `x` using the specified method.
+    ndarray or scalar
+        Smooth minimum with the broadcast shape of the inputs.
 
     Raises
     ------
     ValueError
-        If an unsupported method is specified.
+        If the method is unsupported or its width argument is missing or
+        supplied to a noncompact method.
     """
+    if method == "compact":
+        if half_width is None:
+            raise ValueError("half_width is required for method='compact'")
+        a, b, half_width = jnp.broadcast_arrays(x1, x2, half_width)
+        patch = b - positive_part(b - a, half_width)
+        return jnp.where(a <= b - half_width, a, jnp.where(a >= b + half_width, b, patch))
+    if half_width is not None:
+        raise ValueError("half_width is only supported for method='compact'")
+
     # Ensure x1 and x2 have the same shape by broadcasting
     x1, x2 = jnp.broadcast_arrays(x1, x2)
 
@@ -149,7 +132,8 @@ def smooth_minimum(x1, x2, method="boltzmann", alpha=10):
             f"Unsupported method '{method}'. Supported methods are:\n"
             "- 'logsumexp'\n"
             "- 'boltzmann'\n"
-            "- 'p-norm'"
+            "- 'p-norm'\n"
+            "- 'compact'"
         )
 
 
@@ -446,7 +430,104 @@ def sigmoid_smootherstep(x):
         Output of the sigmoid smootherstep function.
 
     """
-    x = np.array(x)  # Ensure x is a NumPy array for vectorized operations
-    x = np.where(x < 0, 0, x)  # Set x to 0 where x < 0
-    x = np.where(x > 1, 1, x)  # Set x to 1 where x > 1
-    return 6 * x**5 - 15 * x**4 + 10 * x**3
+    x = jnp.clip(jnp.asarray(x), 0.0, 1.0)
+    return x**3 * (10 + x * (-15 + 6 * x))
+
+
+def positive_part(x, half_width):
+    r"""C2 upper approximation to :math:`\max(x,0)` with compact support.
+
+    For :math:`w>0`, put :math:`t=(x+w)/(2w)` and use
+    :math:`w(2t^3-t^4)` inside :math:`[-w,w]`, zero below and the identity
+    above. Value, first and second derivatives match the outer branches.
+    The derivative lies in [0,1]; the result enforces the lower bound and
+    exceeds the exact maximum by at most :math:`3w/16`. Width and input have
+    the same units and may broadcast. A zero width gives the exact maximum;
+    callers using a variable width must establish regularity at its zeros.
+    This is a numerical transition, not an empirical correlation.
+    """
+    x = jnp.asarray(x)
+    w = jnp.asarray(half_width)
+    safe_width = jnp.where(w > 0, w, 1.0)
+    t = jnp.clip((x + safe_width) / (2 * safe_width), 0.0, 1.0)
+    patch = safe_width * t**3 * (2 - t)
+    result = jnp.where(x <= -w, 0.0, jnp.where(x >= w, x, patch))
+    return jnp.where(w > 0, result, jnp.maximum(x, 0.0))
+
+
+def blend_branches(x, left, right, center, half_width):
+    """C2 compact blend of two independently smooth branch evaluations."""
+    weight = sigmoid_smootherstep((x - center + half_width) / (2 * half_width))
+    return (1 - weight) * left + weight * right
+
+
+def quintic_hermite(x, lower, upper, y0, y1, dy0, dy1, d2y0, d2y1):
+    r"""Interpolate endpoint value, first derivative and curvature on [lower,upper].
+
+    With :math:`h=u-l`, :math:`t=(x-l)/h`, this is the unique polynomial
+    of degree at most five satisfying all six endpoint conditions. Derivatives
+    supplied here are with respect to x, not t. It makes a C2 join when callers
+    select the corresponding outer branches. No monotonicity or bound is
+    automatic: those must be verified for each use. Inputs may broadcast.
+    """
+    h = upper - lower
+    t = jnp.clip((x - lower) / h, 0.0, 1.0)
+    h00 = 1 - 10 * t**3 + 15 * t**4 - 6 * t**5
+    h10 = t - 6 * t**3 + 8 * t**4 - 3 * t**5
+    h20 = (t**2 - 3 * t**3 + 3 * t**4 - t**5) / 2
+    h01 = 10 * t**3 - 15 * t**4 + 6 * t**5
+    h11 = -4 * t**3 + 7 * t**4 - 3 * t**5
+    h21 = (t**3 - 2 * t**4 + t**5) / 2
+    return (
+        h00 * y0
+        + h10 * h * dy0
+        + h20 * h**2 * d2y0
+        + h01 * y1
+        + h11 * h * dy1
+        + h21 * h**2 * d2y1
+    )
+
+
+def monotone_cubic_table(x, knots, values, *, flat_left=True, flat_right=True):
+    r"""C1 shape-preserving cubic table with exact knots and constant extension.
+
+    Interior slopes use the weighted harmonic mean of adjacent secants when
+    they have the same sign, and zero otherwise. This is the PCHIP slope
+    construction; each cubic is evaluated in Hermite form. Constant extension
+    is C1 at endpoints whose ``flat_*`` flag is true (slope zero). A false flag
+    retains the one-sided shape-preserving endpoint slope, suitable when that
+    endpoint is a domain boundary rather than a continuation. At least three
+    strictly increasing knots are required. Shape and bound preservation hold
+    for monotone ordinate tables; second derivatives generally jump at knots.
+    The tabulated calibration values are not changed by this interpolation.
+    """
+    xp, yp = jnp.asarray(knots), jnp.asarray(values)
+    h = jnp.diff(xp)
+    d = jnp.diff(yp) / h
+    same_sign = (d[:-1] * d[1:]) > 0
+    dl = jnp.where(same_sign, d[:-1], 1.0)
+    dr = jnp.where(same_sign, d[1:], 1.0)
+    w1, w2 = 2 * h[1:] + h[:-1], h[1:] + 2 * h[:-1]
+    interior = jnp.where(same_sign, (w1 + w2) / (w1 / dl + w2 / dr), 0.0)
+
+    def endpoint(ha, hb, da, db):
+        slope = ((2 * ha + hb) * da - ha * db) / (ha + hb)
+        slope = jnp.where(jnp.sign(slope) != jnp.sign(da), 0.0, slope)
+        return jnp.where(
+            (jnp.sign(da) != jnp.sign(db)) & (jnp.abs(slope) > 3 * jnp.abs(da)),
+            3 * da,
+            slope,
+        )
+
+    left = 0.0 if flat_left else endpoint(h[0], h[1], d[0], d[1])
+    right = 0.0 if flat_right else endpoint(h[-1], h[-2], d[-1], d[-2])
+    slopes = jnp.concatenate((jnp.atleast_1d(left), interior, jnp.atleast_1d(right)))
+    index = jnp.clip(jnp.searchsorted(xp, x, side="right") - 1, 0, len(knots) - 2)
+    interval = xp[index + 1] - xp[index]
+    t = jnp.clip((x - xp[index]) / interval, 0.0, 1.0)
+    return (
+        (2 * t**3 - 3 * t**2 + 1) * yp[index]
+        + (t**3 - 2 * t**2 + t) * interval * slopes[index]
+        + (-2 * t**3 + 3 * t**2) * yp[index + 1]
+        + (t**3 - t**2) * interval * slopes[index + 1]
+    )

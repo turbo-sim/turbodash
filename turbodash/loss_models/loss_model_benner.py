@@ -15,7 +15,6 @@ loss_model_analysis/loss_model_audit/individual_functions/.
 
 from ._backend import jnp
 from .. import math
-from . import _numerics
 from . import loss_model_kacker_okapuu as lm_ko
 from .loss_coefficient_conversion import (
     convert_kinetic_energy_to_stagnation_pressure_loss,
@@ -265,7 +264,7 @@ def get_secondary_loss(flow_parameters, geometry, delta_height):
     stagger = geometry["stagger_angle"]
     AR = height / chord
     CR = math.cosd(beta_in) / math.cosd(beta_out)
-    CR = _numerics.smooth_maximum(CR, 0.1, 0.02)
+    CR = math.smooth_maximum(CR, 0.1, method="compact", half_width=0.02)
     shape = (
         jnp.sqrt(math.cosd(stagger))
         * CR
@@ -276,7 +275,7 @@ def get_secondary_loss(flow_parameters, geometry, delta_height):
     Y_sec_low, Y_sec_high = coefficient_low / AR**0.55, coefficient_high / AR
     a, b = 1.8, 2.2
     y0, y1 = coefficient_low / a**0.55, coefficient_high / b
-    patch = _numerics.quintic_hermite(
+    patch = math.quintic_hermite(
         AR,
         a,
         b,
@@ -444,7 +443,7 @@ def get_incidence_profile_loss_increment(chi, chi_extrapolation=5, loss_limit=0.
     change the incidence reference convention.
 
     For a positive finite ``loss_limit`` the compact C2 upper limiter is
-    :func:`~turbodash.loss_models._numerics.smooth_minimum`, with
+    :func:`~turbodash.math.smooth_minimum` with ``method="compact"`` and
     :math:`w=\min(0.02,0.04\,\Delta\hat\phi_p^2)`. At the default
     limit 0.5 its transition is raw loss 0.48--0.52. The result equals raw
     loss below 0.48 and equals 0.5 above 0.52, never exceeds the bound,
@@ -475,7 +474,7 @@ def get_incidence_profile_loss_increment(chi, chi_extrapolation=5, loss_limit=0.
     )
     loss_poly = jnp.where(chi >= 0, func_1(chi), func_2(chi))
     join_lower = -0.1
-    joined = _numerics.quintic_hermite(
+    joined = math.quintic_hermite(
         chi,
         join_lower,
         0.0,
@@ -496,9 +495,10 @@ def get_incidence_profile_loss_increment(chi, chi_extrapolation=5, loss_limit=0.
     loss_extrap = loss + slope * (chi - _chi)
     loss_increment = jnp.where(chi > _chi, loss_extrap, loss_poly)
     if loss_limit is not None:
-        loss_increment = _numerics.smooth_minimum(
+        loss_increment = math.smooth_minimum(
             loss_increment,
             loss_limit,
+            method="compact",
             half_width=jnp.minimum(0.02, jnp.maximum(0.04 * loss_limit, 0.0)),
         )
     return loss_increment

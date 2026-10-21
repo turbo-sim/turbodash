@@ -23,7 +23,7 @@ STEP = 1e-25
 def source_hashes():
     files = [REPO/'turbodash/loss_models/loss_model_kacker_okapuu.py',
              REPO/'turbodash/loss_models/_blade_loading.py',
-             REPO/'turbodash/loss_models/_numerics.py', REPO/'turbodash/math.py']
+             REPO/'turbodash/math.py']
     return {p.relative_to(REPO).as_posix(): sha256(p) for p in files}
 
 

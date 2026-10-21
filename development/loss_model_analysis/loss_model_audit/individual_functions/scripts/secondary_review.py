@@ -91,7 +91,7 @@ def uncontinued_aspect_factor(ar):
 def source_hashes():
     names = ("turbodash/loss_models/loss_model_kacker_okapuu.py",
              "turbodash/loss_models/_blade_loading.py",
-             "turbodash/loss_models/_numerics.py", "turbodash/loss_models/_backend.py",
+             "turbodash/loss_models/_backend.py",
              "turbodash/math.py")
     return {name: sha256(REPO / name) for name in names}
 

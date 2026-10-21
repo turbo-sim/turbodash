@@ -138,3 +138,101 @@ advanced demo reruns a small comparison through the current API and reports its
 actual outcomes. The KKT matrix later exposed history-alignment and tolerance
 message issues now covered by production tests. Large old result sweeps and
 private experimental hooks are not needed to retain those lessons.
+
+## Detailed KKT reference and diagnostic fields
+
+Write the normalized problem as minimizing $f(x)$ subject to $h(x)=0$,
+$c(x)\geq 0$, and $l\leq x\leq u$. Equality residuals retain their configured
+sign; inequalities are converted to this nonnegative convention internally.
+The Lagrangian is
+
+$$
+L=f-\lambda^T h-\mu^T c-z_L^T(x-l)-z_U^T(u-x),
+$$
+
+where $\lambda$ is unrestricted and $\mu,z_L,z_U\geq 0$. The check includes
+every finite variable bound, even though SciPy's native QP multipliers omit
+bound multipliers. Absent bounds contribute neither a residual nor a multiplier.
+
+Four infinity-norm residuals are reported:
+
+| Residual | Definition |
+| --- | --- |
+| `stationarity` | $\|\nabla f-J_h^T\lambda-J_c^T\mu-z_L+z_U\|_\infty$ |
+| `primal_feasibility` | Largest equality absolute residual, inequality violation, or bound violation. |
+| `dual_feasibility` | Largest negative part of any inequality or bound multiplier. Equality multipliers have no sign restriction. |
+| `complementarity` | Largest absolute product of an inequality/bound multiplier and its corresponding slack: $\mu_i c_i$, $(z_L)_j(x_j-l_j)$, $(z_U)_j(u_j-x_j)$. |
+
+Turbodash estimates multipliers at each reported design by solving a linear
+minimax problem: minimize the largest stationarity or complementarity residual,
+with unrestricted equality multipliers and nonnegative inequality/bound
+multipliers. All constraints and finite bounds participate. There is no
+arbitrary active-set distance cutoff; an inactive constraint cannot balance
+the objective gradient without also contributing its multiplier-times-slack
+residual. The diagnostic multipliers are independent of SLSQP's native QP
+multipliers, which remain available separately. Multipliers need not be unique
+when constraint gradients are dependent.
+
+`optimality` is the maximum of stationarity, dual feasibility, and
+complementarity. `kkt_residual` is the maximum of all four residuals.
+The tolerance-aware quantity is
+
+$$
+\text{kkt\_ratio}=\max\left(
+\frac{\text{primal\_feasibility}}{\text{feasibility\_tolerance}},
+\frac{\text{optimality}}{\text{optimality\_tol}}\right).
+$$
+
+A ratio at most one passes the independent KKT check. The default feasibility
+tolerance is $10^{-6}$ and optimality tolerance is $10^{-4}$. This separates
+physical constraint satisfaction from first-order accuracy. The native
+`ftol` (default $10^{-9}$) controls SLSQP's own stopping rules; its objective
+and step tests do not imply that every KKT residual is below `ftol`. A small
+step alone cannot pass the independent check. Native solver success is still
+required: a feasible design at the iteration limit is reported as unsuccessful.
+These distinctions follow the [SciPy SLSQP documentation](https://docs.scipy.org/doc/scipy/reference/optimize.minimize-slsqp.html)
+and the stopping tests in the [pinned SciPy 1.17.1 implementation](https://github.com/scipy/scipy/blob/v1.17.1/scipy/optimize/__slsqp.c).
+
+These residuals describe the scaled problem and depend on derivative accuracy.
+The same domain-aware finite differences used by the solver are used for the
+check. Reducing `optimality_tol` far below the derivative error does not create
+additional accuracy; review scaling and derivative step size when tightening
+it. A passing check is numerical evidence of first-order KKT conditions, not
+a proof of global optimality or second-order sufficiency. If derivatives or
+the multiplier assessment are unavailable, the report marks diagnostics
+unavailable, saves null values, and does not claim that the KKT check passed.
+Constraint qualifications also matter: at a degenerate constraint, a local
+optimum need not admit KKT multipliers. A failed check is therefore not by itself
+a proof that a better feasible design exists.
+
+Saved optimization diagnostics include `solver_status`, `step_norm`,
+`objective_change`, all four KKT residuals, `optimality`, `kkt_residual`,
+`kkt_ratio`, `diagnostics_available`, and the complete `kkt` assessment.
+`kkt_multipliers` separates equality, inequality, lower-bound, and upper-bound
+multipliers. Constraint multipliers follow their configured component order;
+bound multipliers follow design-variable order. The same diagnostics accompany
+the accepted history and app job result, alongside evaluation counts, elapsed
+time, `domain_rejections`, `derivative_rejections`, and `recovery_events`.
+Each rejection
+event records solver coordinates in `x` and diagnostic metadata in `failure`;
+turbine failures also include the physical `design_variables`. Python callers
+can inspect the full event list through `result.solver.events`. Inspect these
+when a run needs repeated
+recovery. A smaller trial can avoid a domain boundary, but cannot make an
+incompatible set of physical requirements feasible.
+
+
+## Configuration compatibility
+
+Legacy YAML aliases `tolerance`, `max_iterations`, and `derivative_abs_step`
+map to `ftol`, `maxiter`, and `finite_diff_step`. Legacy `library: scipy` and
+`method: slsqp` select the production driver. PySolverView is an indirect
+installation dependency through `jaxprop`, not the driver of these runs.
+The retired `max_fd_backtracks` field is discarded during YAML normalization
+and is not exported; direct `SLSQPOptions` construction does not accept it.
+
+Domain failures carry structured `ModelDomainError` metadata (`code`,
+`quantity`, `value`, optional `margin`, zero-based `stage_index`, `stage_name`,
+and `station`). Rejection events preserve solver coordinates and the physical
+design variables. Consistency errors have `recoverable=False`; unexpected
+exceptions must remain visible rather than becoming retryable domain failures.

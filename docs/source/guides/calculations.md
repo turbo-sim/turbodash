@@ -72,7 +72,8 @@ zero-loss velocity-triangle comparisons.
 Open **Optimization** and use its three tabs:
 
 - **Configuration** selects the objective, maximize/minimize direction, solver
-  tolerances, iteration limit, and SLSQP step and recovery controls.
+  tolerance and iteration limit. **Show expert settings** reveals independent
+  acceptance tolerances and SLSQP step and recovery controls.
 - **Design variables** selects inputs that the optimizer may change.
 - **Constraints** sets limits on calculated results.
 

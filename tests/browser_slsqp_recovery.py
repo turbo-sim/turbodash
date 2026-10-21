@@ -39,7 +39,7 @@ def exercise(context, address, output):
     page.on("response", capture)
     page.goto(address)
     page.wait_for_selector("#perf_table .dash-table-container")
-    source = yaml.safe_load((harness.ROOT / "development/optimization_slsqp/case.yaml").read_text())
+    source = yaml.safe_load((harness.ROOT / "demos/optimization/case_recovery.yaml").read_text())
     # Preserve the original recovery regression trajectory explicitly.
     source["optimization"]["solver_options"]["step_growth_factor"] = None
     assert len(source["optimization"]["design_variables"]) == 14

@@ -132,7 +132,6 @@ optimization:
     domain_backtracking: true
     backtrack_factor: 0.5
     max_backtracks: 20
-    max_fd_backtracks: 12
     feasibility_tol: 1.0e-06
     # Independent final Lagrangian-gradient check in normalized coordinates.
     optimality_tol: 1.0e-04

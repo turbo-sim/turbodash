@@ -6,7 +6,7 @@ used to develop and validate them.
 
 | Directory | Contents |
 | --- | --- |
-| [optimization](optimization/README.md) | Examples and tests using the source package `turbodash.optimization` |
+| [optimization](optimization/README.md) | Independent KKT maintenance checks and the SLSQP recovery/step-control design record; user examples live in [demos/optimization](../demos/optimization/README.md) |
 | [loss_model_analysis](loss_model_analysis/README.md) | Loss correlations, digitization sources, numerical audits, and reports |
 | [new_parametrization](new_parametrization/README.md) | Blade parametrization prototypes and their source papers |
 
@@ -14,7 +14,8 @@ Run commands from the repository root. For example:
 
 ```powershell
 python -B development/loss_model_analysis/loss_model_audit/run.py --check
-python -m unittest development.optimization.test_optimization -v
+python -B development/optimization/verify_kkt.py --preflight
+python -B -m pytest tests/test_optimization_api.py -q
 ```
 
 Study outputs stay beside their scripts. Temporary caches and interactive demo

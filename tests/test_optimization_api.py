@@ -1,4 +1,4 @@
-"""Contract and model checks: python -m unittest development.optimization.test_optimization."""
+"""Production optimization API contracts and real-model example checks."""
 
 import copy
 from contextlib import redirect_stdout
@@ -15,7 +15,7 @@ import yaml
 from turbodash.optimization import turbine as opt
 
 
-EXAMPLE_DIRECTORY = Path(__file__).resolve().parent
+EXAMPLE_DIRECTORY = Path(__file__).resolve().parents[1] / "demos" / "optimization"
 
 
 def synthetic_turbine(config):
@@ -49,6 +49,11 @@ def synthetic_problem():
         "solver_options": {
             "max_iterations": 100,
             "tolerance": 1e-9,
+            # These API contracts use full QP steps. Step-growth/recovery
+            # schedules are exercised separately in test_slsqp.py.
+            "first_step_fraction": 1.0,
+            "max_step_fraction": 1.0,
+            "step_growth_factor": None,
             "print_convergence": False,
             "plot_convergence": False,
         },
@@ -411,7 +416,10 @@ class RealTurbineOptimizationTests(unittest.TestCase):
                     for row in stage["geometry_meanline"].values():
                         self.assertLess(abs(float(row["flaring_angle"])), 1e-4)
                 progress = []
-                result = opt.optimize_turbine(config, callback=progress.append)
+                # The real API route must not delegate either solve to PSV.
+                with patch("pysolver_view.OptimizationSolver", side_effect=AssertionError("Unexpected PSV optimizer")), \
+                     patch("pysolver_view.NonlinearSystemSolver", side_effect=AssertionError("Unexpected PSV nonlinear solver")):
+                    result = opt.optimize_turbine(config, callback=progress.append)
                 self.assertTrue(result.success, result.message)
                 self.assertTrue(result.feasible)
                 self.assertIsInstance(result.solver, OptimizeResult)

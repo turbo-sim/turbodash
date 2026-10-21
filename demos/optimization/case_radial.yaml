@@ -120,8 +120,12 @@ optimization:
     #   value: 1.4
     #   normalize: 1
 
-  # Acceptance threshold for normalized residuals, separate from solver options.
+  # Acceptance threshold for normalized residuals, separate from native ftol.
+  # A 10-degree scale below makes 1e-6 allow 1e-5 degrees of flaring.
   feasibility_tolerance: 1.0e-6
+  # These explicit choices preserve the original example settings. The driver
+  # defaults differ: maxiter=200, finite_diff_step=1e-7,
+  # first_step_fraction=0.25 and step_growth_factor=1.5.
   solver_options:
     ftol: 1.0e-9
     maxiter: 150
@@ -130,9 +134,10 @@ optimization:
     first_step_fraction: 1.0
     max_step_fraction: 1.0
     step_growth_factor: null  # Optional gradual restoration; try 1.5 with a reduced first fraction.
-    # Reject recognized invalid model trials and try a shorter step.
+    # Recover recognized invalid line-search trials, not arbitrary model errors.
+    # Derivatives use one bounded finite-difference probe per variable;
+    # an invalid derivative probe stops the solve rather than being retried.
     domain_backtracking: true
     backtrack_factor: 0.5
     max_backtracks: 20
-    max_fd_backtracks: 12
     optimality_tol: 1.0e-4  # Independent final first-order acceptance check.

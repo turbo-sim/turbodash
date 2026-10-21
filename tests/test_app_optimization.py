@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def case(kind="axial"):
-    return opt.load_case(ROOT / f"development/optimization/case_{kind}.yaml")
+    return opt.load_case(ROOT / f"demos/optimization/case_{kind}.yaml")
 
 
 def settings(config, variables=None, constraints=None, **overrides):
@@ -505,7 +505,7 @@ class JobTests(unittest.TestCase):
         self.assertTrue(self.wait(retry, "alice")[3]["success"])
 
     def test_full_variable_case_recovers_with_structured_worker_diagnostics(self):
-        config = opt.load_case(ROOT / "development/optimization_slsqp/case.yaml")
+        config = opt.load_case(ROOT / "demos/optimization/case_recovery.yaml")
         handle = jobs.start_job(config, config["optimization"], "recovery")
         status, log, progress, result, seen = self.wait(handle, "recovery")
         self.assertEqual(status["state"], "complete", log)

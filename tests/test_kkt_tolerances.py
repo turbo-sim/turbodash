@@ -123,7 +123,10 @@ def test_native_success_is_independently_gated_by_optimality(initial, ftol):
             [initial],
             jac=lambda x: np.array([[4.0 * x[0] ** 3]]),
             options=SLSQPOptions(
-                ftol=ftol, feasibility_tol=1e-12, optimality_tol=tolerance
+                ftol=ftol, feasibility_tol=1e-12, optimality_tol=tolerance,
+                # Keep the trajectory independent of the default quarter cap,
+                # which lands exactly at the quartic optimum from x=1.
+                first_step_fraction=1.0, step_growth_factor=None,
             ),
         )
 

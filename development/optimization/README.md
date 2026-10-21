@@ -1,209 +1,140 @@
-# Turbine optimization example
+# Optimization maintenance
 
-These examples optimize axial and radial turbines using the production
-Turbodash meanline model and its SLSQP driver around SciPy 1.17.1. The driver
-supports step fractions, recovery from recognized invalid model trials, and
-bounded finite-difference probes. PySolverView remains a dependency through
-`jaxprop` but does not drive the optimization.
-The reusable API lives in `turbodash/optimization/turbine.py` and is exported
-by `turbodash.optimization`. This directory contains only examples, inputs, and
-tests; it has no copy or compatibility shim of the optimization implementation. The stable and existing
-experimental apps are unchanged. A separate optimization edition is available:
+Production code lives in [turbodash/optimization](../../turbodash/optimization/).
+This directory retains the independent KKT audit, one difficult starting case
+and the reasoning behind the solver interface. User-facing examples belong in
+[demos/optimization](../../demos/optimization/README.md).
 
-```powershell
-python -m pip install -e ".[optimization]"
-python -m turbodash.apps.app_turbine_optimization
-```
+## Consolidation assessment
 
-See [the app guide](../../turbodash/apps/README.md) for controls and execution details.
-The [SLSQP guide](../../docs/source/guides/optimization.md) documents every
-solver control, failure metadata, and the private SciPy maintenance boundary.
+| Previous material | Decision |
+| --- | --- |
+| Original optimization runner and axial/radial cases | Move into the basic demo. Move useful API contracts to tests/test_optimization_api.py, collected by the production suite. |
+| Standalone optimization_slsqp driver, turbine adapter and SciPy bridge/license | Remove the prototype copies. Production owns the implementation, license and solver regression tests. |
+| Original 14-variable SLSQP comparison | Keep its case in the advanced demo and its compact historical benchmark here. Replace the old runner with the educational comparison. |
+| poor_initial_design, step_fraction_sweep and step_ramp studies/results | Remove the separate studies. Retain the poor-start input for the latest KKT matrix; explain a small set of fraction/recovery policies in the advanced demo. |
+| optimization_troubleshoot hooks, penalty/root workarounds and saved analyses | Remove superseded experiments; retain their conclusions below. |
+| Latest independent KKT validation | Keep the current runner, independent checks, report generation and documented 52-case matrix here. Regenerate results when maintaining the solver. |
 
-## Running the example
+The old API tests are relocated, not discarded. The axial/radial demo cases
+remain inputs to model-domain and app regression tests. This consolidation
+does not change production optimizer or meanline equations.
 
-Use the project's Python environment and install the optimization dependency:
+## Maintained files
 
-```powershell
-python -m pip install -r development/optimization/requirements.txt
-python -m development.optimization.run
-```
+| File | Purpose |
+| --- | --- |
+| [verify_kkt.py](verify_kkt.py) | Production optimizer over the 52-case acceptance matrix; preflight, filtering, workers and resumption. |
+| [kkt_checks.py](kkt_checks.py) | Independent residual signs/scales, multiplier complementarity, step norms, history alignment and fresh final finite-difference stationarity. Does not call the production KKT checker. |
+| [kkt_report.py](kkt_report.py) | Matrix reports and convergence plots. |
+| [case_poor_start.yaml](case_poor_start.yaml) | Physically evaluable poor initial design used by the matrix. |
+| [kkt_validation.md](kkt_validation.md) | Matrix definitions, tolerance profiles, audit method and findings addressed by regressions. |
+| [historical_benchmark.json](historical_benchmark.json) | Original SciPy 1.17.1 comparison; historical evidence, not a current benchmark or acceptance oracle. |
 
-Direct execution also works: `python development/optimization/run.py`.
-There are no command-line arguments. Set the globals at the top of `run.py`:
+Generated exports, logs and reports go under ignored output/. No old result
+directories are needed. Resume only runs with unchanged code, inputs and settings;
+use a fresh output directory after changing the solver.
 
-```python
-CASE_FILES = ("case_axial.yaml",)  # Or ("case_radial.yaml",), or both filenames.
-SHOW_PLOTS = True
-PLOT_TURBINE_EACH_ITERATION = False
-```
+## Why the SLSQP interface was needed
 
-`OUTPUT_DIRECTORY` selects the output parent folder. The default is `output/`
-beside the runner. Each case has its own subdirectory: `output/axial/` or `output/radial/`.
+A turbine can satisfy every variable bound and still have no real velocity
+triangles. The public SciPy SLSQP wrapper does not expose the pending trial
+state needed to shorten that step consistently and retry while retaining the
+solver state. Its iteration callback is too late for that operation.
 
-- `input_case.yaml`: the source case, including its optimization settings.
-- `initial_case.yaml`: the effective starting inputs after initial-value overrides.
-- `optimized_case.yaml`: final optimized inputs, with initial overrides removed
-  so rerunning this file starts from the saved optimized design.
-- `optimization_result.yaml`: final turbine results, constraint diagnostics, and
-  physical and native solver histories.
-- `initial_turbine.png` / `.svg`, `optimized_turbine.png` / `.svg`, and
-  `convergence_history.png` / `.svg`.
+The production bridge updates the pending point, direction and line-search
+quantities together. SciPy still performs SLSQP's quadratic subproblems, merit
+line search and BFGS updates. Turbodash handles model evaluation, trial control,
+diagnostics and result acceptance. It does not monkeypatch installed SciPy,
+clip invalid roots or substitute artificial objective penalties. Only recognized
+model-domain failures are recoverable; programming and consistency errors remain
+visible.
 
-The runner plots the initial and final turbines and the convergence history.
-Live plotting is optional. All numeric output is YAML; no JSON files are written.
-The result's progress history and convergence plot use the accepted physical
-objective and constraint violations. The solver report and solver diagnostics
-use normalized coordinates and the signed minimized objective, so maximizing
-efficiency gives a negative solver objective.
-The result YAML records `solver_elapsed_seconds` and `model_evaluations`; the
-runner also prints these. Solver time excludes the initial/final figure exports.
-Live plots inside solver callbacks add to this time, so disable them when
-comparing numerical performance or running batches of cases.
+| Production module | Responsibility |
+| --- | --- |
+| turbine.py | Physical/configured variables, normalization, responses, callbacks, fresh final reevaluation and YAML exports. |
+| slsqp.py | Evaluation loop, trial fractions, recovery, derivatives, stopping/reporting and independent acceptance. |
+| _slsqp_backend.py | Version-specific SciPy state/workspace and consistent pending-trial shortening. |
+| kkt.py | Feasibility and first-order optimality, including variable bounds. |
 
-## Editing a case
+## Step fractions and recovery
 
-`case_axial.yaml` and `case_radial.yaml` are standalone files containing `inputs`
-and `optimization`. Both maximize total-to-static efficiency with zero stator and
-rotor flaring. Zero flaring demonstrates constraints; it is not a general design
-rule. The original inputs violate it, so a feasible optimized design can have
-lower efficiency than the original, infeasible design.
+first_step_fraction scales the first QP direction; max_step_fraction caps
+every direction, including the first. These are fractions in normalized coordinates, not
+absolute physical movement limits. Smaller fractions can help a particular
+start but can also require more iterations.
 
-Add or comment out entries under `optimization.design_variables`:
+With domain_backtracking enabled, recognized invalid line-search trials are
+shortened by backtrack_factor, up to max_backtracks times. A finite
+step_growth_factor restores a reduced cap gradually toward the maximum; None
+restores it immediately for the next major direction. Recovery cannot repair
+an invalid initial design or make incompatible constraints feasible.
 
-```yaml
-design_variables:
-  blade_velocity_ratio:
-    lower_value: 0.5
-    # initial_value: 0.58
-    upper_value: 0.65
-  rotational_speed:
-    lower_value: 0.5
-    upper_value: 0.95
-```
+Finite-difference probes are separate. The current driver evaluates each once
+in a bound-admissible direction. A physically invalid probe ends the derivative
+calculation with a diagnostic; line-search recovery does not retry it. The old
+max_fd_backtracks setting is ignored for legacy inputs and omitted from the
+maintained examples.
 
-Names are dotted paths relative to `inputs`, or labels with an explicit `path`.
-For example, `stages.0.blade_geometry.rotor.solidity_chord` addresses the first
-stage's rotor. Missing or null `initial_value` uses the current input value.
-Commenting out a variable keeps its original input fixed. Bounds and initial
-values use the model's native units. Initial values outside the bounds are clipped
-to the nearest bound, with a printed message showing the original and new values.
-This applies both to current configuration values and explicit initial overrides.
+The [advanced demo](../../demos/optimization/README.md) shows a small controlled
+comparison. The [SLSQP guide](../../docs/source/guides/optimization.md) documents
+every setting. Current defaults come from SLSQPOptions; the maintenance matrix
+deliberately supplies explicit study settings.
 
-Speed uses two ordinary input fields: `rotational_speed_type: specific` and
-`rotational_speed: 0.7`. With type `specific`, the value is dimensionless specific
-speed; with `actual`, it is rpm. Optimize the numeric `rotational_speed` field
-directly. The type stays fixed during a solve. Older nested speed inputs are still
-accepted by the turbine calculation for existing app cases.
+## KKT acceptance and reporting
 
-`objective_function.variable` selects one scalar output; `type` is `maximize` or
-`minimize`. An optional positive `normalize` scales the objective. Constraints are
-independent list entries; omit the list or set it to null for an unconstrained
-case. The examples include a commented maximum-Mach constraint.
+Native termination, feasibility and final acceptance are distinct:
+result.solver_success records native convergence; result.feasible checks
+normalized residuals and bounds; result.success additionally requires the
+independent first-order assessment. Small steps or objective changes alone
+do not establish stationarity.
 
-Selectors accept an optional leading `$` and `*` over lists or dictionaries.
-Each wildcard match becomes a separate constraint. Supported types are `=`, `<=`,
-and `>=` (also `<` and `>` as non-strict aliases). Targets can be numeric values,
-compatible arrays, or result selectors. Python callers can also supply callables
-for objective variables, constraint variables, and targets; selectors themselves
-do not evaluate algebra.
+The KKT assessment checks primal feasibility, Lagrangian stationarity, multiplier
+dual feasibility and complementarity. Constraint signs, scales and variable
+normalization must agree throughout the solver, multiplier reconstruction and
+exports. When diagnostics are available, kkt_ratio <= 1 summarizes passing the
+configured acceptance limits. Unavailable derivatives must not appear as zero
+optimality.
 
-Constraint `normalize` is `False` for native residual units, a positive scale, or
-`True` to divide by the absolute target. Use an explicit scale for zero targets.
-The separate `optimization.feasibility_tolerance` applies to normalized residuals;
-with scale 10 degrees, tolerance `1e-6` permits `1e-5` degrees of flaring.
-`solver_options` configures the Turbodash SLSQP driver. Both examples show all
-numerical controls with comments:
+The audit reconstructs these quantities independently from physical outputs and
+fresh probes. An audit may pass when an optimization is correctly rejected.
+It also checks callback/export history alignment: distinct normalized points
+must not be merged merely because their physical values are nearly equal.
+Focused regressions include tests/test_kkt_history_alignment.py and
+tests/test_kkt_tolerances.py.
 
-```yaml
-solver_options:
-  ftol: 1.0e-9
-  maxiter: 150
-  finite_diff_step: 1.0e-6
-  first_step_fraction: 1.0
-  max_step_fraction: 1.0
-  step_growth_factor: null
-  domain_backtracking: true
-  backtrack_factor: 0.5
-  max_backtracks: 20
-  max_fd_backtracks: 12
-  optimality_tol: 1.0e-4
-```
+## Running maintenance checks
 
-Step fractions apply to SLSQP's computed QP direction, not to absolute
-physical distances. Keep adaptive recovery enabled to shorten only recognized
-invalid trials; use `first_step_fraction: 0.5` if you also want a smaller first
-trial. Set `step_growth_factor: 1.5` to restore a reduced first fraction or a
-recovered fraction gradually; `null` disables the schedule. Derivative probes
-have their own distance and retry budget. These examples retain their explicit
-iteration limits, derivative steps, and immediate restoration; current app
-defaults are 200, 1e-7, and a growth factor of 1.5 after recovery.
-The old `tolerance`, `max_iterations`, and `derivative_abs_step` names remain
-accepted aliases. Existing `library: scipy` and `method: slsqp` fields also
-remain accepted; they select the new driver.
+From the repository root, in the project environment:
 
-## Python API and progress callbacks
+~~~powershell
+python -B -m pytest tests/test_slsqp.py tests/test_optimization_api.py tests/test_kkt.py tests/test_kkt_tolerances.py tests/test_kkt_history_alignment.py tests/test_kkt_reporting.py -q
+python -B development/optimization/verify_kkt.py --preflight
+python -B development/optimization/verify_kkt.py --filter axial_nominal__flaring__standard --workers 1
+python -B development/optimization/verify_kkt.py --workers 2
+~~~
 
-`turbodash/optimization/turbine.py` contains `TurbineOptimizationProblem`, `TurbinePlotCallback`,
-and the optimization, plotting, and export helpers:
+The full matrix is a maintenance study, not a quick unit test. Its report
+distinguishes audit failures from rejected optimization outcomes. Follow with
+relevant app regressions when changing callback or export contracts.
 
-```python
-from turbodash.optimization import (
-    load_case, optimize_turbine, save_optimization_results,
-    plot_turbine, plot_convergence,
-)
+The private bridge requires SciPy 1.17.1. Upgrades require reviewing its
+interface and workspace layout, then rerunning numerical, recovery, KKT, turbine
+and app checks. The historical benchmark cannot establish compatibility with
+another release.
 
-config = load_case("development/optimization/case_axial.yaml")
+## Retained historical findings
 
-result = optimize_turbine(config, callback=lambda p: print(p["objective"]))
-geometry = result.geometry
-save_optimization_results(result, "development/optimization/output/custom")
-```
+The original problem used 14 variables, four flaring inequalities and no
+equalities. A full unrecovered first trial left the physical domain. Adaptive
+halving and a half-sized first trial both converged to about 89.811945% efficiency
+in 38 major iterations and 586 valid model evaluations, including final
+derivative verification. Halving every direction took 55 iterations and
+840 evaluations in that recorded comparison.
 
-`optimize_turbine(config, optimization=None, *, evaluator=None, callback=None)`
-uses `config["optimization"]` unless given a separate dictionary. Results expose
-`config`, `turbine_results`, `geometry`, physical `design_variables`, objectives,
-constraint diagnostics, and `history`. `solver` is a SciPy `OptimizeResult`
-containing native termination information, recovery events, counts, and final
-optimality checks. `solver_success` records native convergence; `feasible`
-records constraint acceptance; `success` also requires the independent final
-first-order check. Check these before using the design. Recognized invalid
-model trials carry failure metadata and can be retried at a shorter step.
-The model equations are not changed and no artificial penalties are returned.
-
-Callbacks receive independent copies of `iteration`, `objective`,
-`max_constraint_violation`, `design_variables`, `config`, and `turbine_results`.
-Physical values are recovered from the normalized solver vector; rejected
-trials and derivative probes do not produce progress snapshots. The runner uses this hook for optional live turbine
-plots. `plot_turbine(results, title=None, figure=None)` can update an existing
-figure; `plot_convergence(result, show=False)` plots the recorded solver history.
-
-The workbench runs this API in an isolated background worker and publishes
-progress through the callback. It applies the final design only after all
-acceptance checks pass. A physically invalid initial design or exhausted
-recovery budget ends the run with a diagnostic. Model consistency errors and
-unexpected exceptions are not converted into recoverable domain failures.
-
-## Choosing variables and interpreting results
-
-Useful variables include blade velocity ratio, specific speed, reaction, stator
-exit angle, meridional velocity ratios, radius ratios, and row solidity. Axial
-aspect ratio, maximum thickness/chord, and trailing-edge thickness/opening affect
-losses. Use realistic thickness bounds; local bound optima are not finished designs.
-Keep radial row radius ratios away from one to preserve nonzero meridional chord.
-For multistage work-split weights, fix one because uniform rescaling is redundant.
-
-Metal angles follow velocity triangles; independent angles require incidence or
-deviation modeling. Radial aspect ratio is derived. First-stage `radius_ratio_01`
-has no effect in a single stage. Thickness location and trailing-edge wedge angle
-affect blade construction rather than the production losses; leading-edge geometry
-principally affects incidence, currently zero with triangle-matched metal angles.
-Rotor clearance is fixed at 1% of height and stator clearance at zero.
-
-Zero flaring requires equal inlet/outlet heights. Changing aspect ratio alone
-cannot enforce it; the examples vary both row meridional velocity ratios.
-The model reconstructs isentropic flow and deducts empirical losses, so results
-are preliminary meanline designs and SLSQP finds local optima. Blade counts remain
-continuous during optimization; realize integer geometry separately for export.
-
-Run the API and real-model checks with
-`python -m unittest development.optimization.test_optimization -v`.
+Those observations motivated recovery and showed the cost of unnecessary
+damping; they are not promises for other inputs or current revisions. The
+advanced demo reruns a small comparison through the current API and reports its
+actual outcomes. The KKT matrix later exposed history-alignment and tolerance
+message issues now covered by production tests. Large old result sweeps and
+private experimental hooks are not needed to retain those lessons.

@@ -285,7 +285,7 @@ def exercise(context, address, output):
         expect(page.locator("#opt-panel")).to_have_js_property("open", False)
         open_section("opt-panel")
 
-    axial = yaml.safe_load((ROOT / "development/optimization/case_axial.yaml").read_text())
+    axial = yaml.safe_load((ROOT / "demos/optimization/case_axial.yaml").read_text())
     axial["inputs"].update(rotational_speed_type="actual", rotational_speed=30000)
     axial["optimization"]["design_variables"] = {"rotational_speed": {"lower_value": 25000, "upper_value": 35000}}
     axial["optimization"]["constraints"] = []
@@ -322,7 +322,7 @@ def exercise(context, address, output):
     assert len(results[-1]["stages_performance"]) == 2
     expect(page.locator("#td-triangle-mode label:has(input:checked)")).to_have_text("Velocity [m/s]")
 
-    radial = yaml.safe_load((ROOT / "development/optimization/case_radial.yaml").read_text())
+    radial = yaml.safe_load((ROOT / "demos/optimization/case_radial.yaml").read_text())
     upload(radial, "radial.yaml")
     expect(page.locator('#opt-variable-rows .td-opt-row')).to_have_count(12)
     expect(page.locator('#opt-variable-rows input[type="number"]').first).to_have_js_property("valueAsNumber", 0.5)

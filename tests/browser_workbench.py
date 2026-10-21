@@ -262,7 +262,7 @@ def main():
             checks.append("Workspace rail and brand preserve edits; geometry and mesh controls remain available")
 
             # Named multistage load, independent edits, and exact round-trip serialization.
-            config = yaml.safe_load((ROOT / "development/optimization/case_axial.yaml").read_text(encoding="utf-8"))
+            config = yaml.safe_load((ROOT / "demos/optimization/case_axial.yaml").read_text(encoding="utf-8"))
             config["inputs"]["stages"][0]["name"] = "High pressure"
             config["inputs"]["stages"].append(deepcopy(config["inputs"]["stages"][0]))
             config["inputs"]["stages"][1]["name"] = "Low pressure"

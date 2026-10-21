@@ -424,7 +424,7 @@ def exercise(context, address, output):
             page.get_by_role("tab", name="Design variables", exact=True).click()
 
         open_variables()
-        config = yaml.safe_load((ROOT / "development/optimization/case_axial.yaml").read_text(encoding="utf-8"))
+        config = yaml.safe_load((ROOT / "demos/optimization/case_axial.yaml").read_text(encoding="utf-8"))
         config["optimization"]["design_variables"] = {
             "blade_velocity_ratio": {"lower_value": .5, "upper_value": .75, "initial_value": .6}
         }

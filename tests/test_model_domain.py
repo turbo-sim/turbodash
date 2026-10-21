@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def case(kind="axial", stages=1):
-    config = yaml.safe_load((ROOT / f"development/optimization/case_{kind}.yaml").read_text())
+    config = yaml.safe_load((ROOT / f"demos/optimization/case_{kind}.yaml").read_text())
     config["inputs"]["stages"] = [deepcopy(config["inputs"]["stages"][0]) for _ in range(stages)]
     for i, stage in enumerate(config["inputs"]["stages"]):
         stage["name"] = f"stage_{i + 1}"

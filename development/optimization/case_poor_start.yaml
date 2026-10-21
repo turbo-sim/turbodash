@@ -1,0 +1,129 @@
+# Very poor, physically evaluable initial design. Angle is in degrees, not temperature.
+# Two lower bounds widened to include the requested starting values without clipping.
+inputs:
+  loss_model: benner
+  fluid_name: Air
+  turbine_type: axial
+  inlet_property_pair: PT_INPUTS
+  inlet_property_1: 500000.00
+  inlet_property_2: 600.00
+  exit_pressure: 100000.00
+  mass_flow_rate: 10.00
+  inlet_flow_angle: 0.00
+  blade_velocity_ratio: 0.20
+  rotational_speed_type: specific
+  rotational_speed: 0.50
+  stages:
+  - name: stage_1
+    work_fraction_split: 1.00
+    stator_exit_angle: 40.00
+    degree_reaction: 0.50
+    meridional_velocity_ratio_12: 1.00
+    meridional_velocity_ratio_23: 1.00
+    meridional_velocity_ratio_34: 1.00
+    radius_ratio_01: 1.00
+    radius_ratio_12: 1.00
+    radius_ratio_23: 1.00
+    radius_ratio_34: 1.00
+    blade_geometry:
+      stator:
+        solidity_chord: 1.10
+        aspect_ratio: 2.00
+        maximum_thickness_to_chord: 0.30
+        maximum_thickness_location: 0.30
+        leading_edge_radius_to_max_thickness: 0.50
+        trailing_edge_thickness_to_opening: 0.08
+        trailing_edge_wedge_angle: 5.00
+        leading_edge_wedge_angle: 30.00
+      rotor:
+        solidity_chord: 1.10
+        aspect_ratio: 2.00
+        maximum_thickness_to_chord: 0.30
+        maximum_thickness_location: 0.30
+        leading_edge_radius_to_max_thickness: 0.50
+        trailing_edge_thickness_to_opening: 0.08
+        trailing_edge_wedge_angle: 5.00
+        leading_edge_wedge_angle: 30.00
+optimization:
+  design_variables:
+    blade_velocity_ratio:
+      lower_value: 0.20
+      upper_value: 1.00
+      initial_value: 0.20
+    rotational_speed:
+      lower_value: 0.20
+      upper_value: 1.50
+      initial_value: 0.50
+    stages.0.degree_reaction:
+      lower_value: 0.00
+      upper_value: 0.75
+      initial_value: 0.50
+    stages.0.stator_exit_angle:
+      lower_value: 40.00
+      upper_value: 80.00
+      initial_value: 40.00
+    stages.0.meridional_velocity_ratio_12:
+      lower_value: 0.50
+      upper_value: 1.50
+      initial_value: 1.00
+    stages.0.meridional_velocity_ratio_23:
+      lower_value: 0.50
+      upper_value: 1.50
+      initial_value: 1.00
+    stages.0.meridional_velocity_ratio_34:
+      lower_value: 0.50
+      upper_value: 1.50
+      initial_value: 1.00
+    stages.0.blade_geometry.stator.solidity_chord:
+      lower_value: 0.50
+      upper_value: 2.00
+      initial_value: 1.10
+    stages.0.blade_geometry.stator.trailing_edge_thickness_to_opening:
+      lower_value: 0.02
+      upper_value: 0.10
+      initial_value: 0.08
+    stages.0.blade_geometry.stator.aspect_ratio:
+      lower_value: 1.00
+      upper_value: 4.00
+      initial_value: 2.00
+    stages.0.blade_geometry.rotor.solidity_chord:
+      lower_value: 0.50
+      upper_value: 2.00
+      initial_value: 1.10
+    stages.0.blade_geometry.rotor.trailing_edge_thickness_to_opening:
+      lower_value: 0.02
+      upper_value: 0.10
+      initial_value: 0.08
+    stages.0.blade_geometry.rotor.maximum_thickness_to_chord:
+      lower_value: 0.15
+      upper_value: 0.35
+      initial_value: 0.30
+    stages.0.blade_geometry.rotor.aspect_ratio:
+      lower_value: 1.00
+      upper_value: 4.00
+      initial_value: 2.00
+  constraints:
+  - variable: $stages_performance.*.geometry_meanline.*.flaring_angle
+    type: '>='
+    value: -10.00
+    normalize: 10.00
+  - variable: $stages_performance.*.geometry_meanline.*.flaring_angle
+    type: <=
+    value: 10.00
+    normalize: 10.00
+  objective_function:
+    variable: $overall_performance.efficiency_ts
+    type: maximize
+    normalize: 1.00
+  feasibility_tolerance: 1.00e-06
+  solver_options:
+    ftol: 1.00e-09
+    maxiter: 150
+    finite_diff_step: 1.00e-06
+    first_step_fraction: 0.20
+    max_step_fraction: 1.00
+    step_growth_factor: null  # Restore the maximum cap immediately after the reduced start.
+    domain_backtracking: true
+    backtrack_factor: 0.50
+    max_backtracks: 20
+    optimality_tol: 0.0001

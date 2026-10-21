@@ -176,7 +176,7 @@ def exercise(context, address, output):
 
         # Load after many clicks resets the absolute target to the file, and
         # subsequent clicks operate from that loaded design.
-        config = yaml.safe_load((ROOT / "development/optimization/case_axial.yaml").read_text(encoding="utf-8"))
+        config = yaml.safe_load((ROOT / "demos/optimization/case_axial.yaml").read_text(encoding="utf-8"))
         config["inputs"]["stages"][0]["name"] = "High pressure"
         config["inputs"]["stages"].append(deepcopy(config["inputs"]["stages"][0]))
         config["inputs"]["stages"][1]["name"] = "Low pressure"

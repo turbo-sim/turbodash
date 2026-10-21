@@ -102,6 +102,11 @@ experimental app separately, install the `mesh` extra and use
 [applications guide](turbodash/apps/README.md) explains the stable, experimental,
 original stage and dimensionless efficiency applications.
 
+[Two optimization examples](demos/optimization/README.md) introduce the Python
+API, result/report exports, and a small comparison of SLSQP step fractions and
+physical-domain recovery. Solver maintenance and independent KKT checks live in
+[`development/optimization`](development/optimization/README.md).
+
 Calculations live in `turbodash/core/`, blade geometry in `geometry/`, plotting
 in `visualization/`, report generation in `reporting/`, and external-format
 adapters in `io/`. Production loss models remain in `turbodash/loss_models/`.

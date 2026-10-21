@@ -6,6 +6,11 @@ Run the production suite from the repository root:
 python -B -m pytest tests -q -ra
 ```
 
+`test_optimization_api.py` contains the API contracts and real axial/radial
+checks formerly kept with the first development example. The input cases now
+live in `demos/optimization/`. The independent KKT maintenance matrix remains
+in `development/optimization/`; see its README for the longer study commands.
+
 Native meshing and renderer integration tests require the optional TurboMoC,
 Gmsh, PyVista and Dash VTK dependencies. They skip when those dependencies are
 unavailable. The symlink test also skips on Windows without symlink privileges.

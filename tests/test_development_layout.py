@@ -21,6 +21,7 @@ STUDIES = ROOT / "development"
     ("loss_model_analysis/kacker_okapuu_trailing_edge/digitize.py", "REPO"),
     ("loss_model_analysis/loss_model_audit/individual_functions/scripts/common.py", "REPO"),
     ("loss_model_analysis/loss_model_audit/overall_stage/study.py", "REPO"),
+    ("optimization/verify_kkt.py", "ROOT"),
 ])
 def test_studies_resolve_repository_outside_checkout(relative, root_variable, tmp_path):
     script = STUDIES / relative
@@ -38,7 +39,7 @@ def test_studies_resolve_repository_outside_checkout(relative, root_variable, tm
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-@pytest.mark.parametrize("name", ["loss_model_analysis", "new_parametrization"])
+@pytest.mark.parametrize("name", ["loss_model_analysis", "new_parametrization", "optimization"])
 def test_study_markdown_links_resolve_after_relocation(name):
     failures = []
     for document in (STUDIES / name).rglob("*.md"):

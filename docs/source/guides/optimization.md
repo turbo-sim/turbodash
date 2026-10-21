@@ -8,13 +8,13 @@ PySolverView remains an installation dependency through `jaxprop`; it does
 not drive these optimization runs.
 
 Use the [calculation workflow](calculations.md) to choose variables and
-constraints. The standalone examples in `development/optimization/` use the
-same production API as the app:
+constraints. The [standalone examples](../../../demos/optimization/README.md)
+in `demos/optimization/` use the same production API as the app:
 
 ```python
 from turbodash.optimization import load_case, optimize_turbine
 
-case = load_case("development/optimization/case_axial.yaml")
+case = load_case("demos/optimization/case_axial.yaml")
 result = optimize_turbine(case)
 print(result.success, result.message)
 ```
@@ -292,6 +292,6 @@ driver does not monkeypatch SciPy or modify installed packages.
 This implementation requires **SciPy 1.17.1**. Its version and expected
 internal workspace layout are checked before using the private interface.
 Upgrading SciPy requires reviewing that interface and rerunning the numerical,
-recovery, turbine, and app regressions. The prototype and its original
-reproduction case remain in `development/optimization_slsqp/` as development
-evidence; production runs use the modules above.
+recovery, turbine, and app regressions. The maintenance harness and retained
+recovery/KKT findings live in `development/optimization/`; user examples live
+in `demos/optimization/`. Production runs use the modules above.

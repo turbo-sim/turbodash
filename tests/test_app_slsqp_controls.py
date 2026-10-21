@@ -33,7 +33,7 @@ CUSTOM_OPTIONS = dict(
 
 @pytest.fixture
 def case():
-    return load_case(ROOT / "development/optimization/case_axial.yaml")
+    return load_case(ROOT / "demos/optimization/case_axial.yaml")
 
 
 def editor_values(options=None):

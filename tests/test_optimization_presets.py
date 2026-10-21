@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def case(kind="axial", count=1):
-    config = opt.load_case(ROOT / f"development/optimization/case_{kind}.yaml")
+    config = opt.load_case(ROOT / f"demos/optimization/case_{kind}.yaml")
     stage = config["inputs"]["stages"][0]
     config["inputs"]["stages"] = [deepcopy(stage) for _ in range(count)]
     for i, stage in enumerate(config["inputs"]["stages"]):

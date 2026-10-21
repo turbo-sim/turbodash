@@ -250,7 +250,7 @@ def exercise(context, address, output):
                 section.locator(":scope > summary").click()
             page.get_by_role("tab", name="Design variables", exact=True).click()
 
-        config = yaml.safe_load((browser_optimization.ROOT / "development/optimization/case_axial.yaml").read_text(encoding="utf-8"))
+        config = yaml.safe_load((browser_optimization.ROOT / "demos/optimization/case_axial.yaml").read_text(encoding="utf-8"))
         config["optimization"]["design_variables"] = {
             "blade_velocity_ratio": dict(lower_value=.5, upper_value=.75, initial_value=.6),
         }

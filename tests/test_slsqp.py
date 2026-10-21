@@ -790,7 +790,9 @@ print('Standalone solve passed without PSV solver calls.')
         )
         self.assertTrue(result.success, result.message)
         self.assertGreater(result.domain_rejections, 0)
-        failure = result.events[0]["failure"]
+        # The default initial cap can emit a step_cap before the rejection.
+        rejection = next(event for event in result.events if event["kind"] == "trial_rejection")
+        failure = rejection["failure"]
         self.assertEqual(failure["code"], "rotor_radicand")
         self.assertEqual(failure["stage_index"], 1)
         self.assertEqual(failure["value"], -0.2)

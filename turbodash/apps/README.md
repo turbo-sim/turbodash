@@ -208,7 +208,7 @@ in the status/terminal; design plots update when the result is accepted.
 Validation commands:
 
 ```powershell
-python -m unittest development.optimization.test_optimization -v
+python -B -m pytest tests/test_optimization_api.py -q
 python -m pytest tests/test_app_optimization.py tests/test_app_entrypoints.py tests/test_app_meshing.py tests/test_mesh_jobs.py tests/test_refactored_layout.py -q
 python tests/browser_optimization.py
 ```

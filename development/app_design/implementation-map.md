@@ -95,7 +95,7 @@ Reviewed on **21 October 2026** against the local optimization workbench, includ
 | Source path (repository root) | SHA-256 |
 | --- | --- |
 | `turbodash/apps/app_turbine_optimization/workbench.py` | `136e75d9c2b88f3c4ee6a41d6e95629bb5f11e84e7305b3f91ec8d3943620b78` |
-| `turbodash/apps/app_turbine_optimization/assets/workbench.css` | `a26b68c2999dc1a7dbb2353e6f0a756d89d733053f528a2b2cefbb928c7395ad` |
+| `turbodash/apps/app_turbine_optimization/assets/workbench.css` | `51e9bd23a43b55a0fa16923e6651f7741c2f46dac05fec65a21c9e83b36bd327` |
 | `turbodash/apps/app_turbine_optimization/assets/workbench.js` | `8fd4827b0a83b629920a1f76dcabd526bf001cb33204c5589501db86c57b06de` |
 | `turbodash/apps/app_turbine_optimization/opt_panel.py` | `46d8df0524d576bc752f1565d0f09486c2eb3308ac94c85f5da0e9e67b49d015` |
 | `turbodash/apps/app_turbine_optimization/opt_selection.py` | `65e6da4d59a9271e754ee18eaae1f6d5c0422b4cae178b22f688c4a0b5cb5700` |
@@ -107,4 +107,4 @@ Reviewed on **21 October 2026** against the local optimization workbench, includ
 | `turbodash/apps/shared/assets.py` | `9caf7c3d3c2203bf374afb9d705d2b1030219747005da753384af39f2154d4b6` |
 | `turbodash/apps/app_turbine_optimization/assets/blade-ring-light.svg` | `449ba383012ef2bd2ccb66b8b5863d3bce203843230afafc75bcb40c4d0c8eed` |
 | `turbodash/apps/app_turbine_optimization/assets/blade-ring-dark.svg` | `0545beedfc915da2767d51f8002b08b54cf78eaba3ab69fe37544dd771790c07` |
-| `turbodash/apps/app_turbine_optimization/opt_model.py` | `855cc83cd6a539b5b060e70885a34de312508b75d9db08c4b3fea6dd6ce6d98c` |
+| `turbodash/apps/app_turbine_optimization/opt_model.py` | `c4b30763bd4fea8118d7b30d3c97c290a4e97b18e2f621a1c789627ed2222efb` |

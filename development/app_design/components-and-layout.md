@@ -219,7 +219,7 @@ Choosing a result selects its workspace and stage/row scope, opens containing di
 
 Help supplements labels. Ordinary fields use a focusable `?` circle with `title` and accessible explanation. Hover and keyboard focus reveal the same information. The bubble uses panel/text/border tokens and a shadow; it does not intercept pointer events on controls beneath it.
 
-Optimization bound/constraint labels expose their own help. Those compact bubbles are `210px` wide and shift left/center/right by column to remain inside the narrow editor. Optimization tabs have explanatory tooltips after `750ms`, triggered by hover or focus, with maximum width `280px`, padding `10px 12px`, and `12px / 1.5` text. Bubble colors follow the active theme, including tooltips rendered outside the workbench root. Keep geometry-model limitations in nearby help where they affect interpretation.
+Optimization bound/constraint labels expose their own help. Those compact bubbles are `210px` wide and shift left/center/right by column to remain inside the narrow editor. Optimization tabs expose explanatory text through `aria-describedby` and a `data-tooltip` CSS bubble after `750ms` of hover or keyboard-visible focus. The bubble spans the tab strip, sits `6px` below it, and uses `10px 12px` padding, `6px` radius and `12px / 1.5` text. It stays inside the workbench and follows the active theme tokens, with pointer events disabled. The accessible description is retained in a visually hidden span. Keep geometry-model limitations in nearby help where they affect interpretation.
 
 ## 5. Actions, status and asynchronous state
 
@@ -344,7 +344,7 @@ Accessibility here describes implemented semantics and interaction support; it d
 
 All interactive elements receive a `2px` accent focus outline with `3px` offset. Inputs additionally change border to the accent and receive a restrained focus halo. Selected segmented controls keep a keyboard-visible outline through their hidden native radio input. Disabled controls visibly reduce emphasis; do not rely on color alone to communicate failure or success.
 
-Honor `prefers-reduced-motion: reduce`: disable app transitions/animations and animated scroll behavior. Search/context changes, opening a disclosure, changing theme and inspecting a mesh are view actions and must not cause numerical recalculation. See [workbench.js](../../turbodash/apps/app_turbine_optimization/assets/workbench.js), [optimization.js](../../turbodash/apps/app_turbine_optimization/assets/optimization.js), and the focus/reduced-motion rules in [workbench.css](../../turbodash/apps/app_turbine_optimization/assets/workbench.css).
+Honor `prefers-reduced-motion: reduce`: disable motion, animated transitions and animated scroll behavior. Keep the tab-help visibility delay at `750ms`; the delay has no movement and prevents help flashing while navigating. Search/context changes, opening a disclosure, changing theme and inspecting a mesh are view actions and must not cause numerical recalculation. See [workbench.js](../../turbodash/apps/app_turbine_optimization/assets/workbench.js), [optimization.js](../../turbodash/apps/app_turbine_optimization/assets/optimization.js), and the focus/reduced-motion rules in [workbench.css](../../turbodash/apps/app_turbine_optimization/assets/workbench.css).
 
 ## 10. Rebuild checks and transfer to another package
 

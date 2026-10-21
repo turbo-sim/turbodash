@@ -114,7 +114,7 @@ Efficiency is plotted in percent. The loss budget is an efficiency penalty in pe
 3. Apply tokens to editors, reports, tooltips, dropdowns, dialogs and figures together.
 4. Preserve form values, focus/selection context, running jobs and manual plot zoom.
 5. Reapply the current theme after server-rendered figures or controls arrive. Theme selection must survive ordinary edits without a flash back to light mode.
-6. Respect reduced-motion preferences. The production workbench disables its animations, transitions and smooth scrolling for that preference.
+6. Respect reduced-motion preferences. The production workbench disables motion, animated transitions and smooth scrolling for that preference. The tab-help visibility delay remains 750 ms: it introduces no movement and prevents help flashing during navigation.
 
 The app uses `turbodash.workbench.theme` for persisted theme and `turbodash.workbench.inspector-width` for width. Give another package its own storage keys. The standalone guide uses a separate key and never modifies application preferences.
 

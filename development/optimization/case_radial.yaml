@@ -123,12 +123,16 @@ optimization:
   # Acceptance threshold for normalized residuals, separate from solver options.
   feasibility_tolerance: 1.0e-6
   solver_options:
-    library: scipy
-    method: slsqp
-    derivative_method: 2-point
-    derivative_abs_step: 1.0e-6
-    tolerance: 1.0e-9
-    max_iterations: 150
-    print_convergence: true
-    plot_convergence: false  # The runner plots and saves final convergence history.
-    update_on: gradient
+    ftol: 1.0e-9
+    maxiter: 150
+    finite_diff_step: 1.0e-6  # Derivative probes in normalized [0, 1] coordinates.
+    # Fractions of the computed QP direction, not absolute variable changes.
+    first_step_fraction: 1.0
+    max_step_fraction: 1.0
+    step_growth_factor: null  # Optional gradual restoration; try 1.5 with a reduced first fraction.
+    # Reject recognized invalid model trials and try a shorter step.
+    domain_backtracking: true
+    backtrack_factor: 0.5
+    max_backtracks: 20
+    max_fd_backtracks: 12
+    optimality_tol: 1.0e-4  # Independent final first-order acceptance check.

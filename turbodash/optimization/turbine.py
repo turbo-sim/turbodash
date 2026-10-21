@@ -1,21 +1,22 @@
-"""Turbine optimization, plotting, and YAML output using ThermOpt's solver pattern.
-
-The numerical model stays independent of the app. PySolverView handles the
-solver, variable scaling, convergence reporting, and convergence plots.
-"""
+"""Turbine optimization using a direct, recoverable SciPy SLSQP driver."""
 
 from collections import OrderedDict
 from collections.abc import Mapping, MutableMapping
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
+import logging
+import math
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pysolver_view as psv
+from scipy.optimize import OptimizeResult
 import yaml
 
 from turbodash.io.yaml import dump_turbine_yaml
+from turbodash.core.errors import ModelDomainError
+from .slsqp import DomainError, Evaluation, minimize_slsqp, normalize_solver_options
 
 
 # =============================================================================
@@ -270,12 +271,12 @@ def _read_design_variables(inputs, specifications, logger=None):
 
 
 # =============================================================================
-# PySolverView optimization problem
+# Physical turbine problem and normalized SLSQP adapter
 # =============================================================================
 
 
-class TurbineOptimizationProblem(psv.OptimizationProblem):
-    """Adapt the existing turbine calculation to PySolverView's physical API."""
+class TurbineOptimizationProblem:
+    """Evaluate physical designs and map bounded variables to solver coordinates."""
 
     def __init__(self, config, optimization=None, evaluator=None, logger=None):
         self.source_config = deepcopy(config if "inputs" in config else {"inputs": config})
@@ -310,7 +311,6 @@ class TurbineOptimizationProblem(psv.OptimizationProblem):
             self.lower_bounds, self.x0, self.upper_bounds,
         ) = _read_design_variables(self.config["inputs"], self.optimization.get("design_variables"), logger)
         self.bound_range = self.upper_bounds - self.lower_bounds
-        self.problem_scale = 1.0
         self.cache = OrderedDict()
         self.n_evaluations = 0
         self.constraint_sizes = None
@@ -320,19 +320,18 @@ class TurbineOptimizationProblem(psv.OptimizationProblem):
             evaluator = compute_turbine_performance
         self.evaluator = evaluator
 
-        # Like ThermOpt, evaluate before constructing the solver: it queries
-        # constraint counts in its constructor.
+        # The initial design must be physically evaluable before taking a step.
         self.fitness(self.x0)
         if self.get_nec() > len(self.variable_names):
             raise ValueError("There are more scalar equality constraints than design variables.")
 
-    def evaluate(self, physical_values):
+    def evaluate(self, physical_values, *, refresh=False):
         """Return a complete evaluation at this exact physical design point."""
         values = np.asarray(physical_values, dtype=float)
         if values.shape != self.x0.shape or not np.all(np.isfinite(values)):
             raise ValueError("The design vector has an invalid shape or nonfinite values.")
         cache_key = values.tobytes()
-        if cache_key in self.cache:
+        if not refresh and cache_key in self.cache:
             self.cache.move_to_end(cache_key)
             return self.cache[cache_key]
 
@@ -340,14 +339,8 @@ class TurbineOptimizationProblem(psv.OptimizationProblem):
         variables = dict(zip(self.variable_names, values.tolist(), strict=True))
         for path, value in zip(self.variable_paths, values, strict=True):
             set_path(config["inputs"], path, float(value))
-        try:
-            with np.errstate(invalid="raise", divide="raise", over="raise"):
-                turbine_results = self.evaluator(config)
-        except (ValueError, ArithmeticError) as exc:
-            raise ValueError(
-                f"Turbine evaluation failed at {variables}. "
-                f"Choose bounds within the model domain. {exc}"
-            ) from exc
+        with np.errstate(invalid="raise", divide="raise", over="raise"):
+            turbine_results = self.evaluator(config)
 
         objective = evaluate_objective(turbine_results, self.objective_spec)
         equalities, inequalities, report = evaluate_constraints(turbine_results, self.constraint_specs)
@@ -380,7 +373,26 @@ class TurbineOptimizationProblem(psv.OptimizationProblem):
         self.c_eq = evaluation["equalities"]
         self.c_ineq = evaluation["inequalities"]
         self.constraint_data = evaluation["constraint_report"]
-        return psv.combine_objective_and_constraints(self.f, self.c_eq, self.c_ineq)
+        return np.r_[self.f, self.c_eq, self.c_ineq]
+
+    def scale_physical_to_normalized(self, values):
+        return (np.asarray(values, dtype=float) - self.lower_bounds) / self.bound_range
+
+    def scale_normalized_to_physical(self, values):
+        return self.lower_bounds + np.asarray(values, dtype=float) * self.bound_range
+
+    def evaluate_slsqp(self, normalized_values):
+        values = self.scale_normalized_to_physical(normalized_values)
+        try:
+            evaluation = self.evaluate(values)
+        except ModelDomainError as error:
+            metadata = error.to_dict()
+            metadata["design_variables"] = dict(zip(self.variable_names, values.tolist(), strict=True))
+            raise DomainError(str(error), metadata=metadata) from error
+        return Evaluation(
+            self.objective_sign * evaluation["objective"] / self.objective_scale,
+            evaluation["equalities"], -evaluation["inequalities"],
+        )
 
     def get_bounds(self):
         return self.lower_bounds, self.upper_bounds
@@ -394,7 +406,7 @@ class TurbineOptimizationProblem(psv.OptimizationProblem):
 
 @dataclass
 class OptimizationResult:
-    """Physical design, evaluated geometry, and the actual PySolverView solver."""
+    """Physical design, exact evaluated geometry, and the SLSQP result."""
 
     config: dict
     turbine_results: dict
@@ -409,11 +421,48 @@ class OptimizationResult:
     message: str
     max_constraint_violation: float
     history: list
-    solver: psv.OptimizationSolver
+    solver: OptimizeResult
     n_evaluations: int
     initial_turbine_results: dict
     initial_config: dict
     source_config: dict
+
+
+_SOLVER_DIAGNOSTIC_FIELDS = (
+    "step_norm", "objective_change", "optimality", "stationarity",
+    "primal_feasibility", "dual_feasibility", "complementarity",
+    "kkt_residual", "kkt_ratio", "kkt", "kkt_multipliers",
+)
+
+
+def solver_diagnostics(record):
+    """Return portable diagnostics; unavailable numerical values become null.
+
+    Residuals, displacements, and objective changes use solver coordinates and
+    normalization, including when attached to a physical turbine snapshot.
+    """
+    def portable(value):
+        if isinstance(value, Mapping):
+            return {key: portable(item) for key, item in value.items()}
+        if isinstance(value, np.ndarray):
+            return portable(value.tolist())
+        if isinstance(value, (list, tuple)):
+            return [portable(item) for item in value]
+        if isinstance(value, np.generic):
+            return portable(value.item())
+        if isinstance(value, float) and not math.isfinite(value):
+            return None
+        return value
+
+    record = record or {}
+    diagnostic = {name: portable(record.get(name)) for name in _SOLVER_DIAGNOSTIC_FIELDS}
+    kkt = record.get("kkt") or {}
+    diagnostic["diagnostics_available"] = bool(record.get("diagnostics_available", kkt.get("available", False)))
+    if diagnostic["primal_feasibility"] is None:
+        diagnostic["primal_feasibility"] = portable(kkt.get("primal_feasibility"))
+    if diagnostic["kkt_multipliers"] is None:
+        diagnostic["kkt_multipliers"] = portable(kkt.get("multipliers"))
+    return diagnostic
 
 
 def optimize_turbine(config, optimization=None, *, evaluator=None, callback=None, logger=None):
@@ -423,96 +472,112 @@ def optimize_turbine(config, optimization=None, *, evaluator=None, callback=None
     from design_variables stay fixed at their current input values. Each active
     variable uses lower_value / upper_value and optionally initial_value.
 
-    A callback receives independent copies of the progress data, including the
-    full config and turbine_results. It runs once at the initial point and at
-    distinct PySolverView progress points. The default update_on='gradient'
-    avoids sending finite-difference evaluations to plotting or app code.
-    An optional logger receives initial-value clipping and native PSV output;
-    console output is disabled for that solve when a logger is supplied.
+    Callbacks receive copies of accepted physical designs, recovery counts,
+    and solver-scaled step and KKT diagnostics.
+    Only explicitly identified ModelDomainError failures are recoverable; the
+    solver retries their actual trial steps without inventing model values.
+    The optional logger receives one convergence report and recovery diagnostics.
     """
     problem = TurbineOptimizationProblem(config, optimization, evaluator, logger=logger)
-    options = {
-        "library": "scipy", "method": "slsqp", "problem_scale": 1.0,
-        "tolerance": 1e-9, "max_iterations": 150,
-        "derivative_method": "2-point", "derivative_abs_step": 1e-6,
-        "print_convergence": True, "plot_convergence": False,
-        "plot_scale_constraints": "log", "update_on": "gradient",
-        "tolerance_check_cache": 0.0,
-    }
     configured_options = problem.optimization.get("solver_options") or {}
-    if not isinstance(configured_options, dict):
-        raise ValueError("solver_options must be a dictionary.")
-    if "callback_functions" in configured_options:
-        raise ValueError("Pass application callbacks through optimize_turbine(callback=...).")
-    options.update(configured_options)
-    if logger is not None:
-        options.update(logger=logger, print_convergence=False)
+    options = normalize_solver_options(configured_options, feasibility_tolerance=problem.feasibility_tolerance)
+    if logger is None and configured_options.get("print_convergence", True):
+        logger = logging.Logger("turbodash.slsqp", logging.INFO)
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+        logger.addHandler(handler)
 
     initial = problem.evaluate(problem.x0)
     history = []
-    previous_values = None
+    previous_solver_point = None
 
-    def report_progress(physical_values):
-        nonlocal previous_values
+    def report_progress(physical_values, solver_record):
+        nonlocal previous_solver_point
         values = np.asarray(physical_values, dtype=float)
-        # PSV may report the initial/final point twice. Filter roundoff-level
-        # repeats while retaining genuine changes in the design.
-        if previous_values is not None and np.all(
-            np.abs(values - previous_values) <= 8 * np.finfo(float).eps * problem.bound_range
+        solver_point = np.asarray(solver_record["x"], dtype=float)
+        # Preserve each distinct accepted solver point. Even adjacent normalized
+        # floats can round to the same physical values during the affine map.
+        # Merging those rows would attach a later step/KKT assessment to an older
+        # iteration. Only the exact final-point refresh is a duplicate.
+        if previous_solver_point is not None and np.array_equal(
+            solver_point, previous_solver_point
         ):
+            if solver_record.get("diagnostics_available"):
+                history[-1].update(solver_diagnostics(solver_record))
             return
         evaluation = problem.evaluate(values)
         entry = {
-            "iteration": len(history),
+            "iteration": solver_record["iteration"],
             "objective": evaluation["objective"],
             "max_constraint_violation": evaluation["max_constraint_violation"],
             "design_variables": dict(evaluation["design_variables"]),
+            "domain_rejections": solver_record.get("domain_rejections", 0),
+            "derivative_rejections": solver_record.get("derivative_rejections", 0),
+            **solver_diagnostics(solver_record),
         }
         history.append(entry)
-        previous_values = values.copy()
+        previous_solver_point = solver_point.copy()
         if callback is not None:
             state = deepcopy(entry)
             state["config"] = deepcopy(evaluation["config"])
             state["turbine_results"] = deepcopy(evaluation["turbine_results"])
             callback(state)
 
-    def solver_callback(normalized_values, update_number):
-        # Finite differences can leave the problem at a perturbed point.
-        # Retrieve this callback's exact design rather than that last probe.
-        physical_values = problem.scale_normalized_to_physical(normalized_values)
-        report_progress(physical_values)
+    def solver_callback(record):
+        report_progress(problem.scale_normalized_to_physical(record["x"]), record)
 
-    solver = psv.OptimizationSolver(problem, callback_functions=[solver_callback], **options)
-    report_progress(problem.x0)
-    physical_final_values = solver.solve(problem.x0)
-    final = problem.evaluate(physical_final_values)
-    report_progress(physical_final_values)
+    solver = minimize_slsqp(
+        problem.evaluate_slsqp, problem.scale_physical_to_normalized(problem.x0),
+        np.column_stack((np.zeros(len(problem.x0)), np.ones(len(problem.x0)))),
+        options=options, callback=solver_callback, logger=logger,
+    )
+    physical_final_values = problem.scale_normalized_to_physical(solver.x)
+    # Reevaluate the returned design, independent of derivative-probe caches.
+    final = problem.evaluate(physical_final_values, refresh=True)
+    report_progress(physical_final_values, dict(x=solver.x, iteration=solver.nit,
+                    domain_rejections=solver.domain_rejections,
+                    derivative_rejections=solver.derivative_rejections,
+                    **solver_diagnostics(solver)))
+    solver.x_final = physical_final_values.copy()
+    solver.library, solver.method = "scipy", "slsqp"
+    solver.convergence_history = {
+        "iteration": [entry["iteration"] for entry in solver.history],
+        "objective_value": [entry["objective"] for entry in solver.history],
+        "constraint_violation": [entry["max_constraint_violation"] for entry in solver.history],
+    }
+    diagnostic_history = [solver_diagnostics(entry) for entry in solver.history]
+    for name in (*_SOLVER_DIAGNOSTIC_FIELDS, "diagnostics_available"):
+        solver.convergence_history[name] = [entry[name] for entry in diagnostic_history]
 
     # A saved optimized case should use its final inputs as the next baseline.
     # Preserve the original overrides in source_config and initial_config.
     final_config = deepcopy(final["config"])
+    final_config["optimization"]["solver_options"] = {key: value for key, value in options.items() if key != "feasibility_tol"}
     for variable in final_config["optimization"]["design_variables"].values():
         variable.pop("initial_value", None)
 
     feasible = final["max_constraint_violation"] <= problem.feasibility_tolerance
-    solver_success = bool(solver.success)
+    solver_success = bool(solver.solver_success)
     message = str(solver.message)
     if not feasible:
         message += (
             f" Maximum normalized constraint violation {final['max_constraint_violation']:.3g}"
             f" exceeds {problem.feasibility_tolerance:.3g}."
         )
-    return OptimizationResult(
+    result = OptimizationResult(
         config=final_config, turbine_results=final["turbine_results"],
         geometry=[stage["geometry_meanline"] for stage in final["turbine_results"]["stages_performance"]],
         design_variables=final["design_variables"], objective=final["objective"],
         initial_objective=initial["objective"], constraint_report=final["constraint_report"],
-        success=solver_success and feasible, solver_success=solver_success, feasible=bool(feasible),
+        success=bool(solver.success and feasible), solver_success=solver_success, feasible=bool(feasible),
         message=message, max_constraint_violation=final["max_constraint_violation"],
         history=history, solver=solver, n_evaluations=problem.n_evaluations,
         initial_turbine_results=initial["turbine_results"], initial_config=initial["config"],
         source_config=problem.source_config,
     )
+    if configured_options.get("plot_convergence", False):
+        plot_convergence(result, show=True)
+    return result
 
 
 # =============================================================================
@@ -543,9 +608,18 @@ def plot_turbine(turbine_results, title=None, figure=None):
 
 
 def plot_convergence(result, show=False):
-    """Use PySolverView's native objective and constraint convergence figure."""
-    figure = result.solver.plot_convergence_history(showfig=show)
-    figure.axes[0].set_ylabel("Minimized objective (signed and normalized)")
+    """Plot accepted physical objectives and normalized constraint violations."""
+    figure, axes = plt.subplots(2, 1, sharex=True, figsize=(7, 6), layout="constrained")
+    iterations = [entry["iteration"] for entry in result.history]
+    axes[0].plot(iterations, [entry["objective"] for entry in result.history], color="#1675d1")
+    axes[0].set_ylabel("Physical objective")
+    axes[1].semilogy(iterations, [max(entry["max_constraint_violation"], 1e-16) for entry in result.history], color="#ef8c35")
+    axes[1].set_ylabel("Normalized constraint violation")
+    axes[1].set_xlabel("Accepted iteration")
+    for axis in axes:
+        axis.grid(alpha=.2)
+    if show:
+        plt.show(block=False)
     return figure
 
 
@@ -625,7 +699,7 @@ def save_optimization_results(result, output_directory):
                 "input_case": "input_case.yaml",
                 "effective_initial_case": "initial_case.yaml",
                 "optimized_case": "optimized_case.yaml",
-                "solver": "pysolver_view.OptimizationSolver",
+                "solver": "turbodash.optimization.slsqp.minimize_slsqp",
                 "library": result.solver.library, "method": result.solver.method,
             },
             "success": result.success, "solver_success": result.solver_success,
@@ -638,6 +712,11 @@ def save_optimization_results(result, output_directory):
             "solver_elapsed_seconds": result.solver.elapsed_time,
             "progress_history": result.history,
             "solver_convergence_history": result.solver.convergence_history,
+            "solver_status": result.solver.status,
+            **solver_diagnostics(result.solver),
+            "domain_rejections": result.solver.domain_rejections,
+            "derivative_rejections": result.solver.derivative_rejections,
+            "recovery_events": result.solver.events,
             "turbine_results": result.turbine_results,
         },
     }

@@ -41,7 +41,10 @@ def test_export_restores_browser_float_types_without_changing_counts_or_source()
         }],
         "optimization": {
             "constraints": [{"variable": "$angle", "value": 10, "normalize": 10}],
-            "solver_options": {"max_iterations": 150, "plot_convergence": False},
+            "solver_options": {"max_iterations": 150, "plot_convergence": False,
+                               "first_step_fraction": 1, "max_step_fraction": 1,
+                               "step_growth_factor": 1,
+                               "max_backtracks": 20, "domain_backtracking": True},
         },
     }
     original = deepcopy(document)
@@ -59,5 +62,10 @@ def test_export_restores_browser_float_types_without_changing_counts_or_source()
     options = restored["optimization"]["solver_options"]
     assert type(options["max_iterations"]) is int
     assert options["plot_convergence"] is False
+    assert type(options["first_step_fraction"]) is float
+    assert type(options["max_step_fraction"]) is float
+    assert type(options["step_growth_factor"]) is float
+    assert type(options["max_backtracks"]) is int
+    assert options["domain_backtracking"] is True
     # The custom formatting does not affect unrelated PyYAML users.
     assert yaml.safe_dump({"quantity": 1.1}) == "quantity: 1.1\n"

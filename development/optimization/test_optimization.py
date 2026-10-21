@@ -9,6 +9,7 @@ from unittest.mock import patch
 from uuid import uuid4
 
 import numpy as np
+from scipy.optimize import OptimizeResult
 import yaml
 
 from turbodash.optimization import turbine as opt
@@ -55,12 +56,14 @@ def synthetic_problem():
     return config, optimization
 
 
-def pretend_solver_success(solver, initial):
+def pretend_solver_success(evaluate, initial, bounds, **kwargs):
     """Return the initial point to check feasibility independently of the solver."""
-    solver.x_final = np.array(initial, dtype=float)
-    solver.success = True
-    solver.message = "Synthetic solver success"
-    return solver.x_final
+    return OptimizeResult(
+        x=np.array(initial, dtype=float), success=True, solver_success=True,
+        feasible=True, nit=1, message="Synthetic solver success", status=0,
+        domain_rejections=0, derivative_rejections=0, history=[], events=[],
+        optimality=0.0, elapsed_time=0.0,
+    )
 
 
 class OptimizationContractTests(unittest.TestCase):
@@ -80,7 +83,7 @@ class OptimizationContractTests(unittest.TestCase):
         self.assertTrue(result.success, result.message)
         self.assertTrue(result.solver_success)
         self.assertTrue(result.feasible)
-        self.assertIsInstance(result.solver, opt.psv.OptimizationSolver)
+        self.assertIsInstance(result.solver, OptimizeResult)
         self.assertAlmostEqual(result.initial_objective, 0.75)
         self.assertAlmostEqual(result.objective, 1.6, places=6)
         final = result.config["inputs"]["design"]
@@ -224,7 +227,7 @@ class OptimizationContractTests(unittest.TestCase):
 
     def test_solver_success_is_checked_against_independent_feasibility(self):
         config, optimization = synthetic_problem()
-        with patch.object(opt.psv.OptimizationSolver, "solve", new=pretend_solver_success):
+        with patch.object(opt, "minimize_slsqp", new=pretend_solver_success):
             result = opt.optimize_turbine(config, optimization, evaluator=synthetic_turbine)
         self.assertTrue(result.solver_success)
         self.assertFalse(result.feasible)
@@ -234,15 +237,15 @@ class OptimizationContractTests(unittest.TestCase):
     def test_final_geometry_uses_solver_solution_after_other_trial_evaluations(self):
         config, optimization = synthetic_problem()
 
-        def solve_with_perturbed_last_evaluation(solver, initial):
-            solver.x_final = np.array([12.4, 180.0])
-            solver.problem.fitness(solver.x_final)
-            solver.problem.fitness(np.array([12.41, 181.0]))
-            solver.success = True
-            solver.message = "Accepted solution followed by a diagnostic trial"
-            return solver.x_final
+        def solve_with_perturbed_last_evaluation(evaluate, initial, bounds, **kwargs):
+            final = np.array([.6, .4])  # Physical [12.4, 180] in normalized bounds.
+            evaluate(final)
+            evaluate(np.array([.6025, .405]))  # Physical [12.41, 181].
+            result = pretend_solver_success(evaluate, final, bounds, **kwargs)
+            result.message = "Accepted solution followed by a diagnostic trial"
+            return result
 
-        with patch.object(opt.psv.OptimizationSolver, "solve", new=solve_with_perturbed_last_evaluation):
+        with patch.object(opt, "minimize_slsqp", new=solve_with_perturbed_last_evaluation):
             result = opt.optimize_turbine(config, optimization, evaluator=synthetic_turbine)
         self.assertTrue(result.success, result.message)
         self.assertEqual(result.config["inputs"]["design"], {"x": 12.4, "y": 180.0})
@@ -274,18 +277,18 @@ class OptimizationContractTests(unittest.TestCase):
             entry["config"]["inputs"]["design"]["x"] = -1000.0
             entry["turbine_results"]["inputs"]["design"]["x"] = -1000.0
 
-        def repeat_same_point(solver, initial):
-            solver.problem.fitness(initial)
-            solver.problem.fitness(initial.copy())
-            normalized = solver.problem.scale_physical_to_normalized(initial)
-            for notify in solver.callback_functions:
-                notify(normalized, 1)
-            return pretend_solver_success(solver, initial)
+        def repeat_same_point(evaluate, initial, bounds, **kwargs):
+            evaluate(initial)
+            evaluate(initial.copy())
+            kwargs["callback"](dict(x=initial.copy(), iteration=0))
+            return pretend_solver_success(evaluate, initial, bounds, **kwargs)
 
-        with patch.object(opt.psv.OptimizationSolver, "solve", new=repeat_same_point):
+        with patch.object(opt, "minimize_slsqp", new=repeat_same_point):
             result = opt.optimize_turbine(config, optimization, evaluator=evaluator, callback=callback)
-        self.assertEqual(len(calls), 1)
-        self.assertEqual(result.n_evaluations, 1)
+        # Repeated solver requests share the initial evaluation. The returned
+        # design is independently reevaluated once before it can be applied.
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(result.n_evaluations, 2)
         self.assertTrue(progress)
         self.assertEqual(result.history[0]["objective"], 0.75)
         self.assertEqual(result.history[0]["design_variables"]["design.x"], 11.0)
@@ -411,7 +414,7 @@ class RealTurbineOptimizationTests(unittest.TestCase):
                 result = opt.optimize_turbine(config, callback=progress.append)
                 self.assertTrue(result.success, result.message)
                 self.assertTrue(result.feasible)
-                self.assertIsInstance(result.solver, opt.psv.OptimizationSolver)
+                self.assertIsInstance(result.solver, OptimizeResult)
                 effective_initial = compute_turbine_performance(result.initial_config)
                 self.assertAlmostEqual(
                     result.initial_objective,

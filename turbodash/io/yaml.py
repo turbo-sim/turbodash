@@ -30,6 +30,8 @@ def _typed_values(value, continuous=False):
                 "inputs", "overall_performance", "stages_performance",
                 "lower_value", "upper_value", "initial_value", "normalize",
                 "tolerance", "feasibility_tolerance",
+                "ftol", "finite_diff_step", "first_step_fraction",
+                "max_step_fraction", "step_growth_factor", "backtrack_factor", "optimality_tol",
             }
             if key == "value" and "variable" in value:
                 is_continuous = True  # Constraint target.

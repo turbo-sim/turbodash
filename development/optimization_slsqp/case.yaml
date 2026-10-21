@@ -1,0 +1,138 @@
+# Standalone SLSQP experiment: original 14-variable flaring-constrained case.
+# Inputs, objective, constraints and design-variable bounds are unchanged.
+# Solver coordinates are normalized to [0, 1] for every design variable.
+inputs:
+  loss_model: benner
+  fluid_name: Air
+  turbine_type: axial
+  inlet_property_pair: PT_INPUTS
+  inlet_property_1: 500000
+  inlet_property_2: 600
+  exit_pressure: 100000
+  mass_flow_rate: 10
+  inlet_flow_angle: 0
+  blade_velocity_ratio: 0.6648003434125482
+  rotational_speed:
+    type: specific
+    value: 0.8307349377648807
+  stages:
+  - name: stage_1
+    work_fraction_split: 1
+    stator_exit_angle: 67.97531033389964
+    degree_reaction: 0.38681106200345594
+    meridional_velocity_ratio_12: 0.989911047755311
+    meridional_velocity_ratio_23: 1.4999999999999991
+    meridional_velocity_ratio_34: 1.4999999999999982
+    radius_ratio_01: 1
+    radius_ratio_12: 1
+    radius_ratio_23: 1
+    radius_ratio_34: 1
+    blade_geometry:
+      stator:
+        solidity_chord: 1.3276779400383214
+        aspect_ratio: 4
+        maximum_thickness_to_chord: 0.3
+        maximum_thickness_location: 0.3
+        leading_edge_radius_to_max_thickness: 0.5
+        trailing_edge_thickness_to_opening: 0.02
+        trailing_edge_wedge_angle: 5
+        leading_edge_wedge_angle: 30
+      rotor:
+        solidity_chord: 1.804154586563821
+        aspect_ratio: 4
+        maximum_thickness_to_chord: 0.15000000000000505
+        maximum_thickness_location: 0.3
+        leading_edge_radius_to_max_thickness: 0.5
+        trailing_edge_thickness_to_opening: 0.02
+        trailing_edge_wedge_angle: 5
+        leading_edge_wedge_angle: 30
+optimization:
+  design_variables:
+    rotational_speed:
+      lower_value: 0.2
+      upper_value: 1.5
+      initial_value: null
+    blade_velocity_ratio:
+      lower_value: 0.25
+      upper_value: 1.0
+      initial_value: null
+    stages.0.blade_geometry.stator.solidity_chord:
+      lower_value: 0.5
+      upper_value: 2.0
+      initial_value: null
+    stages.0.blade_geometry.stator.trailing_edge_thickness_to_opening:
+      lower_value: 0.02
+      upper_value: 0.1
+      initial_value: null
+    stages.0.blade_geometry.stator.aspect_ratio:
+      lower_value: 1.0
+      upper_value: 4.0
+      initial_value: null
+    stages.0.blade_geometry.rotor.solidity_chord:
+      lower_value: 0.5
+      upper_value: 2.0
+      initial_value: null
+    stages.0.blade_geometry.rotor.trailing_edge_thickness_to_opening:
+      lower_value: 0.02
+      upper_value: 0.1
+      initial_value: null
+    stages.0.blade_geometry.rotor.maximum_thickness_to_chord:
+      lower_value: 0.15
+      upper_value: 0.35
+      initial_value: null
+    stages.0.blade_geometry.rotor.aspect_ratio:
+      lower_value: 1.0
+      upper_value: 4.0
+      initial_value: null
+    stages.0.meridional_velocity_ratio_12:
+      lower_value: 0.5
+      upper_value: 1.5
+      initial_value: null
+    stages.0.meridional_velocity_ratio_23:
+      lower_value: 0.5
+      upper_value: 1.5
+      initial_value: null
+    stages.0.meridional_velocity_ratio_34:
+      lower_value: 0.5
+      upper_value: 1.5
+      initial_value: null
+    stages.0.degree_reaction:
+      lower_value: 0.0
+      upper_value: 0.75
+      initial_value: null
+    stages.0.stator_exit_angle:
+      lower_value: 50.0
+      upper_value: 80.0
+      initial_value: null
+  constraints:
+  - variable: $stages_performance.*.geometry_meanline.*.flaring_angle
+    type: '>='
+    value: -10.0
+    normalize: 10.0
+  - variable: $stages_performance.*.geometry_meanline.*.flaring_angle
+    type: <=
+    value: 10.0
+    normalize: 10.0
+  objective_function:
+    variable: $overall_performance.efficiency_ts
+    type: maximize
+    normalize: 1
+  feasibility_tolerance: 1.0e-06
+  solver_options:
+    ftol: 1.0e-08
+    maxiter: 150
+    finite_diff_step: 1.0e-06
+    # Applied to the first QP direction only; 1.0 preserves the full trial.
+    first_step_fraction: 1.0
+    # Applied to every QP direction, independently of the first-step cap.
+    max_step_fraction: 1.0
+    # Preserve this original comparison case's immediate step restoration.
+    step_growth_factor: null
+    # Reject known physical-domain failures and retry the same line at half step.
+    domain_backtracking: true
+    backtrack_factor: 0.5
+    max_backtracks: 20
+    max_fd_backtracks: 12
+    feasibility_tol: 1.0e-06
+    # Independent final Lagrangian-gradient check in normalized coordinates.
+    optimality_tol: 1.0e-04

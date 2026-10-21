@@ -28,7 +28,6 @@ CASE_FILES = ("case_axial.yaml",)  # Use case_radial.yaml, or include both files
 OUTPUT_DIRECTORY = Path(__file__).resolve().parent / "output"
 SHOW_PLOTS = True
 PLOT_TURBINE_EACH_ITERATION = False
-PLOT_CONVERGENCE_LIVE = True
 
 
 def main():
@@ -38,9 +37,6 @@ def main():
     for case_file in CASE_FILES:
         case_path = example_directory / case_file
         case = load_case(case_path)
-        case["optimization"].setdefault("solver_options", {})["plot_convergence"] = (
-            PLOT_CONVERGENCE_LIVE and SHOW_PLOTS
-        )
         output_directory = OUTPUT_DIRECTORY / case_path.stem.removeprefix("case_")
 
         turbine_callback = TurbinePlotCallback(

@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
 
   test_ubuntu:
@@ -15,17 +18,17 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v6
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v6
       with:
         python-version: '3.12'
 
     - name: Install Poetry
       uses: abatilo/actions-poetry@v3
       with:
-        poetry-version: "1.8.2"
+        poetry-version: "2.1.2"
     
     - name: Install dependencies
       run: poetry install
@@ -39,17 +42,17 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
       - name: Install Poetry
         uses: abatilo/actions-poetry@v3
         with:
-          poetry-version: "1.8.2"
+          poetry-version: "2.1.2"
 
       - name: Install dependencies
         run: poetry install
@@ -57,32 +60,50 @@ jobs:
       # - name: Run tests
       #   run: poetry run pytest
 
-  publish_to_pypi:
+  build:
 
     needs: [test_ubuntu, test_windows]
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v6
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v6
       with:
         python-version: '3.12'
 
     - name: Install Poetry
       uses: abatilo/actions-poetry@v3
       with:
-        poetry-version: "1.8.2"
+        poetry-version: "2.1.2"
 
-    - name: Install dependencies
-      run: poetry install --only=main
+    - name: Build distributions
+      run: poetry build --no-interaction
 
-    - name: Build and publish to PyPI
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        poetry build
-        poetry publish --username $TWINE_USERNAME --password $TWINE_PASSWORD
+    - name: Upload distributions
+      uses: actions/upload-artifact@v7
+      with:
+        name: python-distributions
+        path: dist/
+        if-no-files-found: error
+
+  publish_to_pypi:
+    needs: build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/turbodash-core
+    permissions:
+      id-token: write
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v8
+        with:
+          name: python-distributions
+          path: dist/
+
+      - name: Publish to PyPI with Trusted Publishing
+        uses: pypa/gh-action-pypi-publish@release/v1

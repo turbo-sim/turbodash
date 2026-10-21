@@ -1,0 +1,44 @@
+/* TurboDash optimization workbench tokens, reviewed 2026-10-21.
+   Portable reference extracted from production workbench.css.
+   .td-blueprint is the documentation scope; production uses .td-workbench.
+   Component rules and responsive dimensions are documented separately. */
+.td-blueprint {
+  --td-canvas: #eff3f8;
+  --td-panel: #ffffff;
+  --td-inspector: #f8fafd;
+  --td-input: #ffffff;
+  --td-ink: #18314d;
+  --td-muted: #62758b;
+  --td-line: #d9e2ee;
+  --td-accent: #2462d1;
+  --td-tint: #eaf1fc;
+  --td-grid: #e6edf6;
+  --td-danger: #b33946;
+  --td-warning: #92601d;
+  --td-success: #237548;
+  --td-shadow: 0 12px 40px #18314d15;
+  color-scheme: light;
+}
+.td-blueprint:not([data-theme="dark"]) {
+  --td-disclosure-line: #c7d8ef;
+  --td-disclosure-open: #dce9fc;
+  --td-disclosure-hover: #e2edfc;
+  --td-disclosure-nested: #f3f7fd;
+}
+.td-blueprint[data-theme="dark"] {
+  --td-canvas: #111922;
+  --td-panel: #19242f;
+  --td-inspector: #17222e;
+  --td-input: #111d29;
+  --td-ink: #e7eff9;
+  --td-muted: #adbdce;
+  --td-line: #344558;
+  --td-accent: #88b7ff;
+  --td-tint: #253950;
+  --td-grid: #2b3b4d;
+  --td-danger: #ff9ca6;
+  --td-warning: #e5b575;
+  --td-success: #85d6a4;
+  --td-shadow: 0 12px 40px #00000030;
+  color-scheme: dark;
+}

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="The current TurboDash workbench design: Blueprint light, Graphite dark, components, identity, and source references.">
+  <title>TurboDash design blueprint</title>
+  <link rel="stylesheet" href="assets/tokens.css">
+  <link rel="stylesheet" href="assets/guide.css">
+  <script src="assets/guide.js" defer></script>
+</head>
+<body class="td-blueprint">
+  <a class="skip-link" href="#main">Skip to design guide</a>
+  <header class="guide-header">
+    <a class="brand" href="#main" aria-label="TurboDash design blueprint, beginning of guide">
+      <img class="logo-light" src="assets/blade-ring-light.svg" width="37" height="37" alt="">
+      <img class="logo-dark" src="assets/blade-ring-dark.svg" width="37" height="37" alt="">
+      <span>turbodash</span>
+    </a>
+    <span class="header-caption">Design blueprint</span>
+    <fieldset class="theme-control">
+      <legend class="visually-hidden">Guide color scheme</legend>
+      <label><input type="radio" name="guide-theme" value="light"><span>Light</span></label>
+      <label><input type="radio" name="guide-theme" value="dark"><span>Dark</span></label>
+    </fieldset>
+  </header>
+  <main id="main" tabindex="-1">
+    <section class="intro" aria-labelledby="guide-title">
+      <p class="eyebrow">Optimization workbench · Current design reference</p>
+      <h1 id="guide-title">TurboDash workbench<br>design blueprint.</h1>
+      <p class="lead">Blueprint light and Graphite dark share one structure: a compact parameter inspector, clear workspaces, and generous room for geometry and results. This is the visual companion to the reproducible design specification.</p>
+      <p class="documentation-note"><strong>Documentation specimens.</strong> Controls below demonstrate appearance and interaction only. They do not calculate, optimize, or alter an application design.</p>
+      <nav class="contents" aria-label="Guide sections">
+        <a href="#palette">01 Palette</a><a href="#type">02 Typography</a><a href="#identity">03 Identity</a><a href="#anatomy">04 Layout</a><a href="#components">05 Components</a><a href="#captures">06 App captures</a>
+      </nav>
+    </section>
+
+    <section id="palette" class="guide-section" aria-labelledby="palette-title">
+      <div class="section-heading"><p class="eyebrow">01 / Color roles</p><h2 id="palette-title">Two themes. The same hierarchy.</h2><p>Use colors by role. Panels stay distinct from the canvas; blue identifies selection and action. Red, amber, and green describe outcomes alongside readable text.</p></div>
+      <div class="theme-columns">
+        <article class="surface palette-panel"><h3>Blueprint light</h3><p class="small">Pale inspector, white inputs, blue disclosure headers.</p>
+          <dl class="swatches">
+            <div><dt><i style="--swatch:#eff3f8"></i>Canvas</dt><dd>#EFF3F8</dd></div>
+            <div><dt><i style="--swatch:#ffffff"></i>Panel / input</dt><dd>#FFFFFF</dd></div>
+            <div><dt><i style="--swatch:#f8fafd"></i>Inspector</dt><dd>#F8FAFD</dd></div>
+            <div><dt><i style="--swatch:#18314d"></i>Ink</dt><dd>#18314D</dd></div>
+            <div><dt><i style="--swatch:#62758b"></i>Muted text</dt><dd>#62758B</dd></div>
+            <div><dt><i style="--swatch:#d9e2ee"></i>Line</dt><dd>#D9E2EE</dd></div>
+            <div><dt><i style="--swatch:#2462d1"></i>Accent</dt><dd>#2462D1</dd></div>
+            <div><dt><i style="--swatch:#eaf1fc"></i>Tint</dt><dd>#EAF1FC</dd></div>
+            <div><dt><i style="--swatch:#e6edf6"></i>Plot grid</dt><dd>#E6EDF6</dd></div>
+            <div><dt><i style="--swatch:#b33946"></i>Danger</dt><dd>#B33946</dd></div>
+            <div><dt><i style="--swatch:#92601d"></i>Warning</dt><dd>#92601D</dd></div>
+            <div><dt><i style="--swatch:#237548"></i>Success</dt><dd>#237548</dd></div>
+          </dl>
+        </article>
+        <article class="surface palette-panel"><h3>Graphite dark</h3><p class="small">Graphite surfaces, soft ink, restrained blue accents.</p>
+          <dl class="swatches">
+            <div><dt><i style="--swatch:#111922"></i>Canvas</dt><dd>#111922</dd></div>
+            <div><dt><i style="--swatch:#19242f"></i>Panel</dt><dd>#19242F</dd></div>
+            <div><dt><i style="--swatch:#17222e"></i>Inspector</dt><dd>#17222E</dd></div>
+            <div><dt><i style="--swatch:#111d29"></i>Input</dt><dd>#111D29</dd></div>
+            <div><dt><i style="--swatch:#e7eff9"></i>Ink</dt><dd>#E7EFF9</dd></div>
+            <div><dt><i style="--swatch:#adbdce"></i>Muted text</dt><dd>#ADBDCE</dd></div>
+            <div><dt><i style="--swatch:#344558"></i>Line</dt><dd>#344558</dd></div>
+            <div><dt><i style="--swatch:#88b7ff"></i>Accent</dt><dd>#88B7FF</dd></div>
+            <div><dt><i style="--swatch:#253950"></i>Tint</dt><dd>#253950</dd></div>
+            <div><dt><i style="--swatch:#2b3b4d"></i>Plot grid</dt><dd>#2B3B4D</dd></div>
+            <div><dt><i style="--swatch:#ff9ca6"></i>Danger</dt><dd>#FF9CA6</dd></div>
+            <div><dt><i style="--swatch:#e5b575"></i>Warning</dt><dd>#E5B575</dd></div>
+            <div><dt><i style="--swatch:#85d6a4"></i>Success</dt><dd>#85D6A4</dd></div>
+          </dl>
+        </article>
+      </div>
+      <p class="source-note">Light disclosure additions: line <code>#C7D8EF</code>, open <code>#DCE9FC</code>, hover <code>#E2EDFC</code>, nested <code>#F3F7FD</code>. Exact portable variables: <a href="assets/tokens.css">tokens.css</a>. See <a href="visual-style.md">visual-style.md</a> for dimensions and chart colors.</p>
+    </section>
+
+    <section id="type" class="guide-section" aria-labelledby="type-title">
+      <div class="section-heading"><p class="eyebrow">02 / Typography</p><h2 id="type-title">Technical clarity, without decoration.</h2><p>Use the system sans-serif stack led by Segoe UI. Labels stay compact, numbers align, and units remain attached to their quantities.</p></div>
+      <div class="specimen-grid">
+        <article class="surface type-sample"><h3 class="sample-heading">Meanline</h3><p class="small">View heading · tight tracking · theme ink</p><hr><p class="sample-label">Shaft speed</p><p class="small">Compact field label · clear units and context</p><hr><p class="sample-number">1,234.500 <span>rpm</span></p><p class="small">Formatting specimen only · tabular numerals</p></article>
+        <article class="surface"><h3>Spacing carries the hierarchy</h3><p>Short labels and quiet borders group controls. A bold section title and numbered badge orient the reader without repeated banners or oversized cards.</p><p class="terminal-sample"><span>Documentation sample</span><br>state: ready<br>workspace: meanline<br>calculation: not running</p><p class="small">Monospaced text is reserved for technical output and source-like content.</p></article>
+      </div>
+    </section>
+
+    <section id="identity" class="guide-section" aria-labelledby="identity-title">
+      <div class="section-heading"><p class="eyebrow">03 / Identity and symbols</p><h2 id="identity-title">A compact mark. A live wordmark.</h2><p>The approved blade ring uses three swept blades, a circular casing, and one blue accent. The wordmark stays lowercase text. Geometry and reconstruction instructions are in <a href="iconography.md">iconography.md</a>.</p></div>
+      <div class="theme-columns brand-surfaces">
+        <article class="brand-surface light-surface"><p class="surface-label">Light surface</p><div class="brand-lockup"><img src="assets/blade-ring-light.svg" width="37" height="37" alt="Light-surface blade ring"><span>turbodash</span></div><div class="brand-sizes">
+          <figure><img src="assets/blade-ring-light.svg" width="16" height="16" alt=""><figcaption>16 px</figcaption></figure><figure><img src="assets/blade-ring-light.svg" width="24" height="24" alt=""><figcaption>24 px</figcaption></figure><figure><img src="assets/blade-ring-light.svg" width="32" height="32" alt=""><figcaption>32 px</figcaption></figure><figure><img src="assets/blade-ring-light.svg" width="37" height="37" alt=""><figcaption>37 px</figcaption></figure><figure><img src="assets/blade-ring-light.svg" width="48" height="48" alt=""><figcaption>48 px</figcaption></figure>
+        </div><p class="brand-colors">Primary #173357 · Accent #2462D1</p></article>
+        <article class="brand-surface dark-surface"><p class="surface-label">Dark surface</p><div class="brand-lockup"><img src="assets/blade-ring-dark.svg" width="37" height="37" alt="Dark-surface blade ring"><span>turbodash</span></div><div class="brand-sizes">
+          <figure><img src="assets/blade-ring-dark.svg" width="16" height="16" alt=""><figcaption>16 px</figcaption></figure><figure><img src="assets/blade-ring-dark.svg" width="24" height="24" alt=""><figcaption>24 px</figcaption></figure><figure><img src="assets/blade-ring-dark.svg" width="32" height="32" alt=""><figcaption>32 px</figcaption></figure><figure><img src="assets/blade-ring-dark.svg" width="37" height="37" alt=""><figcaption>37 px</figcaption></figure><figure><img src="assets/blade-ring-dark.svg" width="48" height="48" alt=""><figcaption>48 px</figcaption></figure>
+        </div><p class="brand-colors">Primary #E7EFF9 · Accent #81B3FF</p></article>
+      </div>
+      <p class="source-note">The dark logo accent is <code>#81B3FF</code>; the dark interface accent is <code>#88B7FF</code>. Header logos follow the app theme. Favicons follow the browser's preferred color scheme. Keep those behaviors distinct.</p>
+      <h3 class="subheading">Functional symbols are Unicode</h3>
+      <div class="icon-inventory">
+        <div><span aria-hidden="true">◉</span><strong>Meanline</strong><code>U+25C9</code></div><div><span aria-hidden="true">◇</span><strong>Geometry</strong><code>U+25C7</code></div><div><span aria-hidden="true">▦</span><strong>Mesh</strong><code>U+25A6</code></div><div><span aria-hidden="true">↥</span><strong>Load YAML</strong><code>U+21A5</code></div><div><span aria-hidden="true">↧</span><strong>Save design</strong><code>U+21A7</code></div><div><span aria-hidden="true">↗</span><strong>External link</strong><code>U+2197</code></div><div><span aria-hidden="true">− +</span><strong>Stage count</strong><code>U+2212 / 002B</code></div><div><span aria-hidden="true">×</span><strong>Remove row</strong><code>U+00D7</code></div><div><span aria-hidden="true">?</span><strong>Help</strong><code>U+003F</code></div><div><span aria-hidden="true">›</span><strong>Disclosure</strong><code>U+203A</code></div><div><span aria-hidden="true">≤ = ≥</span><strong>Comparison</strong><code>U+2264 / 003D / 2265</code></div>
+      </div>
+      <p class="source-note">Rail glyphs are 20 px with text labels; action glyphs accompany labels. Help and status circles are CSS shapes. No icon font or external SVG library is needed. System fonts can render the glyphs differently across platforms.</p>
+    </section>
+
+    <section id="anatomy" class="guide-section" aria-labelledby="anatomy-title">
+      <div class="section-heading"><p class="eyebrow">04 / Workbench anatomy</p><h2 id="anatomy-title">Persistent context, progressive detail.</h2><p>Separate workspace navigation from parameter editing and results. Keep design values mounted when sections close or the stage changes. Full behavior is recorded in <a href="components-and-layout.md">components-and-layout.md</a>.</p></div>
+      <figure class="shell-figure">
+        <div class="shell-diagram">
+          <div class="diagram-header"><strong>turbodash</strong><span>Load / Save · Project links · Theme</span></div>
+          <div class="diagram-rail"><span><b aria-hidden="true">◉</b>Meanline</span><span><b aria-hidden="true">◇</b>Geometry</span><span><b aria-hidden="true">▦</b>Mesh</span></div>
+          <div class="diagram-inspector"><strong>Parameter inspector</strong><span>Search</span><span>01 Turbine setup</span><span>02 Fluid state</span><span>03 Shaft speed</span><span>04 Stage design</span><span>05 Optimization</span><small>Sticky context<br>Independent scroll<br>Resize handle</small></div>
+          <div class="diagram-canvas"><strong>Results canvas</strong><p>Context and current state</p><div class="diagram-metrics"><span>Overview</span><span>Metrics</span></div><div class="diagram-plot">Geometry / plot pair</div><span class="diagram-report">Collapsible reports and technical output</span></div>
+        </div>
+        <figcaption>Anatomy schematic, not a running app. Desktop defaults: header 72 px, rail 92 px, inspector 348 px. The actual inspector becomes a Parameters drawer at ≤850 px; this schematic stacks its labeled regions on small screens.</figcaption>
+      </figure>
+    </section>
+
+    <section id="components" class="guide-section" aria-labelledby="components-title">
+      <div class="section-heading"><p class="eyebrow">05 / Interactive specimens</p><h2 id="components-title">Compact controls, explicit meaning.</h2><p>Try the native disclosures, radio groups, and checkbox tree below. Changes stay in these documentation samples. Theme selection is the guide's only stored preference.</p></div>
+      <div class="specimen-grid">
+        <article class="surface component-demo"><h3>Numbered disclosure and segments</h3><p class="small">Open inline, keep context visible, avoid nested scrolling boxes.</p>
+          <details class="numbered-disclosure" open><summary><span class="number-badge">01</span><span>Turbine setup</span></summary><div class="disclosure-body"><fieldset class="segmented"><legend>Turbine type — documentation sample</legend><div><label><input type="radio" name="sample-turbine" value="axial" checked><span>Axial</span></label><label><input type="radio" name="sample-turbine" value="radial"><span>Radial</span></label></div></fieldset><p class="small">Selection changes the specimen highlight only.</p></div></details>
+          <details class="numbered-disclosure"><summary><span class="number-badge">04</span><span>Stage design</span></summary><div class="disclosure-body"><p class="small">Named-stage context belongs beside aerodynamic and blade-row subgroups. Keep values visible when switching editing context.</p></div></details>
+        </article>
+        <article class="surface component-demo"><h3>Aligned optimization rows</h3><p class="small">Example values show the layout; they are not a recommended engineering configuration.</p>
+          <div class="editor-row"><p class="row-title">Variable · sample quantity</p><div class="three-fields"><label for="sample-lower">Lower<input id="sample-lower" type="number" value="0.1" step="any"></label><label for="sample-initial">Initial<input id="sample-initial" type="number" value="0.5" step="any"></label><label for="sample-upper">Upper<input id="sample-upper" type="number" value="0.9" step="any"></label></div></div>
+          <div class="editor-row"><p class="row-title">Constraint · sample quantity</p><div class="three-fields"><label for="sample-comparison">Comparison<select id="sample-comparison"><option>≤</option><option>=</option><option>≥</option></select></label><label for="sample-target">Target<input id="sample-target" type="number" value="1" step="any"></label><label for="sample-scale">Scale<input id="sample-scale" type="number" value="1" step="any"></label></div></div>
+          <p class="small">Labels sit above values. Borders define one row; space separates successive rows.</p>
+        </article>
+        <article class="surface component-demo"><h3>Hierarchical quantity selection</h3><p class="small">Show scope before leaf quantities. A group checkbox reflects full, empty, or partial selection.</p>
+          <details class="quantity-menu" open><summary>Choose quantities <span class="sample-tag">Specimen</span></summary><div class="quantity-tree"><label class="tree-group"><input id="sample-stage-group" type="checkbox" data-tree-group="stage-one">Stage 1 · example</label><details open><summary>Stage inputs</summary><label><input type="checkbox" data-tree-leaf="stage-one" checked>Stage loading</label><label><input type="checkbox" data-tree-leaf="stage-one">Degree of reaction</label></details><details><summary>Stator geometry</summary><label><input type="checkbox" data-tree-leaf="stage-one">Pitch-to-chord ratio</label><label><input type="checkbox" data-tree-leaf="stage-one">Trailing-edge thickness</label></details><details><summary>Rotor geometry</summary><label><input type="checkbox" data-tree-leaf="stage-one">Pitch-to-chord ratio</label></details></div></details>
+          <p class="small" id="tree-status" role="status">Quantity selection specimen.</p>
+        </article>
+        <article class="surface component-demo"><h3>States stay readable</h3><p class="small">Semantic colors support text. These are static examples of status vocabulary.</p><div class="status-list"><p class="status neutral"><span aria-hidden="true"></span>Ready</p><p class="status warning"><span aria-hidden="true"></span>Inputs changed · results need recalculation</p><p class="status success"><span aria-hidden="true"></span>Completed</p><p class="status danger"><span aria-hidden="true"></span>Invalid input · review the indicated field</p></div><p class="small">Use an explicit action to run optimization. Keep progress and technical output available without taking over the whole page.</p></article>
+      </div>
+    </section>
+
+    <section id="captures" class="guide-section" aria-labelledby="captures-title">
+      <div class="section-heading"><p class="eyebrow">06 / Actual application captures</p><h2 id="captures-title">The implemented reference.</h2><p>These are retained app screenshots, not interactive controls. They complement the exact values and rules above; the production source remains authoritative when a capture predates a later refinement.</p></div>
+      <div class="capture-grid">
+        <figure class="capture wide"><a href="implemented/workbench_light_blue.png"><img src="implemented/workbench_light_blue.png" loading="lazy" alt="TurboDash light workbench with blue parameter disclosure styling"></a><figcaption>Blueprint light · blue disclosure headers</figcaption></figure>
+        <figure class="capture wide"><a href="implemented/workbench_dark.png"><img src="implemented/workbench_dark.png" loading="lazy" alt="TurboDash dark workbench showing parameter inspector and results canvas"></a><figcaption>Graphite dark · workbench structure</figcaption></figure>
+        <figure class="capture"><a href="implemented/workbench_mobile.png"><img src="implemented/workbench_mobile.png" loading="lazy" alt="TurboDash narrow-screen workbench reference"></a><figcaption>Mobile · persistent workspace navigation</figcaption></figure>
+        <figure class="capture"><a href="implemented/editor_configuration.png"><img src="implemented/editor_configuration.png" loading="lazy" alt="Current optimization Configuration editor capture"></a><figcaption>Configuration · objective and solver settings</figcaption></figure>
+        <figure class="capture"><a href="implemented/editor_expert.png"><img src="implemented/editor_expert.png" loading="lazy" alt="Current optimization expert options editor capture"></a><figcaption>Expert options · progressive disclosure</figcaption></figure>
+        <figure class="capture"><a href="implemented/editor_variables.png"><img src="implemented/editor_variables.png" loading="lazy" alt="Current optimization variable rows with lower, initial, and upper values"></a><figcaption>Variables · Lower / Initial / Upper</figcaption></figure>
+        <figure class="capture"><a href="implemented/editor_constraints.png"><img src="implemented/editor_constraints.png" loading="lazy" alt="Current optimization constraint rows with comparison, target, and scale"></a><figcaption>Constraints · Comparison / Target / Scale</figcaption></figure>
+        <figure class="capture"><a href="implemented/editor_tree.png"><img src="implemented/editor_tree.png" loading="lazy" alt="Current hierarchical quantity selector with scope and group checkboxes"></a><figcaption>Quantity selector · hierarchical groups</figcaption></figure>
+      </div>
+    </section>
+
+    <footer class="guide-footer"><p class="eyebrow">Rebuild from the specification</p><h2>Build from documented design decisions.</h2><nav aria-label="Blueprint documents"><a href="README.md">Blueprint index</a><a href="design-principles.md">Design principles</a><a href="visual-style.md">Visual style</a><a href="components-and-layout.md">Components and layout</a><a href="iconography.md">Brand and icons</a><a href="implementation-map.md">Implementation map</a></nav><p class="small">Offline documentation · No external fonts, assets, or services · Reviewed 21 October 2026</p></footer>
+  </main>
+</body>
+</html>

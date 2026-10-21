@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "turbodash-core"
-version = "0.8.0"
+version = "0.8.1"
 description = "Interactive Dash app for turbomachinery stage preliminary design"
 authors = ["Roberto Agromayor"]
 license = "MIT"
@@ -82,7 +82,8 @@ build-backend = "poetry.core.masonry.api"
 #    poetry run bump-my-version bump major
 # 5. Release from main: git push origin main --follow-tags
 #    GitHub Actions builds the distributions and publishes the pushed release tag.
-# One-time PyPI setup: https://pypi.org/manage/project/turbodash-core/settings/publishing/
-# Add a GitHub Trusted Publisher: owner=turbo-sim, repository=turbodash,
-# workflow=publish_to_pypi.yaml, environment=pypi (must match the workflow).
-# Publishing uses GitHub OIDC; no PyPI username/password or API-token secret is needed.
+# Publishing uses the existing repository secrets PYPI_PASSWORD (PyPI API token)
+# and PYPI_USERNAME (normally __token__; defaults to it if the secret is absent).
+# A future switch to OIDC requires first registering a matching PyPI Trusted
+# Publisher: owner=turbo-sim, repository=turbodash,
+# workflow=publish_to_pypi.yaml, environment=pypi.

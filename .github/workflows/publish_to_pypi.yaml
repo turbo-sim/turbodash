@@ -96,8 +96,6 @@ jobs:
     environment:
       name: pypi
       url: https://pypi.org/p/turbodash-core
-    permissions:
-      id-token: write
     steps:
       - name: Download distributions
         uses: actions/download-artifact@v8
@@ -105,5 +103,18 @@ jobs:
           name: python-distributions
           path: dist/
 
-      - name: Publish to PyPI with Trusted Publishing
+      - name: Check publishing credentials
+        env:
+          PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          if [ -z "$PYPI_PASSWORD" ]; then
+            echo "::error::Set the repository secret PYPI_PASSWORD to the project's PyPI API token."
+            exit 1
+          fi
+
+      - name: Publish to PyPI with existing credentials
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: ${{ secrets.PYPI_USERNAME || '__token__' }}
+          password: ${{ secrets.PYPI_PASSWORD }}
+          attestations: false

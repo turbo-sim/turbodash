@@ -14,15 +14,15 @@ from dash import no_update
 from plotly.utils import PlotlyJSONEncoder
 
 from turbodash import optimization as opt
-from turbodash.apps.app_turbine_optimization import jobs as jobs
-from turbodash.apps.app_turbine_optimization.model import (
+from turbodash.apps.app_turbine_optimization import opt_jobs as jobs
+from turbodash.apps.app_turbine_optimization.opt_model import (
     build_settings, flat_config, nested_config, output_catalog, variable_catalog,
     variable_groups, constraint_groups,
 )
-from turbodash.apps.app_turbine_optimization.panel import (
+from turbodash.apps.app_turbine_optimization.opt_panel import (
     collect_rows, reconcile_editor, variable_row, constraint_row, outcome_presentation,
 )
-from turbodash.apps.app_turbine_optimization.selection import (
+from turbodash.apps.app_turbine_optimization.opt_selection import (
     apply_selection_operations, picker_signature, picker_tree, selector_menu,
 )
 from turbodash.core.turbine import compute_turbine_performance
@@ -131,7 +131,7 @@ class EditorTests(unittest.TestCase):
         from dash._callback_context import context_value
         from dash._utils import AttributeDict
         from dash.exceptions import PreventUpdate
-        from turbodash.apps.app_turbine_optimization import panel as ui
+        from turbodash.apps.app_turbine_optimization import opt_panel as ui
 
         app = Dash(__name__, suppress_callback_exceptions=True)
         ui.register_callbacks(app, lambda *args: case(), lambda *args: None)
@@ -552,7 +552,7 @@ class WorkspaceTests(unittest.TestCase):
         from dash import Dash
         from dash._callback_context import context_value
         from dash._utils import AttributeDict
-        from turbodash.apps.app_turbine_optimization import panel as ui
+        from turbodash.apps.app_turbine_optimization import opt_panel as ui
 
         original = case()
         current = deepcopy(original)
@@ -592,7 +592,7 @@ class WorkspaceTests(unittest.TestCase):
         from dash import Dash
         from dash._callback_context import context_value
         from dash._utils import AttributeDict
-        from turbodash.apps.app_turbine_optimization import panel as ui
+        from turbodash.apps.app_turbine_optimization import opt_panel as ui
 
         config = case()
         app = Dash(__name__, suppress_callback_exceptions=True)
@@ -600,7 +600,7 @@ class WorkspaceTests(unittest.TestCase):
         launch = next(entry["callback"].__wrapped__ for entry in app.callback_map.values()
                       if entry.get("callback") and entry["callback"].__wrapped__.__name__ == "launch_job")
         arguments = [1, None, [], [], [], [], [], *[[] for _ in range(10)],
-                     "$overall_performance.efficiency_ts", "maximize", 1e-8, 150, 1e-6, config]
+                     "$overall_performance.efficiency_ts", "maximize", 1e-8, 150, 1e-6, config, {}]
         token = context_value.set(AttributeDict(triggered_inputs=[
             dict(prop_id="opt-start.n_clicks", value=1)]))
         try:
@@ -629,7 +629,7 @@ class WorkspaceTests(unittest.TestCase):
         from dash import Dash
         from dash._callback_context import context_value
         from dash._utils import AttributeDict
-        from turbodash.apps.app_turbine_optimization import panel as ui
+        from turbodash.apps.app_turbine_optimization import opt_panel as ui
 
         source = case()
         optimized = deepcopy(source)
@@ -870,7 +870,7 @@ class WorkspaceTests(unittest.TestCase):
         failed = dict(success=False, message="Converged but infeasible", feasible=False)
         arguments = [1, {"id": "a" * 32}, [], [], [], [], []]
         arguments += [[] for _ in range(10)]
-        arguments += ["$overall_performance.efficiency_ts", "maximize", 1e-8, 150, 1e-6, config]
+        arguments += ["$overall_performance.efficiency_ts", "maximize", 1e-8, 150, 1e-6, config, {}]
         token = context_value.set(AttributeDict(triggered_inputs=[dict(prop_id="opt-poll.n_intervals", value=1)]))
         try:
             with module.server.test_request_context("/"), patch.object(jobs, "read_job", return_value=(

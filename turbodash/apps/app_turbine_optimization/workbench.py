@@ -1,4 +1,14 @@
-"""Presentation for the optimization app; model controls remain mounted."""
+"""Build the turbine workbench's page layout and reusable display components.
+
+This module arranges the header, navigation, numbered input sections, stage
+and blade-row editors, plots, performance reports, and geometry tools. It also
+formats tables and headline results and places the controls and terminal
+provided by ``opt_panel`` within the page.
+
+Input controls remain mounted when sections are collapsed or the editing
+context changes, preserving their values. Calculation and interaction
+callbacks are registered by ``app`` and ``opt_panel``.
+"""
 
 import base64
 from decimal import Decimal, ROUND_HALF_UP
@@ -15,7 +25,7 @@ from turbodash.apps.shared.fluid_inputs import (
     pair_fields,
 )
 from turbodash.apps.shared.components.meshing import geometry_panel, mesh_panel
-from .panel import (
+from .opt_panel import (
     actions as optimization_actions,
     panel as optimization_panel,
     terminal as optimization_terminal,
@@ -792,7 +802,8 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
                                         open=True,
                                     ),
                                     html.Details(
-                                        [html.Summary("Performance reports"), report_tabs],
+                                        [html.Summary("Performance reports"),
+                                         html.Div(report_tabs, className="td-report-content")],
                                         id="tables_container",
                                         className="td-report-card td-results-disclosure",
                                         open=True,

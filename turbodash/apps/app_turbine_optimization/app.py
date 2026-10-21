@@ -1,4 +1,14 @@
-"""Optimization edition of the experimental workspace; existing apps stay independent."""
+"""Connect the turbine workbench's inputs, calculations, plots, and optimization.
+
+This module creates the Dash application and registers its calculation and
+file-handling callbacks. It collects the current turbine inputs, evaluates the
+meanline model, updates geometry and performance views, and loads or saves
+designs as YAML. It also connects the documentation and geometry tools.
+
+The page layout comes from ``workbench``. Optimization controls and background
+runs are connected through the ``opt_`` modules, with accepted results fed back
+into the same input fields and result views used for manual calculations.
+"""
 
 from turbodash.apps.shared.paths import SHARED_ASSETS_DIRECTORY
 from turbodash.apps.shared.documentation import register_documentation
@@ -44,13 +54,13 @@ from turbodash.apps.shared.fluid_inputs import (
     property_pair_options,
 )
 from turbodash.visualization.vtk_assets import register_vtk_assets
-from .panel import register_callbacks as register_optimization_callbacks
-from . import jobs as optimization_jobs
-from .model import (
+from .opt_panel import register_callbacks as register_optimization_callbacks
+from . import opt_jobs as optimization_jobs
+from .opt_model import (
     nested_config, build_settings, SLSQP_EXTRA_CONTROLS, extra_solver_options,
     solver_editor_options,
 )
-from .panel import collect_rows
+from .opt_panel import collect_rows
 from .workbench import (
     build_layout,
     stage_editor,
@@ -926,6 +936,7 @@ def _assemble_cfg(overall, stages):
     State("opt-iterations", "value"),
     State("opt-feasibility", "value"),
     *[State(component_id, "value") for _, component_id in SLSQP_EXTRA_CONTROLS],
+    State("opt-solver-options", "data"),
     prevent_initial_call=True,
 )
 def download_yaml(n_clicks, cfg, signature, ov, sv, oi, si, stages, *editor):
@@ -945,7 +956,7 @@ def download_yaml(n_clicks, cfg, signature, ov, sv, oi, si, stages, *editor):
             *editor[10:15],
             results=cfg,
             require_variables=False,
-            solver_options=extra_solver_options(editor[15:]),
+            solver_options=extra_solver_options(editor[15:-1], editor[-1]),
         )
     except (ValueError, KeyError) as error:
         set_props("td-load-error", {"children": f"Design was not saved. {error}"})

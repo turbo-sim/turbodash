@@ -11,7 +11,7 @@ import yaml
 from playwright.sync_api import expect
 
 import browser_optimization as harness
-from turbodash.apps.app_turbine_optimization.model import (
+from turbodash.apps.app_turbine_optimization.opt_model import (
     SLSQP_EXTRA_CONTROLS, solver_editor_options,
 )
 
@@ -64,7 +64,7 @@ def exercise(context, address, output):
             page.wait_for_timeout(100)
         open_section("opt-panel")
         page.get_by_role("tab", name="Configuration", exact=True).click()
-        open_section("opt-step-controls")
+        page.locator("#opt-expert-settings").check()
         options = solver_editor_options(config["optimization"])
         for key, identity in SLSQP_EXTRA_CONTROLS:
             control = page.locator(f"#{identity}")

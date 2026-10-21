@@ -8,6 +8,7 @@
     let selectedResult = 0;
     let matches = [];
     let pendingRefresh = false;
+    let pendingThemeRefresh = false;
     let explicitTheme = readPreference(THEME_KEY);
     let currentTheme = explicitTheme || (media.matches ? "dark" : "light");
     const numericInputs = new WeakMap();
@@ -24,6 +25,17 @@
     function continuousNumber(input) {
         return input instanceof HTMLInputElement && input.type === "number" && input.step === "any";
     }
+    function scientificNumber(text) {
+        // Move the decimal in the written digits rather than rounding the value.
+        const match = /^(-?)(\d*)(?:\.(\d*))?([eE][+-]?\d+)?$/.exec(text);
+        if (!match || !Number.isFinite(Number(text))) return text;
+        const digits = (match[2] || "") + (match[3] || "");
+        const first = digits.search(/[1-9]/);
+        if (first < 0) return "0.000e+0";
+        const exponent = Number((match[4] || "e0").slice(1)) + match[2].length - first - 1;
+        return match[1] + digits[first] + "." + digits.slice(first + 1).padEnd(3, "0") +
+            "e" + (exponent >= 0 ? "+" : "") + exponent;
+    }
     function formatNumericInput(input) {
         if (!root || !root.contains(input) || !continuousNumber(input) || document.activeElement === input ||
             input.value === "" || !input.validity.valid) return;
@@ -33,7 +45,7 @@
         // Numeric callbacks naturally drop lexical trailing zeros. Retain the
         // user's spelling while it still denotes the same committed value.
         const spelling = typed && Number(typed) === Number(raw) ? typed : raw;
-        const display = paddedNumber(spelling);
+        const display = input.classList.contains("td-scientific") ? scientificNumber(spelling) : paddedNumber(spelling);
         if (display !== raw) record.write.call(input, display);
     }
     function scheduleNumericFormat(input) {
@@ -86,6 +98,13 @@
     function currentStyle(name) { return getComputedStyle(root).getPropertyValue(name).trim(); }
     function labelDropdowns() {
         if (!root) return;
+        root.querySelectorAll("[data-opt-help-tab]").forEach(description => {
+            const tab = root.querySelector("." + description.dataset.optHelpTab);
+            if (tab) {
+                tab.dataset.tooltip = description.textContent;
+                tab.setAttribute("aria-describedby", description.id);
+            }
+        });
         root.querySelectorAll(".Select input").forEach(input => {
             const field = input.closest(".td-field,.td-parameter,.td-opt-field");
             const label = field && (field.matches("label") ? field.querySelector("span") : field.querySelector("label"));
@@ -141,7 +160,7 @@
         (graph.layout.shapes || []).forEach((shape, index) => {
             if (shape.line && neutral.test(shape.line.color)) update["shapes[" + index + "].line.color"] = ink;
         });
-        const traceUpdates = new Map();
+        const traceUpdates = {};
         const lossColors = {
             loss_profile: ["#2462D1", "#88B7FF"],
             loss_trailing: ["#4B84E5", "#6D9DE8"],
@@ -167,24 +186,28 @@
             if (role === "solid") colors.fillcolor = currentTheme === "dark" ? "rgba(160,178,202,0.12)" : "rgba(100,120,146,0.12)";
             if (role === "channel") colors.fillcolor = currentTheme === "dark" ? "rgba(136,183,255,0.08)" : "rgba(36,98,209,0.05)";
             if (role === "flow_guide") colors["line.color"] = currentTheme === "dark" ? "rgba(128,183,255,0.58)" : "rgba(68,118,188,0.48)";
-            if (Object.keys(colors).length) {
-                const key = JSON.stringify(colors);
-                if (!traceUpdates.has(key)) traceUpdates.set(key, [colors, []]);
-                traceUpdates.get(key)[1].push(index);
-            }
+            Object.entries(colors).forEach(([key, color]) => {
+                // Undefined skips untouched traces, including numeric colour maps.
+                if (!traceUpdates[key]) traceUpdates[key] = new Array(graph.data.length).fill(undefined);
+                traceUpdates[key][index] = color;
+            });
         });
         graph._tdThemeBusy = true;
         graph._tdTheme = currentTheme;
-        let changes = Promise.resolve();
-        traceUpdates.forEach(args => { changes = changes.then(() => window.Plotly.restyle(graph, ...args)); });
-        changes.then(() => window.Plotly.relayout(graph, update))
-            .finally(() => { graph._tdThemeBusy = false; });
+        // Update traces and framing together instead of redrawing once per colour.
+        Promise.resolve().then(() => window.Plotly.update(graph, traceUpdates, update))
+            .finally(() => { graph._tdThemeBusy = false; queueThemeRefresh(); });
+    }
+    function queueThemeRefresh() {
+        if (pendingThemeRefresh) return;
+        pendingThemeRefresh = true;
+        queueMicrotask(() => { pendingThemeRefresh = false; themeFigures(); });
     }
     function themeFigures() {
         if (!root) return;
         root.querySelectorAll(".js-plotly-plot").forEach(graph => {
             if (!graph._tdThemeListener && typeof graph.on === "function") {
-                graph.on("plotly_afterplot", queueRefresh);
+                graph.on("plotly_afterplot", queueThemeRefresh);
                 graph._tdThemeListener = true;
             }
             if (!graph._tdRadialResetListener && typeof graph.on === "function" &&
@@ -370,6 +393,9 @@
             const target = item.identity.type || (item.control && item.control.id) || "";
             const tab = target.includes("variable") ? "variables" : target.includes("constraint") || target.includes("comparison") ? "constraints" : "settings";
             setProps("opt-tabs", { active_tab: tab });
+            if (item.wrapper.closest("#opt-expert-tolerances,#opt-expert-steps")) {
+                setProps("opt-expert-settings", { value: true });
+            }
         }
         openParents();
         window.setTimeout(() => {
@@ -518,7 +544,8 @@
         }
     });
     media.addEventListener("change", event => { if (!explicitTheme) applyTheme(event.matches ? "dark" : "light", false); });
-    new MutationObserver(queueRefresh).observe(document.documentElement, { childList: true, subtree: true });
+    new MutationObserver(() => { queueThemeRefresh(); queueRefresh(); })
+        .observe(document.documentElement, { childList: true, subtree: true });
     window.TurbodashWorkbench = { applyTheme, setWorkspace, refresh: queueRefresh, indexFields };
     attach();
 })();

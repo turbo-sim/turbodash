@@ -1,8 +1,14 @@
-"""Session-owned subprocess jobs with atomic progress records and SLSQP logs.
+"""Run optimizations in background processes and deliver their results to the app.
 
-The web server never runs a solve or redirects stdout. Workers publish complete
-physical snapshots, so future live geometry clients can consume the same files.
-The local cache supports multiple server workers on a single host.
+Each run belongs to a browser session and receives a saved copy of its turbine
+inputs and optimization settings. A separate Python process calls
+``turbodash.optimization.optimize_turbine``, keeping the web interface responsive
+while publishing convergence logs, progress snapshots, and the final result.
+
+This module manages session ownership, concurrent-run limits, timeouts, and
+expired jobs. Complete JSON snapshots are published through atomic file
+replacement so that web requests can read progress while a worker is running.
+The local file cache supports multiple web-server workers on the same machine.
 """
 
 from contextlib import contextmanager
@@ -22,7 +28,7 @@ import uuid
 
 from turbodash.apps.shared.paths import PROJECT_ROOT
 from turbodash.apps.shared.serialization import json_default
-from .model import flat_config
+from .opt_model import flat_config
 
 
 CACHE_ROOT = Path(tempfile.gettempdir()) / "turbodash_optimization_jobs"
@@ -172,7 +178,7 @@ def start_job(config, settings, owner):
         try:
             with (folder / "worker.log").open("w", encoding="utf-8") as log:
                 process = subprocess.Popen(
-                    [sys.executable, "-m", "turbodash.apps.app_turbine_optimization.jobs", str(folder / "request.json")],
+                    [sys.executable, "-m", "turbodash.apps.app_turbine_optimization.opt_jobs", str(folder / "request.json")],
                     cwd=PROJECT_ROOT, stdin=subprocess.DEVNULL,
                     stdout=log, stderr=subprocess.STDOUT,
                     creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)

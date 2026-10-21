@@ -1,4 +1,15 @@
-"""Model paths, editor defaults and validation shared by optimization clients."""
+"""Turn the workbench's optimization choices into a solver configuration.
+
+This module describes the inputs that users can optimize and the calculated
+outputs they can use as objectives or constraints. It supplies readable labels,
+units, suggested variable bounds, constraint scales, and predefined groups for
+the overall turbine, individual stages, and blade rows.
+
+The configuration helpers validate editor values, load current or older YAML
+solver settings, and convert between the app's nested shaft-speed inputs and
+the numeric input format used by the optimizer. The resulting settings are
+passed to the numerical routines in ``turbodash.optimization``.
+"""
 
 from copy import deepcopy
 import math
@@ -10,13 +21,9 @@ from turbodash.optimization.slsqp import normalize_solver_options
 # The same order is used for loading, launching and exporting the editor.
 SLSQP_EXTRA_CONTROLS = (
     ("first_step_fraction", "opt-first-step"),
-    ("max_step_fraction", "opt-max-step"),
     ("step_growth_factor", "opt-step-growth-factor"),
-    ("domain_backtracking", "opt-domain-backtracking"),
     ("backtrack_factor", "opt-backtrack-factor"),
     ("max_backtracks", "opt-max-backtracks"),
-    ("finite_diff_step", "opt-finite-diff-step"),
-    ("max_fd_backtracks", "opt-max-fd-backtracks"),
     ("optimality_tol", "opt-optimality-tolerance"),
 )
 
@@ -31,16 +38,24 @@ def solver_editor_options(settings=None):
         feasibility_tolerance=settings.get("feasibility_tolerance", 1e-6),
     )
     options.pop("feasibility_tol")  # YAML has one authoritative feasibility limit.
+    options["domain_backtracking"] = True  # Always enabled for workbench runs.
     return options
 
 
-def extra_solver_options(values):
-    """Collect the shared control order without silently dropping an option."""
+def extra_solver_options(values, preserved=None):
+    """Merge editable expert controls with unexposed YAML settings.
+
+    Hiding expert controls does not reset them. The stored options preserve the
+    derivative step and maximum step fraction on load/save; the workbench always
+    enables invalid-trial recovery, irrespective of an imported switch value.
+    """
     if not values:  # Also permits clients that use the default controls.
-        return {}
+        return dict(preserved or {}, domain_backtracking=True)
     if len(values) != len(SLSQP_EXTRA_CONTROLS):
         raise ValueError("Incomplete SLSQP controls. Reload the app and try again.")
-    return {name: value for (name, _), value in zip(SLSQP_EXTRA_CONTROLS, values)}
+    return dict(preserved or {},
+                **{name: value for (name, _), value in zip(SLSQP_EXTRA_CONTROLS, values)},
+                domain_backtracking=True)
 
 
 PERFORMANCE = {
@@ -150,9 +165,8 @@ def variable_catalog(config):
                     weight = stage.get(key, 1)
                     if isinstance(weight, (int, float)) and weight > 0 and math.isfinite(weight):
                         lo, hi = .1 * weight, 2 * weight
-                category = "Meridional velocity ratios" if key.startswith("meridional_") else "Stage inputs"
                 add(prefix + key, f"{title} · {label}", lo, hi, label,
-                    [hierarchy_title, category])
+                    [hierarchy_title, "Stage inputs"])
         # Axial row radii are fixed by that model; radial radius changes set chord.
         if radial:
             for pair in ("01", "12", "23", "34"):
@@ -168,11 +182,14 @@ def variable_catalog(config):
                 lo, hi = _radius_bounds(ratio, pair in ("12", "34"))
                 label = f"Radius ratio {pair} [-]"
                 add(path, f"{title} · {label}", lo, hi, label,
-                    [hierarchy_title, "Radius ratios"])
+                    [hierarchy_title, "Stage inputs"])
         for row in ("stator", "rotor"):
             row_title = f"{title} · {row.title()}"
             row_path = prefix + f"blade_geometry.{row}."
             hierarchy = [hierarchy_title, f"{row.title()} geometry"]
+            if not radial:
+                add(row_path + "aspect_ratio", f"{row_title} · Axial aspect ratio [-]", 1, 4,
+                    "Axial aspect ratio [-]", hierarchy)
             add(row_path + "solidity_chord", f"{row_title} · Solidity [-]", .5, 2,
                 "Solidity [-]", hierarchy)
             add(row_path + "trailing_edge_thickness_to_opening",
@@ -188,9 +205,6 @@ def variable_catalog(config):
                 f"{row_title} · Maximum thickness / meridional chord [-]", .15, .35,
                 "Maximum thickness / meridional chord [-]", hierarchy,
                 preset_active=thickness_active)
-            if not radial:
-                add(row_path + "aspect_ratio", f"{row_title} · Axial aspect ratio [-]", 1, 4,
-                    "Axial aspect ratio [-]", hierarchy)
     return catalog
 
 
@@ -210,6 +224,11 @@ def variable_groups(config, catalog=None):
         if paths:
             groups[key] = dict(label=label, description=description, paths=paths, hierarchy=hierarchy)
 
+    reference = f"stages.{len(stages) - 1}.work_fraction_split"
+    add("all", "Optimize all applicable variables",
+        "Combine all applicable presets; keep operating conditions, inactive geometry inputs "
+        "and the final stage's reference work weight fixed.",
+        [path for path in catalog if path != reference], ["Overall"])
     add("overall", "Shaft speed and blade velocity ratio",
         "Vary the selected shaft-speed definition and overall blade velocity ratio.",
         ["blade_velocity_ratio", "rotational_speed"], ["Overall"])
@@ -240,11 +259,6 @@ def variable_groups(config, catalog=None):
                 "Vary applicable solidity, axial aspect ratio and loss-sensitive thickness ratios.",
                 [path for path in catalog if path.startswith(f"stages.{i}.blade_geometry.{row}.")],
                 [_stage_title(i, stage)])
-    reference = f"stages.{len(stages) - 1}.work_fraction_split"
-    add("all", "Optimize all applicable variables",
-        "Combine all applicable presets; keep operating conditions, inactive geometry inputs "
-        "and the final stage's reference work weight fixed.",
-        [path for path in catalog if path != reference], ["Overall"])
     return groups
 
 

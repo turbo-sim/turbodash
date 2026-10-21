@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 from turbodash import optimization as opt
-from turbodash.apps.app_turbine_optimization.model import (
+from turbodash.apps.app_turbine_optimization.opt_model import (
     build_settings,
     constraint_groups,
     nested_config,

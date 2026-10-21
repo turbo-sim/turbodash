@@ -1,4 +1,14 @@
-"""Hierarchical optimization selectors and ordered selection reconciliation."""
+"""Manage the hierarchical selectors for optimization variables and constraints.
+
+This module builds the searchable menus that organize choices by overall
+turbine, stage, and blade row. Users can select individual quantities or
+predefined groups, with checkbox states reflecting the current selection.
+
+Selection changes are applied in their original order so that rapid clicks
+and delayed browser callbacks preserve the user's choices. Existing rows keep
+their identifiers and edited values, duplicate entries are avoided, and lower
+and upper constraints on the same quantity remain separate editable rows.
+"""
 
 import json
 from uuid import uuid4
@@ -144,8 +154,9 @@ def picker_tree(catalog, rows, kind, revision, groups=None):
                 continue
             identity = ":".join([kind, "groups" if groups is not None else "quantities", *ancestors, label])
             children.append(html.Details([
-                html.Summary(label), *branches(branch, (*ancestors, label)),
-            ], className="td-opt-picker-branch", key=identity,
+                html.Summary(label),
+                html.Div(branches(branch, (*ancestors, label)), className="td-opt-picker-children"),
+            ], open=True, className="td-opt-picker-branch", key=identity,
                 **{"data-opt-branch": identity, "data-opt-node": identity}))
         return children
 

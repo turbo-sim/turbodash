@@ -1,4 +1,15 @@
-"""Dash optimization editors and job delivery, separate from numerical solving."""
+"""Build the optimization controls and connect them to background solver runs.
+
+This module creates the Configuration, Design variables, and Constraints tabs,
+the Start optimization button, and the expandable convergence terminal. Its
+Dash callbacks preserve edits and selections, restore settings from loaded
+designs, and collect the current inputs when the user starts an optimization.
+
+Runs are launched and monitored through ``opt_jobs``. Progress and outcomes
+update the interface, and successful results are applied to the workbench when
+the input design still matches the one used to start the run. Failed runs keep
+the previously displayed design available for further editing.
+"""
 
 from uuid import uuid4
 import time
@@ -7,13 +18,13 @@ from dash import ALL, Input, Output, State, ctx, dcc, html, no_update
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 
-from . import jobs
-from .model import (
+from . import opt_jobs as jobs
+from .opt_model import (
     build_settings, flat_config, nested_config, output_catalog, variable_catalog,
     variable_groups, constraint_groups, SLSQP_EXTRA_CONTROLS, solver_editor_options,
     extra_solver_options,
 )
-from .selection import apply_selection_operations, picker_signature, picker_tree, selector_menu
+from .opt_selection import apply_selection_operations, picker_signature, picker_tree, selector_menu
 
 
 DEFAULT_OBJECTIVE = "$overall_performance.efficiency_ts"
@@ -33,60 +44,60 @@ def panel():
         html.Summary(["Optimization", html.Span("SLSQP", className="td-opt-badge")]),
         html.Div([
             dbc.Tabs(id="opt-tabs", active_tab="settings", children=[
-                dbc.Tab(label="Configuration", tab_id="settings", children=html.Div([
+                dbc.Tab(label="Configuration", tab_id="settings", label_class_name="td-opt-help-configuration", children=html.Div([
                     field("Objective", dcc.Dropdown(id="opt-objective", value=DEFAULT_OBJECTIVE, clearable=False)),
                     field("Goal", dbc.RadioItems(id="opt-direction", value="maximize", inline=True,
                                                 options=[{"label": "Maximize", "value": "maximize"},
                                                          {"label": "Minimize", "value": "minimize"}])),
+                    field("Iteration limit", dbc.Input(id="opt-iterations", type="number", value=solver_editor_options()["maxiter"], min=1, max=2000, step=1)),
                     html.Div([
-                        field("Solver tolerance", dbc.Input(id="opt-tolerance", type="number", value=1e-9, min=1e-14, step="any"),
-                              "Native SLSQP stopping tolerance (ftol), including objective changes, steps, and aggregate feasibility/optimality tests. It is not a guaranteed KKT gradient bound. Final feasibility and optimality are checked separately."),
-                        field("Iteration limit", dbc.Input(id="opt-iterations", type="number", value=solver_editor_options()["maxiter"], min=1, max=2000, step=1)),
-                        field("Feasibility tolerance", dbc.Input(id="opt-feasibility", type="number", value=1e-6, min=1e-14, step="any"),
-                              "Maximum allowed normalized constraint violation before a result can be applied."),
-                    ], className="td-opt-settings-grid"),
-                    html.Details([
-                        html.Summary("Step control and recovery"),
+                        field("Solver tolerance", dbc.Input(id="opt-tolerance", type="number", value=1e-9, min=1e-14, step="any", className="td-scientific"),
+                              "Native SLSQP stopping tolerance (ftol). Separate feasibility and KKT optimality checks still apply; show expert settings to inspect or change them."),
                         html.Div([
-                            field("First-step fraction", dbc.Input(id="opt-first-step", type="number", value=1.0, min=1e-8, max=1, step="any"),
-                                  "Start the first SLSQP search with this fraction of its proposed step. Use 1 for the full step or try 0.2 for a difficult starting design. Later searches use the maximum step fraction unless gradual restoration is enabled below."),
-                            field("Maximum step fraction", dbc.Input(id="opt-max-step", type="number", value=1.0, min=1e-8, max=1, step="any"),
-                                  "Cap the starting fraction in every SLSQP search. Smaller values may slow convergence. This limits a fraction of the proposed step, not an absolute change in a design variable."),
-                            field("Step growth factor (optional)", dbc.Input(id="opt-step-growth-factor", type="number", value=solver_editor_options()["step_growth_factor"], min=1, step="any", placeholder="Blank disables (default 1.5)"),
-                                  "Default 1.5 restores the starting step fraction by 50% each major iteration, capped at the maximum. After an invalid trial is recovered, the next iteration starts from the actual accepted fraction multiplied by this factor, then restores progressively. A factor of 1 holds the current fraction. Leave blank to disable gradual restoration."),
-                            field("Recover invalid trials", dbc.Switch(id="opt-domain-backtracking", value=True),
-                                  "Shorten and retry a trial when the meanline model reports a recoverable physical-domain failure. The model equations are never clipped to manufacture a solution. The initial design must evaluate successfully."),
-                            field("Step reduction factor", dbc.Input(id="opt-backtrack-factor", type="number", value=.5, min=1e-8, max=.99999999, step="any"),
-                                  "Multiply a rejected trial step or derivative perturbation by this factor before retrying. A value of 0.5 halves it; the factor must be between 0 and 1."),
-                            field("Trial retry limit", dbc.Input(id="opt-max-backtracks", type="number", value=20, min=0, step=1),
-                                  "Maximum reductions of a trial that fails the meanline model's domain checks. Exhausting the limit stops the run with the failure details."),
-                            field("Derivative step", dbc.Input(id="opt-finite-diff-step", type="number", value=solver_editor_options()["finite_diff_step"], min=1e-14, step="any"),
-                                  "Finite-difference perturbation in normalized design coordinates, where each variable's bounds span 0 to 1."),
-                            field("Derivative retry limit", dbc.Input(id="opt-max-fd-backtracks", type="number", value=12, min=0, step=1),
-                                  "Maximum reductions when derivative samples fail model-domain checks. An admissible opposite-direction sample can also be used."),
-                            field("Optimality tolerance", dbc.Input(id="opt-optimality-tolerance", type="number", value=1e-4, min=1e-14, step="any"),
-                                  "Maximum allowed KKT stationarity, dual-feasibility, and complementarity residuals in normalized solver coordinates. Includes variable bounds. Constraint and bound violations use the separate feasibility tolerance."),
-                        ], className="td-subsection-body td-opt-settings-grid"),
-                    ], className="td-subsection", id="opt-step-controls"),
+                            field("Feasibility tolerance", dbc.Input(id="opt-feasibility", type="number", value=1e-6, min=1e-14, step="any", className="td-scientific"),
+                                  "Maximum allowed normalized constraint and bound violation before a result can be applied."),
+                            field("Optimality tolerance", dbc.Input(id="opt-optimality-tolerance", type="number", value=1e-4, min=1e-14, step="any", className="td-scientific"),
+                                  "Maximum KKT stationarity, dual-feasibility, and complementarity residuals in normalized solver coordinates, including variable bounds. This is independent of native ftol."),
+                        ], id="opt-expert-tolerances", hidden=True, className="td-opt-settings-grid"),
+                    ], className="td-opt-settings-grid td-opt-tolerances"),
+                    html.Div([
+                        field("First step fraction", dbc.Input(id="opt-first-step", type="number", value=solver_editor_options()["first_step_fraction"], min=1e-8, max=1, step="any"),
+                              "Fraction of the first proposed SLSQP step to try. Default 0.25 starts conservatively, then the growth factor restores larger steps."),
+                        field("Step growth factor", dbc.Input(id="opt-step-growth-factor", type="number", value=solver_editor_options()["step_growth_factor"], min=1, step="any", placeholder="Blank disables"),
+                              "Default 1.5 increases the starting step fraction by 50% each iteration. After recovery, growth restarts from the accepted fraction. A factor of 1 holds it; blank disables gradual restoration."),
+                        field("Step reduction factor", dbc.Input(id="opt-backtrack-factor", type="number", value=.5, min=1e-8, max=.99999999, step="any"),
+                              "Multiply an invalid trial step by this factor before retrying. Default 0.5 halves the step. Recovery is always enabled in the app."),
+                        field("Trial retry limit", dbc.Input(id="opt-max-backtracks", type="number", value=20, min=0, step=1),
+                              "Maximum reductions of an invalid trial. Exhausting the limit stops the run with the physical failure details."),
+                    ], id="opt-expert-steps", hidden=True, className="td-opt-settings-grid td-opt-expert-steps"),
+                    html.Div(
+                        dbc.Checkbox(id="opt-expert-settings", label="Show expert settings", value=False,
+                                     persistence=True, persistence_type="local"),
+                        className="td-opt-expert-footer",
+                    ),
                 ], className="td-opt-tab")),
-                dbc.Tab(label="Design variables", tab_id="variables", children=html.Div([
-                    html.Span("?", title="Only selected inputs are free. A blank initial value uses the current design; values outside bounds are clipped and logged.", tabIndex=0, className="td-help",
-                              **{"aria-label": "About design variables"}),
+                dbc.Tab(label="Design variables", tab_id="variables", label_class_name="td-opt-help-variables", children=html.Div([
                     html.Div([selector_menu("variable"), selector_menu("variable", groups=True)],
                              className="td-opt-picker-actions"),
                     html.Div(id="opt-variable-rows"),
                 ], className="td-opt-tab")),
-                dbc.Tab(label="Constraints", tab_id="constraints", children=html.Div([
-                    html.Span("?", title="Scale divides the residual into dimensionless units. Use a positive physical scale, even for a zero target.", tabIndex=0, className="td-help",
-                              **{"aria-label": "About constraint scaling"}),
+                dbc.Tab(label="Constraints", tab_id="constraints", label_class_name="td-opt-help-constraints", children=html.Div([
                     html.Div([selector_menu("constraint"), selector_menu("constraint", groups=True)],
                              className="td-opt-picker-actions"),
                     html.Div(id="opt-constraint-rows"),
                 ], className="td-opt-tab")),
             ]),
+            *[html.Span(message, id=f"opt-tab-help-{name}", className="visually-hidden",
+                        **{"data-opt-help-tab": f"td-opt-help-{name}"})
+              for name, message in (
+                  ("configuration", "Choose what to optimize and whether to maximize or minimize it. Set the iteration limit and solver tolerance; expert settings reveal the separate acceptance tolerances and step controls. Hiding expert settings keeps their values."),
+                  ("variables", "Select the inputs the optimizer may change, individually or in groups. Set each lower and upper bound. Leave Initial blank to use the current design; out-of-bounds initial values are clipped and logged."),
+                  ("constraints", "Select the limits the design must satisfy, individually or in groups. Choose a comparison and target. Scale divides the physical residual into a normalized violation; it must be positive, even for a zero target."),
+              )],
         ], className="td-opt-body"),
         dcc.Store(id="opt-launching", data=False), dcc.Store(id="opt-catalog"), dcc.Store(id="opt-editor-state", data={"variables": [], "constraints": []}),
         dcc.Store(id="opt-editor-load"),
+        dcc.Store(id="opt-solver-options", data=solver_editor_options()),
         dcc.Store(id="opt-selection-request", data={"revision": 0, "operations": []}),
         dcc.Store(id="opt-picker-signature"),
         dcc.Store(id="opt-job", storage_type="session"), dcc.Store(id="opt-applied-result"),
@@ -122,13 +133,9 @@ def actions():
 
 def recovery_summary(result):
     """Give successful recoveries a compact status outside the solver report."""
-    parts = []
-    for key, label in (("domain_rejections", "invalid trial"),
-                       ("derivative_rejections", "derivative sample")):
-        count = result.get(key, 0)
-        if count:
-            parts.append(f"{count} {label}{'s' if count != 1 else ''}")
-    return f" Recovered {' and '.join(parts)}." if parts else ""
+    count = result.get("domain_rejections", 0)
+    return f" Recovered {count} invalid trial{'s' if count != 1 else ''}." if count else ""
+
 
 
 def outcome_presentation(state, launching=False):
@@ -430,9 +437,16 @@ def register_callbacks(app, live_config, render_results):
         return ([variable_row(row, catalog["variables"]) for row in variables] or html.P("No free inputs yet. Add a variable to begin.", className="td-opt-empty"),
                 [constraint_row(row, catalog["constraints"]) for row in constraints] or html.P("No constraints · bounds still apply to every free input.", className="td-opt-empty"), state)
 
+    app.clientside_callback(
+        "function(expert) { return [!expert, !expert]; }",
+        Output("opt-expert-tolerances", "hidden"), Output("opt-expert-steps", "hidden"),
+        Input("opt-expert-settings", "value"),
+    )
+
     @app.callback(Output("opt-objective", "value"), Output("opt-direction", "value"),
                   Output("opt-tolerance", "value"), Output("opt-iterations", "value"), Output("opt-feasibility", "value"),
                   *[Output(component_id, "value") for _, component_id in SLSQP_EXTRA_CONTROLS],
+                  Output("opt-solver-options", "data"),
                   Input("loaded_cfg_store", "data"))
     def load_settings(config):
         settings = (config or {}).get("optimization", {})
@@ -440,7 +454,7 @@ def register_callbacks(app, live_config, render_results):
         options = solver_editor_options(settings)
         return (objective.get("variable", DEFAULT_OBJECTIVE), objective.get("type", "maximize"),
                 options["ftol"], options["maxiter"], settings.get("feasibility_tolerance", 1e-6),
-                *[options[name] for name, _ in SLSQP_EXTRA_CONTROLS])
+                *[options[name] for name, _ in SLSQP_EXTRA_CONTROLS], options)
 
     job_outputs = [
         Output("opt-job", "data"), Output("opt-status", "children"), Output("opt-log", "children"),
@@ -456,6 +470,7 @@ def register_callbacks(app, live_config, render_results):
         State("opt-tolerance", "value"), State("opt-iterations", "value"), State("opt-feasibility", "value"),
         State("result_store", "data"),
         *[State(component_id, "value") for _, component_id in SLSQP_EXTRA_CONTROLS],
+        State("opt-solver-options", "data"),
     ]
 
     @app.callback(*job_outputs, Input("opt-poll", "n_intervals"), *job_states, prevent_initial_call=True)
@@ -482,7 +497,7 @@ def register_callbacks(app, live_config, render_results):
                 variables = collect_rows(*values[:4])
                 constraints = collect_rows(*values[4:10])
                 settings = build_settings(config, variables, constraints, *values[10:15], results=values[15],
-                                          solver_options=extra_solver_options(values[16:]))
+                                          solver_options=extra_solver_options(values[16:-1], values[-1]))
                 handle = jobs.start_job(config, settings, owner)
                 return handle, "Optimizing turbine…", "Starting a fresh optimization run…", None, "Preparing initial design…", no_update, no_update, True, "running"
             except PreventUpdate:

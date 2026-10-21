@@ -1,5 +1,17 @@
 # Turner / 3DBGB / T-Blade3 blade parametrization
 
+**The papers describe one evolving geometry framework, 3DBGB, later called T-Blade3.** It contains alternative section generators, thickness laws, and edge treatments. The 2022 paper consolidates these options; it does not replace them with one mandatory final formula.
+
+The characteristic developed branch prescribes a B-spline distribution of the **meanline second derivative**, integrates it twice subject to metal-angle and chord-closure conditions, adds thickness normal to that meanline, and maps and stacks the sections on axisymmetric stream surfaces. It does not directly prescribe the finished blade-surface curvature.
+
+The notes cover:
+
+- The contribution of each paper and the actual dates of the supplied conference PDFs.
+- Coordinates, spline controls, meanline reconstruction, thickness and edge alternatives, and 3D mapping.
+- Reasons for the choices, with mathematical interpretation distinguished from author claims.
+- Printed equation errors, limits of smoothness and aerodynamic claims, and missing implementation details.
+- A direct comparison with v3, especially thickness station, normal offsets, and leading-edge asymmetry.
+
 The four supplied papers describe **an evolving family within one geometry framework**, developed by Mark G. Turner and collaborators. The shared architecture is to construct two-dimensional blade sections, map them onto prescribed axisymmetric stream surfaces, and stack and loft them into a three-dimensional blade. The most distinctive developed section generator prescribes the meanline's second derivative with B-splines, integrates twice, and adds a separate thickness distribution.
 
 The papers are not four unrelated methods. Neither are they four interchangeable descriptions of exactly the same algorithm. The 2014 paper adds a substantial section-generation capability to the earlier framework; later work adds thickness and CAD capabilities while retaining earlier options. Accordingly, these notes present a common formulation and separate the alternative meanline, thickness, and edge constructions.

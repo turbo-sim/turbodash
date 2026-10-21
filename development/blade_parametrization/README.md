@@ -9,12 +9,12 @@ from the repository root; each demo resolves its YAML and outputs beside itself.
 | Version 1 | [README](parametrization_v1/README.md) |
 | Version 2 | [README](parametrization_v2/README.md) |
 | Version 3 with leading-edge asymmetry | [README](parametrization_v3/README.md) |
-| Turner curvature study | [README](parametrization_turner/README.md) |
+| Turner curvature study | [Theory notes](parametrization_turner/theory_notes.md) |
 
-The original source PDFs are in [papers](papers/). To export version 3 without
+The retained source PDFs are beside the Turner and version 3 prototypes. To export version 3 without
 opening an interactive window:
 
 ```powershell
-python development/new_parametrization/parametrization_v3/demo_blade.py --no-show --blade-type axial
-python development/new_parametrization/parametrization_v3/demo_blade.py --no-show --blade-type radial
+python development/blade_parametrization/parametrization_v3/demo_blade.py --no-show --blade-type axial
+python development/blade_parametrization/parametrization_v3/demo_blade.py --no-show --blade-type radial
 ```

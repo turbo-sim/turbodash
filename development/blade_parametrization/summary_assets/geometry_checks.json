@@ -1,0 +1,134 @@
+{
+  "v1_cases_checked": [
+    {
+      "case": "impulse",
+      "model": "cubic",
+      "normal_map_margin": 0.8080137822806133
+    },
+    {
+      "case": "impulse",
+      "model": "quintic",
+      "normal_map_margin": 0.8080137822806133
+    },
+    {
+      "case": "impulse",
+      "model": "cosine",
+      "normal_map_margin": 0.8080137822806133
+    },
+    {
+      "case": "reaction",
+      "model": "cubic",
+      "normal_map_margin": 0.8636917757903515
+    },
+    {
+      "case": "reaction",
+      "model": "quintic",
+      "normal_map_margin": 0.8634325715323734
+    },
+    {
+      "case": "reaction",
+      "model": "cosine",
+      "normal_map_margin": 0.8644946507729128
+    },
+    {
+      "case": "straight_constant",
+      "model": "cubic",
+      "normal_map_margin": 1.0
+    },
+    {
+      "case": "straight_constant",
+      "model": "quintic",
+      "normal_map_margin": 1.0
+    },
+    {
+      "case": "straight_constant",
+      "model": "cosine",
+      "normal_map_margin": 1.0
+    },
+    {
+      "case": "radial_constant",
+      "model": "cubic",
+      "normal_map_margin": 0.9678168876925068
+    },
+    {
+      "case": "radial_constant",
+      "model": "quintic",
+      "normal_map_margin": 0.9678168876925068
+    },
+    {
+      "case": "radial_constant",
+      "model": "cosine",
+      "normal_map_margin": 0.9678168876925068
+    },
+    {
+      "case": "broad_maximum",
+      "model": "cubic",
+      "normal_map_margin": 0.8143384393130065
+    },
+    {
+      "case": "broad_maximum",
+      "model": "quintic",
+      "normal_map_margin": 0.8143384393130065
+    },
+    {
+      "case": "broad_maximum",
+      "model": "cosine",
+      "normal_map_margin": 0.8143384393130065
+    },
+    {
+      "case": "flat_ends",
+      "model": "cubic",
+      "normal_map_margin": 1.0
+    },
+    {
+      "case": "flat_ends",
+      "model": "quintic",
+      "normal_map_margin": 1.0
+    },
+    {
+      "case": "flat_ends",
+      "model": "cosine",
+      "normal_map_margin": 1.0
+    }
+  ],
+  "v2_v3_builds_checked": [
+    "v2: axial",
+    "v2: radial_outflow",
+    "v2: radial_inflow",
+    "v3: axial",
+    "v3: radial_outflow",
+    "v3: radial_inflow"
+  ],
+  "v3_zero_asymmetry_max_boundary_error_m": 1.734723475976807e-18,
+  "v3_total_thickness_redistribution_max_error": 2.7755575615628914e-17,
+  "v3_actual_peak_ratio": 0.4271235537174409,
+  "v3_actual_peak_physical_meridional_fraction": 0.143675,
+  "v3_curvature_interval": [
+    0.01862,
+    0.3724
+  ],
+  "v3_curvature_peaks_times_meridional_chord": [
+    {
+      "asymmetry": 0.0,
+      "upper": 23.254927511552133,
+      "lower": 7.219669798349323
+    },
+    {
+      "asymmetry": 0.15,
+      "upper": 6.7308424544558525,
+      "lower": 8.074955437119288
+    }
+  ],
+  "radial_example": {
+    "prime_chord": 0.5596157879354228,
+    "logarithmic_mean_radius_mm": 26.804104393371652,
+    "physical_to_prime_midstation": 0.5690578035573273,
+    "prime_to_physical_midstation": 0.43050087404306037,
+    "template_paired_separation_at_endpoints_mm": [
+      1.4921356947549096,
+      2.611237465821095
+    ],
+    "max_physical_half_thickness_over_radius": 0.05,
+    "local_conformal_max_paired_length_relative_error": 0.00020829427044544158
+  }
+}

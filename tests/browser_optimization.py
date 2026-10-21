@@ -236,7 +236,7 @@ def exercise(context, address, output):
         if expected_success:
             assert "Optimization applied" in status, status
             expect(page.locator("#opt-log")).to_contain_text("Infeasibility")
-            expect(page.locator("#opt-log")).to_contain_text("SUCCESS")
+            expect(page.locator("#opt-log")).to_contain_text("Success: True")
             check_applied_design()
         return status
 

@@ -46,7 +46,10 @@ from turbodash.apps.shared.fluid_inputs import (
 from turbodash.visualization.vtk_assets import register_vtk_assets
 from .panel import register_callbacks as register_optimization_callbacks
 from . import jobs as optimization_jobs
-from .model import nested_config, build_settings
+from .model import (
+    nested_config, build_settings, SLSQP_EXTRA_CONTROLS, extra_solver_options,
+    solver_editor_options,
+)
 from .panel import collect_rows
 from .workbench import (
     build_layout,
@@ -922,6 +925,7 @@ def _assemble_cfg(overall, stages):
     State("opt-tolerance", "value"),
     State("opt-iterations", "value"),
     State("opt-feasibility", "value"),
+    *[State(component_id, "value") for _, component_id in SLSQP_EXTRA_CONTROLS],
     prevent_initial_call=True,
 )
 def download_yaml(n_clicks, cfg, signature, ov, sv, oi, si, stages, *editor):
@@ -941,6 +945,7 @@ def download_yaml(n_clicks, cfg, signature, ov, sv, oi, si, stages, *editor):
             *editor[10:15],
             results=cfg,
             require_variables=False,
+            solver_options=extra_solver_options(editor[15:]),
         )
     except (ValueError, KeyError) as error:
         set_props("td-load-error", {"children": f"Design was not saved. {error}"})
@@ -975,6 +980,9 @@ def load_design(contents):
             raise ValueError("A design must contain at least one stage.")
         cfg = nested_config(core.convert_turbine_config_to_solidity(cfg))
         validate_inlet_inputs(cfg["inputs"])
+        if "optimization" in cfg:
+            options = solver_editor_options(cfg["optimization"])
+            cfg["optimization"] = dict(cfg["optimization"], solver_options=options)
         for stage in cfg["inputs"]["stages"]:
             if not isinstance(stage, dict):
                 raise ValueError("Every stage must contain a mapping of design inputs.")

@@ -4,6 +4,43 @@ from copy import deepcopy
 import math
 
 from turbodash.optimization import read_path
+from turbodash.optimization.slsqp import normalize_solver_options
+
+
+# The same order is used for loading, launching and exporting the editor.
+SLSQP_EXTRA_CONTROLS = (
+    ("first_step_fraction", "opt-first-step"),
+    ("max_step_fraction", "opt-max-step"),
+    ("step_growth_factor", "opt-step-growth-factor"),
+    ("domain_backtracking", "opt-domain-backtracking"),
+    ("backtrack_factor", "opt-backtrack-factor"),
+    ("max_backtracks", "opt-max-backtracks"),
+    ("finite_diff_step", "opt-finite-diff-step"),
+    ("max_fd_backtracks", "opt-max-fd-backtracks"),
+    ("optimality_tol", "opt-optimality-tolerance"),
+)
+
+
+def solver_editor_options(settings=None):
+    """Validate and migrate YAML options to the app's native SLSQP controls."""
+    settings = {} if settings is None else settings
+    if not isinstance(settings, dict):
+        raise ValueError("Optimization settings must be a mapping.")
+    options = normalize_solver_options(
+        settings.get("solver_options", {}),
+        feasibility_tolerance=settings.get("feasibility_tolerance", 1e-6),
+    )
+    options.pop("feasibility_tol")  # YAML has one authoritative feasibility limit.
+    return options
+
+
+def extra_solver_options(values):
+    """Collect the shared control order without silently dropping an option."""
+    if not values:  # Also permits clients that use the default controls.
+        return {}
+    if len(values) != len(SLSQP_EXTRA_CONTROLS):
+        raise ValueError("Incomplete SLSQP controls. Reload the app and try again.")
+    return {name: value for (name, _), value in zip(SLSQP_EXTRA_CONTROLS, values)}
 
 
 PERFORMANCE = {
@@ -311,7 +348,7 @@ def finite(value, label):
     return float(value)
 
 
-def build_settings(config, variables, constraints, objective, direction, tolerance, iterations, feasibility, results=None, *, require_variables=True):
+def build_settings(config, variables, constraints, objective, direction, tolerance, iterations, feasibility, results=None, *, require_variables=True, solver_options=None):
     """Validate UI values before launching; let the API clip initial guesses."""
     choices = variable_catalog(config)
     outputs = output_catalog(config, results)
@@ -351,8 +388,11 @@ def build_settings(config, variables, constraints, objective, direction, toleran
     count = finite(iterations, "Iteration limit")
     if min(tol, feas) <= 0 or count < 1 or count > 2000 or not count.is_integer():
         raise ValueError("Tolerances must be positive; iteration limit must be an integer from 1 to 2000.")
+    options = solver_editor_options(dict(
+        solver_options=dict(solver_options or {}, ftol=tol, maxiter=int(count)),
+        feasibility_tolerance=feas,
+    ))
     return dict(design_variables=selected, constraints=limits,
                 objective_function=dict(variable=objective, type=direction, normalize=outputs[objective]["scale"]),
                 feasibility_tolerance=feas,
-                solver_options=dict(library="scipy", method="slsqp", tolerance=tol, max_iterations=int(count),
-                                    plot_convergence=False, print_convergence=False))
+                solver_options=options)

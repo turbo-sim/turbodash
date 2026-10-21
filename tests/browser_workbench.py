@@ -268,7 +268,7 @@ def main():
             config["inputs"]["stages"][1]["name"] = "Low pressure"
             config["optimization"]["design_variables"] = {"blade_velocity_ratio": {"lower_value": 0.5, "upper_value": 0.65}}
             config["optimization"]["constraints"] = []
-            config["optimization"]["solver_options"]["max_iterations"] = 20
+            config["optimization"]["solver_options"]["maxiter"] = 20
             page.locator('#load_button input[type="file"]').set_input_files({"name": "two-stage-review.yaml", "mimeType": "text/yaml", "buffer": yaml.safe_dump(config).encode()})
             expect(page.locator("#stage_count_label")).to_have_text("2")
             expect(page.locator(".td-inspector .td-section[open]")).to_have_count(0)

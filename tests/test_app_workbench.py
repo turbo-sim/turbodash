@@ -617,7 +617,7 @@ def test_save_exports_current_named_design_and_optimization_editor(live_form):
     saved = yaml.safe_load(download["content"])
     assert "inlet_property_2: 600.00" in download["content"]
     assert "aspect_ratio: 2.00" in download["content"]
-    assert "max_iterations: 123\n" in download["content"]
+    assert "maxiter: 123\n" in download["content"]
     assert type(saved["inputs"]["inlet_property_2"]) is float
     assert saved["inputs"] == config["inputs"]
     assert saved["overall_performance"] == solved["overall_performance"]
@@ -631,7 +631,7 @@ def test_save_exports_current_named_design_and_optimization_editor(live_form):
         saved["optimization"]["objective_function"]["variable"]
         == "$overall_performance.efficiency_tt"
     )
-    assert saved["optimization"]["solver_options"]["max_iterations"] == 123
+    assert saved["optimization"]["solver_options"]["maxiter"] == 123
     assert changes["td-load-error"]["children"] == ""
 
 

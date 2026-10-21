@@ -10,7 +10,8 @@ import dash_bootstrap_components as dbc
 from . import jobs
 from .model import (
     build_settings, flat_config, nested_config, output_catalog, variable_catalog,
-    variable_groups, constraint_groups,
+    variable_groups, constraint_groups, SLSQP_EXTRA_CONTROLS, solver_editor_options,
+    extra_solver_options,
 )
 from .selection import apply_selection_operations, picker_signature, picker_tree, selector_menu
 
@@ -38,10 +39,35 @@ def panel():
                                                 options=[{"label": "Maximize", "value": "maximize"},
                                                          {"label": "Minimize", "value": "minimize"}])),
                     html.Div([
-                        field("Solver tolerance", dbc.Input(id="opt-tolerance", type="number", value=1e-8, min=1e-14, step="any")),
-                        field("Iteration limit", dbc.Input(id="opt-iterations", type="number", value=150, min=1, max=2000, step=1)),
-                        field("Feasibility tolerance", dbc.Input(id="opt-feasibility", type="number", value=1e-6, min=1e-14, step="any")),
+                        field("Solver tolerance", dbc.Input(id="opt-tolerance", type="number", value=1e-9, min=1e-14, step="any"),
+                              "Native SLSQP stopping tolerance (ftol), including objective changes, steps, and aggregate feasibility/optimality tests. It is not a guaranteed KKT gradient bound. Final feasibility and optimality are checked separately."),
+                        field("Iteration limit", dbc.Input(id="opt-iterations", type="number", value=solver_editor_options()["maxiter"], min=1, max=2000, step=1)),
+                        field("Feasibility tolerance", dbc.Input(id="opt-feasibility", type="number", value=1e-6, min=1e-14, step="any"),
+                              "Maximum allowed normalized constraint violation before a result can be applied."),
                     ], className="td-opt-settings-grid"),
+                    html.Details([
+                        html.Summary("Step control and recovery"),
+                        html.Div([
+                            field("First-step fraction", dbc.Input(id="opt-first-step", type="number", value=1.0, min=1e-8, max=1, step="any"),
+                                  "Start the first SLSQP search with this fraction of its proposed step. Use 1 for the full step or try 0.2 for a difficult starting design. Later searches use the maximum step fraction unless gradual restoration is enabled below."),
+                            field("Maximum step fraction", dbc.Input(id="opt-max-step", type="number", value=1.0, min=1e-8, max=1, step="any"),
+                                  "Cap the starting fraction in every SLSQP search. Smaller values may slow convergence. This limits a fraction of the proposed step, not an absolute change in a design variable."),
+                            field("Step growth factor (optional)", dbc.Input(id="opt-step-growth-factor", type="number", value=solver_editor_options()["step_growth_factor"], min=1, step="any", placeholder="Blank disables (default 1.5)"),
+                                  "Default 1.5 restores the starting step fraction by 50% each major iteration, capped at the maximum. After an invalid trial is recovered, the next iteration starts from the actual accepted fraction multiplied by this factor, then restores progressively. A factor of 1 holds the current fraction. Leave blank to disable gradual restoration."),
+                            field("Recover invalid trials", dbc.Switch(id="opt-domain-backtracking", value=True),
+                                  "Shorten and retry a trial when the meanline model reports a recoverable physical-domain failure. The model equations are never clipped to manufacture a solution. The initial design must evaluate successfully."),
+                            field("Step reduction factor", dbc.Input(id="opt-backtrack-factor", type="number", value=.5, min=1e-8, max=.99999999, step="any"),
+                                  "Multiply a rejected trial step or derivative perturbation by this factor before retrying. A value of 0.5 halves it; the factor must be between 0 and 1."),
+                            field("Trial retry limit", dbc.Input(id="opt-max-backtracks", type="number", value=20, min=0, step=1),
+                                  "Maximum reductions of a trial that fails the meanline model's domain checks. Exhausting the limit stops the run with the failure details."),
+                            field("Derivative step", dbc.Input(id="opt-finite-diff-step", type="number", value=solver_editor_options()["finite_diff_step"], min=1e-14, step="any"),
+                                  "Finite-difference perturbation in normalized design coordinates, where each variable's bounds span 0 to 1."),
+                            field("Derivative retry limit", dbc.Input(id="opt-max-fd-backtracks", type="number", value=12, min=0, step=1),
+                                  "Maximum reductions when derivative samples fail model-domain checks. An admissible opposite-direction sample can also be used."),
+                            field("Optimality tolerance", dbc.Input(id="opt-optimality-tolerance", type="number", value=1e-4, min=1e-14, step="any"),
+                                  "Maximum allowed KKT stationarity, dual-feasibility, and complementarity residuals in normalized solver coordinates. Includes variable bounds. Constraint and bound violations use the separate feasibility tolerance."),
+                        ], className="td-subsection-body td-opt-settings-grid"),
+                    ], className="td-subsection", id="opt-step-controls"),
                 ], className="td-opt-tab")),
                 dbc.Tab(label="Design variables", tab_id="variables", children=html.Div([
                     html.Span("?", title="Only selected inputs are free. A blank initial value uses the current design; values outside bounds are clipped and logged.", tabIndex=0, className="td-help",
@@ -72,7 +98,7 @@ def panel():
 
 def terminal():
     return html.Details([
-        html.Summary(["Optimization terminal", html.Span("PySolverView", className="td-opt-badge")]),
+        html.Summary(["Optimization terminal", html.Span("SLSQP", className="td-opt-badge")]),
         html.Pre("Convergence output will appear here when you start a run.", id="opt-log", tabIndex=0,
                  **{"aria-label": "Optimization convergence output"}),
     ], id="opt-terminal", className="td-opt-terminal")
@@ -92,6 +118,17 @@ def actions():
         dbc.Button("Start optimization", id="opt-start", color="primary", className="td-opt-start", n_clicks=0),
     ], id="opt-actions", className="td-optimization-dock td-opt-state-ready",
         **{"aria-label": "Optimization controls", "aria-busy": "false"})
+
+
+def recovery_summary(result):
+    """Give successful recoveries a compact status outside the solver report."""
+    parts = []
+    for key, label in (("domain_rejections", "invalid trial"),
+                       ("derivative_rejections", "derivative sample")):
+        count = result.get(key, 0)
+        if count:
+            parts.append(f"{count} {label}{'s' if count != 1 else ''}")
+    return f" Recovered {' and '.join(parts)}." if parts else ""
 
 
 def outcome_presentation(state, launching=False):
@@ -395,13 +432,15 @@ def register_callbacks(app, live_config, render_results):
 
     @app.callback(Output("opt-objective", "value"), Output("opt-direction", "value"),
                   Output("opt-tolerance", "value"), Output("opt-iterations", "value"), Output("opt-feasibility", "value"),
+                  *[Output(component_id, "value") for _, component_id in SLSQP_EXTRA_CONTROLS],
                   Input("loaded_cfg_store", "data"))
     def load_settings(config):
         settings = (config or {}).get("optimization", {})
         objective = settings.get("objective_function", {})
-        options = settings.get("solver_options", {})
+        options = solver_editor_options(settings)
         return (objective.get("variable", DEFAULT_OBJECTIVE), objective.get("type", "maximize"),
-                options.get("tolerance", 1e-8), options.get("max_iterations", 150), settings.get("feasibility_tolerance", 1e-6))
+                options["ftol"], options["maxiter"], settings.get("feasibility_tolerance", 1e-6),
+                *[options[name] for name, _ in SLSQP_EXTRA_CONTROLS])
 
     job_outputs = [
         Output("opt-job", "data"), Output("opt-status", "children"), Output("opt-log", "children"),
@@ -416,6 +455,7 @@ def register_callbacks(app, live_config, render_results):
         State("opt-objective", "value"), State("opt-direction", "value"),
         State("opt-tolerance", "value"), State("opt-iterations", "value"), State("opt-feasibility", "value"),
         State("result_store", "data"),
+        *[State(component_id, "value") for _, component_id in SLSQP_EXTRA_CONTROLS],
     ]
 
     @app.callback(*job_outputs, Input("opt-poll", "n_intervals"), *job_states, prevent_initial_call=True)
@@ -441,7 +481,8 @@ def register_callbacks(app, live_config, render_results):
                 config = live_config(ov, sv, oi, si, stages)
                 variables = collect_rows(*values[:4])
                 constraints = collect_rows(*values[4:10])
-                settings = build_settings(config, variables, constraints, *values[10:15], results=values[15])
+                settings = build_settings(config, variables, constraints, *values[10:15], results=values[15],
+                                          solver_options=extra_solver_options(values[16:]))
                 handle = jobs.start_job(config, settings, owner)
                 return handle, "Optimizing turbine…", "Starting a fresh optimization run…", None, "Preparing initial design…", no_update, no_update, True, "running"
             except PreventUpdate:
@@ -480,6 +521,9 @@ def register_callbacks(app, live_config, render_results):
                     render_results(result["turbine_results"], None)
                     config, applied = nested_config(result["config"]), result
                     message = f"Optimization applied · objective {result['objective']:.7g}. {result['message']}"
+                    recovery = recovery_summary(result)
+                    if recovery:
+                        message = message.rstrip(".") + "." + recovery
                     pending = dict(handle, applying=True, target=jobs.fingerprint(result["config"]),
                                    applied_at=time.time(), message=message)
                     return pending, "Applying optimized design…", log, progress, summary, config, applied, no_update, "applying"

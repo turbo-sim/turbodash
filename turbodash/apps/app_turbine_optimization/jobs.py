@@ -1,4 +1,4 @@
-"""Session-owned subprocess jobs with atomic progress records and PSV logs.
+"""Session-owned subprocess jobs with atomic progress records and SLSQP logs.
 
 The web server never runs a solve or redirects stdout. Workers publish complete
 physical snapshots, so future live geometry clients can consume the same files.
@@ -47,8 +47,17 @@ def _write_json(path, value):
 
 
 def _read_mapping(path):
+    """Read one complete snapshot, allowing a brief Windows replacement lock."""
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
+        for attempt in range(20):
+            try:
+                contents = path.read_text(encoding="utf-8")
+                break
+            except PermissionError:
+                if attempt == 19:
+                    raise
+                time.sleep(.02)
+        value = json.loads(contents)
         if isinstance(value, dict):
             return value
     except (ValueError, OSError) as error:
@@ -220,6 +229,7 @@ def source_config(handle, owner):
 
 def _run_worker(request_path):
     from turbodash.optimization import optimize_turbine
+    from turbodash.optimization.turbine import solver_diagnostics
 
     folder = Path(request_path).resolve().parent
     logger = logging.Logger(f"turbodash.optimization.{folder.name}", logging.INFO)
@@ -240,27 +250,27 @@ def _run_worker(request_path):
     threading.Thread(target=watch, daemon=True).start()
     try:
         request = _read_mapping(Path(request_path))
-        logger.info("Optimizing turbine · scipy / SLSQP")
-        logger.info("PSV Func-value is the signed, normalized minimized objective; progress below uses physical units.")
 
         def progress(snapshot):
             _write_json(folder / "progress.json", snapshot)
-            logger.info("Update %d · physical objective %.8g · max violation %.3g",
-                        snapshot["iteration"], snapshot["objective"], snapshot["max_constraint_violation"])
 
         result = optimize_turbine(request["config"], request["optimization"], callback=progress, logger=logger)
         payload = dict(config=result.config, turbine_results=result.turbine_results,
                        success=result.success, solver_success=result.solver_success, feasible=result.feasible,
                        message=result.message, objective=result.objective, initial_objective=result.initial_objective,
                        max_constraint_violation=result.max_constraint_violation, constraint_report=result.constraint_report,
-                       history=result.history, fingerprint=request["fingerprint"])
+                       history=result.history, fingerprint=request["fingerprint"],
+                       solver_status=result.solver.status,
+                       **solver_diagnostics(result.solver),
+                       domain_rejections=result.solver.domain_rejections,
+                       derivative_rejections=result.solver.derivative_rejections,
+                       recovery_events=result.solver.events)
         _write_json(folder / "result.json", payload)
-        logger.info("%s · %s", "SUCCESS" if result.success else "NOT APPLIED", result.message)
-        logger.info("Model evaluations: %d · elapsed %.2f s", result.n_evaluations, result.solver.elapsed_time)
         _write_json(folder / "status.json", dict(state="complete", message=result.message))
     except Exception as error:
         logger.exception("ERROR: %s", error)
-        _write_json(folder / "status.json", dict(state="failed", message=str(error)))
+        failure = error.to_dict() if hasattr(error, "to_dict") else None
+        _write_json(folder / "status.json", dict(state="failed", message=str(error), failure=failure))
     finally:
         finished.set()
         handler.close()

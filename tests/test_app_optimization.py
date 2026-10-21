@@ -483,8 +483,13 @@ class JobTests(unittest.TestCase):
             self.assertEqual(status["state"], "complete", log)
             self.assertTrue(result["success"], log)
             self.assertTrue(seen)
-            self.assertIn("SUCCESS", log)
+            self.assertIn("Success: True", log)
             self.assertIn("Grad-eval", log)
+            self.assertIn("Exit message:", log)
+            for duplicate in ("Optimizing turbine ·", "PSV Func-value", "physical objective",
+                              "Model evaluations:", "SUCCESS ·"):
+                self.assertNotIn(duplicate, log)
+            self.assertNotRegex(log, r"(?m)^Update \d+")
             self.assertEqual(progress["config"]["inputs"], progress["turbine_results"]["inputs"])
 
     def test_failure_releases_session_and_next_run_works(self):
@@ -498,6 +503,37 @@ class JobTests(unittest.TestCase):
         self.assertIsNone(result)
         retry = jobs.start_job(config, settings(config), "alice")
         self.assertTrue(self.wait(retry, "alice")[3]["success"])
+
+    def test_full_variable_case_recovers_with_structured_worker_diagnostics(self):
+        config = opt.load_case(ROOT / "development/optimization_slsqp/case.yaml")
+        handle = jobs.start_job(config, config["optimization"], "recovery")
+        status, log, progress, result, seen = self.wait(handle, "recovery")
+        self.assertEqual(status["state"], "complete", log)
+        self.assertTrue(result["success"], log)
+        self.assertTrue(seen)
+        self.assertAlmostEqual(result["objective"], .8981194547, places=7)
+        self.assertEqual(result["domain_rejections"], 1)
+        self.assertEqual(progress["domain_rejections"], 1)
+        failure = result["recovery_events"][0]["failure"]
+        self.assertEqual(failure["quantity"], "rotor_exit_radicand")
+        self.assertEqual(failure["stage_index"], 0)
+        self.assertEqual(failure["station"], 4)
+        self.assertLess(failure["value"], 0)
+        self.assertTrue(failure["recoverable"])
+        self.assertIn("Rejected trial", log)
+        self.assertNotIn("Update 1", log)
+        self.assertEqual(result["config"]["optimization"]["solver_options"]["backtrack_factor"], .5)
+
+        # The identical domain violation is a clean, reviewable failure with
+        # recovery disabled; it must never be reported as an applied design.
+        config["optimization"]["solver_options"]["domain_backtracking"] = False
+        failed = jobs.start_job(config, config["optimization"], "recovery")
+        status, log, _, result, _ = self.wait(failed, "recovery")
+        self.assertEqual(status["state"], "complete", log)
+        self.assertFalse(result["success"])
+        self.assertEqual(result["solver_status"], 11)
+        self.assertIn("No valid line-search trial", result["message"])
+        self.assertAlmostEqual(result["objective"], .9068481151, places=7)
 
     def test_unexpected_worker_exit_and_expired_or_invalid_handles(self):
         config = case()
@@ -723,7 +759,7 @@ class WorkspaceTests(unittest.TestCase):
             "read_job",
             return_value=(
                 dict(state="complete", message=optimized.message),
-                "SUCCESS",
+                "Success: True",
                 None,
                 payload,
             ),

@@ -23,7 +23,7 @@ def main():
     parser.add_argument("--browser", default="C:/Program Files/Google/Chrome/Application/chrome.exe")
     parser.add_argument("--smoke", action="store_true")
     args = parser.parse_args()
-    output = ROOT / "development/app_design/implemented"
+    output = ROOT / "development/app_design/output_workbench"
     temporary = output / "output_browser"
     for folder in ("temp", "profile", "downloads"):
         (temporary / folder).mkdir(parents=True, exist_ok=True)

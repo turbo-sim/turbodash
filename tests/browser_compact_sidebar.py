@@ -15,7 +15,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", default="http://127.0.0.1:8067")
     args = parser.parse_args()
-    output = ROOT / "development/app_design/implemented"
+    output = ROOT / "development/app_design/output_compact_sidebar"
     scratch = output / "output_compact_sidebar"
     for name in ("temp", "profile", "downloads"):
         (scratch / name).mkdir(parents=True, exist_ok=True)

@@ -1,7 +1,7 @@
 """Optional browser regression for lossless numeric presentation in the workbench.
 
 Starts its own local app; browser profile, temporary files, logs and downloads
-are written only under development/app_design/implemented/output_numeric/.
+are written only under development/app_design/output_numeric/.
 """
 
 import argparse
@@ -26,7 +26,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--browser", default="C:/Program Files/Google/Chrome/Application/chrome.exe")
     args = parser.parse_args()
-    output = ROOT / "development/app_design/implemented/output_numeric"
+    output = ROOT / "development/app_design/output_numeric"
     for folder in ("temp", "profile", "downloads"):
         (output / folder).mkdir(parents=True, exist_ok=True)
     os.environ.update(TEMP=str(output / "temp"), TMP=str(output / "temp"), PYTHONDONTWRITEBYTECODE="1")
@@ -236,7 +236,7 @@ def main():
                     checks.append("Property-only updates and YAML save/reload retain exact numerical values independently of display padding")
                     assert not errors, errors
                     report = {"checks": checks, "browser_errors": errors, "successful_result_updates": len(results)}
-                    destination = ROOT / "development/app_design/implemented/numeric_browser_checks.json"
+                    destination = output / "report.json"
                     destination.write_text(json.dumps(report, indent=2), encoding="utf-8")
                     print(json.dumps(report, indent=2))
                 except Exception:

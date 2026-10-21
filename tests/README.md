@@ -67,9 +67,11 @@ poetry run python docs/build_docs.py --no-autobuild
 python tests/browser_workbench.py --url http://127.0.0.1:8050 --browser "C:/Program Files/Google/Chrome/Application/chrome.exe"
 ```
 
-The workbench script saves actual-app PNGs and a JSON report under
-`development/app_design/implemented/`; browser profiles and downloads stay in
-its ignored `output_browser/` directory. Keep the server's temporary directory
+The workbench script saves actual-app PNGs, its JSON report, browser profiles
+and downloads under ignored `development/app_design/output_workbench/`.
+The [app design blueprint](../development/app_design/README.md) keeps only curated
+current screenshots; copy reviewed references into its `implemented/` folder.
+Keep the server's temporary directory
 inside the checkout when running repository-confined development checks.
 It also checks the three independent plot groups, solid endwalls and hidden
 geometry legends, velocity-triangle display modes, and the row/final-exit loss
@@ -92,7 +94,9 @@ python docs/development/verify_source_fidelity.py
 
 `browser_numeric_format.py` starts its own server and checks three-decimal
 display padding, additional entered digits, tiny tolerances, focused editing,
-dynamic controls and precise YAML round trips. Formatting must not cause an
+dynamic controls and precise YAML round trips. Its captures, profile and
+`report.json` stay in ignored `development/app_design/output_numeric/`.
+Formatting must not cause an
 extra calculation or change numeric model values.
 
 Interaction stress regressions start and stop their own local servers. They use
@@ -120,5 +124,5 @@ rapid selection and removal while earlier updates are still pending.
 checks contained sections, inline fields, compact optimization rows and both
 themes at desktop, 390 px and 320 px. It also checks a resized 280 px inspector
 and menus opened near the bottom of the scrolling area. It saves three
-optimization screenshots and `compact_sidebar_browser_checks.json` in the
-implemented design folder, with scratch output in `output_compact_sidebar/`.
+optimization screenshots and `compact_sidebar_browser_checks.json` under ignored
+`development/app_design/output_compact_sidebar/`, alongside its scratch output.

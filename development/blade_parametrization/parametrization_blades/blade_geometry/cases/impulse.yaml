@@ -1,0 +1,51 @@
+# Smooth symmetric approximation to the supplied rotor schematic, in the app's orientation.
+# Assumed dimensions in mm: chord 54, max paired thickness 16.1, pitch 26.7, tip radius 0.5.
+# 12 blades are a realization choice; mean radius gives the requested pitch exactly.
+# Both edge ratios are derived for a 0.5 mm limiting tip radius (not a circular cap).
+# R30.2 is not enforced: the current camber/thickness family approximates the outline.
+# See ../../../validation_blades/impulse_reference.md and ../../../validation_blades/validation/impulse_reference_fit.json.
+schema_version: 2
+label: Impulse blade — reference crescent, symmetric ends
+source:
+  geometry:
+    type: axial
+    mean_radius: 0.05099324376664327
+    blade_height: 0.01
+    meridional_chord: 0.054
+    inlet_radius: 0.02
+    outlet_radius: 0.035
+  cascade:
+    blade_count: 12
+  camberline:
+    inlet_metal_angle_deg: -54.289
+    outlet_metal_angle_deg: 54.289
+    interpolation: angle
+    turning_location: 0.5
+    turning_concentration: 1.8753
+  thickness:
+    maximum_thickness_ratio: 0.29814814814814816
+    maximum_thickness_location: 0.5
+    leading_edge_thickness_ratio: 0.014543325329243387
+    trailing_edge_thickness_ratio: 0.014543325329243387
+    leading_edge_fraction: 0.005
+    trailing_edge_fraction: 0.005
+    leading_edge_rounding_exponent: 3.0
+    trailing_edge_rounding_exponent: 3.0
+    shape_exponent: 2.0
+    leading_edge_fullness: 0.0
+    trailing_edge_fullness: 0.0
+  leading_edge:
+    relief_strength: 0.0
+    pressure_side: auto
+  trailing_edge:
+    relief_strength: 0.0
+    pressure_side: auto
+  correction:
+    preserve_physical_thickness: false
+    warning_tolerance: 0.01
+  numerics:
+    number_of_points: 401
+  flow_domain:
+    inlet_chords: 0.5
+    outlet_chords: 1.0
+overrides: {}

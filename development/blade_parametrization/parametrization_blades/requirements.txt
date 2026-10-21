@@ -1,0 +1,14 @@
+# Standalone geometry and Plotly/Dash app dependencies.
+# Install with: python -m pip install -r requirements.txt
+numpy>=1.26,<3
+scipy>=1.11,<2
+PyYAML>=6,<7
+plotly>=5.23,<7
+dash>=3.2,<5
+
+# Optional mapping / VTK / Gmsh dependencies are maintained by TurboMoC.
+# In the TurboDash Poetry environment, install them with: poetry install -E mesh
+# Install the companion checkout into this same interpreter:
+# python -m pip install -e /path/to/method_of_characteristics
+# This prototype was verified against local TurboMoC 1.2.1. Alternatively use
+# its prepared environment and set TURBOMOC_SOURCE to the companion checkout.

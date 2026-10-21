@@ -1,0 +1,318 @@
+{
+  "law": "Shared blade kernel: rational Denton law with independent reference fullness inputs",
+  "input": "f_LE and f_TE, not the internal a coefficients",
+  "values": [
+    -0.5,
+    -0.25,
+    0.0,
+    0.25,
+    0.5
+  ],
+  "base_points": 601,
+  "baselines": {
+    "impulse": {
+      "parameters": {
+        "geometry": {
+          "type": "axial",
+          "mean_radius": 0.05099324376664327,
+          "blade_height": 0.01,
+          "meridional_chord": 0.054,
+          "inlet_radius": 0.02,
+          "outlet_radius": 0.035
+        },
+        "cascade": {
+          "blade_count": 12
+        },
+        "camberline": {
+          "inlet_metal_angle_deg": -54.289,
+          "outlet_metal_angle_deg": 54.289,
+          "interpolation": "angle",
+          "turning_location": 0.5,
+          "turning_concentration": 1.8753
+        },
+        "thickness": {
+          "maximum_thickness_ratio": 0.29814814814814816,
+          "maximum_thickness_location": 0.5,
+          "leading_edge_thickness_ratio": 0.014543325329243387,
+          "trailing_edge_thickness_ratio": 0.014543325329243387,
+          "leading_edge_fraction": 0.005,
+          "trailing_edge_fraction": 0.005,
+          "leading_edge_rounding_exponent": 3.0,
+          "trailing_edge_rounding_exponent": 3.0,
+          "shape_exponent": 2.0,
+          "leading_edge_fullness": 0.0,
+          "trailing_edge_fullness": 0.0
+        },
+        "leading_edge": {
+          "relief_strength": 0.0,
+          "pressure_side": "auto"
+        },
+        "trailing_edge": {
+          "relief_strength": 0.0,
+          "pressure_side": "auto"
+        },
+        "correction": {
+          "preserve_physical_thickness": false,
+          "warning_tolerance": 0.01
+        },
+        "numerics": {
+          "number_of_points": 601
+        },
+        "flow_domain": {
+          "inlet_chords": 0.5,
+          "outlet_chords": 1.0
+        }
+      },
+      "metrics": {
+        "family": "impulse",
+        "leading_fullness": 0.0,
+        "trailing_fullness": 0.0,
+        "positive_thickness": true,
+        "thickness_slope_sign_changes": 1,
+        "maximum_body_thickness_mm": 16.1,
+        "body_peak_xi": 0.5,
+        "maximum_paired_thickness_mm": 16.1,
+        "minimum_normal_map_margin": 0.4702242616567578,
+        "self_intersection": false,
+        "neighbor_intersection": false,
+        "intersection_sample_count": 843,
+        "diagnostic_sample_count": 22403
+      }
+    },
+    "reaction": {
+      "parameters": {
+        "geometry": {
+          "type": "axial",
+          "mean_radius": 0.05,
+          "blade_height": 0.01,
+          "meridional_chord": 0.015,
+          "inlet_radius": 0.02,
+          "outlet_radius": 0.035
+        },
+        "cascade": {
+          "blade_count": 24
+        },
+        "camberline": {
+          "inlet_metal_angle_deg": 0.0,
+          "outlet_metal_angle_deg": 60.0,
+          "interpolation": "angle",
+          "turning_location": 0.52,
+          "turning_concentration": 1.2
+        },
+        "thickness": {
+          "maximum_thickness_ratio": 0.22,
+          "maximum_thickness_location": 0.3,
+          "leading_edge_thickness_ratio": 0.06,
+          "trailing_edge_thickness_ratio": 0.015,
+          "leading_edge_fraction": 0.1,
+          "trailing_edge_fraction": 0.025,
+          "leading_edge_rounding_exponent": 3.0,
+          "trailing_edge_rounding_exponent": 3.0,
+          "shape_exponent": 2.0,
+          "leading_edge_fullness": 0.0,
+          "trailing_edge_fullness": 0.0
+        },
+        "leading_edge": {
+          "relief_strength": 0.15,
+          "pressure_side": "auto"
+        },
+        "trailing_edge": {
+          "relief_strength": 0.0,
+          "pressure_side": "auto"
+        },
+        "correction": {
+          "preserve_physical_thickness": false,
+          "warning_tolerance": 0.01
+        },
+        "numerics": {
+          "number_of_points": 601
+        },
+        "flow_domain": {
+          "inlet_chords": 0.5,
+          "outlet_chords": 1.0
+        }
+      },
+      "metrics": {
+        "family": "reaction",
+        "leading_fullness": 0.0,
+        "trailing_fullness": 0.0,
+        "positive_thickness": true,
+        "thickness_slope_sign_changes": 1,
+        "maximum_body_thickness_mm": 3.3113176359585466,
+        "body_peak_xi": 0.26725,
+        "maximum_paired_thickness_mm": 3.311317636255652,
+        "minimum_normal_map_margin": 0.8803472975903504,
+        "self_intersection": false,
+        "neighbor_intersection": false,
+        "intersection_sample_count": 844,
+        "diagnostic_sample_count": 22404
+      }
+    }
+  },
+  "cases": [
+    {
+      "family": "impulse",
+      "leading_fullness": -0.5,
+      "trailing_fullness": -0.5,
+      "positive_thickness": true,
+      "thickness_slope_sign_changes": 1,
+      "maximum_body_thickness_mm": 16.1,
+      "body_peak_xi": 0.5,
+      "maximum_paired_thickness_mm": 16.1,
+      "minimum_normal_map_margin": 0.4702242616567578,
+      "self_intersection": false,
+      "neighbor_intersection": false,
+      "intersection_sample_count": 843,
+      "diagnostic_sample_count": 22403
+    },
+    {
+      "family": "impulse",
+      "leading_fullness": -0.25,
+      "trailing_fullness": -0.25,
+      "positive_thickness": true,
+      "thickness_slope_sign_changes": 1,
+      "maximum_body_thickness_mm": 16.1,
+      "body_peak_xi": 0.5,
+      "maximum_paired_thickness_mm": 16.1,
+      "minimum_normal_map_margin": 0.4702242616567578,
+      "self_intersection": false,
+      "neighbor_intersection": false,
+      "intersection_sample_count": 843,
+      "diagnostic_sample_count": 22403
+    },
+    {
+      "family": "impulse",
+      "leading_fullness": 0.0,
+      "trailing_fullness": 0.0,
+      "positive_thickness": true,
+      "thickness_slope_sign_changes": 1,
+      "maximum_body_thickness_mm": 16.1,
+      "body_peak_xi": 0.5,
+      "maximum_paired_thickness_mm": 16.1,
+      "minimum_normal_map_margin": 0.4702242616567578,
+      "self_intersection": false,
+      "neighbor_intersection": false,
+      "intersection_sample_count": 843,
+      "diagnostic_sample_count": 22403,
+      "neutral_coordinate_error_mm": 0.0
+    },
+    {
+      "family": "impulse",
+      "leading_fullness": 0.25,
+      "trailing_fullness": 0.25,
+      "positive_thickness": true,
+      "thickness_slope_sign_changes": 1,
+      "maximum_body_thickness_mm": 16.1,
+      "body_peak_xi": 0.5,
+      "maximum_paired_thickness_mm": 16.1,
+      "minimum_normal_map_margin": 0.4702242616567578,
+      "self_intersection": false,
+      "neighbor_intersection": false,
+      "intersection_sample_count": 843,
+      "diagnostic_sample_count": 22403
+    },
+    {
+      "family": "impulse",
+      "leading_fullness": 0.5,
+      "trailing_fullness": 0.5,
+      "positive_thickness": true,
+      "thickness_slope_sign_changes": 1,
+      "maximum_body_thickness_mm": 16.1,
+      "body_peak_xi": 0.5,
+      "maximum_paired_thickness_mm": 16.1,
+      "minimum_normal_map_margin": 0.4702242616567578,
+      "self_intersection": false,
+      "neighbor_intersection": false,
+      "intersection_sample_count": 843,
+      "diagnostic_sample_count": 22403
+    },
+    {
+      "family": "reaction",
+      "leading_fullness": 0.0,
+      "trailing_fullness": -0.5,
+      "positive_thickness": true,
+      "thickness_slope_sign_changes": 1,
+      "maximum_body_thickness_mm": 3.305943166486611,
+      "body_peak_xi": 0.282375,
+      "maximum_paired_thickness_mm": 3.3059431438991735,
+      "minimum_normal_map_margin": 0.8807640855012083,
+      "self_intersection": false,
+      "neighbor_intersection": false,
+      "intersection_sample_count": 844,
+      "diagnostic_sample_count": 22404
+    },
+    {
+      "family": "reaction",
+      "leading_fullness": 0.0,
+      "trailing_fullness": -0.25,
+      "positive_thickness": true,
+      "thickness_slope_sign_changes": 1,
+      "maximum_body_thickness_mm": 3.308746402841786,
+      "body_peak_xi": 0.2743125,
+      "maximum_paired_thickness_mm": 3.3087464041433505,
+      "minimum_normal_map_margin": 0.8805307159451699,
+      "self_intersection": false,
+      "neighbor_intersection": false,
+      "intersection_sample_count": 844,
+      "diagnostic_sample_count": 22404
+    },
+    {
+      "family": "reaction",
+      "leading_fullness": 0.0,
+      "trailing_fullness": 0.0,
+      "positive_thickness": true,
+      "thickness_slope_sign_changes": 1,
+      "maximum_body_thickness_mm": 3.3113176359585466,
+      "body_peak_xi": 0.26725,
+      "maximum_paired_thickness_mm": 3.311317636255652,
+      "minimum_normal_map_margin": 0.8803472975903504,
+      "self_intersection": false,
+      "neighbor_intersection": false,
+      "intersection_sample_count": 844,
+      "diagnostic_sample_count": 22404,
+      "neutral_coordinate_error_mm": 0.0
+    },
+    {
+      "family": "reaction",
+      "leading_fullness": 0.0,
+      "trailing_fullness": 0.25,
+      "positive_thickness": true,
+      "thickness_slope_sign_changes": 1,
+      "maximum_body_thickness_mm": 3.3136170625961343,
+      "body_peak_xi": 0.2613125,
+      "maximum_paired_thickness_mm": 3.313617049622794,
+      "minimum_normal_map_margin": 0.8801976330259426,
+      "self_intersection": false,
+      "neighbor_intersection": false,
+      "intersection_sample_count": 844,
+      "diagnostic_sample_count": 22404
+    },
+    {
+      "family": "reaction",
+      "leading_fullness": 0.0,
+      "trailing_fullness": 0.5,
+      "positive_thickness": true,
+      "thickness_slope_sign_changes": 1,
+      "maximum_body_thickness_mm": 3.315641849261478,
+      "body_peak_xi": 0.256375,
+      "maximum_paired_thickness_mm": 3.3156418492610618,
+      "minimum_normal_map_margin": 0.8800721883410393,
+      "self_intersection": false,
+      "neighbor_intersection": false,
+      "intersection_sample_count": 844,
+      "diagnostic_sample_count": 22404
+    }
+  ],
+  "figures": [
+    {
+      "family": "impulse",
+      "equal_aspect": true,
+      "common_pixels_per_mm": 6.2099993139740235
+    },
+    {
+      "family": "reaction",
+      "equal_aspect": true,
+      "common_pixels_per_mm": 17.626823684989972
+    }
+  ]
+}

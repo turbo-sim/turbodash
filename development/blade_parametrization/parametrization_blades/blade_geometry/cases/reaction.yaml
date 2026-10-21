@@ -1,0 +1,47 @@
+# Illustrative reaction section; geometry only, not an aerodynamic solution.
+# Lengths are metres. All thickness ratios are full thickness / section scale.
+schema_version: 2
+label: Reaction blade — moderate positive turning
+source:
+  geometry:
+    type: axial
+    mean_radius: 0.05
+    blade_height: 0.01
+    meridional_chord: 0.015
+    inlet_radius: 0.02
+    outlet_radius: 0.035
+  cascade:
+    blade_count: 24
+  camberline:
+    inlet_metal_angle_deg: 0.0
+    outlet_metal_angle_deg: 60.0
+    interpolation: angle
+    turning_location: 0.52
+    turning_concentration: 1.2
+  thickness:
+    maximum_thickness_ratio: 0.22
+    maximum_thickness_location: 0.3
+    leading_edge_thickness_ratio: 0.06
+    trailing_edge_thickness_ratio: 0.015
+    leading_edge_fraction: 0.1
+    trailing_edge_fraction: 0.025
+    leading_edge_rounding_exponent: 3.0
+    trailing_edge_rounding_exponent: 3.0
+    shape_exponent: 2.0
+    leading_edge_fullness: 0.0
+    trailing_edge_fullness: 0.0
+  leading_edge:
+    relief_strength: 0.15
+    pressure_side: auto
+  trailing_edge:
+    relief_strength: 0.0
+    pressure_side: auto
+  correction:
+    preserve_physical_thickness: false
+    warning_tolerance: 0.01
+  numerics:
+    number_of_points: 401
+  flow_domain:
+    inlet_chords: 0.5
+    outlet_chords: 1.0
+overrides: {}

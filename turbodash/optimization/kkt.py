@@ -1,9 +1,29 @@
-"""Pointwise first-order KKT diagnostics in the caller's scaled coordinates.
+"""Assess first-order constrained optimality at the point actually reported.
+
+Native SLSQP termination combines several stopping tests. Its success flag or
+a small step alone does not establish that each KKT residual is below a user's
+chosen threshold, especially when trial steps are deliberately shortened. This
+module separately checks primal feasibility, stationarity of the Lagrangian,
+multiplier signs (dual feasibility), and complementarity, including variable
+bounds. The driver uses the diagnostics for reporting and final acceptance.
+
+``assess_kkt`` estimates multipliers at the supplied point with a small linear
+program, using all inequalities and finite bounds rather than selecting an
+active set through an arbitrary cutoff. It then recomputes the residuals from
+those multipliers and the supplied values and derivatives. Separate feasibility
+and optimality tolerances make acceptance explicit; native ``ftol`` is not
+treated as a component-wise KKT tolerance.
 
 For h(x)=0, c(x)>=0 and l<=x<=u the sign convention is
 L = f - lambda*h - mu*c - z_lower*(x-l) - z_upper*(u-x).
 Equality multipliers are free; all other multipliers are nonnegative.
-This checks necessary first-order conditions, not second-order or global optimality.
+
+All diagnostics use the caller's objective, constraint, and coordinate scaling.
+Their quality depends on derivative accuracy and numerical conditioning. A
+passing check is numerical evidence of first-order KKT conditions, not proof of
+a local minimum, second-order sufficiency, or global optimality. The usual
+constraint qualifications are needed when interpreting KKT as a necessary
+condition at a constrained minimum. This module has no turbine or app dependency.
 """
 
 import numpy as np

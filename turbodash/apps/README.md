@@ -137,17 +137,22 @@ channel shape, rather than a computed CFD velocity field. Stator/rotor profiles
 use orange/blue outlines with matching translucent fills.
 
 Expand **Optimization** at the bottom of the left sidebar. **Configuration**
-selects a scalar objective, maximize/minimize, solver tolerance, iteration limit,
-and feasibility tolerance. **Step control and recovery** exposes first-step and
-maximum step fractions, optional gradual step restoration, domain backtracking,
-trial and derivative retry budgets,
-the derivative step, and the final optimality tolerance. Loaded and saved YAML
-preserve these controls. See the [SLSQP guide](../../docs/source/guides/optimization.md)
-for their meanings and defaults.
-The iteration limit defaults to 200 and **Step growth factor (optional)** to
-`1.5`. After domain recovery, the next starting fraction grows from the accepted
-reduced fraction by 50%, then continues growing toward the maximum. Leave the
-field blank to disable gradual restoration.
+selects an objective, maximize/minimize, iteration limit, and solver tolerance.
+**Show expert settings** reveals the independent feasibility and optimality
+limits, grouped with the solver tolerance in scientific notation. It also shows
+first step fraction (default `0.25`), step growth factor (`1.5`), step reduction
+factor, and trial retry limit inline. Hiding expert settings preserves their
+values. Invalid-trial recovery is always enabled in the app; maximum step
+fraction and derivative step remain configurable through YAML/Python. The driver
+uses one bound-aware derivative probe per variable, without derivative retries.
+See the [SLSQP guide](../../docs/source/guides/optimization.md) for details.
+
+Hover or keyboard-focus a tab for 750 ms to see its purpose. The variable and
+constraint tabs place their Add buttons directly below the tabs. Picker branches
+start expanded, with indented checkboxes and connecting tree lines; users can
+collapse branches themselves. Lower/Initial/Upper and Comparison/Target/Scale
+remain visible as small labels inside their fields, including while typing.
+
 Add inputs under **Design variables**, then set physical lower/upper bounds.
 Leave Initial blank to use the current design, or enter an explicit override;
 out-of-bounds guesses are clipped and reported. Every unselected input stays
@@ -180,9 +185,11 @@ includes its optimization settings without reapplying old initial overrides.
 
 `app_turbine_optimization/workbench.py` owns the layout and display formatting;
 `shared/fluid_inputs.py` owns readable thermodynamic properties and safe pair conversion.
-`app_turbine_optimization/model.py` owns editor choices and validation;
-`app_turbine_optimization/panel.py` owns the panel/callbacks;
-`app_turbine_optimization/jobs.py` owns isolated processes, session ownership,
+`app_turbine_optimization/opt_model.py` owns editor choices and validation;
+`app_turbine_optimization/opt_panel.py` owns the panel/callbacks;
+`app_turbine_optimization/opt_selection.py` owns hierarchical variable and
+constraint menus and applies selection changes while preserving edits;
+`app_turbine_optimization/opt_jobs.py` owns isolated processes, session ownership,
 progress, and logs. Its CSS/JavaScript live in `app_turbine_optimization/assets/` and
 are loaded only by this version. Numerical code lives in the
 `turbodash.optimization` package, independently of Dash. Its optional `logger`

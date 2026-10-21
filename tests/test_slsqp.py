@@ -50,7 +50,7 @@ class SLSQPWrapperTests(unittest.TestCase):
             lambda x: Evaluation(objective(x)),
             x0,
             jac=lambda x: gradient(x)[None, :],
-            options=SLSQPOptions(ftol=1e-11, maxiter=100),
+            options=SLSQPOptions(first_step_fraction=1.0, ftol=1e-11, maxiter=100),
         )
         self.assertTrue(public.success, public.message)
         self.assertTrue(result.success, result.message)
@@ -102,7 +102,7 @@ class SLSQPWrapperTests(unittest.TestCase):
             [0.5, 0.5],
             bounds=bounds,
             jac=jacobian,
-            options=SLSQPOptions(ftol=1e-11),
+            options=SLSQPOptions(first_step_fraction=1.0, ftol=1e-11),
         )
         self.assertTrue(public.success, public.message)
         self.assertTrue(result.success, result.message)
@@ -141,7 +141,7 @@ class SLSQPWrapperTests(unittest.TestCase):
             [0.5, 0.5],
             bounds=bounds,
             jac=lambda x: np.vstack([gradient(x), -2.0 * x]),
-            options=SLSQPOptions(ftol=1e-10),
+            options=SLSQPOptions(first_step_fraction=1.0, ftol=1e-10),
         )
         self.assertTrue(public.success, public.message)
         self.assertTrue(result.success, result.message)
@@ -169,7 +169,7 @@ class SLSQPWrapperTests(unittest.TestCase):
             [0.36],
             bounds=[(-2.0, 2.0)],
             jac=jacobian,
-            options=SLSQPOptions(ftol=1e-11),
+            options=SLSQPOptions(first_step_fraction=1.0, ftol=1e-11),
         )
         self.assertTrue(result.success, result.message)
         self.assertAlmostEqual(result.x[0], 0.04, places=6)
@@ -189,7 +189,7 @@ class SLSQPWrapperTests(unittest.TestCase):
             evaluate,
             [0.36],
             jac=jacobian,
-            options=SLSQPOptions(domain_backtracking=False),
+            options=SLSQPOptions(first_step_fraction=1.0, domain_backtracking=False),
         )
         self.assertFalse(result.success)
         self.assertFalse(result.solver_success)
@@ -219,7 +219,7 @@ class SLSQPWrapperTests(unittest.TestCase):
         self.assertAlmostEqual(result.x[0], -0.4, places=5)
         self.assertLess(attempts[1], 0.0)
 
-    def test_fd_uses_opposite_side_when_forward_probe_is_outside_domain(self):
+    def test_invalid_derivative_probe_stops_without_trying_opposite_side(self):
         attempts = []
 
         def evaluate(x):
@@ -229,18 +229,14 @@ class SLSQPWrapperTests(unittest.TestCase):
             return Evaluation((x[0] + 0.4) ** 2)
 
         result = minimize_slsqp(evaluate, [0.0], bounds=[(-1.0, 1.0)])
-        self.assertTrue(result.success, result.message)
-        self.assertAlmostEqual(result.x[0], -0.4, places=5)
-        self.assertTrue(any(x > 0.0 for x in attempts))
-        self.assertTrue(any(-1e-4 < x < 0.0 for x in attempts))
-        self.assertFalse(
-            any(
-                event["kind"] in ("step_cap", "step_restoration")
-                for event in result.events
-            )
-        )
+        self.assertFalse(result.success)
+        self.assertEqual(result.status, 12)
+        self.assertEqual(attempts, [0.0, SLSQPOptions().finite_diff_step])
+        self.assertEqual(result.derivative_rejections, 1)
+        self.assertIn("not retried", result.message)
+        self.assertFalse(result.diagnostics_available)
 
-    def test_fd_shrinks_probes_when_both_sides_leave_domain(self):
+    def test_invalid_derivative_probe_is_not_shrunk(self):
         attempts = []
 
         def evaluate(x):
@@ -255,13 +251,13 @@ class SLSQPWrapperTests(unittest.TestCase):
             evaluate,
             [0.0],
             bounds=[(-1.0, 1.0)],
-            options=SLSQPOptions(finite_diff_step=0.1, ftol=1e-5),
+            options=SLSQPOptions(first_step_fraction=1.0, finite_diff_step=0.1, ftol=1e-5),
         )
-        self.assertTrue(result.success, result.message)
-        self.assertTrue(any(abs(x) >= 0.01 for x in attempts))
-        self.assertTrue(any(0.0 < abs(x) < 0.01 for x in attempts))
-        self.assertLess(abs(result.x[0]), 0.01)
-        self.assertLess(result.fun, 1e-5)
+        self.assertFalse(result.success)
+        self.assertEqual(result.status, 12)
+        self.assertEqual(attempts, [0.0, .1])
+        self.assertEqual(result.fun, 0.0)
+        self.assertIsNone(result.kkt)
 
     @staticmethod
     def _quadratic_with_trials(options):
@@ -316,7 +312,7 @@ class SLSQPWrapperTests(unittest.TestCase):
             evaluate,
             [0.36],
             jac=jacobian,
-            options=SLSQPOptions(step_growth_factor=None),
+            options=SLSQPOptions(first_step_fraction=1.0, step_growth_factor=None),
         )
         self.assertTrue(recovered.success, recovered.message)
         self.assertGreater(recovered.domain_rejections, 0)
@@ -474,7 +470,7 @@ class SLSQPWrapperTests(unittest.TestCase):
         def evaluate(x):
             return Evaluation(100.0 * (x[1] - x[0] ** 2) ** 2 + (1.0 - x[0]) ** 2)
 
-        result = minimize_slsqp(evaluate, [-1.2, 1.0], options=SLSQPOptions(maxiter=1))
+        result = minimize_slsqp(evaluate, [-1.2, 1.0], options=SLSQPOptions(first_step_fraction=1.0, maxiter=1))
         self.assertFalse(result.success)
         self.assertFalse(result.solver_success)
         self.assertEqual(result.status, 9)
@@ -489,7 +485,7 @@ class SLSQPWrapperTests(unittest.TestCase):
             evaluate,
             [0.36],
             jac=jacobian,
-            options=SLSQPOptions(domain_backtracking=False),
+            options=SLSQPOptions(first_step_fraction=1.0, domain_backtracking=False),
         )
         self.assertIs(_slsqp_py.slsqp, original)
 
@@ -552,7 +548,7 @@ class SLSQPWrapperTests(unittest.TestCase):
             lambda x: Evaluation(objective(x)),
             [-1.2, 1.0],
             jac=lambda x: gradient(x)[None, :],
-            options=SLSQPOptions(ftol=1e-11),
+            options=SLSQPOptions(first_step_fraction=1.0, ftol=1e-11),
         )
         self.assertTrue(public.success, public.message)
         self.assertTrue(result.success, result.message)
@@ -584,7 +580,7 @@ class SLSQPWrapperTests(unittest.TestCase):
             evaluate,
             [0.36],
             jac=jacobian,
-            options=SLSQPOptions(max_backtracks=0),
+            options=SLSQPOptions(first_step_fraction=1.0, max_backtracks=0),
         )
         self.assertFalse(result.success)
         self.assertEqual(result.status, 11)
@@ -601,7 +597,7 @@ class SLSQPWrapperTests(unittest.TestCase):
             return Evaluation(1.0)
 
         result = minimize_slsqp(
-            evaluate, [0.0], options=SLSQPOptions(max_fd_backtracks=3)
+            evaluate, [0.0], options=SLSQPOptions()
         )
         self.assertFalse(result.success)
         self.assertFalse(result.solver_success)
@@ -609,8 +605,7 @@ class SLSQPWrapperTests(unittest.TestCase):
         self.assertEqual(result.x[0], 0.0)
         self.assertEqual(result.fun, 1.0)
         self.assertTrue(any(x > 0.0 for x in attempts))
-        self.assertTrue(any(x < 0.0 for x in attempts))
-        self.assertGreater(len({abs(x) for x in attempts if x}), 1)
+        self.assertEqual(attempts, [0.0, SLSQPOptions().finite_diff_step])
 
     def test_native_merit_backtracking_remains_active_after_a_step_cap(self):
         attempts = []
@@ -828,7 +823,7 @@ print('Standalone solve passed without PSV solver calls.')
         attempts = []
         model, jacobian = self._sqrt_problem(attempts)
         result = minimize_slsqp(
-            model, [0.36], jac=jacobian, options=dict(domain_backtracking=False)
+            model, [0.36], jac=jacobian, options=dict(first_step_fraction=1.0, domain_backtracking=False)
         )
         self.assertEqual(result.status, 11)
         self.assertTrue(result.diagnostics_available)
@@ -841,7 +836,7 @@ print('Standalone solve passed without PSV solver calls.')
                 raise DomainError("No derivative probe is evaluable")
             return Evaluation(1.0)
 
-        result = minimize_slsqp(model, [0.0], options=dict(max_fd_backtracks=0))
+        result = minimize_slsqp(model, [0.0], options=SLSQPOptions())
         self.assertEqual(result.status, 12)
         self.assertFalse(result.diagnostics_available)
         self.assertIsNone(result.history[0]["optimality"])

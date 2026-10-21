@@ -115,7 +115,7 @@ def test_unavailable_solver_diagnostics_are_strict_json_safe():
 
 
 def test_worker_publishes_kkt_assessment_and_finite_json(tmp_path, monkeypatch):
-    from turbodash.apps.app_turbine_optimization import jobs
+    from turbodash.apps.app_turbine_optimization import opt_jobs as jobs
     import turbodash.optimization
 
     result = optimize_turbine(_case(), evaluator=_evaluate)
@@ -143,7 +143,7 @@ def test_worker_publishes_kkt_assessment_and_finite_json(tmp_path, monkeypatch):
 
 
 def test_snapshot_reader_retries_brief_replacement_lock(monkeypatch):
-    from turbodash.apps.app_turbine_optimization import jobs
+    from turbodash.apps.app_turbine_optimization import opt_jobs as jobs
 
     path = Mock()
     path.read_text.side_effect = [
@@ -160,7 +160,7 @@ def test_snapshot_reader_retries_brief_replacement_lock(monkeypatch):
 
 
 def test_snapshot_reader_reports_persistent_access_denial_after_bounded_retry(monkeypatch):
-    from turbodash.apps.app_turbine_optimization import jobs
+    from turbodash.apps.app_turbine_optimization import opt_jobs as jobs
 
     denied = PermissionError("Access permanently denied")
     path = Mock()
@@ -179,7 +179,7 @@ def test_snapshot_reader_reports_persistent_access_denial_after_bounded_retry(mo
 @pytest.mark.parametrize("failure", [FileNotFoundError("Missing snapshot"),
                                       OSError("Read failed"), "malformed JSON", "[]"])
 def test_snapshot_reader_does_not_retry_other_errors(failure, monkeypatch):
-    from turbodash.apps.app_turbine_optimization import jobs
+    from turbodash.apps.app_turbine_optimization import opt_jobs as jobs
 
     path = Mock()
     if isinstance(failure, Exception):

@@ -25,6 +25,44 @@ and divided by its optional normalization. Constraint residuals are divided
 by their configured scales. The model and the app continue to use physical
 input units.
 
+## Why use a dedicated SLSQP driver?
+
+A turbine can satisfy every individual variable bound and still have no real
+velocity triangle. At such a trial point, the model cannot supply a valid
+objective and constraints. The driver needs to reject that evaluation, shorten
+the pending step, and retry without losing the solver's accumulated state.
+After recovery, it can restore the step fraction gradually to reduce the chance
+of immediately crossing the model domain again.
+
+In the supported SciPy version, `scipy.optimize.minimize(method="SLSQP")` does
+not expose this pending-trial recovery or the step-fraction controls. Its
+iteration callback cannot intercept and retry an undefined pending model
+evaluation. Simply evaluating a shorter step inside an objective
+function would also leave the solver's internal step and line-search state
+inconsistent with the evaluated point.
+
+Turbodash therefore calls the same compiled SciPy SLSQP algorithm through a
+small private bridge that updates those quantities together. SciPy still
+performs the quadratic subproblems, merit line search, and BFGS updates.
+Recognized domain failures trigger another model evaluation at a shorter step;
+the driver does not replace invalid equations with clipped roots or invented
+objective penalties. Recovery is limited and may still fail.
+
+Scaling, derivative handling, and independent KKT reporting could be built
+around the public interface. The reason for the private bridge is control of
+the pending trial and its internal state. The tradeoff is a pinned SciPy version
+and explicit compatibility work when upgrading it.
+
+The source separates these responsibilities:
+
+| Module in `turbodash/optimization/` | Purpose |
+| --- | --- |
+| `__init__.py` | Exposes the shared Python API used by scripts and the app. |
+| `turbine.py` | Translates configured physical variables and responses into a scaled optimization problem; assembles physical results, histories, and exports. |
+| `slsqp.py` | Runs the evaluation loop, controls trial fractions and recovery, computes derivatives, and coordinates reporting and acceptance. |
+| `_slsqp_backend.py` | Owns the private SciPy state and workspace and consistently shortens pending trials. |
+| `kkt.py` | Independently evaluates first-order feasibility and optimality residuals, including variable bounds. |
+
 ## Configure the solver
 
 Set the following fields under `optimization` in a case YAML. These are the
@@ -38,13 +76,12 @@ optimization:
     ftol: 1.0e-9
     maxiter: 200
     finite_diff_step: 1.0e-7
-    first_step_fraction: 1.0
+    first_step_fraction: 0.25
     max_step_fraction: 1.0
     step_growth_factor: 1.5
     domain_backtracking: true
     backtrack_factor: 0.5
     max_backtracks: 20
-    max_fd_backtracks: 12
     optimality_tol: 1.0e-4
 ```
 
@@ -59,7 +96,6 @@ optimization:
 | `domain_backtracking` | Retry recognized invalid model trials at shorter distances. |
 | `backtrack_factor` | Factor multiplying a rejected trial's displacement; `0.5` halves it. |
 | `max_backtracks` | Maximum additional trial reductions for each native function request. |
-| `max_fd_backtracks` | Maximum derivative-probe reductions after trying both directions. |
 | `optimality_tol` | Independent acceptance tolerance for KKT stationarity, dual feasibility, and complementarity in normalized coordinates. |
 | `feasibility_tolerance` | Independent acceptance tolerance for normalized constraint and bound violations. This field belongs directly under `optimization`. |
 
@@ -70,10 +106,9 @@ SLSQP. A fraction of `0.5` is half that direction, not an absolute limit of
 half a physical unit or half a variable's range. SLSQP can shorten the trial
 further through its merit-function line search.
 
-Start with both fractions at `1.0`, domain backtracking enabled, and growth
-factor `1.5`. Valid full steps remain available until recovery is needed. If a
-particular starting design needs a more conservative first move, try
-`first_step_fraction: 0.5`. Applying a small fraction at every iteration can
+The defaults use `first_step_fraction: 0.25`, `max_step_fraction: 1.0`, domain
+backtracking enabled, and growth factor `1.5`. The first move is conservative
+and subsequent steps grow toward the full fraction. Applying a small fraction at every iteration can
 slow convergence considerably. Changing `finite_diff_step` changes derivative
 sampling, not the initial line-search step.
 
@@ -97,18 +132,32 @@ iteration's original QP direction, including further native line-search
 reductions. The next iteration starts at that fraction times the growth
 factor, capped at `max_step_fraction`. For example, recovery to `0.25` gives
 subsequent starting fractions `0.375, 0.5625, 0.84375, 1.0` with growth `1.5`.
-Further domain recovery restarts this process again. Derivative-probe recovery
-does not change the step schedule.
+Further domain recovery restarts this process again.
 
 Native line search and domain recovery can still shorten any trial further.
 A growth factor of `1.0` holds the starting fraction until a domain recovery
 reduces it again. Set `step_growth_factor: null` to restore the maximum
 immediately on the next iteration instead. Gradual restoration is enabled by
 default and does not guarantee physically valid trials. The default iteration
-limit is `200`, while the default first-step fraction remains `1.0`.
+limit is `200` and the default first-step fraction is `0.25`.
 
-The workbench exposes the controls in **Optimization → Configuration →
-Step control and recovery** and preserves them when loading or saving YAML.
+The workbench's **Optimization ? Configuration** tab shows the iteration limit
+and one solver tolerance (`ftol`). **Show expert settings** expands the same view
+inline: feasibility and KKT optimality tolerances appear beside the solver
+tolerance, followed by the first step fraction, growth factor, reduction factor,
+and trial retry limit. All three tolerances display in scientific notation.
+The switch changes visibility only: hiding expert values does not reset them or
+change their role in final acceptance. The three tolerances remain independent;
+changing `ftol` does not silently rescale the other two.
+
+The app always enables invalid-trial recovery. Maximum step fraction and the
+finite-difference step remain YAML/Python options and are preserved when loading
+and saving a design, but are not shown in the editor. The Python SLSQP interface
+still exposes `ftol`, `feasibility_tol`, and `optimality_tol` independently;
+turbine YAML uses the top-level `feasibility_tolerance` field for feasibility. The retired `max_fd_backtracks` key is discarded when
+loading legacy YAML, and is not exported. Direct `SLSQPOptions` construction
+no longer accepts it.
+
 Older configurations using `tolerance`, `max_iterations`, or
 `derivative_abs_step` are accepted as aliases for `ftol`, `maxiter`, and
 `finite_diff_step`. Legacy `library: scipy` and `method: slsqp` still select
@@ -145,10 +194,11 @@ stored SLSQP search step and corresponding line-search state consistently.
 The native solver then judges the valid trial using its usual merit test.
 The rejected design never becomes an accepted progress snapshot.
 
-Finite-difference probes use the same failure information. They stay within
-variable bounds, try the opposite direction when necessary, and reduce the
-probe distance if both sides are invalid. The derivative recovery budget is
-separate from the line-search budget.
+Finite differences choose one probe direction and distance from the available
+variable bounds before evaluating the model. There is no derivative retry or
+step-halving mechanism. A physically invalid probe stops the solve with its
+variable index and failure metadata; no derivative or KKT certificate is
+invented. This is separate from recovery of invalid line-search trials.
 
 There must be a valid starting design. Recovery cannot repair an invalid
 initial point because there is no accepted design to backtrack toward. An

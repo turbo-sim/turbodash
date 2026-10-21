@@ -1,9 +1,34 @@
-"""Standalone SLSQP with optional trial damping and explicit domain recovery.
+"""Run SciPy's SLSQP with controlled trial steps and explicit domain recovery.
 
-Only NumPy and SciPy are required. Coordinates and scaling belong to the caller.
-An evaluation returns a minimized objective, equalities == 0 and inequalities
->= 0, all in one model call. Raise DomainError only for a recognized physical
-domain failure; programming errors deliberately propagate to the caller.
+This driver manages the evaluation loop around SciPy's compiled optimizer. A
+model can be undefined at a trial point even when every variable satisfies its
+bounds. On a recognized ``DomainError``, the driver can shorten the pending step
+and retry the actual model. Successful recovery can also limit the next step,
+with gradual growth toward the configured maximum fraction. SciPy's own merit
+line search remains active, and its accumulated solver state is retained.
+
+In the supported SciPy version, ``minimize(method='SLSQP')`` exposes neither
+these step fractions nor a hook to reject an undefined pending trial and retry
+it with consistent internal state. An iteration callback cannot supply that
+control, and an exception from a model evaluation would otherwise escape the
+public wrapper. The private interaction is isolated in ``_slsqp_backend``;
+this module chooses when to evaluate, shorten, recover, or stop. It uses the
+existing SLSQP algorithm rather than implementing another optimizer.
+
+Bound-aware finite differences use one probe per variable. An invalid probe
+stops the solve with a diagnostic instead of retrying or inventing a derivative. Histories and callbacks describe the initial and accepted designs,
+and ``kkt`` supplies independent first-order diagnostics at those points.
+Final success requires native success and the configured feasibility and
+optimality limits. These derivative and reporting features could also surround
+the public interface; pending-trial control is the reason for the private bridge.
+
+The numerical driver requires NumPy and SciPy and has no turbine or UI assumptions.
+The caller owns coordinates and scaling and returns an ``Evaluation`` containing
+a minimized objective, equalities == 0, and inequalities >= 0. Only explicitly
+identified ``DomainError`` failures are recoverable. No artificial objective
+values or modifications to the model equations are used, and programming errors
+propagate to the caller. Recovery has finite retry limits and cannot guarantee
+that a feasible continuation exists.
 """
 
 from collections import OrderedDict
@@ -20,7 +45,14 @@ from .kkt import assess_kkt
 
 
 class DomainError(Exception):
-    """This exact model point is outside a recognized physical domain."""
+    """Identify an undefined physical model evaluation that may permit a retry.
+
+    Raise this only when the model recognizes a domain failure at the supplied
+    point. Metadata records its cause for reporting; it does not supply substitute
+    objective or constraint values. Recovery means trying another point, and can
+    still fail if no valid trial step is found within the limits. Derivative
+    probes are not retried.
+    """
 
     def __init__(self, message, *, metadata=None):
         super().__init__(message)
@@ -36,6 +68,13 @@ class _CallbackStop(Exception):
 
 @dataclass
 class Evaluation:
+    """Return the objective and all constraints from one model evaluation.
+
+    The objective is minimized. Equalities must be zero and inequalities must
+    be nonnegative at a feasible point. Values must already use the caller's
+    intended normalization; this container applies no physical scaling.
+    """
+
     objective: float
     equalities: np.ndarray = field(default_factory=lambda: np.empty(0))
     inequalities: np.ndarray = field(default_factory=lambda: np.empty(0))
@@ -46,16 +85,28 @@ class Evaluation:
 
 @dataclass(frozen=True)
 class SLSQPOptions:
+    """Configure native stopping, trial recovery, derivatives, and final checks.
+
+    ``ftol`` and ``maxiter`` control SciPy's native solve. Step fractions limit
+    trial motion along its proposed direction; backtracking retries recognized
+    domain failures, and ``step_growth_factor`` governs restoration of the cap
+    after a shortened start or recovery. See ``minimize_slsqp`` for that sequence.
+
+    ``finite_diff_step`` is an absolute distance in the caller's coordinates
+    ([0, 1] for the turbine adapter). Each derivative probe is evaluated once. ``feasibility_tol`` and ``optimality_tol`` are independent acceptance
+    thresholds for scaled residuals, not aliases for native ``ftol``. Validation
+    rejects unsupported values before a solve begins.
+    """
+
     ftol: float = 1e-9
     maxiter: int = 200
     finite_diff_step: float = 1e-7
-    first_step_fraction: float = 1.0
+    first_step_fraction: float = 0.25
     max_step_fraction: float = 1.0
     step_growth_factor: float | None = 1.5
     domain_backtracking: bool = True
     backtrack_factor: float = 0.5
     max_backtracks: int = 20
-    max_fd_backtracks: int = 12
     feasibility_tol: float = 1e-6
     optimality_tol: float = 1e-4
 
@@ -95,7 +146,6 @@ class SLSQPOptions:
         for name, minimum in (
             ("maxiter", 1),
             ("max_backtracks", 0),
-            ("max_fd_backtracks", 0),
         ):
             value = getattr(self, name)
             if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
@@ -116,6 +166,8 @@ def normalize_solver_options(configured=None, *, feasibility_tolerance=1e-6):
     if not isinstance(configured, dict):
         raise ValueError("solver_options must be a dictionary.")
     configured = deepcopy(configured)
+    # Older YAML files exposed derivative retries; the driver no longer uses them.
+    configured.pop("max_fd_backtracks", None)
     aliases = {
         "tolerance": "ftol",
         "max_iterations": "maxiter",
@@ -217,16 +269,17 @@ def minimize_slsqp(
     """Minimize a combined model evaluation through SciPy's compiled SLSQP.
 
     ``jac`` optionally returns rows [objective, equalities, inequalities].
-    Otherwise use bounded, one-sided differences; try the other direction and
-    shrink on DomainError. No artificial objective/constraint penalties are used.
+    Otherwise use bounded, one-sided differences with one probe per variable.
+    Choose the direction from the available bound distance before evaluating;
+    a DomainError stops differentiation without retrying. No artificial
+    objective/constraint penalties are used.
 
     The two step fractions scale the QP direction before its first trial: the
     first major iteration uses min(first_step_fraction, max_step_fraction), and
     later initial caps grow by step_growth_factor up to max_step_fraction.
     After a domain-recovered iteration, growth restarts from the actual accepted
     fraction of that iteration's original QP direction, including any native
-    merit shortening. Further recoveries reset it again. Derivative recovery
-    does not change the cap. Growth 1 holds the current/recovered cap; None
+    merit shortening. Further recoveries reset it again. Growth 1 holds the current/recovered cap; None
     restores max_step_fraction immediately on each iteration after the first.
     Native merit backtracking remains active in both cases.
     Domain backtracking is applied to every native function request. A final
@@ -452,50 +505,33 @@ def minimize_slsqp(
             matrix = np.empty(expected_shape)
             base = value.vector()
             for column in range(n):
-                found = False
-                for shrink in range(options.max_fd_backtracks + 1):
-                    length = options.finite_diff_step * options.backtrack_factor**shrink
-                    forward_room, backward_room = (
-                        upper[column] - point[column],
-                        point[column] - lower[column],
-                    )
-                    directions = (
-                        (1, -1)
-                        if forward_room >= length or forward_room >= backward_room
-                        else (-1, 1)
-                    )
-                    for direction in directions:
-                        room = forward_room if direction == 1 else backward_room
-                        step = direction * min(length, room)
-                        probe = point.copy()
-                        probe[column] = np.clip(
-                            point[column] + step, lower[column], upper[column]
-                        )
-                        step = probe[column] - point[column]
-                        if abs(step) <= 8 * np.finfo(float).eps * max(
-                            1, abs(point[column])
-                        ):
-                            continue
-                        try:
-                            sampled = model(probe)
-                        except DomainError as error:
-                            record_event(
-                                dict(
-                                    kind="derivative_rejection",
-                                    column=column,
-                                    x=probe.copy(),
-                                    message=str(error),
-                                    failure=error.to_dict(),
-                                )
-                            )
-                            continue
-                        matrix[:, column] = (sampled.vector() - base) / step
-                        found = True
-                        break
-                    if found:
-                        break
-                if not found:
-                    raise DomainError(f"No valid perturbation for variable {column}.")
+                length = options.finite_diff_step
+                forward_room = upper[column] - point[column]
+                backward_room = point[column] - lower[column]
+                # Choose a bound-admissible direction before evaluating. This
+                # is ordinary one-sided differentiation, not a domain retry.
+                direction = 1 if forward_room >= length or forward_room >= backward_room else -1
+                room = forward_room if direction == 1 else backward_room
+                probe = point.copy()
+                probe[column] = np.clip(
+                    point[column] + direction * min(length, room),
+                    lower[column], upper[column],
+                )
+                step = probe[column] - point[column]
+                if abs(step) <= 8 * np.finfo(float).eps * max(1, abs(point[column])):
+                    raise DomainError(f"No representable derivative perturbation for variable {column}.")
+                try:
+                    sampled = model(probe)
+                except DomainError as error:
+                    record_event(dict(
+                        kind="derivative_rejection", column=column, x=probe.copy(),
+                        message=str(error), failure=error.to_dict(),
+                    ))
+                    raise DomainError(
+                        f"Derivative probe for variable {column} failed; probes are not retried: {error}",
+                        metadata={"column": column, "probe": probe.tolist(), "cause": error.to_dict()},
+                    ) from error
+                matrix[:, column] = (sampled.vector() - base) / step
         if matrix.shape != expected_shape or not np.all(np.isfinite(matrix)):
             raise ValueError(f"Jacobian must be finite with shape {expected_shape}.")
         derivative_cache = point.copy(), matrix.copy()

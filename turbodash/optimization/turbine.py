@@ -1,4 +1,27 @@
-"""Turbine optimization using a direct, recoverable SciPy SLSQP driver."""
+"""Translate a turbine design problem into SLSQP inputs and physical results.
+
+This module is the bridge between turbine configurations and the generic solver.
+It reads selected design variables, objectives, and constraints from dictionaries
+or YAML cases, resolves their dotted paths, and evaluates the meanline model.
+Active variables are mapped from their physical bounds to [0, 1]; objective and
+constraint normalization keeps their numerical scales under user control. One
+model evaluation supplies all responses at a design, with exact-point caching
+avoiding repeated work for the same physical variables.
+
+Independent variable bounds cannot describe every physically admissible turbine.
+For example, an in-bounds combination may have no real rotor-exit velocity
+triangle. The adapter translates an explicit ``ModelDomainError`` into the
+driver's ``DomainError`` and preserves diagnostic metadata, allowing the driver
+to shorten the trial. It does not alter equations, invent penalty values, or
+turn arbitrary programming errors into recoverable failures. The initial design
+must evaluate successfully before this recovery mechanism can be used.
+
+``optimize_turbine`` also assembles physical convergence histories, callbacks,
+plots, and saved results. Acceptance requires native solver success together
+with the final feasibility and independent optimality checks. Keeping these
+responsibilities here gives the app and standalone studies the same behavior,
+while step control and SciPy internals remain in the solver modules.
+"""
 
 from collections import OrderedDict
 from collections.abc import Mapping, MutableMapping
@@ -276,7 +299,19 @@ def _read_design_variables(inputs, specifications, logger=None):
 
 
 class TurbineOptimizationProblem:
-    """Evaluate physical designs and map bounded variables to solver coordinates."""
+    """Adapt configured turbine variables and responses to a scaled solver problem.
+
+    Copies of the configuration keep trial evaluations separate from the input
+    case. Only selected variables change; all other inputs remain fixed. Model
+    results are cached by the exact physical variable vector so the objective
+    and every constraint refer to the same turbine evaluation.
+
+    The adapter retains physical values for reporting and provides normalized
+    coordinates and residuals for SLSQP. Its constraint helpers express
+    inequalities as residuals <= 0; ``evaluate_slsqp`` reverses their sign to
+    meet the generic driver's >= 0 convention. Recognized model-domain errors
+    carry the failing physical variables into the driver's recovery diagnostics.
+    """
 
     def __init__(self, config, optimization=None, evaluator=None, logger=None):
         self.source_config = deepcopy(config if "inputs" in config else {"inputs": config})

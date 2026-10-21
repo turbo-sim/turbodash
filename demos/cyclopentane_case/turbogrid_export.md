@@ -6,7 +6,8 @@ Run from the repository root:
 python demos/cyclopentane_case/export_rotor_turbogrid.py --inlet-extension-fraction 1.0 --outlet-extension-fraction 2.0
 ```
 
-This reads the solved `cyclopentane_8.yaml` by default and writes the import files
+This reads `cyclopentane_10.yaml`, recalculates its inputs with the current backend,
+and realizes integer blade geometry before writing the import files
 to `demos/cyclopentane_case/output/turbogrid_rotor`. Use `--yaml-path` and
 `--output-dir` to choose another case or destination. Import the generated
 `BladeGen.inf` into TurboGrid with its accompanying `.curve` files.
@@ -22,7 +23,7 @@ coordinates. The blade profiles themselves do not change.
 | `--inlet-extension-fraction` | Overrides the common value at the inlet. |
 | `--outlet-extension-fraction` | Overrides the common value at the outlet. |
 
-Each fraction multiplies the rotor's meridional (axial) chord from the solved YAML.
+Each fraction multiplies the rotor's recomputed meridional (axial) chord.
 The exporter finds the minimum and maximum axial coordinates across all exported
 span profiles, including the rounded edges, then sets:
 

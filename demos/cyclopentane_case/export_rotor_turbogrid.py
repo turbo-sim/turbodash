@@ -1,7 +1,13 @@
+"""Recalculate axial turbine inputs and export consistent integer rotor geometry.
+
+Defaults to the retained tenth cyclopentane design. Use --yaml-path to export
+the final app-loadable YAML written by optimize.py instead.
+"""
+
 from __future__ import annotations
 
 import argparse
-import importlib.util
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -10,21 +16,13 @@ import yaml
 
 CASE_DIR = Path(__file__).resolve().parent
 REPO_ROOT = CASE_DIR.parents[1]
-DEFAULT_YAML_PATH = CASE_DIR / "cyclopentane_8.yaml"
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+from turbodash.core.turbine import compute_turbine_performance, get_blade_row_geometry
+from turbodash.geometry.blade import compute_blade_coordinates_cartesian
+
+DEFAULT_YAML_PATH = CASE_DIR / "cyclopentane_10.yaml"
 DEFAULT_OUTPUT_DIR = CASE_DIR / "output" / "turbogrid_rotor"
-
-
-def _load_compute_blade_coordinates_cartesian():
-    module_path = REPO_ROOT / "turbodash" / "geometry" / "blade.py"
-    spec = importlib.util.spec_from_file_location("geom_blade_local", module_path)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"Could not load geometry module from {module_path}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module.compute_blade_coordinates_cartesian
-
-
-compute_blade_coordinates_cartesian = _load_compute_blade_coordinates_cartesian()
 
 
 def _as_float(value):
@@ -32,14 +30,10 @@ def _as_float(value):
 
 
 def load_solved_yaml(yaml_path: Path):
-    with open(yaml_path, "r") as stream:
+    """Evaluate current inputs, ignoring any stale results saved in the file."""
+    with open(yaml_path, "r", encoding="utf-8") as stream:
         data = yaml.safe_load(stream)
-    if "stages_performance" not in data:
-        raise KeyError(
-            "The TurboGrid exporter expects a solved YAML file containing "
-            "`stages_performance`. Run main.py first or export a solved case."
-        )
-    return data
+    return compute_turbine_performance({"inputs": data["inputs"]})
 
 
 def get_axial_rotor_stage(results, stage_number: int):
@@ -84,7 +78,7 @@ def make_rotor_profile_section(
     camberline_type: str,
     thickness_model: str,
 ):
-    rotor_geom = stage["geometry"]["rotor"]
+    rotor_geom = get_blade_row_geometry(stage, "rotor", turbine_type="axial", discrete=True)
     rotor_inlet = stage["flow_stations"][2]
     rotor_outlet = stage["flow_stations"][3]
 
@@ -296,7 +290,7 @@ def write_bladegen_inf(
 def write_metadata(
     path: Path, *, args, stage, sections, hub_radius, shroud_radius, axial_domain
 ):
-    rotor_geom = stage["geometry"]["rotor"]
+    rotor_geom = get_blade_row_geometry(stage, "rotor", turbine_type="axial", discrete=True)
     metadata = {
         "yaml_path": str(args.yaml_path),
         "stage_number": args.stage_number,
@@ -329,7 +323,7 @@ def write_metadata(
 def export_rotor_turbogrid(args):
     results = load_solved_yaml(args.yaml_path)
     stage = get_axial_rotor_stage(results, args.stage_number)
-    rotor_geom = stage["geometry"]["rotor"]
+    rotor_geom = get_blade_row_geometry(stage, "rotor", turbine_type="axial", discrete=True)
     rotor_inlet = stage["flow_stations"][2]
     rotor_outlet = stage["flow_stations"][3]
 
@@ -427,7 +421,7 @@ def build_parser():
     parser = argparse.ArgumentParser(
         description=(
             "Export an axial rotor in TurboGrid profile-points format "
-            "from a solved turbodash YAML file."
+            "from current turbodash YAML inputs."
         )
     )
     parser.add_argument("--yaml-path", type=Path, default=DEFAULT_YAML_PATH)

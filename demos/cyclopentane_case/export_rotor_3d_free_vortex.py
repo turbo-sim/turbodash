@@ -1,7 +1,12 @@
+"""Recalculate axial turbine inputs and export consistent integer rotor geometry.
+
+Defaults to the retained tenth cyclopentane design. Use --yaml-path to export
+the final app-loadable YAML written by optimize.py instead.
+"""
+
 from __future__ import annotations
 
 import argparse
-import importlib.util
 import sys
 from pathlib import Path
 
@@ -11,36 +16,25 @@ import yaml
 
 CASE_DIR = Path(__file__).resolve().parent
 REPO_ROOT = CASE_DIR.parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+from turbodash.core.turbine import compute_turbine_performance, get_blade_row_geometry
+from turbodash.geometry.blade import compute_blade_coordinates_cartesian
 
 
-DEFAULT_YAML_PATH = CASE_DIR / "cyclopentane_6.yaml"
+
+DEFAULT_YAML_PATH = CASE_DIR / "cyclopentane_10.yaml"
 DEFAULT_OUTPUT_DIR = CASE_DIR / "output" / "rotor_3d_free_vortex"
 
 
-def _load_compute_blade_coordinates_cartesian():
-    module_path = REPO_ROOT / "turbodash" / "geometry" / "blade.py"
-    spec = importlib.util.spec_from_file_location("geom_blade_local", module_path)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"Could not load geometry module from {module_path}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module.compute_blade_coordinates_cartesian
-
-
-compute_blade_coordinates_cartesian = _load_compute_blade_coordinates_cartesian()
-
-
 def load_results(yaml_path: Path, *, recompute: bool):
-    with open(yaml_path, "r") as stream:
+    """Always evaluate inputs with the current backend before physical export.
+
+    ``recompute`` remains accepted for compatibility with earlier CLI commands.
+    """
+    with open(yaml_path, "r", encoding="utf-8") as stream:
         cfg = yaml.safe_load(stream)
-    if not recompute and "stages_performance" in cfg:
-        return cfg
-
-    if str(REPO_ROOT) not in sys.path:
-        sys.path.insert(0, str(REPO_ROOT))
-    from turbodash.core.turbine import compute_turbine_performance
-
-    return compute_turbine_performance(cfg)
+    return compute_turbine_performance({"inputs": cfg["inputs"]})
 
 
 def _float(value):
@@ -83,7 +77,7 @@ def make_rotor_section_3d(
     camberline_type: str,
     thickness_model: str,
 ):
-    rotor_geom = stage["geometry"]["rotor"]
+    rotor_geom = get_blade_row_geometry(stage, "rotor", turbine_type="axial", discrete=True)
     rotor_inlet = stage["flow_stations"][2]
     rotor_outlet = stage["flow_stations"][3]
 
@@ -313,8 +307,7 @@ def build_parser():
         "--recompute",
         action="store_true",
         help=(
-            "Recompute the meanline result from the YAML inputs. By default, "
-            "the script uses saved stages_performance data if present."
+            "Compatibility option: inputs are now always recomputed with the current backend."
         ),
     )
     return parser

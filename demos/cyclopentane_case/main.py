@@ -1,28 +1,26 @@
-import yaml
-import numpy as np
-import turbodash as td
-from turbodash.core import turbine
-from turbodash.reporting import turbine as reporting
-from turbodash.visualization import matplotlib_turbine as plotting
-from turbodash.visualization import plotly_turbine
-import matplotlib.pyplot as plt
+"""Evaluate the retained cyclopentane design and save current plots and blade CSVs.
+
+Run from any directory. Use --show to open figures; batch runs save them only.
+Physical blade coordinates use realized integer geometry; performance uses the
+continuous meanline model, as in the optimization app.
+"""
+
+import argparse
+import json
 from pathlib import Path
-
-from turbodash.geometry.blade import (
-    compute_blade_coordinates_cartesian,
-    compute_blade_coordinates_radial,
-)
-
-import jaxprop as jxp
-
-td.set_plot_options()
-
+import sys
+from time import perf_counter
 
 CASE_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(CASE_DIR.parents[1]))
 BLADE_EXPORT_POINTS = 200
-yaml_path = CASE_DIR / "cyclopentane_8.yaml"
-with open(yaml_path, "r") as f:
-    cfg = yaml.safe_load(f)
+
+import numpy as np
+import yaml
+from plotly.utils import PlotlyJSONEncoder
+from turbodash.core.turbine import compute_turbine_performance, get_blade_row_geometry
+from turbodash.geometry.blade import compute_blade_coordinates_cartesian, compute_blade_coordinates_radial
+from turbodash.io.yaml import dump_turbine_yaml
 
 
 def _write_blade_coordinates_csv(path, x, y):
@@ -59,8 +57,8 @@ def export_turbine_blade_coordinates(results, output_dir, N_points=BLADE_EXPORT_
     if turbine_type == "axial":
         x_cursor = 0.0
         for stage_idx, stage in enumerate(stages, start=1):
-            stator_geom = stage["geometry"]["stator"]
-            rotor_geom = stage["geometry"]["rotor"]
+            stator_geom = get_blade_row_geometry(stage, "stator", turbine_type=turbine_type, discrete=True)
+            rotor_geom = get_blade_row_geometry(stage, "rotor", turbine_type=turbine_type, discrete=True)
 
             x_b, y_b, *_ = compute_blade_coordinates_cartesian(
                 camberline_type="curvature_based",
@@ -68,7 +66,7 @@ def export_turbine_blade_coordinates(results, output_dir, N_points=BLADE_EXPORT_
                 y1=0.0,
                 beta1=np.deg2rad(stage["flow_stations"][0]["alpha"]),
                 beta2=np.deg2rad(stage["flow_stations"][1]["alpha"]),
-                chord_ax=stator_geom["chord"],
+                chord_ax=stator_geom["chord_meridional"],
                 loc_max=stator_geom["maximum_thickness_location"],
                 thickness_max=stator_geom["maximum_thickness"],
                 thickness_trailing=stator_geom["trailing_edge_thickness"],
@@ -79,14 +77,14 @@ def export_turbine_blade_coordinates(results, output_dir, N_points=BLADE_EXPORT_
             )
             export_row(stage_idx, "stator", x_b, y_b)
 
-            rotor_x0 = x_cursor + stator_geom["chord"] + stator_geom["opening"]
+            rotor_x0 = x_cursor + stator_geom["chord_meridional"] + stator_geom["opening"]
             x_b, y_b, *_ = compute_blade_coordinates_cartesian(
                 camberline_type="curvature_based",
                 x1=rotor_x0,
                 y1=0.0,
                 beta1=np.deg2rad(stage["flow_stations"][2]["beta"]),
                 beta2=np.deg2rad(stage["flow_stations"][3]["beta"]),
-                chord_ax=rotor_geom["chord"],
+                chord_ax=rotor_geom["chord_meridional"],
                 loc_max=rotor_geom["maximum_thickness_location"],
                 thickness_max=rotor_geom["maximum_thickness"],
                 thickness_trailing=rotor_geom["trailing_edge_thickness"],
@@ -97,12 +95,12 @@ def export_turbine_blade_coordinates(results, output_dir, N_points=BLADE_EXPORT_
             )
             export_row(stage_idx, "rotor", x_b, y_b)
 
-            x_cursor = rotor_x0 + rotor_geom["chord"] + rotor_geom["opening"]
+            x_cursor = rotor_x0 + rotor_geom["chord_meridional"] + rotor_geom["opening"]
 
     elif turbine_type == "radial":
         for stage_idx, stage in enumerate(stages, start=1):
             for row_name in ("stator", "rotor"):
-                geom = stage["geometry"][row_name]
+                geom = get_blade_row_geometry(stage, row_name, turbine_type=turbine_type, discrete=True)
                 x_b, y_b, *_ = compute_blade_coordinates_radial(
                     "curvature_based",
                     geom["radius_in"],
@@ -124,49 +122,43 @@ def export_turbine_blade_coordinates(results, output_dir, N_points=BLADE_EXPORT_
 
     return exported_files
 
-from time import perf_counter
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--yaml-path", type=Path, default=CASE_DIR / "cyclopentane_10.yaml")
+    parser.add_argument("--output-dir", type=Path, default=CASE_DIR / "output" / "design_10")
+    parser.add_argument("--show", action="store_true")
+    args = parser.parse_args()
+    import matplotlib
+    if not args.show:
+        matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from turbodash.reporting import turbine as reporting
+    from turbodash.visualization import matplotlib_turbine as plotting
 
-t0 = perf_counter()
-out = turbine.compute_turbine_performance(cfg)
-elapsed = perf_counter() - t0
-print(f"compute_turbine_performance: {elapsed*1e3:.2f} ms")
-
-# Plot turbine design
-fig = plotting.plot_turbine_meridional_channel(out)
-fig = plotting.plot_turbine_blades(out)   # @Srinivas: This is the function that plots the blades
-#TODO: inspect the function that plots the turbine blades
-#TODO: generate better blades for impulse cascade (changing the parametrization and the input parameter values)
-exported_blade_files = export_turbine_blade_coordinates(
-    out,
-    output_dir=CASE_DIR / "output" / "blade_coordinates",
-    N_points=BLADE_EXPORT_POINTS,
-)
-print("Exported blade coordinate CSV files:")
-for path in exported_blade_files:
-    print(f"  {path}")
-fig = plotting.plot_velocity_triangles_turbine(out, mode="mach")
-fig = plotting.plot_turbine_loss_distribution(out)
-
-table = reporting.flow_stations_table(out)
-print(table)
-
-
-plt.show()
-
-
-# # # plotly — each opens its own browser tab
-# plotly_turbine.plot_turbine_meridional_channel(out).show()
-# plotly_turbine.plot_turbine_blades(out).show()
-
-# # nu_range = np.linspace(1e-3, 2.0, 250)
-# nu_range = np.asarray(0.2)
-# nu_range = np.linspace(0.01, 1, 100)
-# trends = turbine.compute_turbine_efficiency_trends(out, nu_range)
-# plotly_turbine.plot_turbine_efficiency_trends(trends, out).show()
+    cfg = yaml.safe_load(args.yaml_path.read_text(encoding="utf-8"))
+    start = perf_counter()
+    results = compute_turbine_performance(cfg)
+    print(f"Meanline evaluation: {1000 * (perf_counter() - start):.2f} ms")
+    print(f"Total-to-static efficiency: {results['overall_performance']['efficiency_ts']:.4%}")
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    plain_results = json.loads(json.dumps(results, cls=PlotlyJSONEncoder))
+    (args.output_dir / "solved_case.yaml").write_text(dump_turbine_yaml(plain_results), encoding="utf-8")
+    figures = {
+        "meridional_channel": plotting.plot_turbine_meridional_channel(results),
+        "blade_to_blade": plotting.plot_turbine_blades(results),
+        "velocity_triangles": plotting.plot_velocity_triangles_turbine(results, mode="mach"),
+        "loss_distribution": plotting.plot_turbine_loss_distribution(results),
+    }
+    for name, fig in figures.items():
+        fig.savefig(args.output_dir / f"{name}.png", dpi=160, bbox_inches="tight")
+    files = export_turbine_blade_coordinates(results, args.output_dir / "blade_coordinates")
+    print("Blade coordinate files:", *files, sep="\n  ")
+    print(reporting.flow_stations_table(results))
+    print(f"Outputs: {args.output_dir}")
+    if args.show:
+        plt.show()
+    plt.close("all")
 
 
-# figs = plotly_turbine.plot_velocity_triangles_turbine(out, mode="mach")
-# for fig in figs:
-#     fig.show()
-# plotly_turbine.plot_turbine_loss_distribution(out).show()
-
+if __name__ == "__main__":
+    main()

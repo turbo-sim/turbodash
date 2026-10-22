@@ -3,6 +3,8 @@
 Run: python tests/browser_dropdown_themes.py --chromium PATH --output DIRECTORY
 """
 
+import re
+
 from playwright.sync_api import expect
 
 import browser_optimization as harness
@@ -48,6 +50,19 @@ def exercise(context, address, output):
             assert matches_theme(control), (theme, workspace, tab, identity, 'hover')
             control.click(force=True)
             assert matches_theme(control), (theme, workspace, tab, identity, 'open')
+            # Select the highlighted option and leave focus in the closed control.
+            page.keyboard.press('Enter')
+            expect(dropdown).not_to_have_class(re.compile(r'\bis-open\b'))
+            expect(dropdown).to_have_class(re.compile(r'\bis-focused\b'))
+            # Moving away must not change the selected-but-focused background.
+            page.mouse.move(800, 120)
+            assert matches_theme(control), (theme, workspace, tab, identity, 'selected, closed and focused',
+                dropdown.get_attribute('class'), control.evaluate("element => getComputedStyle(element).backgroundColor"))
+            for label in dropdown.locator('.Select-value-label').all():
+                assert matches_theme(label, input_field=True), (theme, identity, 'selected text')
+            if 'opt-constraint-path' in identity:
+                page.screenshot(path=str(output / f'constraint_selected_focused_{theme}.png'), full_page=True)
+            control.click(force=True)
             # Non-searchable comparisons have a focusable DIV, not an INPUT.
             # Its inline white background was missed by outer-control checks.
             for surface in dropdown.locator('.Select-input').all():

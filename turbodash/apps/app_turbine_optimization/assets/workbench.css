@@ -156,7 +156,10 @@
 /* Own every React Select interaction state, including searchable hover and
    pseudo-focus, rather than inheriting its white default surfaces. */
 .td-workbench .Select > .Select-control,
-.td-workbench .Select:is(:hover,.is-open,.is-focused,.is-pseudo-focused,.is-searchable) > .Select-control {
+.td-workbench .Select:is(:hover,.is-open,.is-focused,.is-pseudo-focused,.is-searchable) > .Select-control,
+/* Dash injects .Select.is-focused:not(.is-open) after app styles load.
+   Match that full state with the workbench scope so theme colors win. */
+.td-workbench .Select.is-focused:not(.is-open) > .Select-control {
   background: var(--td-input); color: var(--td-ink);
 }
 .td-workbench .Select.is-disabled > .Select-control { background: var(--td-canvas); color: var(--td-muted); }

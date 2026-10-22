@@ -73,20 +73,24 @@ explicit diagnostic. Nonfinite metal angles themselves remain invalid inputs.
 | Turning concentration | 1.2 | 1.8753 |
 | Half-turning location | 0.52 | 0.5 |
 | Nominal maximum-thickness location if absent from meanline | 0.3 | 0.5 |
-| LE fullness | 0 | 0 |
-| TE fullness | 0 | 0 |
+| LE fullness | 0 | -0.25 |
+| TE fullness | 0 | -0.25 |
 | LE rounding fraction | 0.1 | 0.005 |
 | TE rounding fraction | 0.025 | 0.005 |
 | LE and TE rounding exponents | 3 | 3 |
 | Body exponent | 2 | 2 |
-| LE and TE pressure-side relief | 0 | 0 |
+| LE pressure-side relief | 0.15 | 0 |
+| TE pressure-side relief | 0 | 0 |
 
-The development reaction example supplies the moderate turning distribution;
-the impulse reference fit supplies its centered, symmetric turning endpoint and
-small symmetric rounding fractions. Relief is disabled initially: it is a
-local design adjustment rather than a generic aerodynamic requirement, and
-would otherwise make a zero-turning blade require an arbitrary pressure side.
-Zero fullness recovers original Denton exactly and provides a neutral baseline.
+The endpoints follow the thickness sensitivity study: the reaction profile with
+zero fullness (original Denton), and the impulse profile with -0.25 fullness at
+both shoulders. Turning, thickness location, rounding and body exponent use the
+same study presets. Reaction leading relief is 0.15; impulse leading relief and
+all trailing relief are zero. For a zero-turning meanline row, leading relief is
+disabled because an automatic pressure side is undefined. These are geometric
+shape defaults, not aerodynamic requirements. The study's absolute dimensions
+and thickness/edge ratios are not copied over meanline values, so a calculated
+row need not reproduce the example outline exactly.
 Every numeric shape value is interpolated linearly, then validated, including
 the rational fullness admissibility condition. LE and TE remain independent;
 each fullness input lies in `[-0.5, 0.5]`. Some strongly opposed pairs within
@@ -129,13 +133,28 @@ production kernel through its coordinate adapters.
 
 1. Calculate a valid axial or radial design in **Meanline**. Each successful
    calculation creates fresh stator and rotor baselines for every stage.
-2. Open **Geometry**, choose the stage and row, and expand a parameter group.
+2. Open **Geometry**, choose the stage and row, and expand a numbered section:
+   **01 Meridional channel** (including blade count), **02 Camberline and turning**,
+   **03 Thickness distribution**, or **04 Flow domain**. The Geometry inspector
+   replaces the Meanline inputs while retaining their values. Search stays within
+   the current workspace. Base sampling points live under **Flow domain → Advanced:
+   resolution**. Slider endpoints show the current minimum and maximum; turning
+   concentration initially spans 1–3, expanding for valid typed values outside it.
    Dimensions are displayed in millimetres, angles in degrees, and thickness
    controls are full-thickness ratios. Number boxes accept arbitrary floating
    point values; slider increments do not round the stored input.
-3. Adjust turning, independent LE/TE fullness, thickness, rounding, relief or
+3. Adjust turning, independent LE/TE fullness, thickness, rounding, leading-edge relief or
    physical-thickness correction. **Inherited** and **Edited** distinguish
-   baseline values from overrides. Reset a field or use **Reset row**.
+   baseline values from overrides. Reset a field or use **Restore preset defaults**
+   to clear the selected row's overrides while retaining its meanline dimensions
+   and angles. A stage dropdown and Stator/Rotor toggle stay visible above the
+   numbered sections.
+   Thickness has separate menus for body/shoulders, leading edge, trailing-edge
+   rounding, and physical thickness correction. Leading relief uses the automatic
+   pressure-side convention; trailing relief is disabled. Row YAML imports with
+   explicit leading-side selection or nonzero trailing relief are rejected with
+   an explanation. The standalone kernel still supports these advanced settings.
+   The information buttons show the parameter guide's tooltips on hover or focus.
 4. Inspect the blade, camberline and thickness plots and 3D row preview. The
    preview uses the shared TurboMoC VTK renderer. **Configure display** controls
    row visibility, displayed blade copies, surface visibility and colors. These
@@ -143,15 +162,20 @@ production kernel through its coordinate adapters.
    parameters. **Fit view** frames the geometry. Optional **Passage crosscuts**
    measure the current axial passage; they do not change the blade shape.
    Radial physical passage crosscuts are not implemented.
-5. **Save row YAML** records the selected row's source and sparse overrides.
-   **Load row YAML** applies its effective values as overrides of the current
-   row, preserving the current meanline source for reset. The main header's
+5. **Row YAML** opens a dialog with the selected row's source and sparse overrides.
+   Copy or download the text, paste a replacement, or choose a YAML file.
+   Uploading a file fills the editor without changing the blade. **Apply to row**
+   validates the draft and applies its effective values as overrides of the current
+   row, preserving the current meanline source for reset. Errors stay visible in
+   the dialog and leave the last valid geometry intact. Close discards unapplied
+   text; reopening shows the current row. The main header's
    **Save design** remains the meanline/optimization design file; save row YAML
    as well to retain CFD geometry edits.
 6. Download the current axial geometry as independent TurboGrid rows or a
    positioned TurboGrid assembly. This ZIP export does not require optional
-   mesh dependencies. With `poetry install -E mesh`, also export CAD or generate
-   its mesh in **Mesh**. Geometry edits invalidate an existing mesh. The mesh
+   mesh dependencies. The Geometry inspector has no separate 3D-model ZIP button.
+   With `poetry install -E mesh`, generate its mesh in **Mesh**. Geometry edits
+   invalidate an existing mesh. The mesh
    extra also supplies `dash_vtk` and the TurboMoC browser renderer required for
    the 3D preview. Without it, the viewer explains how to install the extra;
    the geometry editor and 2D plots remain available. Both axial and radial
@@ -159,6 +183,8 @@ production kernel through its coordinate adapters.
    turbine CAD/mesh export remains axial-only.
 
 Geometry editing does not change the thermodynamic solution or rerun meanline.
+Editor responses are accepted only for the current calculation and latest edit
+revision, so delayed responses cannot replace a newer row edit or YAML import.
 The next **successful** meanline calculation replaces all row baselines and
 clears their overrides, including when its resulting geometry is unchanged.
 Failed calculations preserve the last successful geometry. Tabs, themes,

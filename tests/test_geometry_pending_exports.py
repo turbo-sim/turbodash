@@ -44,7 +44,7 @@ def test_projection_guard_compares_only_same_baseline_epoch(state, event, blocke
 
 def test_availability_disables_actions_until_projection_catches_up(guarded, state):
     _, callbacks = guarded
-    assert callbacks["geometry_export_available"](state.results, state.signature, *state.live, state.event)
+    assert "geometry_export_available" not in callbacks
     status = callbacks["display_status"]({"state": "complete"}, state.results,
                                           state.signature, *state.live, state.event)
     assert status[0] and status[-1] and "Wait for geometry edits" in status[1]
@@ -53,7 +53,6 @@ def test_availability_disables_actions_until_projection_catches_up(guarded, stat
     assert disabled and "Wait for geometry edits" in message
     current = deepcopy(state.results)
     current["_geometry_projection"]["revision"] = 6
-    assert not callbacks["geometry_export_available"](current, state.signature, *state.live, state.event)
     assert not callbacks["update_export_availability"](current, "axial", "independent", "", state.event)[0]
     ready = callbacks["display_status"]({"state": "idle"}, current, state.signature, *state.live, state.event)
     assert not ready[0] and ready[1] == ""
@@ -68,9 +67,7 @@ def test_pending_clicks_never_export_or_submit_a_mesh(guarded, state, monkeypatc
     monkeypatch.setattr(turbogrid, "export_turbogrid_assembly_zip", forbidden)
     monkeypatch.setattr(meshing.mesh_jobs, "start_job", forbidden)
     monkeypatch.setattr(meshing, "ctx", SimpleNamespace(triggered_id="mesh_generate"))
-    data, message = callbacks["download_geometry"](
-        1, state.results, state.signature, 0, "stator", *state.live, state.event)
-    assert data is no_update and "Wait for geometry edits" in message
+    assert "download_geometry" not in callbacks
     for mode in ("independent", "assembly"):
         data, message, opened = callbacks["download_turbogrid"](
             1, state.results, "axial", mode, "1", state.event)
@@ -102,12 +99,12 @@ def test_matching_old_mesh_cannot_download_during_pending_edit(guarded, state, m
 
 def test_existing_signature_and_dependency_guards_remain_active(guarded, state, monkeypatch):
     _, callbacks = guarded
-    _, message = callbacks["download_geometry"](
-        1, state.results, "stale-inputs", 0, "stator", *state.live, state.event)
+    status = callbacks["display_status"]({"state": "idle"}, state.results, "stale-inputs", *state.live, state.event)
+    message = status[1]
     assert "inputs have changed" in message
     monkeypatch.setattr(meshing.meshing, "dependency_status", lambda: (False, "Missing meshing package"))
-    _, message = callbacks["download_geometry"](
-        1, state.results, state.signature, 0, "stator", *state.live, None)
+    status = callbacks["display_status"]({"state": "idle"}, state.results, state.signature, *state.live, None)
+    message = status[1]
     assert message == "Missing meshing package"
 
 

@@ -14,6 +14,49 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def check_geometry_controls(page, output):
+    """Verify workspace isolation, scoped search, help, and slider endpoints."""
+    from playwright.sync_api import expect
+
+    expect(page.locator("#td-inputs-title")).to_have_text("Geometry inputs")
+    expect(page.locator("#geometry_stage .Select-value-label")).to_have_count(1, timeout=30000)
+    assert page.locator('[data-controls-workspace="meanline"] input:visible').count() == 0
+    headings = page.locator("#blade_modeller_controls > details > summary").all_text_contents()
+    assert headings == ["01Meridional channel", "02Camberline and turning", "03Thickness distribution", "04Flow domain"]
+    page.screenshot(path=str(output / "geometry_controls_collapsed.png"))
+    search = page.locator("#td-parameter-search")
+    search.fill("inlet pressure")
+    expect(page.locator("#td-search-results")).to_contain_text("No matching parameters")
+    search.fill("relief")
+    expect(page.locator(".td-search-result")).to_have_count(1)
+    page.locator(".td-search-result").click()
+    expect(page.locator("#blade-help-leading_edge-relief_strength")).to_be_visible()
+    page.locator("#blade-help-leading_edge-relief_strength").hover()
+    expect(page.locator(".tooltip-inner")).to_contain_text("Remove some thickness")
+    page.mouse.move(900, 100)
+    search.fill("base sampling")
+    page.locator(".td-search-result").click()
+    expect(page.locator("#blade-help-numerics-number_of_points")).to_be_visible()
+    search.fill("turning concentration")
+    page.locator(".td-search-result").click()
+    slider = page.locator('[data-parameter-aliases="camberline.turning_concentration"] .td-blade-slider')
+    expect(slider.locator(".rc-slider-mark-text")).to_have_text(["1", "3"])
+    page.locator("#td-collapse-all").click()
+    page.locator("#blade-section-3 > summary").click()
+    page.screenshot(path=str(output / "geometry_controls_thickness.png"))
+    page.locator('.td-workspace-rail [data-workspace="meanline"]').click()
+    expect(page.locator("#td-inputs-title")).to_have_text("Meanline inputs")
+    search.fill("turning concentration")
+    expect(page.locator("#td-search-results")).to_contain_text("No matching parameters")
+    page.locator('.td-workspace-rail [data-workspace="mesh"]').click()
+    expect(page.locator("#td-inputs-title")).to_have_text("Mesh inputs")
+    assert page.locator('[data-controls-workspace="meanline"] input:visible').count() == 0
+    page.locator('.td-workspace-rail [data-workspace="geometry"]').click()
+    search.fill("")
+    search.press("Escape")
+    print("PASS geometry sections, workspace isolation, scoped search, tooltips and endpoints", flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", default="http://127.0.0.1:8067")
@@ -67,11 +110,22 @@ def main():
                         return
                 raise AssertionError(f"Timed out: {label}; errors={errors}; notice={observed.get('blade_modeller_error')}")
 
+            def store_data(identity):
+                # Responses may arrive after Dash has superseded them. Read
+                # the accepted browser store, not the last network response.
+                return page.evaluate("""id => {
+                    const state = window.store?.getState();
+                    const path = state?.paths?.strs?.[id];
+                    if (!path) return {};
+                    const component = path.reduce((node, key) => node[key], state.layout);
+                    return component.props.data || {};
+                }""", identity)
+
             def state():
-                return observed.get("geometry_state", {}).get("data", {})
+                return store_data("geometry_state")
 
             def committed():
-                return observed.get("geometry_committed", {}).get("data", {})
+                return store_data("geometry_committed")
 
             def row(index=0):
                 return state()["rows"][index]["parameters"]
@@ -80,7 +134,9 @@ def main():
                 return sum("td-calculation-state.data" in item.get("output", "") for item in calls)
 
             def field(path):
-                return page.locator('input[id=' + json.dumps(json.dumps({"path": path, "type": "blade-parameter"}, separators=(",", ":"))) + ']')
+                control = page.locator('input[id=' + json.dumps(json.dumps({"path": path, "type": "blade-parameter"}, separators=(",", ":"))) + ']')
+                control.evaluate("node => { for (let p=node.parentElement; p; p=p.parentElement) if(p.tagName==='DETAILS') p.open=true; }")
+                return control
 
             page.goto(args.url)
             wait(lambda: len(state().get("rows", [])) == 2, "initial geometry baseline")
@@ -88,6 +144,7 @@ def main():
             initial_outline = page.locator("#blades_plot .js-plotly-plot").evaluate(
                 "graph => JSON.stringify(graph.data.filter(t => t.x?.length > 600).map(t => [t.x,t.y]))")
             page.locator('.td-workspace-rail [data-workspace="geometry"]').click()
+            check_geometry_controls(page, output)
             page.wait_for_function("document.querySelector('#geometry_profile .js-plotly-plot')?.data?.some(t => t.x?.length > 600)", timeout=60000)
             page.locator("#blade_modeller_preview").scroll_into_view_if_needed()
             page.wait_for_function("document.querySelector('#geometry-scene canvas') && window.dash_clientside.studio?.scenes.geometry?.actors.some(a => a.props.actor.visibility && a.props.children[0].props.points.length > 1800)", timeout=60000)
@@ -207,30 +264,53 @@ def main():
             valid_state = deepcopy(state())
             field("thickness.trailing_edge_fullness").fill("-0.5")
             field("thickness.trailing_edge_fullness").press("Tab")
-            wait(lambda: "Edit not applied" in observed.get("blade_modeller_error", {}).get("children", ""), "inadmissible pair diagnostic")
+            wait(lambda: "Edit not applied" in page.locator("#blade_modeller_error").inner_text(), "inadmissible pair diagnostic")
             assert state()["rows"] == valid_state["rows"] and state()["_epoch"] == valid_state["_epoch"]
             valid_state = deepcopy(state())
             checks.append("invalid rational-fullness pair preserves geometry")
 
             # Separate row ownership, YAML round trip and geometric crosscuts.
-            page.locator("#geometry_row").locator("xpath=ancestor::details").evaluate("node => node.open = true")
-            page.locator("#geometry_row input").fill("Rotor")
-            page.locator("#geometry_row input").press("Enter")
+            page.locator("#geometry_row label").filter(has_text="Rotor").click()
             wait(lambda: page.locator("#blade_modeller_context").get_attribute("data-row") == "stage_01/rotor", "rotor selection")
             field("camberline.turning_concentration").fill("1.5123456789")
+            # Opening the dialog includes the numeric edit blurred by its button.
+            page.locator("#blade_yaml_open").click()
+            page.locator("#blade_yaml_text").wait_for(state="visible")
             with page.expect_download() as download_info:
-                # Clicking Save directly commits the focused numeric field.
                 page.locator("#blade_modeller_save").click()
             wait(lambda: row(1)["overrides"].get("camberline.turning_concentration") == 1.5123456789, "independent rotor edit")
             assert row() == valid_state["rows"][0]["parameters"]
             import yaml
             saved_row = yaml.safe_load(Path(download_info.value.path()).read_text(encoding="utf-8"))
             assert saved_row["overrides"]["camberline.turning_concentration"] == 1.5123456789
+            yaml_before = deepcopy(state()["rows"])
+            page.locator("#blade_yaml_text").fill("source: [broken")
+            page.locator("#blade_yaml_apply").click()
+            wait(lambda: "Could not import" in page.locator("#blade_yaml_feedback").inner_text(), "invalid YAML explained in dialog")
+            assert state()["rows"] == yaml_before
             saved_row["overrides"]["thickness.trailing_edge_fullness"] = -.15
             page.locator('#blade_modeller_upload input[type="file"]').set_input_files({
                 "name": "rotor.yaml", "mimeType": "text/yaml", "buffer": json.dumps(saved_row).encode(),
             })
+            wait(lambda: "Loaded rotor.yaml" in page.locator("#blade_yaml_file_notice").inner_text(), "YAML file fills draft")
+            assert state()["rows"] == yaml_before
+            page.context.grant_permissions(["clipboard-read", "clipboard-write"])
+            page.locator("#blade_yaml_copy").click()
+            wait(lambda: page.evaluate("navigator.clipboard.readText()") == page.locator("#blade_yaml_text").input_value(), "copy YAML")
+            page.locator("#blade_yaml_apply").click()
             wait(lambda: row(1)["overrides"].get("thickness.trailing_edge_fullness") == -.15, "row YAML import")
+            page.locator("#blade_yaml_close").click()
+            page.locator("#blade_yaml_text").wait_for(state="hidden")
+            # Restore applies only to the selected row, then exercise pasted YAML.
+            page.locator("#blade_modeller_reset").click()
+            wait(lambda: not row(1)["overrides"], "restore selected row preset defaults")
+            assert row() == valid_state["rows"][0]["parameters"]
+            page.locator("#blade_yaml_open").click()
+            page.locator("#blade_yaml_text").fill(json.dumps(saved_row))
+            page.locator("#blade_yaml_apply").click()
+            wait(lambda: row(1)["overrides"].get("thickness.trailing_edge_fullness") == -.15, "pasted YAML applied")
+            page.locator("#blade_yaml_close").click()
+            page.locator("#blade_yaml_text").wait_for(state="hidden")
             assert row() == valid_state["rows"][0]["parameters"]
             checks.append("independent row edits, immediate YAML save and round trip")
             page.locator("#blade_modeller_crosscuts input").check()
@@ -255,7 +335,7 @@ def main():
 
             def delay_edits(route):
                 request = route.request.post_data_json
-                if capture_edits and "geometry_state.data" in request.get("output", ""):
+                if capture_edits and "blade_modeller_edit_proposal.data" in request.get("output", ""):
                     pending.append(route)
                 else:
                     route.continue_()
@@ -301,6 +381,9 @@ def main():
             pressure.fill("-1")
             pressure.press("Tab")
             wait(lambda: observed.get("td-calculation-state", {}).get("data", {}).get("valid") is False, "failed calculation")
+            if state() != valid_state:
+                (output / "failed_calculation_before.json").write_text(json.dumps(valid_state, indent=2), encoding="utf-8")
+                (output / "failed_calculation_after.json").write_text(json.dumps(state(), indent=2), encoding="utf-8")
             assert state() == valid_state
             checks.append("failed meanline calculation preserves last geometry")
             pressure.fill(previous_pressure)
@@ -322,13 +405,13 @@ def main():
             page.locator("#blade_modeller_crosscuts input").check()
             wait(lambda: "axial" in page.locator("#blade_modeller_passage_note").inner_text(), "explicit radial crosscut limitation")
             correction = page.locator('[id=' + json.dumps(json.dumps({"path": "correction.preserve_physical_thickness", "type": "blade-parameter"}, separators=(",", ":"))) + '] input[type="checkbox"]')
-            correction.locator("xpath=ancestor::details").evaluate("node => node.open = true")
+            correction.locator("xpath=ancestor::details").evaluate_all("nodes => nodes.forEach(node => node.open = true)")
             correction.check()
             wait(lambda: row(1)["overrides"].get("correction.preserve_physical_thickness") is True, "radial physical thickness correction")
             wait(lambda: observed.get("blade_modeller_3d_proposal", {}).get("data", {}).get("token", [None] * 4)[1:3] == [state()["_epoch"], state()["revision"]], "corrected radial 3D proposal")
             page.locator("#blade_modeller_preview").scroll_into_view_if_needed()
             page.screenshot(path=str(output / "radial3d.png"), full_page=True)
-            assert page.locator("#geometry_download_button").is_disabled()
+            assert page.locator("#geometry_download_button").count() == 0
             checks.append("radial meanline/2D/3D workflow and explicit export/crosscut limits")
             assert not errors, errors
             passed = True

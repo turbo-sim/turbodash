@@ -15,8 +15,9 @@ from .blade_parametrization.geometry import build_section
 from .blade_parametrization.parameters import ParameterState, resolve_parameters, state_from_dict
 
 
-# Rounded shape endpoints informed by the development reaction and symmetric
-# impulse examples. Dimensions and angles are always supplied by meanline.
+# Shape endpoints use the thickness-study reaction neutral-fullness profile and
+# impulse -0.25/-0.25 profile. Dimensions, thickness and edge dimensions, and
+# metal angles remain supplied by meanline rather than copied from the figures.
 REACTION_PRESET = {
     "camberline.turning_concentration": 1.2,
     "camberline.turning_location": .52,
@@ -28,7 +29,7 @@ REACTION_PRESET = {
     "thickness.leading_edge_rounding_exponent": 3.,
     "thickness.trailing_edge_rounding_exponent": 3.,
     "thickness.shape_exponent": 2.,
-    "leading_edge.relief_strength": .0,
+    "leading_edge.relief_strength": .15,
     "trailing_edge.relief_strength": .0,
 }
 IMPULSE_PRESET = {
@@ -38,6 +39,9 @@ IMPULSE_PRESET = {
     "thickness.maximum_thickness_location": .5,
     "thickness.leading_edge_fraction": .005,
     "thickness.trailing_edge_fraction": .005,
+    "thickness.leading_edge_fullness": -.25,
+    "thickness.trailing_edge_fullness": -.25,
+    "leading_edge.relief_strength": 0.,
 }
 
 
@@ -121,6 +125,9 @@ def parameters_from_meanline(geometry, turbine_type="axial", *, label="Meanline 
     source["correction"] = {"preserve_physical_thickness": False}
     source["numerics"] = {"number_of_points": 601}
     warnings = []
+    if abs(outgoing - incoming) < 1e-10:
+        source["leading_edge"]["relief_strength"] = 0.
+        warnings.append("Leading-edge relief is disabled for a zero-turning blade because its pressure side is undefined.")
     if classification["fallback"]:
         warnings.append(classification["fallback"])
     if float(geometry["trailing_edge_thickness"]) > 0:

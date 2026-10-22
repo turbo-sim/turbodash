@@ -40,8 +40,7 @@ def editor():
     app = Dash(__name__, suppress_callback_exceptions=True)
     app.layout = ui.geometry_panel()
     ui.register_callbacks(app)
-    callback = next(value["callback"].__wrapped__ for key, value in app.callback_map.items()
-                    if "geometry_state.data" in key)
+    callback = app.callback_map["blade_modeller_edit_proposal.data"]["callback"].__wrapped__.transition
     return callback
 
 
@@ -165,6 +164,7 @@ def test_section_failure_with_admissible_parameter_domains_preserves_both_views(
     # Each value satisfies FIELD_SPECS, but automatic pressure-side selection
     # is undefined for a zero-turning blade when relief becomes nonzero.
     row_id = "stage_01/stator"
+    state = update_geometry_override(state, row_id, "leading_edge.relief_strength", 0.)
     state = update_geometry_override(state, row_id, "camberline.inlet_metal_angle_deg", 20.)
     state = update_geometry_override(state, row_id, "camberline.outlet_metal_angle_deg", 20.)
     candidate = update_geometry_override(state, row_id, "leading_edge.relief_strength", .2)
@@ -367,12 +367,12 @@ def test_save_includes_numeric_blur_edit_before_editor_response(state):
     app = Dash(__name__, suppress_callback_exceptions=True)
     app.layout = ui.geometry_panel()
     ui.register_callbacks(app)
-    save = app.callback_map["blade_modeller_download.data"]["callback"].__wrapped__
+    save = ui.row_yaml_document
     pending = journal(state, [{"kind": "set", "path": "camberline.turning_location", "value": .567891234}])
-    downloaded = yaml.safe_load(save(1, state, 0, "stator", pending, None)["content"])
+    downloaded = yaml.safe_load(save(state, 0, "stator", pending, None)["content"])
     assert downloaded["overrides"]["camberline.turning_location"] == .567891234
     with pytest.raises(PreventUpdate):
-        save(1, state, 0, "stator", pending, 200)
+        save(state, 0, "stator", pending, 200)
 
 
 def test_pending_import_then_edit_projects_all_imported_controls(editor, state):
@@ -387,3 +387,67 @@ def test_pending_import_then_edit_projects_all_imported_controls(editor, state):
     assert value(output[0], "thickness.maximum_thickness_ratio") == .05
     assert output[2][ui.PATHS.index("thickness.maximum_thickness_ratio")] == .05
     assert output[2][ui.PATHS.index("camberline.outlet_metal_angle_deg")] == 20.
+
+
+def test_reordered_editor_projects_values_by_component_identity(editor, results, state):
+    controls = list(components(ui.controls()))
+    fields = [item.id for item in controls if isinstance(getattr(item, "id", None), dict)
+              and item.id.get("type") == "blade-parameter"]
+    sliders = [item.id for item in controls if isinstance(getattr(item, "id", None), dict)
+               and item.id.get("type") == "blade-slider"]
+    assert len(fields) == len(ui.PATHS) == len({item["path"] for item in fields})
+    token = context_value.set(AttributeDict(triggered_inputs=[{"prop_id": "result_store.data", "value": results}]))
+    try:
+        output = editor(results, 0, "stator", None, fields, sliders, state, state, 1)
+    finally:
+        context_value.reset(token)
+    effective = resolve_parameters(row_parameter_state(output[0], "stage_01/stator")).values
+    assert output[2] == [ui.to_control(item["path"], ui._lookup(effective, item["path"])) for item in fields]
+    assert output[3] == [ui._lookup(effective, item["path"]) for item in sliders]
+
+
+def test_parameter_help_matches_reference():
+    import re
+    guide = Path(__file__).parents[1] / "development/blade_parametrization/parametrization_blades/parameter_guide.md"
+    tips = dict(re.findall(r"`([a-z_]+\.[a-z_]+)`\s+\*\*Tooltip:\*\* ([^\n]+)", guide.read_text(encoding="utf-8")))
+    assert set(ui.PATHS) <= set(tips)
+    assert ui.PARAMETER_HELP == tips
+
+
+def test_row_import_rejects_relief_settings_hidden_from_editor(state):
+    payload = row_parameter_state(state, "stage_01/stator").to_dict()
+    payload["overrides"]["leading_edge.pressure_side"] = "minus"
+    contents = "data:text/yaml;base64," + base64.b64encode(yaml.safe_dump(payload).encode()).decode()
+    with pytest.raises(ValueError, match="automatic pressure-side"):
+        ui.import_row_yaml(contents, state, "stage_01/stator")
+    payload["overrides"] = {"trailing_edge.relief_strength": .15}
+    contents = "data:text/yaml;base64," + base64.b64encode(yaml.safe_dump(payload).encode()).decode()
+    with pytest.raises(ValueError, match="no trailing-edge relief"):
+        ui.import_row_yaml(contents, state, "stage_01/stator")
+
+
+def test_yaml_dialog_upload_is_a_draft_and_download_preserves_text(state):
+    app = Dash(__name__, suppress_callback_exceptions=True)
+    app.layout = ui.geometry_panel()
+    ui.register_callbacks(app)
+    callbacks = {item["callback"].__wrapped__.__name__: item["callback"].__wrapped__
+                 for item in app.callback_map.values() if "callback" in item}
+    draft = "# user comment\nsource: [not yet valid YAML"
+    before = deepcopy(state)
+    token = context_value.set(AttributeDict(triggered_inputs=[{"prop_id": "blade_modeller_upload.contents"}]))
+    try:
+        output = callbacks["edit_yaml"](1, 0, "data:text/yaml;base64," + base64.b64encode(draft.encode()).decode(),
+                                         state, 0, "stator", None, None, "draft.yaml")
+    finally:
+        context_value.reset(token)
+    assert output[0] is no_update and output[2] is no_update
+    assert output[1] == draft and "Apply to row" in output[4]
+    assert state == before
+    assert callbacks["save_yaml"](1, draft, {"filename": "row.yaml"})["content"] == draft
+
+
+def test_yaml_dialog_feedback_rejects_replaced_baseline(state):
+    app = Dash(__name__, suppress_callback_exceptions=True)
+    ui.register_callbacks(app)
+    feedback = app.callback_map["blade_yaml_feedback.children"]["callback"].__wrapped__
+    assert "baseline changed" in feedback(None, state, "", {"epoch": "old", "id": "dialog"})

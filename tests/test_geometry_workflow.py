@@ -17,10 +17,10 @@ def callback(name):
 def test_solver_has_no_geometry_or_view_inputs_and_editor_has_no_optimizer_trials():
     inputs = callback("update_turbine")["inputs"]
     assert {item["id"] for item in inputs if not item["id"].startswith("{")} == {"opt-applied-result"}
-    editor = callback("edit")["inputs"]
+    editor = callback("prepare_edit")["inputs"]
     assert any(item["id"] == "result_store" for item in editor)
     assert not any(item["id"].startswith("opt-") for item in editor)
-    for name in ("manage_mesh", "download_geometry", "download_turbogrid"):
+    for name in ("manage_mesh", "download_turbogrid"):
         entry = callback(name)
         assert any(item["id"] == "geometry_results_store" for item in entry["inputs"] + entry["state"])
         assert not any(item["id"] == "result_store" for item in entry["inputs"] + entry["state"])

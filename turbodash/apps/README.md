@@ -127,7 +127,7 @@ selector uses saved names; Stator/Rotor switches the visible blade fields while
 all stage inputs remain mounted. Continuous inputs accept full floating-point
 precision and display at least three decimal places, preserving extra supplied
 digits. Formatting does not round stored values or interrupt typing; discrete
-counts stay whole numbers. Find a parameter (Ctrl/Cmd+K) searches names and aliases, opens its
+counts stay whole numbers. Find a parameter (Ctrl/Cmd+K) searches names and aliases within the current Meanline, Geometry, or Mesh workspace, opens its
 section, selects its stage/row, and focuses the field. The inspector can be resized
 on desktop and opened as a drawer on narrow screens.
 

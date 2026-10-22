@@ -249,6 +249,7 @@
             button.setAttribute("aria-current", active ? "page" : "false");
         });
         setProps("td-workspace", { data: workspace });
+        closeSearch();
         applyScope();
         window.setTimeout(() => {
             if (window.Plotly) root.querySelectorAll(".js-plotly-plot").forEach(graph => {
@@ -258,6 +259,14 @@
     }
     function applyScope() {
         if (!root) return;
+        const workspace = root.dataset.workspace || "meanline";
+        const title = document.getElementById("td-inputs-title");
+        if (title) title.textContent = workspace[0].toUpperCase() + workspace.slice(1) + " inputs";
+        const searchInput = document.getElementById("td-parameter-search");
+        if (searchInput) {
+            searchInput.placeholder = "Find a " + workspace + " parameter…";
+            searchInput.setAttribute("aria-label", "Find a " + workspace + " parameter");
+        }
         const stage = String(root.dataset.stageIndex || "0");
         const row = root.dataset.bladeRow || "stator";
         root.querySelectorAll(".td-inspector [data-stage-index]").forEach(element => {
@@ -316,6 +325,8 @@
             const pane = wrapper.closest("#geometry_pane,#mesh_pane");
             const workspace = controlsWorkspace ? controlsWorkspace.dataset.controlsWorkspace :
                 pane ? (pane.id === "mesh_pane" ? "mesh" : "geometry") : "meanline";
+            if (workspace !== (root.dataset.workspace || "meanline")) return;
+            if (wrapper.closest('.td-blade-field[hidden]') || wrapper.style.display === "none") return;
             const section = wrapper.closest("details");
             const summary = section && section.querySelector(":scope > summary");
             const context = [workspace[0].toUpperCase() + workspace.slice(1)];
@@ -490,7 +501,8 @@
                 event.preventDefault(); setWorkspace(nav.dataset.workspace); return;
             }
             if (event.target.closest("#td-collapse-all")) {
-                root.querySelectorAll(".td-inspector details").forEach(details => { details.open = false; }); return;
+                root.querySelectorAll('.td-inspector [data-controls-workspace="' + root.dataset.workspace + '"] details')
+                    .forEach(details => { details.open = false; }); return;
             }
             if (event.target.closest("#td-inspector-toggle")) { setDrawer(!root.classList.contains("td-inspector-open")); return; }
             if (event.target.closest(".td-inspector-backdrop")) { setDrawer(false); return; }

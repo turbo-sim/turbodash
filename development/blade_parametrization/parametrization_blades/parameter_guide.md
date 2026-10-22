@@ -1,6 +1,6 @@
 # Blade parametrization: parameter reference and application help
 
-This reference is intended for turbomachinery users who require the physical and geometric interpretation of each control without deriving the parametrization. Each **Tooltip** provides concise application text; **Design guidance** describes its effect, parameter coupling, and relevant limitations. This document defines the proposed help content; it does not install UI tooltips.
+This reference is intended for turbomachinery users who require the physical and geometric interpretation of each control without deriving the parametrization. Each **Tooltip** provides concise application text; **Design guidance** describes its effect, parameter coupling, and relevant limitations. The integrated Geometry editor uses these tooltip texts on its information buttons. Its simplified controls use automatic pressure-side leading relief and omit trailing relief; the full kernel reference below also covers the standalone model's advanced settings.
 
 Parameter keys match the saved configuration and `FIELD_SPECS`. All editable parameters are included, followed by the source-only continuous blade count, display controls, and diagnostic definitions. See the [mathematical formulation](README.md) for derivations and the [directory overview](../README.md) for implementation status.
 

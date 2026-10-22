@@ -263,6 +263,7 @@ def test_layout_has_five_numbered_closed_sections_and_no_studio_brand():
         for item in mounted
         if isinstance(item, html.Details)
         and "td-section" in getattr(item, "className", "").split()
+        and "td-blade-group" not in getattr(item, "className", "").split()
     ]
     assert len(sections) == 5
     assert all(item.open is False for item in sections)

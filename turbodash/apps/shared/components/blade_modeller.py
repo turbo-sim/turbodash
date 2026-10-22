@@ -16,7 +16,8 @@ import re
 import uuid
 
 import yaml
-from dash import ALL, ClientsideFunction, Input, Output, State, ctx, dcc, html, no_update
+import dash_bootstrap_components as dbc
+from dash import ALL, MATCH, ClientsideFunction, Input, Output, State, ctx, dcc, html, no_update
 from dash.exceptions import PreventUpdate
 
 from turbodash.geometry.blade_parametrization.parameters import (
@@ -34,14 +35,17 @@ from turbodash.geometry.meanline import (
 )
 from .meshing import _engineering_plot, geometry_panel as _mesh_geometry_panel
 from .turbogrid import turbogrid_export_panel
+from .blade_help import PARAMETER_HELP
+from .meshing import _hint
 
 
 PATHS = tuple(FIELD_SPECS)
+HIDDEN_PATHS = {"leading_edge.pressure_side", "trailing_edge.relief_strength", "trailing_edge.pressure_side"}
 SLIDER_RANGES = {
     "camberline.inlet_metal_angle_deg": (-85., 85., .25),
     "camberline.outlet_metal_angle_deg": (-85., 85., .25),
     "camberline.turning_location": (.01, .99, .005),
-    "camberline.turning_concentration": (1., 8., .05),
+    "camberline.turning_concentration": (1., 3., .05),
     "thickness.maximum_thickness_ratio": (.001, .65, .0025),
     "thickness.maximum_thickness_location": (.01, .99, .005),
     "thickness.leading_edge_thickness_ratio": (0., .3, .0025),
@@ -54,7 +58,6 @@ SLIDER_RANGES = {
     "thickness.leading_edge_rounding_exponent": (2., 8., .05),
     "thickness.trailing_edge_rounding_exponent": (2., 8., .05),
     "leading_edge.relief_strength": (0., .95, .005),
-    "trailing_edge.relief_strength": (0., .95, .005),
 }
 SLIDER_PATHS = tuple(SLIDER_RANGES)
 
@@ -114,7 +117,7 @@ def input_view(state, row_id):
         origin = resolved.provenance[path]
         labels.append({"override": "Edited", "inherited": "Inherited", "default": "Default"}[origin])
         resets.append(origin != "override")
-        hidden = (kind == "axial" and path in {"geometry.inlet_radius", "geometry.outlet_radius"}) or (
+        hidden = path in HIDDEN_PATHS or (kind == "axial" and path in {"geometry.inlet_radius", "geometry.outlet_radius"}) or (
             kind == "radial" and path in {"geometry.mean_radius", "geometry.meridional_chord"})
         styles.append({"display": "none"} if hidden else {})
     return values, labels, resets, styles
@@ -128,6 +131,8 @@ def import_row_yaml(contents, state, row_id):
             raise ValueError("Choose a YAML file smaller than 1 MB.")
         parsed = yaml.safe_load(base64.b64decode(payload, validate=True).decode("utf-8-sig"))
         imported = resolve_parameters(state_from_dict(parsed)).values
+        if imported["leading_edge"]["pressure_side"] != "auto" or imported["trailing_edge"]["relief_strength"] != 0:
+            raise ValueError("This editor uses automatic pressure-side leading relief and no trailing-edge relief. Set leading_edge.pressure_side to auto and trailing_edge.relief_strength to 0 in the YAML.")
         current = row_parameter_state(state, row_id)
         inherited = resolve_parameters(state_from_dict({**current.to_dict(), "overrides": {}})).values
         if imported["geometry"]["type"] != inherited["geometry"]["type"]:
@@ -168,6 +173,8 @@ def fold_edit_journal(current, event):
         row_id, kind = action["row"], action["kind"]
         try:
             if kind == "set":
+                if action["path"] in HIDDEN_PATHS:
+                    raise ValueError("This relief setting is not editable in the geometry workspace.")
                 candidate = update_geometry_override(state, row_id, action["path"],
                                                      from_control(action["path"], action.get("value")))
             elif kind == "reset":
@@ -201,41 +208,72 @@ def _field(path):
                             className="td-blade-number")
     units = "mm" if spec["units"] == "m" else "°" if spec["units"] == "deg" else ""
     label = spec["label"] + (f" [{units}]" if units else "")
-    children = [html.Div([html.Label(label, htmlFor=json.dumps(identifier, sort_keys=True, separators=(",", ":"))),
+    children = [html.Div([html.Div([
+                          html.Label(label, htmlFor=json.dumps(identifier, sort_keys=True, separators=(",", ":"))),
+                          _hint(PARAMETER_HELP[path], "blade-help-" + path.replace(".", "-")),
+                          ], className="td-blade-label"),
                           control], className="td-blade-input-line")]
     if path == "geometry.type":
         children.append(html.Span("Set by the Meanline turbine configuration.", className="td-blade-caption"))
     if path in SLIDER_RANGES:
         children.append(dcc.Slider(id={"type": "blade-slider", "path": path}, value=None,
-                                   marks=None, updatemode="mouseup", className="td-blade-slider",
+                                   marks={value: f"{value:g}" for value in SLIDER_RANGES[path][:2]},
+                                   updatemode="mouseup", className="td-blade-slider",
                                    **slider_settings(path, None)))
     children.append(html.Div([
         html.Span("Inherited", id={"type": "blade-origin", "path": path}),
         html.Button("Reset", id={"type": "blade-reset", "path": path}, n_clicks=0,
                     disabled=True, title=f"Reset {spec['label'].lower()} to the calculated baseline"),
     ], className="td-blade-provenance"))
-    return html.Div(children, id={"type": "blade-field", "path": path}, className="td-blade-field")
+    return html.Div(children, id={"type": "blade-field", "path": path}, className="td-blade-field",
+                    hidden=path in HIDDEN_PATHS,
+                    **{"data-parameter-label": label, "data-parameter-aliases": path})
 
 
 def controls():
-    groups = list(dict.fromkeys(spec["group"] for spec in FIELD_SPECS.values()))
+    def fields(*prefixes):
+        return [_field(path) for path in PATHS if path not in HIDDEN_PATHS and any(path.startswith(prefix) for prefix in prefixes)]
+
+    def submenu(title, children, *, opened=False):
+        return html.Details([html.Summary(title), *children], open=opened, className="td-subsection td-blade-subsection")
+
+    def section(number, title, children):
+        return html.Details([
+            html.Summary([html.Span(f"{number:02}", className="td-section-number"),
+                          html.Span(title, className="td-section-title")]),
+            html.Div(children, className="td-section-body"),
+        ], id=f"blade-section-{number}", className="td-section td-blade-group", open=False)
+
+    body = [path for path in PATHS if path.startswith("thickness.") and not any(
+        word in path for word in ("leading_edge_thickness", "trailing_edge_thickness", "edge_fraction", "rounding_exponent"))]
     return html.Div([
         html.Div(id="blade_modeller_context", **{"data-row": "", "data-epoch": ""}),
         html.Div("Calculate a turbine to prepare its blade rows.", id="blade_modeller_source", role="status"),
-        html.P("Edits change geometry only. A successful meanline calculation replaces all blade edits with new calculated defaults.",
+        html.P("Edit this blade row without changing the meanline calculation.",
                className="td-blade-caption"),
         html.Div([
-            html.Button("Reset row", id="blade_modeller_reset", n_clicks=0, className="td-action"),
-            dcc.Upload(id="blade_modeller_upload", accept=".yaml,.yml", multiple=False,
-                       children=html.Button("Load row YAML", className="td-action")),
-            html.Button("Save row YAML", id="blade_modeller_save", n_clicks=0, className="td-action"),
-            dcc.Download(id="blade_modeller_download"),
+            html.Button("Row YAML", id="blade_yaml_open", n_clicks=0, className="td-action",
+                        title="View, copy, paste, or load this row's YAML parameters"),
+            html.Button("Restore preset defaults", id="blade_modeller_reset", n_clicks=0, className="td-action",
+                        title="Clear this row's overrides and restore its preset shape with the calculated meanline dimensions"),
         ], className="td-blade-actions"),
         html.Div(id="blade_modeller_error", role="alert", className="td-blade-error"),
-        *[html.Details([html.Summary(group), *[_field(path) for path in PATHS
-                                             if FIELD_SPECS[path]["group"] == group]],
-                       open=group in {"Camberline and turning", "Thickness distribution"},
-                       className="td-row-settings td-blade-group") for group in groups],
+        section(1, "Meridional channel", fields("geometry.", "cascade.")),
+        section(2, "Camberline and turning", fields("camberline.")),
+        section(3, "Thickness distribution", [
+            submenu("Body and shoulders", [_field(path) for path in body], opened=True),
+            submenu("Leading edge", fields("thickness.leading_edge_thickness", "thickness.leading_edge_fraction",
+                                           "thickness.leading_edge_rounding", "leading_edge.relief_strength") + [
+                html.P("Relief is applied to the pressure side using the blade's turning direction.", className="td-blade-caption")]),
+            submenu("Trailing-edge rounding", fields("thickness.trailing_edge_thickness", "thickness.trailing_edge_fraction",
+                                                      "thickness.trailing_edge_rounding")),
+            submenu("Physical thickness correction", fields("correction.")),
+        ]),
+        section(4, "Flow domain", fields("flow_domain.") + [
+            submenu("Advanced: resolution", fields("numerics.") + [
+                html.P("Sampling controls numerical resolution, not the blade shape law.", className="td-blade-caption")]),
+        ]),
+        *[_field(path) for path in PATHS if path in HIDDEN_PATHS],
     ], id="blade_modeller_controls", className="td-blade-modeller")
 
 
@@ -243,18 +281,25 @@ def geometry_panel(*, workbench=False):
     """Preserve the shared workspace shape and export IDs used by all editions."""
     panel = _mesh_geometry_panel(workbench=workbench)
     side = next(child for child in panel.children if isinstance(child, html.Aside))
-    for child in side.children:
-        if isinstance(child, html.H4):
-            child.children = "Blade modeller"
-        elif isinstance(child, html.P):
-            child.children = "Prepare each blade row for CFD using its calculated baseline."
-    side.children.append(controls())
+    side.children = [
+        html.Div([
+            html.Label("Stage", htmlFor="geometry_stage", className="td-blade-selector-label"),
+            dcc.Dropdown(id="geometry_stage", options=[], value=0, clearable=False,
+                         className="td-blade-stage", searchable=False),
+            html.Label("Blade row", className="td-blade-selector-label"),
+            dcc.RadioItems(id="geometry_row", options=[{"label": "Stator", "value": "stator"},
+                                                       {"label": "Rotor", "value": "rotor"}],
+                           value="stator", className="td-blade-row-switch", inline=True),
+        ], className="td-blade-selector"),
+        html.Div(id="geometry_rows_container"), controls(),
+    ]
     main = next(child for child in panel.children if isinstance(child, html.Main))
     main.children = [
+        yaml_dialog(),
         *[dcc.Store(id=name) for name in (
             "geometry_state", "geometry_committed", "geometry_results_store", "blade_modeller_drag",
             "blade_modeller_events", "blade_modeller_event_sink", "blade_modeller_ack_sink",
-            "blade_modeller_2d_proposal", "blade_modeller_3d_proposal")],
+            "blade_modeller_2d_proposal", "blade_modeller_3d_proposal", "blade_modeller_edit_proposal", "blade_yaml_context", "blade_yaml_submission")],
         html.Div(id="geometry_message", role="status", className="td-blade-caption"),
         html.Section([
             html.Div([
@@ -278,6 +323,49 @@ def geometry_panel(*, workbench=False):
         html.Details([html.Summary("TurboGrid export"), turbogrid_export_panel()], className="td-row-settings"),
     ]
     return panel
+
+
+def yaml_dialog():
+    return dbc.Modal([
+        dcc.Download(id="blade_modeller_download"),
+        dbc.ModalHeader(dbc.ModalTitle("Row parameters", id="blade_yaml_title"), close_button=False),
+        dbc.ModalBody([
+            html.P("Copy this row's parameters, paste another YAML definition, or choose a file. Changes take effect only when you select Apply to row.",
+                   className="td-blade-caption"),
+            html.Div([
+                dcc.Upload(id="blade_modeller_upload", accept=".yaml,.yml", multiple=False,
+                           children=html.Button("Choose YAML file", className="td-yaml-button")),
+                html.Div([dcc.Clipboard(id="blade_yaml_copy", target_id="blade_yaml_text", title="Copy YAML", style={"display": "inline-block"}),
+                          html.Span("Copy YAML")], className="td-yaml-copy"),
+                html.Button("Download YAML", id="blade_modeller_save", n_clicks=0, className="td-yaml-button"),
+            ], className="td-yaml-toolbar"),
+            html.Div(id="blade_yaml_file_notice", role="status", className="td-blade-caption"),
+            html.Label("Row YAML", htmlFor="blade_yaml_text", className="visually-hidden"),
+            dcc.Textarea(id="blade_yaml_text", value="", spellCheck=False, className="td-yaml-code"),
+            html.Div(id="blade_yaml_feedback", role="status", className="td-yaml-feedback"),
+        ]),
+        dbc.ModalFooter([
+            html.Button("Close", id="blade_yaml_close", n_clicks=0, className="td-yaml-button"),
+            html.Button("Apply to row", id="blade_yaml_apply", n_clicks=0, disabled=True, className="td-yaml-button td-yaml-primary"),
+        ]),
+    ], id="blade_yaml_modal", is_open=False, size="lg", centered=True,
+       backdrop="static", className="td-blade-yaml")
+
+
+def row_yaml_document(state, stage, row_name, pending, result_timestamp):
+    """Capture accepted row intent, including the edit blurred by opening YAML."""
+    if state and state.get("_result_timestamp") != result_timestamp:
+        raise PreventUpdate
+    if state and pending and pending.get("epoch") == state.get("_epoch") and pending.get("sequence", 0) > state.get("revision", 0):
+        state, errors, _ = fold_edit_journal(state, pending)
+        if errors:
+            raise ValueError("Resolve the pending invalid geometry edit before opening YAML.")
+    selected = selected_row(state, stage, row_name)
+    if selected is None:
+        raise PreventUpdate
+    name = re.sub(r"[^\w-]+", "_", selected["label"]).strip("_")
+    return {"content": yaml.safe_dump(row_parameter_state(state, selected["id"]).to_dict(), sort_keys=False, allow_unicode=True),
+            "filename": f"{name}_geometry.yaml", "type": "application/yaml"}
 
 
 def _theme_figure(figure, row, row_id):
@@ -344,6 +432,12 @@ def evaluate_3d(state, row_id):
 
 def register_callbacks(app, *, results_store="result_store"):
     """Register the sole geometry-state writer and separate live/commit views."""
+    app.clientside_callback(
+        "function(low, high) { return {[low]: String(low), [high]: String(high)}; }",
+        Output({"type": "blade-slider", "path": MATCH}, "marks"),
+        Input({"type": "blade-slider", "path": MATCH}, "min"),
+        Input({"type": "blade-slider", "path": MATCH}, "max"),
+    )
     vtk.register_vtk_callbacks(app, panes=("geometry",))
     app.clientside_callback(
         ClientsideFunction(namespace="bladeModeller", function_name="sampleDrag"),
@@ -357,25 +451,10 @@ def register_callbacks(app, *, results_store="result_store"):
         Output("blade_modeller_event_sink", "data"),
         Input({"type": "blade-parameter", "path": ALL}, "value"),
         Input({"type": "blade-reset", "path": ALL}, "n_clicks"),
-        Input("blade_modeller_reset", "n_clicks"), Input("blade_modeller_upload", "contents"),
+        Input("blade_modeller_reset", "n_clicks"),
         State({"type": "blade-parameter", "path": ALL}, "id"),
         State({"type": "blade-reset", "path": ALL}, "id"), prevent_initial_call=True)
 
-    @app.callback(
-        Output("geometry_state", "data"), Output("geometry_committed", "data"),
-        Output({"type": "blade-parameter", "path": ALL}, "value"),
-        Output({"type": "blade-slider", "path": ALL}, "value"),
-        Output({"type": "blade-slider", "path": ALL}, "min"), Output({"type": "blade-slider", "path": ALL}, "max"),
-        Output({"type": "blade-origin", "path": ALL}, "children"),
-        Output({"type": "blade-reset", "path": ALL}, "disabled"), Output({"type": "blade-field", "path": ALL}, "style"),
-        Output("blade_modeller_source", "children"), Output("blade_modeller_error", "children"),
-        Output("blade_modeller_context", "data-row"), Output("blade_modeller_context", "data-epoch"),
-        Input(results_store, "data"), Input("geometry_stage", "value"), Input("geometry_row", "value"),
-        Input("blade_modeller_events", "data"),
-        State({"type": "blade-parameter", "path": ALL}, "id"), State({"type": "blade-slider", "path": ALL}, "id"),
-        State("geometry_state", "data"), State("geometry_committed", "data"),
-        State(results_store, "modified_timestamp"), prevent_initial_call=True,
-    )
     def edit(results, stage, row_name, event, identifiers, slider_ids, current, committed, result_timestamp):
         trigger = ctx.triggered_id
         dragging = trigger == "blade_modeller_events" and bool((event or {}).get("dragging"))
@@ -439,22 +518,56 @@ def register_callbacks(app, *, results_store="result_store"):
                     fields, fields, fields, no_update, f"Edit not applied: {error} Previous valid geometry is shown.", no_update, no_update)
         projected, labels, disabled, styles = input_view(state, row_id)
         by_path = dict(zip(PATHS, projected))
-        settings = [slider_settings(path, by_path[path]) for path in SLIDER_PATHS]
+        slider_paths = [item["path"] for item in slider_ids]
+        field_paths = [item["path"] for item in identifiers]
+        settings = [slider_settings(path, by_path[path]) for path in slider_paths]
         # Preserve the DOM value/selection in every unrelated numeric field.
         shown_values = [value if not edited_path or path == edited_path or path in refresh_fields or (row_id, path) in rejected else no_update
                         for path, value in zip(PATHS, projected)]
-        slider_values = [by_path[path] for path in SLIDER_PATHS]
+        shown_values = dict(zip(PATHS, shown_values))
+        labels, disabled, styles = (dict(zip(PATHS, items)) for items in (labels, disabled, styles))
+        slider_values = [by_path[path] for path in slider_paths]
         if dragging:
             slider_values = [no_update] * len(SLIDER_PATHS)
         selected = next(item for item in state["rows"] if item["id"] == row_id)
         count = len(selected["parameters"].get("overrides", {}))
         label = f"{selected['label']} · {count} edited parameter{'s' if count != 1 else ''}"
-        classification = selected.get("classification", {})
-        if classification.get("weight") is not None:
-            label += f" · impulse preset weight {classification['weight']:.3f}"
         return (state if state_changed else no_update, state if state_changed and not dragging else no_update,
-                shown_values, slider_values, [item["min"] for item in settings], [item["max"] for item in settings],
-                labels, disabled, styles, label, notice, row_id, state.get("_epoch", ""))
+                [shown_values[path] for path in field_paths], slider_values,
+                [item["min"] for item in settings], [item["max"] for item in settings],
+                [labels[path] for path in field_paths], [disabled[path] for path in field_paths],
+                [styles[path] for path in field_paths], label, notice, row_id, state.get("_epoch", ""))
+
+    @app.callback(
+        Output("blade_modeller_edit_proposal", "data"),
+        Input(results_store, "data"), Input("geometry_stage", "value"), Input("geometry_row", "value"),
+        Input("blade_modeller_events", "data"),
+        State({"type": "blade-parameter", "path": ALL}, "id"), State({"type": "blade-slider", "path": ALL}, "id"),
+        State("geometry_state", "data"), State("geometry_committed", "data"),
+        State(results_store, "modified_timestamp"), prevent_initial_call=True,
+    )
+    def prepare_edit(*args):
+        values = edit(*args)
+        proposed = values[0] if values[0] is not no_update else args[6]
+        return {"values": values, "stage": args[1] or 0, "row": args[2] or "stator",
+                "epoch": (proposed or {}).get("_epoch"), "revision": (proposed or {}).get("revision", 0),
+                "result_timestamp": args[8]}
+
+    # Expose the pure transition for unit tests; only acceptEdit writes browser state.
+    prepare_edit.transition = edit
+    app.clientside_callback(
+        ClientsideFunction(namespace="bladeModeller", function_name="acceptEdit"),
+        Output("geometry_state", "data"), Output("geometry_committed", "data"),
+        Output({"type": "blade-parameter", "path": ALL}, "value"),
+        Output({"type": "blade-slider", "path": ALL}, "value"),
+        Output({"type": "blade-slider", "path": ALL}, "min"), Output({"type": "blade-slider", "path": ALL}, "max"),
+        Output({"type": "blade-origin", "path": ALL}, "children"),
+        Output({"type": "blade-reset", "path": ALL}, "disabled"), Output({"type": "blade-field", "path": ALL}, "style"),
+        Output("blade_modeller_source", "children"), Output("blade_modeller_error", "children"),
+        Output("blade_modeller_context", "data-row"), Output("blade_modeller_context", "data-epoch"),
+        Input("blade_modeller_edit_proposal", "data"), State("geometry_state", "data"),
+        State("geometry_stage", "value"), State("geometry_row", "value"),
+        State(results_store, "modified_timestamp"), prevent_initial_call=True)
 
     @app.callback(Output("blade_modeller_2d_proposal", "data"), Input("geometry_state", "data"),
                   Input("geometry_stage", "value"), Input("geometry_row", "value"),
@@ -496,24 +609,70 @@ def register_callbacks(app, *, results_store="result_store"):
         Input("blade_modeller_3d_proposal", "data"), State("geometry_committed", "data"),
         State("geometry_stage", "value"), State("geometry_row", "value"), prevent_initial_call=True)
 
-    @app.callback(Output("blade_modeller_download", "data"), Input("blade_modeller_save", "n_clicks"),
-                  State("geometry_state", "data"), State("geometry_stage", "value"), State("geometry_row", "value"),
-                  State("blade_modeller_events", "data"),
-                  State(results_store, "modified_timestamp"),
-                  prevent_initial_call=True)
-    def save_yaml(clicks, state, stage, row_name, pending, result_timestamp):
-        if state and state.get("_result_timestamp") != result_timestamp:
-            raise PreventUpdate
-        # Clicking Save blurs a numeric input first. Include that browser
-        # transaction even when its ordinary editor response is still pending.
-        if state and pending and pending.get("epoch") == state.get("_epoch") and pending.get("sequence", 0) > state.get("revision", 0):
-            state, errors, _ = fold_edit_journal(state, pending)
-            if errors:
+    @app.callback(
+        Output("blade_yaml_modal", "is_open"), Output("blade_yaml_text", "value"),
+        Output("blade_yaml_context", "data"), Output("blade_yaml_title", "children"),
+        Output("blade_yaml_file_notice", "children"),
+        Input("blade_yaml_open", "n_clicks"), Input("blade_yaml_close", "n_clicks"),
+        Input("blade_modeller_upload", "contents"),
+        State("geometry_state", "data"), State("geometry_stage", "value"), State("geometry_row", "value"),
+        State("blade_modeller_events", "data"), State(results_store, "modified_timestamp"),
+        State("blade_modeller_upload", "filename"), prevent_initial_call=True)
+    def edit_yaml(open_clicks, close_clicks, contents, state, stage, row_name, pending, result_timestamp, filename):
+        trigger = ctx.triggered_id
+        if trigger == "blade_yaml_close":
+            return False, no_update, no_update, no_update, ""
+        if trigger == "blade_modeller_upload":
+            if not contents:
                 raise PreventUpdate
-        selected = selected_row(state, stage, row_name)
-        if not clicks or selected is None:
+            try:
+                payload = contents.split(",", 1)[1]
+                if len(payload) > 1_400_000:
+                    raise ValueError("Choose a YAML file smaller than 1 MB.")
+                draft = base64.b64decode(payload, validate=True).decode("utf-8-sig")
+                return no_update, draft, no_update, no_update, f"Loaded {filename or 'YAML file'} into the editor. Select Apply to row to use it."
+            except (ValueError, IndexError, UnicodeError, binascii.Error) as error:
+                return no_update, no_update, no_update, no_update, f"Could not read file: {error}"
+        if trigger != "blade_yaml_open" or not open_clicks:
             raise PreventUpdate
-        parameters = row_parameter_state(state, selected["id"])
-        name = re.sub(r"[^\w-]+", "_", selected["label"]).strip("_")
-        return {"content": yaml.safe_dump(parameters.to_dict(), sort_keys=False, allow_unicode=True),
-                "filename": f"{name}_geometry.yaml", "type": "application/yaml"}
+        try:
+            document = row_yaml_document(state, stage, row_name, pending, result_timestamp)
+        except (PreventUpdate, ValueError) as error:
+            return True, "", None, "Row parameters", str(error) or "Wait for a successful calculation before opening row parameters."
+        selected = selected_row(state, stage, row_name)
+        captured = {"epoch": state["_epoch"], "row": selected["id"], "filename": document["filename"],
+                    "label": selected["label"], "id": uuid.uuid4().hex}
+        return True, document["content"], captured, selected["label"] + " — YAML", ""
+
+    app.clientside_callback(
+        ClientsideFunction(namespace="bladeModeller", function_name="applyYaml"),
+        Output("blade_yaml_submission", "data"), Input("blade_yaml_apply", "n_clicks"),
+        State("blade_yaml_text", "value"), State("blade_yaml_context", "data"), prevent_initial_call=True)
+
+    app.clientside_callback(
+        "function(captured, state) { return !captured || !state || captured.epoch !== state._epoch; }",
+        Output("blade_yaml_apply", "disabled"),
+        Input("blade_yaml_context", "data"), Input("geometry_state", "data"))
+
+    @app.callback(Output("blade_yaml_feedback", "children"),
+                  Input("blade_yaml_submission", "data"), Input("geometry_state", "data"),
+                  Input("blade_modeller_error", "children"), Input("blade_yaml_context", "data"))
+    def yaml_feedback(submission, state, error, captured):
+        if not captured:
+            return ""
+        if not state or state.get("_epoch") != captured["epoch"]:
+            return "The calculated baseline changed. Close and reopen Row YAML before applying."
+        if not submission or submission.get("dialog") != captured["id"]:
+            return ""
+        if submission.get("error"):
+            return submission["error"]
+        if state.get("revision", 0) < submission["sequence"]:
+            return "Validating row parameters…"
+        return error or f"Applied to {captured['label']}."
+
+    @app.callback(Output("blade_modeller_download", "data"), Input("blade_modeller_save", "n_clicks"),
+                  State("blade_yaml_text", "value"), State("blade_yaml_context", "data"), prevent_initial_call=True)
+    def save_yaml(clicks, draft, captured):
+        if not clicks or not draft:
+            raise PreventUpdate
+        return {"content": draft, "filename": (captured or {}).get("filename", "blade_row.yaml"), "type": "application/yaml"}

@@ -110,6 +110,26 @@
     }
     window.dash_clientside = Object.assign({}, window.dash_clientside, {
         bladeModeller: {
+            acceptEdit: function (proposal, state, stage, row, resultTimestamp) {
+                const no = window.dash_clientside.no_update, skip = Array(13).fill(no);
+                if (!proposal || proposal.result_timestamp !== resultTimestamp) return skip;
+                if (state && proposal.epoch === state._epoch && proposal.revision < state.revision) return skip;
+                if (journal.epoch === proposal.epoch && proposal.revision < journal.sequence) return skip;
+                const restoreNoUpdate = value => {
+                    if (value && value._dash_no_update) return no;
+                    return Array.isArray(value) ? value.map(restoreNoUpdate) : value;
+                };
+                const values = proposal.values.map(restoreNoUpdate);
+                if (proposal.stage !== (stage || 0) || proposal.row !== (row || "stator")) {
+                    // Keep edits to the previous row, but never show its controls
+                    // as those of the newly selected row.
+                    if (values[0] !== no) {
+                        setTimeout(() => window.dash_clientside.set_props("geometry_row", {value: row || "stator"}), 0);
+                    }
+                    return values.slice(0, 2).concat(Array(11).fill(no));
+                }
+                return values;
+            },
             acknowledge: function (state) {
                 const no = window.dash_clientside.no_update;
                 if (!state || !state._epoch) return no;
@@ -125,7 +145,7 @@
                 }
                 return no;
             },
-            forwardControls: function (values, resetClicks, resetRow, upload, ids, resetIds) {
+            forwardControls: function (values, resetClicks, resetRow, ids, resetIds) {
                 const no = window.dash_clientside.no_update;
                 const events = window.dash_clientside.callback_context.triggered || [];
                 events.forEach(event => {
@@ -133,7 +153,6 @@
                     let id;
                     try {id = JSON.parse(key);} catch (_) {id = key;}
                     if (id === "blade_modeller_reset" && resetRow) send({kind: "reset"}, false);
-                    else if (id === "blade_modeller_upload" && upload) send({kind: "import", contents: upload}, false);
                     else if (id.type === "blade-reset") {
                         const index = resetIds.findIndex(item => item.path === id.path);
                         if (resetClicks[index]) send({kind: "reset", path: id.path}, false);
@@ -148,6 +167,22 @@
                     }
                 });
                 return no;
+            },
+            applyYaml: function (clicks, draft, captured) {
+                const no = window.dash_clientside.no_update;
+                if (!clicks) return no;
+                const selected = context(), dialog = captured && captured.id;
+                if (!captured || selected.epoch !== captured.epoch || selected.row !== captured.row) {
+                    return {dialog: dialog, error: "The selected row or baseline changed. Close and reopen Row YAML."};
+                }
+                if (!draft || !draft.trim()) return {dialog: dialog, error: "Paste YAML or choose a file first."};
+                const bytes = new TextEncoder().encode(draft);
+                if (bytes.length > 1000000) return {dialog: dialog, error: "Use YAML smaller than 1 MB."};
+                let binary = "";
+                for (let i = 0; i < bytes.length; i += 8192) binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+                const event = send({kind: "import", contents: "data:application/yaml;base64," + btoa(binary)}, false, captured);
+                return event ? {dialog: dialog, sequence: event.sequence} :
+                    {dialog: dialog, error: "Wait for the current row to finish loading, then try again."};
             },
             sampleDrag: function (values, ids) {
                 const no = window.dash_clientside.no_update;

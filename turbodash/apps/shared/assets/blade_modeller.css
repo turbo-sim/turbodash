@@ -9,15 +9,20 @@
 .td-blade-modeller .td-blade-field {padding: 9px 10px 6px; border-bottom: 1px solid var(--td-line, #D9E2EE);}
 .td-blade-field:last-child {border-bottom: 0;}
 .td-blade-input-line {display: grid; grid-template-columns: minmax(0, 1fr) minmax(74px, 39%); gap: 8px; align-items: center;}
-.td-blade-input-line > label {font-size: 11px; line-height: 1.4; font-weight: 500; margin: 0;}
+.td-blade-label {display: flex; align-items: center; gap: 2px;}
+.td-blade-label label {font-size: 11px; line-height: 1.4; font-weight: 500; margin: 0;}
 .td-blade-input-line input[type="number"] {width: 100%; min-width: 0; padding: 5px 7px; border: 1px solid var(--td-line, #D9E2EE); border-radius: 4px; color: inherit; background: var(--td-input, white); font: inherit; font-variant-numeric: tabular-nums;}
 .td-workbench .td-inspector .td-blade-input-line input[type="number"] {min-height: 34px; padding: 6px 7px; font-size: 12px;}
 .td-blade-input-line .Select {font-size: 11px;}
 .td-blade-provenance {display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-size: 10px; color: var(--td-muted, #62758B);}
 .td-blade-provenance button {padding: 0 3px; border: 0; background: transparent; color: var(--td-accent, #2462D1); font-size: 10px;}
 .td-blade-provenance button:disabled {opacity: .35;}
-/* DCC supplies 25px bottom padding inline for tick labels, which are absent here. */
-.td-blade-modeller .td-blade-slider {padding: 10px 6px 4px !important;}
+.td-blade-modeller .td-blade-slider {padding: 10px 12px 25px !important;}
+.td-blade-modeller .rc-slider-mark-text {color: var(--td-muted, #62758B); font-size: 10px; white-space: nowrap;}
+.td-blade-modeller .td-blade-subsection {margin-bottom: 8px; border: 1px solid var(--td-line, #D9E2EE); border-radius: 5px;}
+.td-blade-modeller .td-blade-subsection > summary {padding: 10px; cursor: pointer; font-size: 11px; font-weight: 600;}
+.td-blade-modeller .td-blade-subsection > .td-blade-caption {padding: 0 10px;}
+.td-blade-modeller .td-section-body {padding: 8px 4px;}
 .td-blade-modeller .rc-slider-track {background: var(--td-accent, #2462D1);}
 .td-blade-modeller .rc-slider-rail {background: var(--td-line, #D9E2EE);}
 .td-blade-modeller .rc-slider-handle {border-color: var(--td-accent, #2462D1); background: var(--td-input, white);}
@@ -29,3 +34,37 @@
 .td-blade-preview {min-height: 510px;}
 .td-plot-group > .td-blade-caption {padding: 0 12px;}
 @media (max-width: 700px) {.td-blade-toolbar {flex-wrap: wrap; gap: 4px;}}
+
+/* Compact, persistent row selection. */
+.td-blade-selector {padding: 12px; border: 1px solid var(--td-line, #d9e2ee); border-radius: 9px; background: var(--td-panel, white);}
+.td-blade-selector-label {display: block; margin: 0 0 6px; font-size: 10px; font-weight: 600; color: var(--td-muted, #62758b); letter-spacing: .04em; text-transform: uppercase;}
+.td-blade-stage {margin-bottom: 12px;}
+.td-blade-row-switch {display: flex; gap: 4px; padding: 4px; border-radius: 7px; background: var(--td-tint, #eaf1fc);}
+.td-blade-row-switch label {position: relative; display: flex !important; justify-content: center; flex: 1; padding: 8px 12px; border-radius: 5px; font-size: 12px; font-weight: 600; color: var(--td-muted, #62758b); cursor: pointer; margin: 0;}
+.td-blade-row-switch input {position: absolute; opacity: 0; width: 1px; height: 1px;}
+.td-blade-row-switch label:has(input:checked) {background: var(--td-panel, white); color: var(--td-accent, #2462d1); box-shadow: 0 1px 4px #00000015;}
+.td-blade-row-switch label:has(input:focus-visible) {outline: 2px solid var(--td-accent, #2462d1); outline-offset: 1px;}
+.td-blade-actions {display: grid; grid-template-columns: 1fr;}
+.td-blade-actions button {min-height: 34px; border-radius: 6px; font-size: 12px;}
+.td-blade-actions #blade_yaml_open {font-weight: 600; color: var(--td-accent, #2462d1); background: var(--td-tint, #eaf1fc);}
+/* The Bootstrap modal lives in a portal outside the workbench root. */
+.td-blade-yaml {--yaml-bg: #fff; --yaml-code: #f5f8fc; --yaml-text: #18314d; --yaml-muted: #62758b; --yaml-border: #d9e2ee; --yaml-accent: #2462d1;}
+body:has(.td-workbench[data-theme="dark"]) .td-blade-yaml {--yaml-bg: #19242f; --yaml-code: #111d29; --yaml-text: #e7eff9; --yaml-muted: #adbdce; --yaml-border: #344558; --yaml-accent: #88b7ff; color-scheme: dark;}
+.td-blade-yaml .modal-content {background: var(--yaml-bg); color: var(--yaml-text); border: 1px solid var(--yaml-border); border-radius: 12px; box-shadow: 0 20px 80px #0004; font-family: "Segoe UI", sans-serif;}
+.td-blade-yaml .modal-header, .td-blade-yaml .modal-footer {border-color: var(--yaml-border); padding: 16px 22px;}
+.td-blade-yaml .modal-title {font-size: 18px; font-weight: 600;}
+.td-blade-yaml .modal-body {padding: 8px 22px 16px;}
+.td-blade-yaml .td-blade-caption {color: var(--yaml-muted); font-size: 12px;}
+.td-yaml-toolbar {display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 16px 0 8px;}
+.td-yaml-button, .td-yaml-copy {padding: 8px 12px; border: 1px solid var(--yaml-border); border-radius: 6px; background: var(--yaml-bg); color: var(--yaml-text); font: 12px "Segoe UI", sans-serif;}
+.td-yaml-button:hover {background: var(--yaml-code);}
+.td-yaml-copy {position: relative; display: flex; align-items: center; gap: 8px; padding-left: 34px;}
+.td-yaml-copy #blade_yaml_copy {position: absolute; inset: 0; display: flex !important; align-items: center; padding-left: 12px; cursor: pointer;}
+.td-yaml-copy > span {pointer-events: none;}
+.td-yaml-button:disabled {opacity: .5; cursor: default;}
+.td-yaml-primary {background: var(--yaml-accent); border-color: var(--yaml-accent); color: var(--yaml-bg); font-weight: 600;}
+.td-yaml-primary:hover {background: var(--yaml-accent); filter: brightness(.94);}
+.td-yaml-code {display: block; width: 100%; height: min(50vh, 440px); min-height: 180px; padding: 16px; border: 1px solid var(--yaml-border); border-radius: 7px; background: var(--yaml-code); color: var(--yaml-text); font: 12px/1.65 Consolas, "Cascadia Code", monospace; resize: vertical; tab-size: 2; white-space: pre;}
+.td-blade-yaml :focus-visible {outline: 2px solid var(--yaml-accent); outline-offset: 2px;}
+.td-yaml-feedback {min-height: 24px; padding-top: 10px; font-size: 12px; color: var(--yaml-text);}
+@media (max-width: 600px) {.td-blade-yaml .modal-body, .td-blade-yaml .modal-header, .td-blade-yaml .modal-footer {padding-left: 14px; padding-right: 14px;}}

@@ -114,7 +114,7 @@ def test_symmetric_impulse_settings_are_possible_without_linking_inputs():
     x = np.linspace(0, 1, 1001)
     np.testing.assert_allclose(denton_thickness(x, values["thickness"])[1], denton_thickness(1-x, values["thickness"])[1], atol=1e-15)
     edited = state.with_override("thickness.trailing_edge_fullness", 0.2)
-    assert resolve_parameters(edited).values["thickness"]["leading_edge_fullness"] == 0
+    assert resolve_parameters(edited).values["thickness"]["leading_edge_fullness"] == -0.25
     section = build_section(values)
     assert abs(section.camber[-1, 1]) < 1e-14
 
@@ -225,3 +225,35 @@ def test_no_production_module_imports_retired_geometry_archive():
             else:
                 continue
             assert not any("legacy" in name.split(".") for name in modules), path
+
+
+@pytest.mark.parametrize("family,fullness,incoming", [("reaction", 0., 0.), ("impulse", -.25, -60.)])
+def test_app_shape_endpoints_match_selected_thickness_study_profiles(family, fullness, incoming):
+    study = json.loads((ROOT / "development/blade_parametrization/parametrization_thickness/results/sensitivity.json").read_text())
+    reference = deepcopy(study["baselines"][family]["parameters"])
+    reference["thickness"].update(leading_edge_fullness=fullness, trailing_edge_fullness=fullness)
+    preset = meanline.REACTION_PRESET if family == "reaction" else meanline.IMPULSE_PRESET
+    for path, expected in preset.items():
+        group, name = path.split(".")
+        assert expected == reference[group][name], path
+    geometry = row_geometry(metal_angle_in=incoming, maximum_thickness=.0027,
+                            trailing_edge_thickness=.00018, leading_edge_radius=.00012)
+    values = resolve_parameters(meanline.parameters_from_meanline(geometry)[0]).values
+    thickness = values["thickness"]
+    assert thickness["maximum_thickness_ratio"] == pytest.approx(.0027 / .015)
+    assert thickness["trailing_edge_thickness_ratio"] == pytest.approx(.00018 / .015)
+    inferred_radius = (.015 * thickness["leading_edge_thickness_ratio"]**2 *
+                       thickness["leading_edge_rounding_exponent"] * np.cos(np.deg2rad(incoming)) /
+                       (8 * thickness["leading_edge_fraction"]))
+    assert inferred_radius == pytest.approx(.00012)
+    assert thickness["leading_edge_fullness"] == fullness
+    assert thickness["trailing_edge_fullness"] == fullness
+    build_section(values)
+
+
+def test_zero_turning_baseline_has_no_undefined_pressure_side_relief():
+    state, _, warnings = meanline.parameters_from_meanline(row_geometry(metal_angle_in=20, metal_angle_out=20))
+    values = resolve_parameters(state).values
+    assert values["leading_edge"]["relief_strength"] == 0.
+    assert any("zero-turning" in warning for warning in warnings)
+    build_section(values)

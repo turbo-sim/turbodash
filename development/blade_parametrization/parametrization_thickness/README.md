@@ -1,6 +1,6 @@
 # Denton thickness modification — investigation V5
 
-This note condenses the final rational modification and its sensitivity for impulse and reaction blades. It retains the existing parametrization: **camberline plus thickness, with separately specified leading- and trailing-edge fullness**. The app and this study now use the same implementation in [parametrization_blades](../parametrization_blades/README.md). Preset fullness remains zero.
+This note condenses the final rational modification and its sensitivity for impulse and reaction blades. It retains the existing parametrization: **camberline plus thickness, with separately specified leading- and trailing-edge fullness**. The app and this study now use the same implementation in [parametrization_blades](../parametrization_blades/README.md). The study's baseline cases retain zero fullness. The integrated app uses the impulse row with **LE = TE = -0.25** and the reaction row with **LE = TE = 0** as its shape-preset endpoints, including their turning, rounding, and leading-relief settings. App dimensions, maximum thickness, leading-edge radius target, and trailing-edge thickness still come from meanline; intermediate shapes interpolate between these endpoints.
 
 ## 1. Original Denton thickness
 
@@ -135,7 +135,7 @@ $$
 -0.5\le f_{TE}\le0.5,
 $$
 
-with both defaults zero and each value specified separately. The formula and its admissibility condition remain unchanged:
+with both generic kernel defaults zero and each value specified separately. The integrated impulse preset uses -0.25 at both shoulders as described above. The formula and its admissibility condition remain unchanged:
 
 $$
 \frac{a_{LE}+a_{TE}}{2}

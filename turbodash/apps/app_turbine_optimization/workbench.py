@@ -500,7 +500,7 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
                 [
                     html.Div(
                         [
-                            html.H2("Design inputs"),
+                            html.H2("Meanline inputs", id="td-inputs-title"),
                             html.Button("Collapse all", id="td-collapse-all"),
                         ],
                         className="td-inspector-title",
@@ -522,16 +522,18 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
             ),
             html.Div(
                 [
-                    section(1, "Turbine setup", setup, "setup"),
-                    section(2, "Operating point", operating, "operating"),
-                    section(3, "Shaft speed", speed, "speed"),
-                    section(4, "Stage design", stage, "stage"),
-                    opt,
+                    html.Div([
+                        section(1, "Turbine setup", setup, "setup"),
+                        section(2, "Operating point", operating, "operating"),
+                        section(3, "Shaft speed", speed, "speed"),
+                        section(4, "Stage design", stage, "stage"),
+                        opt,
+                    ], **{"data-controls-workspace": "meanline"}),
                     *extras,
                 ],
                 className="td-inspector-scroll",
             ),
-            optimization_actions(),
+            html.Div(optimization_actions(), **{"data-controls-workspace": "meanline"}),
             html.Div(
                 id="td-inspector-resize",
                 role="separator",

@@ -825,7 +825,10 @@ def register_meshing_callbacks(app, *, precise_inputs=False, results_store="resu
         Output("mesh_stage", "options"),
         Output("mesh_stage", "value"),
         Output("mesh_row", "value"),
-        Input(results_store, "data"),
+        # Stage identities belong to accepted meanline results. Reading the
+        # geometry projection here creates a cycle through geometry_stage and
+        # the modeller's committed state during initial loading.
+        Input("result_store" if modeller else results_store, "data"),
         Input("mesh_row_choice", "data"),
         State("geometry_stage", "value"),
         State("mesh_stage", "value"),
@@ -985,37 +988,27 @@ def register_meshing_callbacks(app, *, precise_inputs=False, results_store="resu
             message = f"Could not display the row sections: {error}"
             return _empty(message), _empty(message), message
 
-    if modeller:
+    if not modeller:
         @app.callback(
-            Output("geometry_download_button", "disabled"),
-            Input(results_store, "data"),
-            Input("result_input_signature", "data"),
-            *[Input(*item) for item in _LIVE],
-            Input("blade_modeller_events", "data"),
+            Output("geometry_download", "data"), Output("geometry_download_error", "children"),
+            Input("geometry_download_button", "n_clicks"), State(results_store, "data"),
+            State("result_input_signature", "data"), State("geometry_stage", "value"), State("geometry_row", "value"),
+            *[State(*item) for item in _LIVE],
+            *([State("blade_modeller_events", "data")] if modeller else []),
+            prevent_initial_call=True,
         )
-        def geometry_export_available(results, signature, *live):
-            return bool(availability(results, signature, live))
-
-    @app.callback(
-        Output("geometry_download", "data"), Output("geometry_download_error", "children"),
-        Input("geometry_download_button", "n_clicks"), State(results_store, "data"),
-        State("result_input_signature", "data"), State("geometry_stage", "value"), State("geometry_row", "value"),
-        *[State(*item) for item in _LIVE],
-        *([State("blade_modeller_events", "data")] if modeller else []),
-        prevent_initial_call=True,
-    )
-    def download_geometry(clicks, results, signature, stage, row, *live):
-        if not clicks:
-            raise PreventUpdate
-        reason = availability(results, signature, live)
-        if reason:
-            return no_update, reason
-        try:
-            data = meshing.geometry_zip(results, stage_index=stage, row=row)
-            return dcc.send_bytes(data, f"turbodash_stage_{stage + 1}_{row}_geometry.zip", type="application/zip"), ""
-        except Exception as error:
-            _LOG.exception("Geometry export failed")
-            return no_update, f"Geometry export failed: {error}"
+        def download_geometry(clicks, results, signature, stage, row, *live):
+            if not clicks:
+                raise PreventUpdate
+            reason = availability(results, signature, live)
+            if reason:
+                return no_update, reason
+            try:
+                data = meshing.geometry_zip(results, stage_index=stage, row=row)
+                return dcc.send_bytes(data, f"turbodash_stage_{stage + 1}_{row}_geometry.zip", type="application/zip"), ""
+            except Exception as error:
+                _LOG.exception("Geometry export failed")
+                return no_update, f"Geometry export failed: {error}"
 
     @app.callback(
         Output("mesh_job", "data"), Output("mesh_status", "data"), Output("mesh_poll", "disabled"),

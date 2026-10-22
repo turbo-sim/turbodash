@@ -6,8 +6,10 @@ def fullness_coefficients(parameters):
     """Return the center and slope of a(z); reject singular combinations."""
     f = np.array([parameters.get("leading_edge_fullness", 0.),
                   parameters.get("trailing_edge_fullness", 0.)], dtype=float)
-    if not np.isfinite(f).all() or np.any(np.abs(f) > .5):
-        raise ValueError("Leading and trailing fullness must each lie in [-0.5, 0.5].")
+    if not np.isfinite(f).all() or np.any(np.abs(f) > 1):
+        raise ValueError("Leading and trailing fullness must each lie in [-1, 1].")
+    if np.any(np.abs(f) == 1):
+        raise ValueError("Shoulder fullness endpoints -1 and +1 produce degenerate thickness profiles; use values strictly between them.")
     n = parameters["shape_exponent"]
     a = 2*f/(1+f)
     center = float(a.mean())

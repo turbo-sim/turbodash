@@ -748,6 +748,7 @@ _GEOMETRY_SPECS = [
     ("Radius out", "mm", "radius_out", 2, 1e3),
     ("Hub-tip ratio at inlet", "-", "hub_tip_ratio_in", 4, 1.0),
     ("Hub-tip ratio at outlet", "-", "hub_tip_ratio_out", 4, 1.0),
+    ("Blade-row flow turning", "deg", "flow_turning", 2, 1.0),
     ("Height", "mm", "height", 2, 1e3),
     ("Aspect ratio", "-", "aspect_ratio", 3, 1.0),
     ("Chord", "mm", "chord", 2, 1e3),

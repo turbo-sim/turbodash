@@ -96,9 +96,10 @@ and thickness/edge ratios are not copied over meanline values, so a calculated
 row need not reproduce the example outline exactly.
 Every numeric shape value is interpolated linearly, then validated, including
 the rational fullness admissibility condition. LE and TE remain independent;
-each fullness input lies in `[-0.5, 0.5]`. Some strongly opposed pairs within
-those individual limits are rejected because their shared rational denominator
-would become singular.
+the app controls span `[-1, 1]`. Valid profiles require values strictly between
+the endpoints, which are degenerate limits of the thickness law. Some strongly
+opposed pairs within those individual limits are also rejected because their
+shared rational denominator would become singular.
 
 Meanline-provided dimensions, angles and thickness values take precedence.
 In particular an explicitly supplied thickness location is retained, even at
@@ -142,7 +143,7 @@ production kernel through its coordinate adapters.
    replaces the Meanline inputs while retaining their values. Search stays within
    the current workspace. Base sampling points live under **Flow domain → Advanced:
    resolution**. Slider endpoints show the current minimum and maximum; turning
-   concentration initially spans 1–3, expanding for valid typed values outside it.
+   concentration initially spans 1–5, expanding for valid typed values outside it.
    Dimensions are displayed in millimetres, angles in degrees, and thickness
    controls are full-thickness ratios. Number boxes accept arbitrary floating
    point values; slider increments do not round the stored input.

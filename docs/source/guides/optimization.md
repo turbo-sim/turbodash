@@ -20,6 +20,11 @@ print(result.success, result.message)
 Run this example from a repository checkout. The basic demo explains reporting
 and exports; the advanced demo compares step fractions and recovery policies.
 
+In the app, **Stop** beside **Start optimization** cancels the running worker.
+The current design and convergence log are retained; the unfinished result is
+not applied. Stop is enabled only while a numerical run is active. You can
+adjust the settings and start a fresh run after stopping.
+
 ## Account for exhaust recovery
 
 After the `stages` section, turbine inputs include a prescribed diffuser recovery:
@@ -56,6 +61,46 @@ The overall result key is `efficiency_ts_with_recovery`. It is available as an
 optimization objective or constraint under **Overall**. The recovery fraction
 is an assumption held fixed during optimization, not a design variable. The
 original total-to-static and total-to-total metrics remain available.
+
+## Constrain flow angles and blade-row turning
+
+Under **Constraints > + Add constraint**, each stage's **Station 1–4** menus
+offer **Absolute flow angle [deg]** (`alpha`) and **Relative flow angle [deg]**
+(`beta`). These are calculated quantities, so they constrain the velocity
+triangles without introducing independent angle design variables.
+
+| Station | Boundary | Frame relevant to the blades |
+| --- | --- | --- |
+| 1 | Stator inlet | Absolute; equals relative for the stationary stator |
+| 2 | Stator outlet | Absolute; equals relative for the stationary stator |
+| 3 | Rotor inlet | Relative |
+| 4 | Rotor outlet | Relative |
+
+**+ Add groups** offers **Stator inlet relative flow angle** and **Rotor inlet
+relative flow angle**, for all stages or an individual stage. They start with
+an editable signed inlet-angle constraint **≥ 0°**, using `beta` at station 1
+or 3 respectively. Negative angles retain their sign; adjust the comparison
+and target for the intended velocity triangle.
+
+To prevent almost straight rows, prefer **Minimum blade-row turning**. This
+adds separate stator and rotor lower bounds, each initially **≥ 50°**:
+
+$$
+\Delta\theta_S=|\alpha_2-\alpha_1|,\qquad
+\Delta\theta_R=|\beta_4-\beta_3|.
+$$
+
+An inlet-angle limit alone cannot guarantee either difference. The turning
+group applies to each stage separately, so high turning in one row cannot
+compensate for insufficient turning in another. The group is off until
+selected, and both thresholds are independently editable. The 50° default
+is a design starting point, not an aerodynamic validity limit.
+
+Turning appears under row geometry in the constraint picker and geometry
+report, with result key `geometry_meanline.<row>.flow_turning`. Angle constraints
+use normalization scale 90°. They are saved and loaded with the optimization
+settings. These constraints govern meanline flow turning; they do not restrict
+subsequent geometry-only camberline edits, and are not incidence constraints.
 
 ## Constrain hub-to-tip ratios
 

@@ -70,6 +70,7 @@ PERFORMANCE = {
     "rotational_speed": ("Rotational speed [rpm]", 10000),
 }
 GEOMETRY = {
+    "flow_turning": ("Blade-row flow turning [deg]", 90),
     "flaring_angle": ("Flaring angle [deg]", 10),
     "height": ("Blade height [m]", .01),
     "chord": ("True chord [m]", .01),
@@ -276,6 +277,10 @@ def _constraint_default(path, scale):
         return "<=", 10
     if quantity == "height":
         return ">=", .001
+    if quantity in ("alpha", "beta"):
+        return ">=", 0
+    if quantity == "flow_turning":
+        return ">=", 50
     if quantity in AXIAL_GEOMETRY:
         return ">=", .8
     if quantity in ("efficiency_ts", "efficiency_tt", "efficiency_ts_with_recovery"):
@@ -320,7 +325,9 @@ def output_catalog(config, results=None):
                     [hierarchy_title, f"{row_title} geometry"])
         for station in ("1", "2", "3", "4"):
             for key, label, scale in (("Ma_abs", "Absolute Mach [-]", 1), ("Ma_rel", "Relative Mach [-]", 1),
-                                      ("p", "Pressure [Pa]", 1e5), ("T", "Temperature [K]", 500)):
+                                      ("p", "Pressure [Pa]", 1e5), ("T", "Temperature [K]", 500),
+                                      ("alpha", "Absolute flow angle [deg]", 90),
+                                      ("beta", "Relative flow angle [deg]", 90)):
                 add(f"$stages_performance.{index}.flow_stations.{int(station) - 1}.{key}",
                     f"{title} · Station {station} · {label}", scale, label,
                     [hierarchy_title, f"Station {station}"])
@@ -356,6 +363,22 @@ def constraint_groups(config, catalog=None):
         return [row(f"$stages_performance.{scope}.geometry_meanline.{blade_row}.{quantity}")
                 for blade_row in ("stator", "rotor") for quantity in AXIAL_GEOMETRY]
 
+    def angle_groups(scope, hierarchy, prefix=""):
+        for blade_row, station in (("stator", 0), ("rotor", 2)):
+            add(f"{prefix}{blade_row}_inlet_relative_angle", f"{blade_row.title()} inlet relative flow angle",
+                "Constrain the signed inlet angle in the blade-row frame, in degrees. "
+                "Starts at >= 0 degrees; edit the comparison and target. For a stationary "
+                "stator this equals the absolute inlet angle. An inlet-angle limit alone "
+                "does not guarantee minimum turning.",
+                [row(f"$stages_performance.{scope}.flow_stations.{station}.beta")], hierarchy)
+        add(f"{prefix}minimum_turning", "Minimum blade-row turning",
+            "Require at least 50 degrees of flow turning in every selected stator and rotor. "
+            "Uses |absolute outlet - inlet angle| for stators and |relative outlet - inlet angle| "
+            "for rotors. Edit the two row limits independently. This constrains meanline "
+            "flow turning, not a geometry-only camber edit.",
+            [row(f"$stages_performance.{scope}.geometry_meanline.{blade_row}.flow_turning")
+             for blade_row in ("stator", "rotor")], hierarchy)
+
     add("subsonic", "Maximum Mach number",
         "Keep blade-row Mach numbers at or below 1: absolute in stators, relative in rotors.",
         [row("$overall_performance.maximum_mach_number")], ["Overall"])
@@ -371,7 +394,9 @@ def constraint_groups(config, catalog=None):
     )
     add("hub_tip_ratios", "Hub-to-tip ratios", hub_tip_description,
         hub_tip_limits("*"), ["All stages"])
+    angle_groups("*", ["All stages"])
     for i, stage in enumerate(config["inputs"].get("stages", [])):
+        angle_groups(str(i), [_stage_title(i, stage)], prefix=f"stage_{i}_")
         add(f"stage_{i}_hub_tip_ratios", "Hub-to-tip ratios", hub_tip_description,
             hub_tip_limits(str(i)), [_stage_title(i, stage)])
         add(f"stage_{i}_limits", "Mach, flaring and blade-height limits",

@@ -323,3 +323,74 @@ def test_radial_model_does_not_offer_fixed_hub_tip_ratios(kind):
     config["inputs"]["turbine_type"] = kind
     assert not any("hub_tip_ratio" in path for path in output_catalog(config))
     assert not any("hub_tip_ratio" in key for key in constraint_groups(config))
+
+
+@pytest.mark.parametrize("kind", ["axial", "radial"])
+def test_flow_angle_constraints_and_turning_use_each_rows_physical_frame(kind):
+    config = case(kind, count=2)
+    result = compute_turbine_performance(config)
+    catalog = output_catalog(config, result)
+    groups = constraint_groups(config, catalog)
+    for index, stage in enumerate(result["stages_performance"]):
+        stations = stage["flow_stations"]
+        for station in range(4):
+            for key in ("alpha", "beta"):
+                path = f"$stages_performance.{index}.flow_stations.{station}.{key}"
+                assert catalog[path]["scale"] == 90
+                assert opt.read_path(result, path) == stations[station][key]
+                wildcard = path.replace(f".{index}.", ".*.", 1)
+                assert len(opt.resolve_value(wildcard, result)) == 2
+        for blade_row, start, angle in (("stator", 0, "alpha"), ("rotor", 2, "beta")):
+            expected = abs(stations[start + 1][angle] - stations[start][angle])
+            assert stage["geometry_meanline"][blade_row]["flow_turning"] == pytest.approx(expected)
+            inlet = groups[f"stage_{index}_{blade_row}_inlet_relative_angle"]["rows"]
+            assert inlet == [dict(path=f"$stages_performance.{index}.flow_stations.{start}.beta",
+                                  comparison=">=", target=0, scale=90)]
+        assert stations[0]["alpha"] == stations[0]["beta"]
+    rows = groups["minimum_turning"]["rows"]
+    assert len(rows) == 2
+    assert all((row["comparison"], row["target"], row["scale"]) == (">=", 50, 90) for row in rows)
+    settings = build_settings(
+        config, [dict(path="blade_velocity_ratio", lower=.5, upper=.7)], rows,
+        "$overall_performance.efficiency_ts_with_recovery", "maximize", 1e-8, 50, 1e-6, result,
+    )
+    equalities, inequalities, report = opt.evaluate_constraints(result, settings["constraints"])
+    expected = [stage["geometry_meanline"][row]["flow_turning"]
+                for row in ("stator", "rotor") for stage in result["stages_performance"]]
+    assert len(equalities) == 0 and len(inequalities) == len(report) == 4
+    np.testing.assert_allclose(inequalities, (50 - np.array(expected)) / 90)
+    assert "stage_1_minimum_turning" in groups
+
+
+@pytest.mark.parametrize("incoming,outgoing,allowed", [(20, 22, False), (-20, -18, False),
+    (-25, 25, True), (25, -25, True), (-20, 20, False), (0, 0, False)])
+def test_minimum_turning_rejects_nearly_straight_rows_for_either_angle_sign(incoming, outgoing, allowed):
+    from turbodash.core.turbine import compute_blade_row_geometry
+    blade = case()["inputs"]["stages"][0]["blade_geometry"]["stator"]
+    geometry = compute_blade_row_geometry("axial", .1, .1, .02, .02,
+                                          incoming, outgoing, blade_geometry=blade)
+    result = {"stages_performance": [{"geometry_meanline": {"stator": geometry}}]}
+    _, residuals, _ = opt.evaluate_constraints(result, [dict(
+        variable="$stages_performance.0.geometry_meanline.stator.flow_turning",
+        type=">=", value=50, normalize=90,
+    )])
+    assert bool(residuals[0] <= 0) is allowed
+
+
+def test_inlet_and_turning_groups_toggle_independently_and_preserve_edits():
+    config = case()
+    catalog, groups = output_catalog(config), constraint_groups(config)
+    rows = apply_selection_operations([], catalog, groups, "constraint", [
+        dict(kind="constraint", group="minimum_turning", selected=True),
+        dict(kind="constraint", group="stator_inlet_relative_angle", selected=True),
+        dict(kind="constraint", group="rotor_inlet_relative_angle", selected=True),
+    ])
+    assert len(rows) == 4
+    rows[0]["target"] = 35.123456789
+    before = deepcopy(rows)
+    assert apply_selection_operations(rows, catalog, groups, "constraint", [
+        dict(kind="constraint", group="minimum_turning", selected=True),
+    ]) == before
+    assert apply_selection_operations(rows, catalog, groups, "constraint", [
+        dict(kind="constraint", group="rotor_inlet_relative_angle", selected=False),
+    ]) == before[:3]

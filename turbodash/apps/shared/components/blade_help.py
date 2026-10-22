@@ -27,9 +27,11 @@ PARAMETER_HELP = {'geometry.type': 'Choose an axial blade on a cylinder or a rad
                                          'meridional coordinate along the blade.',
  'thickness.shape_exponent': 'Change the broadness of the central thickness contribution.',
  'thickness.leading_edge_fullness': 'Make the leading shoulder narrower with a negative value or '
-                                    'fuller with a positive value.',
+                                    'fuller with a positive value. The control spans -1 to +1; exact endpoints '
+                                    'and singular leading/trailing combinations are rejected.',
  'thickness.trailing_edge_fullness': 'Make the trailing shoulder narrower with a negative value or '
-                                     'fuller with a positive value.',
+                                     'fuller with a positive value. The control spans -1 to +1; exact endpoints '
+                                     'and singular leading/trailing combinations are rejected.',
  'thickness.leading_edge_thickness_ratio': 'Set the unrounded body thickness at the leading '
                                            'endpoint, before the tip is closed.',
  'thickness.trailing_edge_thickness_ratio': 'Set the unrounded body thickness at the trailing '

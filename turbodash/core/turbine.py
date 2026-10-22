@@ -625,6 +625,7 @@ def compute_blade_row_geometry(
         A_out=A_out,
         metal_angle_in=angle_in_deg,
         metal_angle_out=angle_out_deg,
+        flow_turning=abs(angle_out_deg - angle_in_deg),
     )
     return _geometry_with_blade_count(geometry, turbine_type, N_blades, discrete=False)
 

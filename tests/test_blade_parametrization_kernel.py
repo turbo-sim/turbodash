@@ -36,7 +36,7 @@ def test_zero_fullness_recovers_original_denton_exactly(location, exponent):
     np.testing.assert_array_equal(denton_body(x, p), expected)
 
 
-@pytest.mark.parametrize("leading, trailing", [(0.2, -0.1), (-0.2, 0.3), (0, 0.5), (-0.5, -0.5)])
+@pytest.mark.parametrize("leading, trailing", [(0.2, -0.1), (-0.2, 0.3), (0, 0.5), (-0.5, -0.5), (-0.9, -0.9), (0.9, 0.9)])
 def test_independent_fullness_has_declared_shoulder_ratios(leading, trailing):
     p = deepcopy(DEFAULTS["thickness"])
     p.update(leading_edge_fullness=leading, trailing_edge_fullness=trailing)
@@ -54,7 +54,7 @@ def test_independent_fullness_has_declared_shoulder_ratios(leading, trailing):
     np.testing.assert_allclose(denton_body(anchors, p), expected, atol=1e-15)
 
 
-@pytest.mark.parametrize("leading, trailing", [(-0.5, 0.5), (0.5, -0.5), (0.50001, 0), (0, float("nan"))])
+@pytest.mark.parametrize("leading, trailing", [(-0.5, 0.5), (0.5, -0.5), (1.00001, 0), (-1.00001, 0), (-1, 0), (0, 1), (0, float("nan"))])
 def test_fullness_rejects_out_of_bounds_and_joint_singularities(leading, trailing):
     p = DEFAULTS["thickness"] | {"leading_edge_fullness": leading, "trailing_edge_fullness": trailing}
     with pytest.raises(ValueError, match="fullness"):

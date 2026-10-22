@@ -504,6 +504,44 @@ class JobTests(unittest.TestCase):
         retry = jobs.start_job(config, settings(config), "alice")
         self.assertTrue(self.wait(retry, "alice")[3]["success"])
 
+    def test_cancel_terminates_owned_worker_preserves_snapshots_and_allows_retry(self):
+        config = case()
+        handle = jobs.start_job(config, settings(config), "alice")
+        process = jobs._PROCESSES[handle["id"]]
+        folder = jobs.job_directory(handle, "alice")
+        with self.assertRaisesRegex(ValueError, "another session"):
+            jobs.cancel_job(handle, "bob")
+        self.assertIsNone(process.poll())
+        (folder / "solver.log").write_text("Existing convergence output", encoding="utf-8")
+        jobs._write_json(folder / "progress.json", dict(iteration=3))
+        jobs.cancel_job(handle, "alice")
+        self.assertIsNotNone(process.poll())
+        # Even a late completion cannot publish a cancelled result.
+        jobs._write_json(folder / "status.json", dict(state="complete", message="Late completion"))
+        jobs._write_json(folder / "result.json", dict(success=True))
+        status, log, progress, result = jobs.read_job(handle, "alice")
+        self.assertEqual(status["state"], "cancelled")
+        self.assertIn("Existing convergence output", log)
+        self.assertEqual(progress, dict(iteration=3))
+        self.assertIsNone(result)
+        jobs.cancel_job(handle, "alice")  # Repeated clicks are harmless.
+        retry = jobs.start_job(config, settings(config), "alice")
+        self.assertTrue(self.wait(retry, "alice")[3]["success"])
+
+    def test_cancellation_reaches_worker_owned_by_another_web_process(self):
+        config = case()
+        handle = jobs.start_job(config, settings(config), "alice")
+        process = jobs._PROCESSES.pop(handle["id"])
+        try:
+            jobs.cancel_job(handle, "alice")
+            process.wait(timeout=20)
+            self.assertEqual(jobs.read_job(handle, "alice")[0]["state"], "cancelled")
+            self.assertIsNone(jobs.read_job(handle, "alice")[3])
+        finally:
+            if process.poll() is None:
+                process.kill()
+                process.wait(timeout=10)
+
     def test_full_variable_case_recovers_with_structured_worker_diagnostics(self):
         config = opt.load_case(ROOT / "demos/optimization/case_recovery.yaml")
         handle = jobs.start_job(config, config["optimization"], "recovery")
@@ -566,6 +604,7 @@ class WorkspaceTests(unittest.TestCase):
                      "$overall_performance.efficiency_ts", "maximize", 1e-8, 150, 1e-6, original]
         scenarios = [
             ("running", None, "running", "primary"),
+            ("cancelled", None, "cancelled", "primary"),
             ("failed", None, "failed", "danger"),
             ("complete", dict(success=False, message="Infeasible result"), "failed", "danger"),
             ("complete", dict(success=True, fingerprint=jobs.fingerprint(original)),

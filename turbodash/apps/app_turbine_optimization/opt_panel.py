@@ -126,7 +126,11 @@ def actions():
                      **{"aria-live": "polite", "aria-atomic": "true"}),
             html.Div(id="opt-progress", className="td-opt-progress", **{"aria-live": "polite"}),
         ], className="td-optimization-status"),
-        dbc.Button("Start optimization", id="opt-start", color="primary", className="td-opt-start", n_clicks=0),
+        html.Div([
+            dbc.Button("Start optimization", id="opt-start", color="primary", className="td-opt-start", n_clicks=0),
+            dbc.Button("Stop", id="opt-stop", color="danger", outline=True, disabled=True, n_clicks=0,
+                       title="Stop the running optimization and retain the current design."),
+        ], className="td-opt-run-buttons"),
     ], id="opt-actions", className="td-optimization-dock td-opt-state-ready",
         **{"aria-label": "Optimization controls", "aria-busy": "false"})
 
@@ -148,6 +152,7 @@ def outcome_presentation(state, launching=False):
         "design_changed": ("Design changed · result not applied", "warning", "warning"),
         "unconfirmed": ("Application unconfirmed", "warning", "warning"),
         "failed": ("Optimization failed", "danger", "danger"),
+        "cancelled": ("Stopped by user", "neutral", "primary"),
     }
     state = "running" if launching else state
     if state not in states:
@@ -488,6 +493,16 @@ def register_callbacks(app, live_config, render_results):
         # slower launch response. The numerical job itself remains isolated.
         return run_or_poll(click, None, *values)
 
+    @app.callback(*[Output(output.component_id, output.component_property, allow_duplicate=True)
+                    for output in job_outputs], Input("opt-stop", "n_clicks"), *job_states,
+                  prevent_initial_call=True)
+    def stop_job(click, *values):
+        handle = values[0]
+        if not click or not handle or handle.get("applying"):
+            raise PreventUpdate
+        jobs.cancel_job(handle, jobs.session_owner())
+        return run_or_poll(None, None, *values)
+
     def run_or_poll(_click, _tick, handle, ov, sv, oi, si, stages, *values):
         owner = jobs.session_owner()
         if ctx.triggered_id == "opt-start":
@@ -524,11 +539,13 @@ def register_callbacks(app, live_config, render_results):
                 raise PreventUpdate
             status, log, progress, result = jobs.read_job(handle, owner)
             summary = (f"Update {progress['iteration']} · objective {progress['objective']:.7g} · violation {progress['max_constraint_violation']:.3g}" if progress else "Preparing initial design…")
+            if status["state"] == "cancelled" and not progress:
+                summary = ""
             if status["state"] == "running":
                 return no_update, "Optimizing turbine…", log, progress, summary, no_update, no_update, no_update, "running"
             config, applied = no_update, no_update
             message = status["message"]
-            outcome = "failed"
+            outcome = "cancelled" if status["state"] == "cancelled" else "failed"
             if result and result["success"]:
                 current = live_config(ov, sv, oi, si, stages)
                 if jobs.fingerprint(current) != result["fingerprint"]:
@@ -564,8 +581,10 @@ def register_callbacks(app, live_config, render_results):
 
     app.clientside_callback(
         """function(job, launching, style) {
-            return [!!job || !!launching, job ? 'td-opt-panel td-section td-opt-busy' : 'td-opt-panel td-section',
+            return [!!job || !!launching, !job || !!job.applying || !!launching,
+                    job ? 'td-opt-panel td-section td-opt-busy' : 'td-opt-panel td-section',
                     Object.assign({}, style, {pointerEvents: 'auto'})];
         }""",
-        Output("opt-start", "disabled"), Output("opt-panel", "className"), Output("design-controls", "style"),
+        Output("opt-start", "disabled"), Output("opt-stop", "disabled"),
+        Output("opt-panel", "className"), Output("design-controls", "style"),
         Input("opt-job", "data"), Input("opt-launching", "data"), State("design-controls", "style"))

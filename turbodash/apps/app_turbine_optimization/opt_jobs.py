@@ -192,6 +192,9 @@ def start_job(config, settings, owner):
 def job_status(handle, owner):
     folder = job_directory(handle, owner)
     status = _read_mapping(folder / "status.json")
+    if (folder / "cancel").exists():
+        # The marker is authoritative even if completion raced with the click.
+        status = dict(state="cancelled", message="Optimization stopped by user. Current design retained.")
     process = _PROCESSES.get(handle["id"])
     if status["state"] == "running":
         exited = process is not None and process.poll() is not None
@@ -206,6 +209,25 @@ def job_status(handle, owner):
     if process is not None and process.poll() is not None:
         _PROCESSES.pop(handle["id"], None)
     return status
+
+
+def cancel_job(handle, owner):
+    """Cancel only an owned run, including across web-server workers."""
+    folder = job_directory(handle, owner)
+    if job_status(handle, owner)["state"] != "running":
+        return
+    (folder / "cancel").touch()
+    process = _PROCESSES.get(handle["id"])
+    if process is not None and process.poll() is None:
+        process.terminate()
+        try:
+            process.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.wait(timeout=2)
+    # Another server process may own Popen; the worker's watchdog reads cancel.
+    _write_json(folder / "status.json", dict(
+        state="cancelled", message="Optimization stopped by user. Current design retained."))
 
 
 def read_job(handle, owner):
@@ -248,6 +270,8 @@ def _run_worker(request_path):
         started = time.monotonic()
         while not finished.wait(1):
             (folder / "heartbeat").touch()
+            if (folder / "cancel").exists():
+                os._exit(0)
             if time.monotonic() - started > TIMEOUT_SECONDS:
                 logger.error("ERROR: Optimization exceeded the 10 minute limit.")
                 _write_json(folder / "status.json", dict(state="failed", message="Optimization timed out after 10 minutes."))

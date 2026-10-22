@@ -41,6 +41,12 @@ The optimization workbench provides turbine calculations and constrained optimiz
 poetry run app_turbine_optimization --open-browser
 ```
 
+Its **Geometry** workspace uses the production conformal camberline and rational
+Denton blade modeller. Edits update the geometry and meanline blade views;
+the next successful meanline calculation resets them to fresh interpolated
+presets. See the [blade geometry guide](docs/source/guides/blade_geometry.md)
+for parameter mapping, row YAML, CAD/mesh export, and supported configurations.
+
 For a pip installation, use:
 
 ```bash

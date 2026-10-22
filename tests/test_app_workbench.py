@@ -112,6 +112,7 @@ def optimization_editor():
         1e-9,
         123,
         1e-7,
+        .25, 1.5, .5, 12, 1e-4, {},
     ]
 
 
@@ -184,7 +185,7 @@ def test_every_stage_and_both_rows_remain_mounted_with_continuous_inputs(kind):
     fields = [item for item in mounted if isinstance(item, dcc.Input)]
     identifiers = [(item.id["stage"], item.id["key"]) for item in fields]
     assert len(identifiers) == len(set(identifiers))
-    expected = set(defaults)
+    expected = {key for key in defaults if not key.endswith("wedge_angle")}
     if kind == "radial":
         expected -= {"stator.aspect_ratio", "rotor.aspect_ratio"}
     for index in (0, 1):

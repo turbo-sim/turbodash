@@ -5,7 +5,7 @@ from numbers import Integral
 import numpy as np
 
 from turbodash.geometry.sections import _make_section, _positive, _station_geometry
-from turbodash.core.turbine import get_blade_row_geometry
+from turbodash.geometry.meanline import physical_row_geometry
 
 
 def build_assembly_layout(
@@ -16,8 +16,8 @@ def build_assembly_layout(
     outlet_extension_fraction=2.0,
     span_sections=11,
     profile_points=800,
-    camberline_type="curvature_based",
-    thickness_model="NACA",
+    camberline_type="conformal",
+    thickness_model="rational_denton",
 ):
     """Return a serializable layout in metres for every stator and rotor.
 
@@ -27,8 +27,8 @@ def build_assembly_layout(
     chord endpoints. Full-span sections, including hub and shroud, are sampled
     to check axial extents. This is not a continuous-surface collision check.
 
-    Endwalls follow the same clipped linear radius mapping as the existing
-    section generator, with linear transitions across gaps and constant-radius
+    Endwalls follow each shared cylindrical row model, with linear transitions
+    across gaps and constant-radius
     outer extensions. Interfaces are placed halfway across each gap. Results
     are not modified. No meshes or TurboGrid import files are generated here.
     """
@@ -55,18 +55,20 @@ def build_assembly_layout(
         for row_name, inlet_index in (("stator", 0), ("rotor", 2)):
             row_id = f"stage_{stage_number:02d}/{row_name}"
             try:
-                geometry = get_blade_row_geometry(stage, row_name, turbine_type="axial", discrete=True)
+                geometry = physical_row_geometry(stage, row_name)
                 chord = _positive(geometry["chord_meridional"], "Meridional chord")
                 blade_count = _positive(geometry["blade_count"], "Blade count")
                 if not blade_count.is_integer():
                     raise ValueError("Blade count must be an integer.")
                 inlet, outlet = stage["flow_stations"][inlet_index:inlet_index + 2]
-                radius_in, height_in = _station_geometry(inlet)
-                radius_out, height_out = _station_geometry(outlet)
+                source_radius_in, _ = _station_geometry(inlet)
+                source_radius_out, _ = _station_geometry(outlet)
+                radius_in = radius_out = geometry["radius_in"]
+                height_in = height_out = geometry["height"]
                 omega = 0.0
                 if row_name == "rotor":
-                    omega = float(inlet["u"]) / radius_in
-                    omega_out = float(outlet["u"]) / radius_out
+                    omega = float(inlet["u"]) / source_radius_in
+                    omega_out = float(outlet["u"]) / source_radius_out
                     if not np.isfinite(omega) or not np.isclose(omega, omega_out):
                         raise ValueError("Rotor inlet and outlet must have consistent finite speed.")
                 sections = [
@@ -135,9 +137,9 @@ def build_assembly_layout(
         "length_unit": "m",
         "axis_of_rotation": "X",
         "coordinate_origin": "first_stator_nominal_leading_edge",
-        "endwall_model": "piecewise_linear_station_radii",
-        "camberline_type": camberline_type,
-        "thickness_model": thickness_model,
+        "endwall_model": "cylindrical_rows_with_linear_gap_transitions",
+        "camberline_type": "conformal",
+        "thickness_model": "rational_denton",
         "span_sections": int(span_sections),
         "profile_points_requested": int(profile_points),
         "inlet_extension_fraction": inlet_fraction,

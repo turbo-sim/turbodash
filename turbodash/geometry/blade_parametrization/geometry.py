@@ -35,6 +35,39 @@ class Section:
     pressure_side: str
 
 
+def map_section_coordinates(section, span_fraction=None):
+    """Map authoritative chart samples to XYZ metres without optional CAD.
+
+    Axial sections retain their developed physical shape across span by
+    scaling both chart coordinates with the local conformal chord. Radial
+    sections share one chart and are extruded between parallel endwalls.
+    Edge protrusions are retained in both cases. The input section is never
+    resampled; CAD and mesh consumers may separately interpolate these data.
+    """
+    if span_fraction is None:
+        span_fraction = section.diagnostics["span_fraction"]
+    if not np.isfinite(span_fraction) or not 0 <= span_fraction <= 1:
+        raise ValueError("span_fraction must be between zero and one.")
+    geometry = section.parameters["geometry"]
+    mapped = {}
+    for name in ("camber", "plus", "minus", "boundary"):
+        points = np.asarray(getattr(section, name), dtype=float)
+        if geometry["type"] == "axial":
+            radius = geometry["mean_radius"] + (span_fraction - .5) * geometry["blade_height"]
+            scale = section.meridional_chord / (radius * section.prime_chord)
+            theta = scale * points[:, 1]
+            z = radius * scale * points[:, 0]
+        elif geometry["type"] == "radial":
+            direction = np.sign(geometry["outlet_radius"] - geometry["inlet_radius"])
+            radius = geometry["inlet_radius"] * np.exp(direction * points[:, 0])
+            theta = points[:, 1]
+            z = np.full(len(points), span_fraction * geometry["blade_height"])
+        else:
+            raise ValueError("Physical mapping supports only axial and radial geometry.")
+        mapped[name] = np.column_stack((radius * np.cos(theta), radius * np.sin(theta), z))
+    return mapped
+
+
 def _integral(values, coordinate):
     return np.r_[0., np.cumsum(.5 * (values[1:] + values[:-1]) * np.diff(coordinate))]
 

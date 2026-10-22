@@ -22,6 +22,8 @@ STUDIES = ROOT / "development"
     ("loss_model_analysis/loss_model_audit/individual_functions/scripts/common.py", "REPO"),
     ("loss_model_analysis/loss_model_audit/overall_stage/study.py", "REPO"),
     ("optimization/verify_kkt.py", "ROOT"),
+    ("blade_parametrization/parametrization_camberline/sensitivity_study.py", "REPO"),
+    ("blade_parametrization/parametrization_thickness/sensitivity_study.py", "REPO"),
 ])
 def test_studies_resolve_repository_outside_checkout(relative, root_variable, tmp_path):
     script = STUDIES / relative
@@ -39,9 +41,10 @@ def test_studies_resolve_repository_outside_checkout(relative, root_variable, tm
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-@pytest.mark.parametrize("name", ["loss_model_analysis", "new_parametrization", "optimization"])
+@pytest.mark.parametrize("name", ["loss_model_analysis", "blade_parametrization", "optimization"])
 def test_study_markdown_links_resolve_after_relocation(name):
     failures = []
+    assert (STUDIES / name).is_dir(), f"Study directory is missing: {name}"
     for document in (STUDIES / name).rglob("*.md"):
         if any(part.startswith((".cache", "output", "__pycache__")) for part in document.parts):
             continue
@@ -62,4 +65,14 @@ def test_source_papers_remain_available_to_digitization():
     for relative, *_ in CHARTS.values():
         with (PAPER_ROOT / relative).open("rb") as stream:
             assert stream.read(5) == b"%PDF-"
-    assert list((STUDIES / "new_parametrization/papers").rglob("*.pdf"))
+
+
+def test_blade_studies_retain_formulation_and_production_kernel_reference():
+    directory = STUDIES / "blade_parametrization"
+    formulation = directory / "parametrization_blades/README.md"
+    guide = directory / "parametrization_blades/parameter_guide.md"
+    assert formulation.is_file() and guide.is_file()
+    assert "turbodash/geometry/blade_parametrization/geometry.py" in formulation.read_text(encoding="utf-8")
+    for name in ("parametrization_camberline", "parametrization_thickness"):
+        contents = (directory / name / "sensitivity_study.py").read_text(encoding="utf-8")
+        assert "from turbodash.geometry.blade_parametrization" in contents

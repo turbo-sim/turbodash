@@ -4,10 +4,8 @@ from scipy.interpolate import PchipInterpolator
 from plotly.subplots import make_subplots
 from turbodash.core.turbine import get_blade_row_geometry
 
-from turbodash.geometry.blade import (
-    compute_blade_coordinates_radial,
-    compute_blade_coordinates_cartesian,
-)
+from turbodash.geometry.meanline import state_for_stage_row, section_from_state
+from turbodash.geometry.blade import section_coordinates
 
 # =============================================================================
 # Styling constants (mirror of the mpl module's intent, plotly idiom)
@@ -426,186 +424,57 @@ def plot_turbine_meridional_channel(results, *, theme="light"):
 # =============================================================================
 # Plot turbine blades (multistage)
 # =============================================================================
-def plot_turbine_blades(results, N_points=201, N_blades_plot=8, *, theme="light"):
-    """
-    Blade cascades for a full multistage turbine, axial or radial.
-    Mirror of the mpl function of the same name.
-
-    Axial cascades show continuous meanline pitch and profiles. A radial full
-    annulus uses integer geometry, realized independently of performance.
-
-    Returns
-    -------
-    fig : plotly.graph_objects.Figure
-    """
-    stages = [
-        dict(
-            stage,
-            geometry={
-                row: get_blade_row_geometry(stage, row) for row in ("stator", "rotor")
-            },
-        )
-        for stage in results["stages_performance"]
-    ]
+def plot_turbine_blades(results, N_points=601, N_blades_plot=8, *, theme="light"):
+    """Render effective shared blade states with actual sampled kernel curves."""
+    stages = results["stages_performance"]
     if not stages:
         raise ValueError("A solved turbine with at least one stage is required.")
     turbine_type = results["inputs"]["turbine_type"]
     fig = go.Figure()
-
-    def _blade_trace(x, y, color, label):
-        x, y = np.asarray(x), np.asarray(y)
-        if len(x) and (x[-1] != x[0] or y[-1] != y[0]):
-            x, y = np.r_[x, x[0]], np.r_[y, y[0]]
-        fig.add_trace(
-            go.Scatter(
-                x=1000.0 * x,
-                y=1000.0 * y,
-                mode="lines",
-                line=dict(color=color, width=LINE_WIDTH),
-                fill="toself",
-                fillcolor=_ROW_FILLS[label],
-                name=label,
-                legendgroup=label,
-                showlegend=False,
-            )
-        )
-
+    cursor, greatest_radius, first_pitch = 0., 0., None
+    starts, chords = [], []
+    for stage in stages:
+        for row in ("stator", "rotor"):
+            state = state_for_stage_row(stage, row, turbine_type)
+            section = section_from_state(state)
+            params = section.parameters
+            if params["geometry"]["type"] != turbine_type:
+                raise ValueError("The edited row stream surface differs from the turbine type.")
+            points = section_coordinates(section)
+            label, color = ("Stator", COLOR_STATOR) if row == "stator" else ("Rotor", COLOR_ROTOR)
+            count = params["cascade"]["blade_count"]
+            if turbine_type == "axial":
+                pitch = 2*np.pi*params["geometry"]["mean_radius"]/count
+                first_pitch = pitch if first_pitch is None else first_pitch
+                copies = [points+[cursor, (index-1)*pitch] for index in range(N_blades_plot+3)]
+                starts.append(cursor)
+                chords.append(section.meridional_chord)
+                cursor += section.meridional_chord + INTERCASCADE_GAP_FACTOR*get_blade_row_geometry(stage, row)["opening"]
+            elif turbine_type == "radial":
+                def rotations():
+                    for angle in np.arange(count)*2*np.pi/count:
+                        rotation = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
+                        yield points@rotation.T
+                copies = rotations()
+                greatest_radius = max(greatest_radius, float(np.linalg.norm(points, axis=1).max()))
+            else:
+                raise ValueError(f"Invalid stage type: {turbine_type!r}")
+            for copy in copies:
+                fig.add_trace(go.Scatter(x=1000*copy[:, 0], y=1000*copy[:, 1], mode="lines",
+                    line=dict(color=color, width=LINE_WIDTH, simplify=False), fill="toself",
+                    fillcolor=_ROW_FILLS[label], name=label, legendgroup=label, showlegend=False))
     if turbine_type == "axial":
-
-        def draw_stage(out, stator_position, rotor_position):
-            def draw_row(*, geom, x0, beta_in, beta_out, color, label):
-                x_b, y_b, *_ = compute_blade_coordinates_cartesian(
-                    camberline_type="curvature_based",
-                    x1=x0,
-                    y1=0.0,
-                    beta1=np.deg2rad(beta_in),
-                    beta2=np.deg2rad(beta_out),
-                    chord_ax=geom["chord_meridional"],
-                    loc_max=geom["maximum_thickness_location"],
-                    thickness_max=geom["maximum_thickness"],
-                    thickness_trailing=geom["trailing_edge_thickness"],
-                    wedge_trailing=np.deg2rad(geom["trailing_edge_wedge_angle"]),
-                    radius_leading=geom["leading_edge_radius"],
-                    N_points=N_points,
-                )
-                for i in range(5 * N_blades_plot):
-                    y_shift = (i - 10.5) * geom["spacing"]
-                    _blade_trace(x_b, y_b + y_shift, color, label)
-
-            stator_geom = out["geometry"]["stator"]
-            rotor_geom = out["geometry"]["rotor"]
-            draw_row(
-                geom=stator_geom,
-                x0=stator_position["start"],
-                beta_in=out["flow_stations"][0]["alpha"],
-                beta_out=out["flow_stations"][1]["alpha"],
-                color=COLOR_STATOR,
-                label="Stator",
-            )
-            draw_row(
-                geom=rotor_geom,
-                x0=rotor_position["start"],
-                beta_in=out["flow_stations"][2]["beta"],
-                beta_out=out["flow_stations"][3]["beta"],
-                color=COLOR_ROTOR,
-                label="Rotor",
-            )
-
-        rows = _axial_row_layout(stages)
-        for index, st in enumerate(stages):
-            draw_stage(st, rows[2 * index], rows[2 * index + 1])
-        y_top = N_blades_plot * stages[0]["geometry"]["stator"]["spacing"]
-        _style_axes(
-            fig,
-            xtitle="Axial direction [mm]",
-            ytitle="Tangential direction [mm]",
-            equal=True,
-        )
-        fig.update_xaxes(range=_axial_view_range(rows), constrain="domain", tickangle=0)
-        fig.update_yaxes(range=[0, 1000.0 * y_top])
-
-    elif turbine_type == "radial":
-
-        def draw_stage(out):
-            def draw_row(geom, color, label):
-                x_b, y_b, *_ = compute_blade_coordinates_radial(
-                    "curvature_based",
-                    geom["radius_in"],
-                    geom["radius_out"],
-                    np.deg2rad(geom["metal_angle_in"]),
-                    np.deg2rad(geom["metal_angle_out"]),
-                    0.0,
-                    geom["maximum_thickness_location"],
-                    geom["maximum_thickness"],
-                    geom["trailing_edge_thickness"],
-                    np.deg2rad(geom["trailing_edge_wedge_angle"]),
-                    geom["leading_edge_radius"],
-                    N_points,
-                )
-                th = np.linspace(0.0, 2.0 * np.pi, 200)
-                _line_black = dict(color="black", width=1.0)
-                fig.add_trace(
-                    go.Scatter(
-                        x=1000.0 * geom["radius_in"] * np.cos(th),
-                        y=1000.0 * geom["radius_in"] * np.sin(th),
-                        mode="lines",
-                        line=_line_black,
-                        showlegend=False,
-                    )
-                )
-                fig.add_trace(
-                    go.Scatter(
-                        x=1000.0 * geom["radius_out"] * np.cos(th),
-                        y=1000.0 * geom["radius_out"] * np.sin(th),
-                        mode="lines",
-                        line=_line_black,
-                        showlegend=False,
-                    )
-                )
-
-                N = int(geom["blade_count"])
-                dtheta = 2.0 * np.pi / N
-                for i in range(N):
-                    ct, st_ = np.cos(i * dtheta), np.sin(i * dtheta)
-                    _blade_trace(
-                        ct * x_b - st_ * y_b, st_ * x_b + ct * y_b, color, label
-                    )
-
-            draw_row(
-                get_blade_row_geometry(
-                    out, "stator", turbine_type="radial", discrete=True
-                ),
-                COLOR_STATOR,
-                "Stator",
-            )
-            draw_row(
-                get_blade_row_geometry(
-                    out, "rotor", turbine_type="radial", discrete=True
-                ),
-                COLOR_ROTOR,
-                "Rotor",
-            )
-
-        r_min, r_max = np.inf, 0.0
-        for st in stages:
-            draw_stage(st)
-            for fs in st["flow_stations"]:
-                r_min = min(r_min, fs["r"])
-                r_max = max(r_max, fs["r"])
-
-        r_pad = 0.25 * (r_max - r_min)
-        _style_axes(
-            fig, xtitle="x direction [mm]", ytitle="y direction [mm]", equal=True
-        )
-        fig.update_xaxes(range=[0.0, 1000.0 * r_max], constrain="domain")
-        fig.update_yaxes(range=[0.0, 1000.0 * (r_max + r_pad)], constrain="domain")
-
+        _style_axes(fig, xtitle="Axial direction [mm]", ytitle="Tangential direction [mm]", equal=True)
+        first = -CHANNEL_EXTENSION_CHORDS*chords[0]
+        last = starts[-1]+(1+CHANNEL_EXTENSION_CHORDS)*chords[-1]
+        padding = .05*(last-first)
+        fig.update_xaxes(range=[1000*(first-padding), 1000*(last+padding)], constrain="domain")
+        fig.update_yaxes(range=[0, 1000*N_blades_plot*first_pitch])
     else:
-        raise ValueError(f"Invalid stage type: {turbine_type!r}")
-
-    fig.update_layout(
-        template="simple_white", margin=dict(l=30, r=30, t=30, b=30), showlegend=False
-    )
+        _style_axes(fig, xtitle="x direction [mm]", ytitle="y direction [mm]", equal=True)
+        fig.update_xaxes(range=[0., 1050*greatest_radius], constrain="domain")
+        fig.update_yaxes(range=[0., 1050*greatest_radius], constrain="domain")
+    fig.update_layout(template="simple_white", margin=dict(l=30, r=30, t=30, b=30), showlegend=False)
     return apply_plot_theme(fig, theme)
 
 

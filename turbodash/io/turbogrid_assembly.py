@@ -36,8 +36,8 @@ def build_turbogrid_assembly_files(
     outlet_extension_fraction=2.0,
     span_sections=11,
     profile_points=800,
-    camberline_type="curvature_based",
-    thickness_model="NACA",
+    camberline_type="conformal",
+    thickness_model="rational_denton",
 ):
     """Return text files for all rows in a shared X-axis coordinate system.
 
@@ -102,10 +102,10 @@ def build_turbogrid_assembly_files(
             "coordinates_already_positioned": True,
             "endwall_model": layout["endwall_model"],
             "required_endwall_curve_type": layout["required_endwall_curve_type"],
-            "spanwise_model": "free_vortex_constant_meridional_velocity",
+            "spanwise_model": "constant_midspan_metal_angles",
             "angle_reference": "absolute" if row["blade_row"] == "stator" else "relative",
-            "camberline_type": camberline_type,
-            "thickness_model": thickness_model,
+            "camberline_type": "conformal",
+            "thickness_model": "rational_denton",
             "span_sections": int(span_sections),
             "profile_points_requested": int(profile_points),
             "profile_points_written_per_section": len(sections[0]["points"]),

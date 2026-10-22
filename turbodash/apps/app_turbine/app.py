@@ -394,7 +394,8 @@ def make_stage_accordion_item(stage_idx, stage_values, turbine_type):
                 ),
             )
             for key, label, lo, hi, step in BLADE_GEOMETRY_FIELDS
-            if key != "aspect_ratio" or turbine_type != "radial"
+            if (key != "aspect_ratio" or turbine_type != "radial")
+            and not key.endswith("wedge_angle")
         ]
         geometry_items.append(
             dbc.AccordionItem(
@@ -1033,7 +1034,7 @@ def update_turbine(overall_values, stage_values, overall_ids, stage_ids, store_s
         fig_meridional = _plotting.plot_turbine_meridional_channel(out)
         try:
             fig_blades = _plotting.plot_turbine_blades(
-                out, N_points=500, N_blades_plot=8
+                out, N_points=601, N_blades_plot=8
             )
         except ValueError as error:
             # Physical profile construction must not discard a meanline solve.

@@ -15,10 +15,11 @@ import numpy as np
 from scipy.integrate import quad
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parent))
-from parametrization_blades.blade_geometry import analysis as geometry
-from parametrization_blades.blade_geometry.thickness import denton_body
-from parametrization_blades.blade_geometry.geometry import turning_angle
+REPO = HERE.parents[2]
+sys.path.insert(0, str(REPO))
+from turbodash.geometry.blade_parametrization import analysis as geometry
+from turbodash.geometry.blade_parametrization.thickness import denton_body
+from turbodash.geometry.blade_parametrization.geometry import turning_angle
 
 SWEEPS = {"location": ("turning_location", (.3, .4, .5, .6, .7)),
           "concentration": ("turning_concentration", (1., 1.5, 2., 2.5, 3.))}

@@ -21,12 +21,14 @@ from dash import ALL, ClientsideFunction, Dash, Input, Output, State, ctx, dcc, 
 from dash.exceptions import PreventUpdate
 from flask import abort, send_file
 
-from .parameters import FIELD_SPECS, load_case, resolve_parameters, state_from_dict
-from .plots import PLOT_BASE_POINTS, build_figures, empty_figure, passage_traces
-from .turbomoc_adapter import TurboMOCUnavailable
+from turbodash.geometry.blade_parametrization import parameters as production_parameters
+from turbodash.geometry.blade_parametrization.parameters import FIELD_SPECS, load_case, resolve_parameters, state_from_dict
+from turbodash.geometry.blade_parametrization.plots import PLOT_BASE_POINTS, build_figures, empty_figure, passage_traces
+from turbodash.geometry.blade_parametrization.turbomoc_adapter import TurboMOCUnavailable
 
 HERE = Path(__file__).resolve().parent
-CASES = {"reaction": HERE / "cases" / "reaction.yaml", "impulse": HERE / "cases" / "impulse.yaml"}
+CASE_DIRECTORY = Path(production_parameters.__file__).parent / "cases"
+CASES = {name: CASE_DIRECTORY / f"{name}.yaml" for name in ("reaction", "impulse")}
 PLOTS = (
     ("camberline", "Camberline", "Angle-controlled turning in the conformal plane"),
     ("thickness", "Thickness distribution", "Physical target and measured paired thickness"),
@@ -86,7 +88,7 @@ def load_uploaded_yaml(contents, filename=None):
         state = state_from_dict(data)
         draft = state.to_dict()
         input_view(draft)
-        from .geometry import build_section
+        from turbodash.geometry.blade_parametrization.geometry import build_section
         build_section(resolve_parameters(state).values)
         return draft
     except (IndexError, AttributeError, UnicodeError, binascii.Error, yaml.YAMLError, ValueError) as error:
@@ -188,7 +190,7 @@ def evaluate_draft(draft: dict, *, include_preview: bool = True,
     try:
         resolved = resolve_parameters(state_from_dict(draft))
         if section_builder is None:
-            from .geometry import build_section
+            from turbodash.geometry.blade_parametrization.geometry import build_section
             section_builder = build_section
         section = section_builder(resolved.values)
         preview = None
@@ -196,7 +198,7 @@ def evaluate_draft(draft: dict, *, include_preview: bool = True,
         if include_preview:
             try:
                 if preview_builder is None:
-                    from .turbomoc_adapter import make_preview
+                    from turbodash.geometry.blade_parametrization.turbomoc_adapter import make_preview
                     preview_builder = make_preview
                 preview = preview_builder(section)
             except (TurboMOCUnavailable, ImportError) as error:
@@ -215,8 +217,8 @@ def evaluate_draft(draft: dict, *, include_preview: bool = True,
 def evaluate_preview(draft):
     """Build only the committed 3D geometry, independently of live 2D work."""
     try:
-        from .geometry import build_section
-        from .turbomoc_adapter import make_preview
+        from turbodash.geometry.blade_parametrization.geometry import build_section
+        from turbodash.geometry.blade_parametrization.turbomoc_adapter import make_preview
         resolved = resolve_parameters(state_from_dict(draft))
         preview = make_preview(build_section(resolved.values))
         return {"valid": True, "fingerprint": resolved.fingerprint, "preview": preview}
@@ -238,8 +240,8 @@ def passage_view(source, selection):
     if "enabled" not in (selection or []):
         return base, "Geometric crosscuts between neighboring blades; hover a cut for its physical opening."
     try:
-        from .geometry import build_section
-        from .passage import section_passage
+        from turbodash.geometry.blade_parametrization.geometry import build_section
+        from turbodash.geometry.blade_parametrization.passage import section_passage
 
         parameters = deepcopy(source["parameters"])
         parameters["numerics"]["number_of_points"] = max(
@@ -268,7 +270,7 @@ def passage_view(source, selection):
 def _register_renderer(app: Dash) -> tuple[bool, str]:
     try:
         import dash_vtk  # noqa: F401 -- register the browser component bundle
-        from .turbomoc_adapter import renderer_asset_directory
+        from turbodash.geometry.blade_parametrization.turbomoc_adapter import renderer_asset_directory
         directory = renderer_asset_directory()
         if directory is None:
             raise ImportError("TurboMoC renderer assets were not found.")

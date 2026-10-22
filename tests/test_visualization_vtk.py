@@ -3,7 +3,9 @@
 from copy import deepcopy
 import json
 
-from dash import Dash, html
+from dash import Dash, html, no_update
+from dash._callback_context import context_value
+from dash._utils import AttributeDict
 import numpy as np
 import pytest
 
@@ -138,7 +140,7 @@ def test_callbacks_update_render_token_and_note_without_replacing_host():
     app = Dash(__name__)
     app.layout = html.Div([vtk.vtk_panel(pane) for pane in vtk.PANES])
     vtk.register_vtk_callbacks(app)
-    assert len(app.callback_map) == 12
+    assert len(app.callback_map) == 18
     assert all("-scene.children" not in key for key in app.callback_map)
     assert "studio.render" in vtk._RENDER
     assert "studio.commit" in vtk._RENDER
@@ -242,3 +244,135 @@ def test_quality_arrays_must_match_original_face_count(surface):
     with pytest.raises(ValueError, match="one finite value per original polygon"):
         vtk.mesh_data({"surfaces": {"inspection": {**surface,
                       "cell_ids": [5, 6], "cell_values": [.8], "color_values": [.8]}}})
+
+
+@pytest.mark.parametrize("family", ["axial", "radial", "linear"])
+def test_geometry_preserves_physical_family_and_mapping_note(preview, family):
+    preview["metadata"].update(geometry_type=family, note="Physical conformal mapping in millimetres.")
+    data = vtk.geometry_data(preview)
+    assert data["rows"][0]["geometry_type"] == family
+    assert data["rows"][0]["is_linear"] is (family == "linear")
+    assert data["note"] == preview["metadata"]["note"]
+    assert data["rows"][0]["surfaces"] is preview["surfaces"]
+
+
+def test_single_row_geometry_allows_full_blade_ring_without_changing_mesh_budget(preview, monkeypatch):
+    monkeypatch.setattr(vtk, "MAX_DISPLAY_TRIANGLES", 8)
+    preview["metadata"]["blade_count"] = 83
+    data = vtk.geometry_data(preview)
+    assert vtk.display_rows(data, pane="geometry")[2][0]["max"] == 83
+    assert vtk.mesh_data(preview)["copy_limit"] == 2
+    monkeypatch.setattr(vtk, "MAX_DISPLAY_TRIANGLES", 3)
+    assert vtk.geometry_data(preview)["rows"] == []
+
+
+def test_native_color_picker_count_and_slider_follow_saved_row_settings(preview):
+    data = vtk.geometry_data(preview)
+    row = data["rows"][0]
+    preferences = vtk.update_appearance({"copies": {row["id"]: 5}}, row, "color", "#123456", surface="blade")
+    components = list(descendants(vtk.row_display_controls(data, preferences, pane="geometry")[0]))
+    controls = {component.id["type"]: component for component in components
+                if isinstance(getattr(component, "id", None), dict)
+                and "surface" not in component.id and "action" not in component.id}
+    assert controls["vtk-row-copies"].value == controls["vtk-row-slider"].value == 5
+    assert controls["vtk-row-slider"].max == 8
+    assert controls["vtk-row-slider"].updatemode == "mouseup"
+    pickers = [component for component in components if getattr(component, "className", None) == "surface-color-picker"]
+    assert len(pickers) == len(vtk.BOUNDARIES)
+    blade = next(component for component in pickers if component.id["surface"] == "blade")
+    assert getattr(blade, "data-color") == "#123456"
+    assert json.loads(getattr(blade, "data-color-id")) == {**blade.id, "type": "vtk-row-color"}
+    assert all(label in text_content(components[0]) for label in ("Blade only", "All surfaces", "Reset display"))
+
+
+def test_per_row_appearance_and_presets_do_not_change_other_rows_or_geometry(preview):
+    data = vtk.geometry_data(preview)
+    row = data["rows"][0]
+    rotor = {**row, "id": "stage_1_rotor", "role": "rotor"}
+    original = deepcopy(data)
+    prefs = vtk.update_appearance({}, row, "color", "#123456", surface="blade")
+    prefs = vtk.update_appearance(prefs, rotor, "preset", "surfaces")
+    assert vtk.appearance_settings(row, prefs)["colors"]["blade"] == "#123456"
+    assert vtk.appearance_settings(rotor, prefs)["colors"]["blade"] == "#ef8c26"
+    assert vtk.appearance_settings(rotor, prefs)["surfaces"] == list(vtk.BOUNDARIES)
+    reset = vtk.update_appearance(prefs, row, "preset", "reset")
+    assert vtk.appearance_settings(row, reset)["colors"]["blade"] == "#477db3"
+    assert reset["appearance"][rotor["id"]] == prefs["appearance"][rotor["id"]]
+    hidden = vtk.update_appearance(reset, row, "surface", [], surface="blade")
+    assert "blade" not in vtk.appearance_settings(row, hidden)["surfaces"]
+    after_counts = vtk.display_preferences([rotor["id"]], [7], [{"row": rotor["id"]}], hidden)
+    assert after_counts["appearance"] == hidden["appearance"]
+    assert data == original
+
+
+def test_display_callback_updates_native_picker_color_then_rebuilds_preset_controls(preview):
+    app = Dash(__name__)
+    vtk.register_vtk_callbacks(app, panes=("geometry",))
+    callback = next(item["callback"].__wrapped__ for name, item in app.callback_map.items()
+                    if "geometry-vtk-display-state.data" in name)
+    data = vtk.geometry_data(preview)
+    row_id = data["rows"][0]["id"]
+    count_id = {"type": "vtk-row-copies", "pane": "geometry", "row": row_id}
+    color_id = {"type": "vtk-row-color", "pane": "geometry", "row": row_id, "surface": "blade"}
+    preset_id = {"type": "vtk-row-preset", "pane": "geometry", "row": row_id, "action": "blade"}
+    previous = vtk.display_preferences([row_id], [5], [count_id])
+    def call(trigger, property, value, saved):
+        token = context_value.set(AttributeDict(triggered_inputs=[{
+            "prop_id": json.dumps(trigger, sort_keys=True, separators=(",", ":")) + "." + property,
+            "value": value}]))
+        try:
+            return callback([row_id], [5], [], ["#123456"], [], [1], [count_id], [], [color_id], [], [preset_id], saved, data)
+        finally:
+            context_value.reset(token)
+    colored, controls = call(color_id, "data", "#123456", previous)
+    assert controls is no_update
+    assert colored["appearance"][row_id]["colors"]["blade"] == "#123456"
+    preset, controls = call(preset_id, "n_clicks", 1, colored)
+    assert preset["appearance"][row_id]["surfaces"] == ["blade"]
+    assert preset["appearance"][row_id]["colors"]["blade"] == "#123456"
+    assert len(controls) == 1
+    assert preset["copies"][row_id] == 5
+
+
+@pytest.mark.parametrize("value,maximum,expected", [("5", 8, 5), ("99", 8, 8), ("bad", 8, 1), (0, 8, 1), (float("nan"), 8, 1)])
+def test_display_count_is_bounded_without_touching_physical_count(value, maximum, expected):
+    assert vtk.clamp_display_count(value, maximum) == expected
+
+
+def test_missing_renderer_note_cannot_be_masked_by_valid_geometry_note():
+    missing = vtk._RENDER.split("const rows =", 1)[0]
+    assert "Install the Turbodash mesh extra" in missing
+    assert "(data || {}).note" not in missing
+
+
+@pytest.mark.parametrize("kind", ["surface", "color"])
+def test_display_callback_applies_all_batched_surface_or_color_edits(preview, kind):
+    app = Dash(__name__)
+    vtk.register_vtk_callbacks(app, panes=("geometry",))
+    callback = next(item["callback"].__wrapped__ for name, item in app.callback_map.items()
+                    if "geometry-vtk-display-state.data" in name)
+    data = vtk.geometry_data(preview)
+    row_id = data["rows"][0]["id"]
+    count_id = {"type": "vtk-row-copies", "pane": "geometry", "row": row_id}
+    ids = [{"type": "vtk-row-" + kind, "pane": "geometry", "row": row_id, "surface": name}
+           for name in ("blade", "hub")]
+    values = [[], []] if kind == "surface" else ["#123456", "#654321"]
+    property_name = "value" if kind == "surface" else "data"
+    token = context_value.set(AttributeDict(triggered_inputs=[{
+        "prop_id": json.dumps(identifier, sort_keys=True, separators=(",", ":")) + "." + property_name,
+        "value": value} for identifier, value in zip(ids, values)]))
+    previous = vtk.display_preferences([row_id], [3], [count_id])
+    try:
+        updated, controls = callback([row_id], [3], values if kind == "surface" else [],
+                                     values if kind == "color" else [], [], [], [count_id],
+                                     ids if kind == "surface" else [], ids if kind == "color" else [],
+                                     [], [], previous, data)
+    finally:
+        context_value.reset(token)
+    assert controls is no_update
+    settings = updated["appearance"][row_id]
+    if kind == "surface":
+        assert settings["surfaces"] == []
+    else:
+        assert settings["colors"]["blade"] == "#123456"
+        assert settings["colors"]["hub"] == "#654321"

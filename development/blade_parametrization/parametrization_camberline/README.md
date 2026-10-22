@@ -172,4 +172,4 @@ From the TurboDash repository root:
 poetry run python development/blade_parametrization/parametrization_camberline/sensitivity_study.py
 ```
 
-The [script](sensitivity_study.py) calls the shared `parametrization_blades.blade_geometry` section builder and analysis helpers. It generates all four PNG/SVG figures embedded above and [numerical results](results/sensitivity.json), including the complete reference parameters and per-case checks.
+The [script](sensitivity_study.py) calls the production `turbodash.geometry.blade_parametrization` section builder and analysis helpers. It generates all four PNG/SVG figures embedded above and [numerical results](results/sensitivity.json), including the complete reference parameters and per-case checks.

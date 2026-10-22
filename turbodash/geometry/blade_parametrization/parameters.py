@@ -64,7 +64,7 @@ DEFAULTS = {
         "preserve_physical_thickness": False,
         "warning_tolerance": 0.01,
     },
-    "numerics": {"number_of_points": 401},
+    "numerics": {"number_of_points": 601},
     "flow_domain": {"inlet_chords": 0.5, "outlet_chords": 1.0},
 }
 

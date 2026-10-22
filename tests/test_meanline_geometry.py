@@ -6,7 +6,6 @@ test_production_loss_models.py.
 """
 
 from copy import deepcopy
-import hashlib
 import importlib
 import json
 from pathlib import Path
@@ -145,11 +144,31 @@ def test_invalid_integer_choices_are_rejected(reference, count):
         core.realize_blade_row_geometry(geometry, "axial", blade_count=count)
 
 
-def test_physical_exports_match_reference_bytes(reference):
+def test_physical_exports_use_new_kernel_without_changing_meanline(reference):
+    from turbodash.geometry.meanline import state_for_stage_row, section_from_state
     case, result = reference
     before = deepcopy(result)
     files = build_turbogrid_files(result, span_sections=3, profile_points=80)
-    assert {name: hashlib.sha256(text.encode()).hexdigest() for name, text in files.items()} == GEOMETRY_REFERENCE[case]["integer_export_sha256"]
+    for row in ROWS:
+        folder = f"stage_01/{row}"
+        metadata = yaml.safe_load(files[f"{folder}/metadata.yaml"])
+        assert metadata["camberline_type"] == "conformal"
+        assert metadata["thickness_model"] == "rational_denton"
+        assert metadata["spanwise_model"] == "constant_midspan_metal_angles"
+        lines = [line for line in files[f"{folder}/profile.curve"].splitlines() if not line.startswith("#")]
+        coordinates = np.array([[float(value) for value in line.split()[:3]] for line in lines]) / 1000
+        points_per_section = metadata["profile_points_written_per_section"]
+        midspan = coordinates[points_per_section:2*points_per_section]
+        section = section_from_state(state_for_stage_row(result["stages_performance"][0], row))
+        radius = section.parameters["geometry"]["mean_radius"]
+        expected = np.column_stack((section.boundary[:, 0]*radius,
+                                    radius*np.cos(section.boundary[:, 1]),
+                                    radius*np.sin(section.boundary[:, 1])))
+        assert len(midspan) == len(expected)
+        # Export rotates the closed contour start to its axial minimum.
+        expected = np.roll(expected[:-1], -int(np.argmin(expected[:-1, 0])), axis=0)
+        expected = np.vstack((expected, expected[:1]))
+        assert np.allclose(midspan, expected, atol=1e-12)
     assert result == before
 
 
@@ -168,6 +187,17 @@ def test_meshing_and_assembly_use_integer_geometry_without_mutation(reference):
     layout = build_assembly_layout(result, row_gaps=[.001], span_sections=3, profile_points=80)
     assert [row["blade_count"] for row in layout["rows"]] == [GEOMETRY_REFERENCE[case]["integer_geometry"][row]["blade_count"] for row in ROWS]
     assert result == before
+
+
+def test_assembly_export_reports_shared_geometry_laws(reference):
+    from turbodash.io.turbogrid_assembly import build_turbogrid_assembly_files
+    _, result = reference
+    files = build_turbogrid_assembly_files(result, row_gaps=[.001], span_sections=2, profile_points=80)
+    for row in ROWS:
+        metadata = yaml.safe_load(files[f"stage_01/{row}/metadata.yaml"])
+        assert metadata["camberline_type"] == "conformal"
+        assert metadata["thickness_model"] == "rational_denton"
+        assert metadata["spanwise_model"] == "constant_midspan_metal_angles"
 
 
 def test_selected_row_does_not_realize_other_rows(reference):
@@ -253,4 +283,8 @@ def test_app_callback_retains_meanline_result_when_physical_plot_fails(monkeypat
     assert result["stages_performance"][0]["geometry_discrete"] is None
     assert result["overall_performance"]["efficiency_ts"] > 0
     if profile_failure:
-        assert "Example invalid physical profile" in outputs[1]["layout"]["annotations"][0]["text"]
+        if app_name == "app_turbine_experimental":
+            from dash import no_update
+            assert outputs[1] is no_update  # Shared geometry callback owns this plot.
+        else:
+            assert "Example invalid physical profile" in outputs[1]["layout"]["annotations"][0]["text"]

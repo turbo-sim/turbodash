@@ -111,6 +111,16 @@ remembers an explicit choice. The left rail switches between **Meanline**,
 **Geometry**, and **Mesh** without resetting inputs or jobs. Clicking the brand
 returns to Meanline. Load YAML and Save design remain in the header.
 
+Geometry is a blade modeller using the production conformal camberline and
+rational Denton thickness. Its per-row baseline comes from each successful
+meanline result plus interpolated reaction/impulse presets. Geometry controls
+edit sparse overrides shared by the blade views and CAD/mesh exporters;
+they never rerun meanline. A successful new calculation clears those overrides,
+while failed calculations, tab changes and optimizer progress retain them.
+Use the row YAML controls to save/load geometry separately from the header's
+meanline design file. See the [blade geometry guide](../../docs/source/guides/blade_geometry.md)
+for mapping, presets, state ownership, launch instructions and limitations.
+
 Five numbered sections start collapsed: **Turbine setup**, **Operating point**,
 **Shaft speed**, **Stage design**, and **Optimization**. The stage
 selector uses saved names; Stator/Rotor switches the visible blade fields while

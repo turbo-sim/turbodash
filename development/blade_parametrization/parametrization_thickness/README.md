@@ -152,4 +152,4 @@ From the TurboDash repository root:
 poetry run python development/blade_parametrization/parametrization_thickness/sensitivity_study.py
 ```
 
-The [script](sensitivity_study.py) calls the shared `parametrization_blades.blade_geometry` section builder and rational law. It generates the two PNG/SVG figures and [numerical results](results/sensitivity.json), including the resolved preset inputs. This single note contains the formulation, motivation, sensitivity results, and discussion; no new parametrization is introduced.
+The [script](sensitivity_study.py) calls the production `turbodash.geometry.blade_parametrization` section builder and rational law. It generates the two PNG/SVG figures and [numerical results](results/sensitivity.json), including the resolved preset inputs. This single note contains the formulation, motivation, sensitivity results, and discussion; no new parametrization is introduced.

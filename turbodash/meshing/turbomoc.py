@@ -21,9 +21,9 @@ import struct
 from zipfile import ZIP_DEFLATED, ZipFile
 
 import numpy as np
-from scipy.interpolate import make_interp_spline
-
-from turbodash.geometry.blade import compute_blade_coordinates_cartesian
+from turbodash.geometry.meanline import parameters_from_meanline, state_for_stage_row, section_from_state
+from turbodash.geometry.blade_parametrization.parameters import ParameterState, resolve_parameters
+from turbodash.geometry.blade_parametrization import turbomoc_adapter as conformal_adapter
 from turbodash.core.turbine import get_blade_row_geometry
 
 
@@ -33,15 +33,15 @@ _INSTALL_MESSAGE = (
     "with: python -m pip install -e ../method_of_characteristics"
 )
 _OPTION_DEFAULTS = {
-    "profile_points": 200,
+    "profile_points": 601,
     "inlet_chords": 0.5,
     "outlet_chords": 1.0,
     "span_layers": 12,
     "span_stretch": 1.5,
     "inflation_enabled": False,
     "inflation_growth": 1.2,
-    "camberline_type": "curvature_based",
-    "thickness_model": "NACA",
+    "camberline_type": "conformal",
+    "thickness_model": "rational_denton",
 }
 
 
@@ -148,113 +148,74 @@ def _options(options, chord_mm):
         raise ValueError("inflation_growth must be greater than one.")
     if resolved["inflation_thickness_mm"] < resolved["first_height_mm"]:
         raise ValueError("inflation_thickness_mm must be at least first_height_mm.")
-    if resolved["camberline_type"] not in ("curvature_based", "NACA", "circular_arc",
+    if resolved["camberline_type"] not in ("conformal", "curvature_based", "NACA", "circular_arc",
                                           "linear_angle_change", "linear_slope_change"):
         raise ValueError("Unsupported camberline_type.")
-    if resolved["thickness_model"] not in ("NACA", "Denton", "B_spline"):
+    if resolved["thickness_model"] not in ("rational_denton", "NACA", "Denton", "B_spline"):
         raise ValueError("Unsupported thickness_model.")
     return resolved
 
 
-def _boundary_splines(geometry, angles, chord, options):
-    """Transfer three sampled profile segments with continuous edge tangents."""
-    count = options["profile_points"]
-    trailing = _positive(geometry["trailing_edge_thickness"], "Trailing edge thickness")
-    wedge = np.deg2rad(float(geometry["trailing_edge_wedge_angle"]))
-    x, y, *_ = compute_blade_coordinates_cartesian(
-        options["camberline_type"], 0., 0., *angles, chord,
-        float(geometry["maximum_thickness_location"]),
-        _positive(geometry["maximum_thickness"], "Maximum thickness"),
-        trailing, wedge, _positive(geometry["leading_edge_radius"], "Leading edge radius"),
-        count, thickness_model=options["thickness_model"],
-    )
-    points = np.column_stack((np.asarray(y), -np.asarray(x))) * 1000
-    if not np.isfinite(points).all():
-        raise ValueError("The selected blade profile contains nonfinite coordinates.")
-    sizes = [count, count // 2, count]
-    segments = np.split(points, np.cumsum(sizes)[:-1])
-    # The generator repeats the TE joins; share their exact coordinates in CAD.
-    tolerance = max(1e-8, chord * 1000 * 2e-6)
-    for index in range(3):
-        if np.linalg.norm(segments[index][-1] - segments[(index + 1) % 3][0]) > tolerance:
-            raise ValueError("The generated blade segments do not form a closed contour.")
-        segments[(index + 1) % 3][0] = segments[index][-1]
-    leading = np.array([-np.cos(angles[0]), -np.sin(angles[0])])
-    outgoing = np.array([np.sin(angles[1] + wedge / 2), -np.cos(angles[1] + wedge / 2)])
-    returning = -np.array([np.sin(angles[1] - wedge / 2), -np.cos(angles[1] - wedge / 2)])
-    directions = [(leading, outgoing), (outgoing, returning), (returning, leading)]
-    splines = []
-    for segment, tangents in zip(segments, directions):
-        segment = segment[np.r_[True, np.linalg.norm(np.diff(segment, axis=0), axis=1) > 1e-10]]
-        distance = np.r_[0., np.cumsum(np.linalg.norm(np.diff(segment, axis=0), axis=1))]
-        splines.append(make_interp_spline(distance / distance[-1], segment, k=3,
-            bc_type=([(1, tangents[0] * distance[-1])], [(1, tangents[1] * distance[-1])])))
-    # A shared sampled contour drives display and clearance checks.
-    sampled = np.vstack([spline(np.linspace(0, 1, 3 * len(spline.c)))[:-1] for spline in splines]
-                        + [splines[0](np.array([0.]))])
-    # Align the complete sampled envelope to the meridional LE plane.
-    origin = sampled[np.argmax(sampled[:, 1])].copy()
-    for spline in splines:
-        spline.c -= origin
-    return splines, sampled - origin
+def _boundary_splines(geometry, angles, chord, options, *, parameters=None):
+    """Compatibility entry point using the shared rounded-side CAD adapter."""
+    from types import SimpleNamespace
+    state = parameters or parameters_from_meanline(geometry)[0]
+    section = section_from_state(state, check_intersections=False)
+    radius_mm = section.parameters["geometry"]["mean_radius"]*1000
+    mapping = SimpleNamespace(reference_radius=radius_mm, reference_chord=chord*1000,
+                              prime_chord=lambda eta: section.prime_chord)
+    splines, sampled, _ = conformal_adapter._boundary_splines(section, mapping)
+    return splines, sampled
 
 
 def build_blade_row(results, stage_index=0, row="stator", *, options=None):
-    """Return ``(turbo_moc Design, metadata)`` for one cylindrical blade row."""
-    geometry, radii, heights, chord, count, angles = _row_inputs(results, stage_index, row)
-    options = _options(options, chord * 1000)
-    modules = _modules()
-    radius, height = float(np.mean(radii)) * 1000, float(np.mean(heights)) * 1000
-    splines, sampled = _boundary_splines(geometry, angles, chord, options)
-    # The small rounded-edge envelope beyond the nominal chord is retained.
-    physical_chord = float(np.ptp(sampled[:, 1]))
-    dimensions = {"type": "axial", "hub_radius": radius - height / 2,
-                  "blade_height": height, "hub_chord": physical_chord,
-                  "tip_chord": physical_chord, "num_blades": count}
-    mapping = modules["channel"].MeridionalChannel(modules["channel"].geometry_from_machine(dimensions))
-    blade = {"provider": "turbodash", "pitch": mapping.pitch,
-             "boundary_splines": splines,
-             "blade_curve": {"x": sampled[:, 0].tolist(), "y": sampled[:, 1].tolist()},
-             "trailing_edge": {"x": [], "y": []},
-             "metal_angle_in": float(np.rad2deg(angles[0])),
-             "metal_angle_out": float(np.rad2deg(angles[1]))}
-    flow_domain = {"inlet_chords": options["inlet_chords"], "outlet_chords": options["outlet_chords"],
-                   "domain_shift_mode": "auto", "domain_shift": 0., "num_points": 100}
-    # TurboMoC's generic contour-based rotor passage also works for stators;
-    # unlike its MoC stator builder, this does not require a nozzle solution.
-    curves = modules["rotor"]._flow_domain(blade, flow_domain)
-    curves.update(blade_curve=sampled, trailing_edge=np.empty((0, 2)))
-    design = modules["row"].Design(mapping, blade, curves, flow_domain=flow_domain)
-    for eta in (0., .5, 1.):
-        section_blade, section_curves = design.section(eta)
-        modules["row"].require_containment(section_blade, section_curves)
-    flattened = not (np.isclose(radii[0], radii[1], rtol=1e-8) and
-                     np.isclose(heights[0], heights[1], rtol=1e-8))
-    notes = ["Independent cylindrical blade-row passage; midspan metal angles are retained across span.",
-             "No free-vortex twist, tip clearance or coupled stage interfaces."]
-    if flattened:
-        notes.insert(0, "Inlet/outlet radius or height varies in the meanline design; this model uses their arithmetic averages and omits endwall flaring.")
-    source_row = {"profile_geometry": {name: float(geometry[name]) for name in
-                  ("chord_meridional", "blade_count", "maximum_thickness_location", "maximum_thickness",
-                   "trailing_edge_thickness", "trailing_edge_wedge_angle", "leading_edge_radius")},
-                  "station_radii_m": radii, "station_heights_m": heights,
-                  "metal_angles_rad": angles}
-    fingerprint = hashlib.sha256(json.dumps(source_row | {"options": options},
-                                            sort_keys=True, allow_nan=False).encode()).hexdigest()
-    metadata = {"stage_index": int(stage_index), "stage_number": int(stage_index + 1), "row": row,
+    """Return the shared conformal blade as a TurboMoC Design and metadata."""
+    original_geometry, radii, heights, chord, count, angles = _row_inputs(results, stage_index, row)
+    stage = results["stages_performance"][stage_index]
+    state = state_for_stage_row(stage, row)
+    values = resolve_parameters(state).values
+    if values["geometry"]["type"] != "axial":
+        raise ValueError("The turbine meshing interface supports axial blade rows only; use the radial row modeller for preview.")
+    chord = values["geometry"]["meridional_chord"]
+    if stage.get("geometry_parameters", {}).get(row) is not None:
+        # The modeller owns the flow domain and profile sampling. Old mesh
+        # option fields may survive in saved/browser settings, but must never
+        # replace the effective row state. Legacy unprojected workflows retain
+        # their historical per-job domain options below.
+        if options is not None and not isinstance(options, dict):
+            raise ValueError("options must be a dictionary.")
+        options = dict(options or {}) | values["flow_domain"]
+    options = _options(options, chord*1000)
+    if stage.get("geometry_parameters", {}).get(row) is not None:
+        options["profile_points"] = values["numerics"]["number_of_points"]
+    # Explicit per-job extensions apply only outside the shared modeller path.
+    values["flow_domain"].update(inlet_chords=options["inlet_chords"], outlet_chords=options["outlet_chords"])
+    section = section_from_state(ParameterState(values), check_intersections=True)
+    _modules()  # Preserve the public optional-dependency failure contract.
+    design = conformal_adapter.build_design(section)
+    radius, height = values["geometry"]["mean_radius"]*1000, values["geometry"]["blade_height"]*1000
+    count = values["cascade"]["blade_count"]
+    physical_chord = float(np.ptp(np.asarray(design.curves["blade_curve"])[:, 1]))
+    flattened = not (np.isclose(radii[0], radii[1], rtol=1e-8) and np.isclose(heights[0], heights[1], rtol=1e-8))
+    notes = ["Shared conformal cylinder with constant section angles across span; no free-vortex twist or endwall flaring.",
+             "Rounded trailing tip closes to zero width; meanline trailing thickness supplies its unrounded shoulder scale."]
+    source_row = {"parameters": state.to_dict(), "station_radii_m": radii, "station_heights_m": heights,
+                  "metal_angles_rad": np.deg2rad([values["camberline"]["inlet_metal_angle_deg"], values["camberline"]["outlet_metal_angle_deg"]]).tolist()}
+    fingerprint = hashlib.sha256(json.dumps(source_row | {"options": options}, sort_keys=True, allow_nan=False).encode()).hexdigest()
+    metadata = {"stage_index": int(stage_index), "stage_number": int(stage_index+1), "row": row,
                 "blade_count": count, "blade_count_integer": count,
-                "blade_count_continuous": geometry.get("blade_count_continuous"),
-                "coordinate_units": "mm", "axis_of_rotation": "Z",
-                "cgns_coordinate_units": "m", "endwall_model": "cylindrical_average",
-                "spanwise_model": "constant_midspan_metal_angles",
+                "blade_count_continuous": original_geometry.get("blade_count_continuous"),
+                "coordinate_units": "mm", "axis_of_rotation": "Z", "cgns_coordinate_units": "m",
+                "endwall_model": "cylindrical_average", "spanwise_model": "constant_midspan_metal_angles",
                 "flattened_meanline": flattened, "notes": notes,
-                "hub_radius_mm": radius - height / 2, "shroud_radius_mm": radius + height / 2,
-                "mean_radius_mm": radius, "height_mm": height, "pitch_mm": mapping.pitch,
-                "nominal_chord_mm": chord * 1000, "profile_chord_mm": physical_chord,
-                "metal_angle_in_deg": blade["metal_angle_in"], "metal_angle_out_deg": blade["metal_angle_out"],
+                "hub_radius_mm": radius-height/2, "shroud_radius_mm": radius+height/2,
+                "mean_radius_mm": radius, "height_mm": height, "pitch_mm": design.meridional_channel.pitch,
+                "nominal_chord_mm": chord*1000, "profile_chord_mm": physical_chord,
+                "metal_angle_in_deg": values["camberline"]["inlet_metal_angle_deg"],
+                "metal_angle_out_deg": values["camberline"]["outlet_metal_angle_deg"],
                 "source_radius_m": radii, "source_height_m": heights, "source_row": source_row,
                 "source_fingerprint": fingerprint, "turbo_moc_version": import_module("turbo_moc").__version__,
-                "options": options}
+                "options": options, "geometry_diagnostics": design.blade["v4_diagnostics"]}
     return design, metadata
 
 

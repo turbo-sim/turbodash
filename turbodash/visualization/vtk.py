@@ -10,9 +10,11 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
+from copy import deepcopy
 
 import numpy as np
-from dash import ALL, Input, Output, State, dcc, html, no_update
+from dash import ALL, MATCH, Input, Output, State, ctx, dcc, html, no_update
 
 from turbodash.visualization.vtk_assets import available as vtk_available
 
@@ -21,6 +23,9 @@ MAX_DISPLAY_TRIANGLES = 200_000
 BOUNDARIES = ("blade", "hub", "shroud", "inlet", "outlet", "periodic_left", "periodic_right")
 QUALITY_COLORS = ("#239b56", "#f4d03f", "#c0392b")
 PANES = ("geometry", "overview", "mesh")
+SURFACE_COLORS = {"blade": "#477db3", "hub": "#a6b3b8", "shroud": "#ccd1d6",
+                  "inlet": "#6699bf", "outlet": "#73a68c",
+                  "periodic_left": "#b399bf", "periodic_right": "#bfb585"}
 
 
 def _json_default(value):
@@ -87,9 +92,12 @@ def _row(preview, *, index=0, offset=0.0, job=None):
     count = metadata.get("blade_count", preview.get("num_blades", 1))
     if isinstance(count, bool) or not np.isfinite(count) or int(count) != count or count < 1:
         raise ValueError("VTK previews need a positive integer blade count.")
+    family = metadata.get("geometry_type", preview.get("geometry_type", "axial"))
+    if family not in {"axial", "radial", "linear"}:
+        raise ValueError("VTK geometry_type must be axial, radial, or linear.")
     return {"id": f"stage_{stage}_{role}", "label": f"Stage {stage} {role}",
-            "role": role, "num_blades": int(count), "is_linear": False,
-            "geometry_type": "axial", "job": job,
+            "role": role, "num_blades": int(count), "is_linear": family == "linear",
+            "geometry_type": family, "job": job,
             "surfaces": preview.get("surfaces", {}),
             "placement": {"streamwise_offset_mm": float(offset), "angular_phase_deg": 0.0}}
 
@@ -102,9 +110,13 @@ def geometry_data(preview):
     if triangles > MAX_DISPLAY_TRIANGLES:
         return empty_data("Geometry exceeds the display limit. Reduce the preview resolution.")
     row = _row(preview)
-    limit = max(1, MAX_DISPLAY_TRIANGLES // max(1, triangles))
+    # Geometry reuses the same surface actors for each rigid display copy, as
+    # TurboMoC does; the user may display the entire physical row. The base
+    # dataset limit above still protects against oversized individual rows.
+    limit = row["num_blades"]
     return {"key": _key(row), "rows": [row], "inspection": None, "quality": None,
-            "note": "Independent cylindrical blade-row geometry. XYZ coordinates are in millimetres.",
+            "note": preview.get("metadata", {}).get("note") or
+                    f"Independent {row['geometry_type']} blade-row geometry. XYZ coordinates are in millimetres.",
             "copy_limit": limit}
 
 
@@ -235,7 +247,102 @@ def display_preferences(visible, counts, identifiers, previous=None):
                 copies[identifier["row"]] = int(number)
         except (ValueError, TypeError):
             pass
-    return {"known_rows": known, "visible_rows": [row for row in known if row in shown], "copies": copies}
+    return {**previous, "known_rows": known, "visible_rows": [row for row in known if row in shown], "copies": copies}
+
+
+def appearance_settings(row, preferences=None, *, pane="geometry"):
+    """TurboMoC's per-row display controls, independent of geometric state."""
+    saved = (preferences or {}).get("appearance", {}).get(row["id"], {})
+    colors = {**SURFACE_COLORS, "blade": "#ef8c26" if row.get("role") == "rotor" else SURFACE_COLORS["blade"]}
+    colors.update({key: value for key, value in saved.get("colors", {}).items()
+                   if key in BOUNDARIES and isinstance(value, str) and re.fullmatch(r"#[0-9a-fA-F]{6}", value)})
+    return {"surfaces": [name for name in saved.get("surfaces", ["blade"] if pane == "overview" else ["blade", "hub"])
+                         if name in BOUNDARIES], "colors": colors, "edges": bool(saved.get("edges", True))}
+
+
+def update_appearance(preferences, row, kind, value, *, surface=None, pane="geometry"):
+    """Apply one display-only change without losing other rows' preferences."""
+    updated = deepcopy(preferences or {})
+    settings = appearance_settings(row, updated, pane=pane)
+    if kind == "surface" and surface in BOUNDARIES:
+        enabled = set(settings["surfaces"])
+        enabled.add(surface) if surface in (value or []) else enabled.discard(surface)
+        settings["surfaces"] = [name for name in BOUNDARIES if name in enabled]
+    elif kind == "color" and surface in BOUNDARIES:
+        if not isinstance(value, str) or not re.fullmatch(r"#[0-9a-fA-F]{6}", value):
+            return updated
+        settings["colors"][surface] = value
+    elif kind == "edges":
+        settings["edges"] = "edges" in (value or [])
+    elif kind == "preset":
+        if value == "reset":
+            settings = appearance_settings(row, pane=pane)
+            updated.setdefault("copies", {})[row["id"]] = min(1 if pane == "mesh" else 3, row["num_blades"])
+        elif value in {"blade", "surfaces"}:
+            settings["surfaces"] = ["blade"] if value == "blade" else list(BOUNDARIES)
+        else:
+            return updated
+    else:
+        return updated
+    updated.setdefault("appearance", {})[row["id"]] = settings
+    return updated
+
+
+def clamp_display_count(value, maximum):
+    """Keep the text input and slider on a valid display-copy count."""
+    try:
+        number = float(value)
+        if isinstance(value, bool) or not np.isfinite(number):
+            return 1
+        return max(1, min(int(maximum), int(number)))
+    except (TypeError, ValueError, OverflowError):
+        return 1
+
+
+def _display_id(kind, pane, row, **extra):
+    return {"type": "vtk-row-" + kind, "pane": pane, "row": row, **extra}
+
+
+def row_display_controls(data, preferences, *, pane):
+    """Match the installed TurboMoC count, visibility, color and preset UI."""
+    _, _, rows = display_rows(data, preferences, pane=pane)
+    datasets = {row["id"]: row for row in (data or {}).get("rows", [])}
+    controls = []
+    for row in rows:
+        identity = row["row"]
+        settings = appearance_settings(datasets[identity], preferences, pane=pane)
+        surfaces = []
+        for name in BOUNDARIES:
+            color_id = _display_id("color", pane, identity, surface=name)
+            surfaces.append(html.Div([
+                dcc.Checklist(id=_display_id("surface", pane, identity, surface=name),
+                              options=[{"label": name.replace("_", " ").title(), "value": name}],
+                              value=[name] if name in settings["surfaces"] else []),
+                dcc.Store(id=color_id, data=settings["colors"][name]),
+                html.Div(id=_display_id("picker", pane, identity, surface=name), className="surface-color-picker",
+                         **{"data-color-id": json.dumps(color_id, sort_keys=True, separators=(",", ":")),
+                            "data-color": settings["colors"][name],
+                            "data-color-label": f"{row['label']} {name.replace('_', ' ')} color"}),
+            ], className="td-display-surface-row"))
+        controls.append(html.Section([
+            html.H5(row["label"]),
+            html.Div([
+                html.Label("Displayed blades", style={"flex": "1", "marginBottom": 0}),
+                dcc.Input(id=_display_id("copies", pane, identity), type="text", inputMode="numeric",
+                          pattern="[0-9]*", min=1, max=row["max"], step=1, value=row["value"], debounce=True,
+                          style={"width": "65px"}),
+            ], className="td-display-row-count", title="Display copies only; physical blade count and exported geometry are unchanged."),
+            dcc.Slider(id=_display_id("slider", pane, identity), min=1, max=row["max"], step=1,
+                       value=row["value"], marks={1: "1", row["max"]: str(row["max"])}, updatemode="mouseup"),
+            html.Div([html.Button(label, id=_display_id("preset", pane, identity, action=action), n_clicks=0,
+                                  className="btn btn-outline-secondary btn-sm")
+                      for label, action in (("Blade only", "blade"), ("All surfaces", "surfaces"), ("Reset display", "reset"))],
+                     className="td-display-presets"),
+            *surfaces,
+            *([dcc.Checklist(id=_display_id("edges", pane, identity), options=[{"label": "Mesh edges", "value": "edges"}],
+                            value=["edges"] if settings["edges"] else [])] if pane == "mesh" else []),
+        ], className="td-display-section"))
+    return controls
 
 
 def vtk_panel(pane, message="Generate geometry or a mesh to view it in 3D.", extra_controls=None):
@@ -264,7 +371,7 @@ def vtk_panel(pane, message="Generate geometry or a mesh to view it in 3D.", ext
                                   inputStyle={"marginRight": "7px"}, labelStyle={"display": "block", "marginBottom": "5px"}),
                 ], className="td-display-section"),
                 html.Div([
-                    html.H5("Blades per row"),
+                    html.H5("Blade display"),
                     html.Div("Available after geometry or a mesh is generated.", id=f"{pane}-vtk-copy-controls"),
                 ], className="td-display-section"),
                 html.Div([
@@ -273,11 +380,11 @@ def vtk_panel(pane, message="Generate geometry or a mesh to view it in 3D.", ext
                                   options=[{"label": name.replace("_", " ").title(), "value": name} for name in BOUNDARIES],
                                   value=default_surfaces,
                                   inputStyle={"marginRight": "7px"}, labelStyle={"display": "block", "marginBottom": "5px"}),
-                ], className="td-display-section"),
+                ], className="td-display-section", style={"display": "none"}),
                 html.Div([
                     dcc.Checklist(id=f"{pane}-vtk-edges", options=[{"label": "Mesh edges", "value": "edges"}],
                                   value=["edges"], inputStyle={"marginRight": "7px"}),
-                ], className="td-display-section", style={} if pane == "mesh" else {"display": "none"}),
+                ], className="td-display-section", style={"display": "none"}),
                 html.Button("Fit view", id=f"{pane}-vtk-fit", n_clicks=0,
                             className="btn btn-outline-secondary btn-sm"),
                 *extras,
@@ -292,7 +399,7 @@ _RENDER = r"""function(data, surfaces, preferences, edges, fitClicks) {
     const pane = PANE;
     const studio = window.dash_clientside.studio;
     if (!studio || !window.dash_vtk || !window.turbomocMeshEdges)
-        return [noUpdate, (data || {}).note || 'The VTK viewer is unavailable. Install the mesh extra.'];
+        return [noUpdate, 'The VTK viewer is unavailable. Install the Turbodash mesh extra to enable it.'];
     const rows = (data || {}).rows || [];
     preferences = preferences || {};
     const known = preferences.known_rows || [];
@@ -302,11 +409,14 @@ _RENDER = r"""function(data, surfaces, preferences, edges, fitClicks) {
     rows.forEach(row => {
         const desired = Number((preferences.copies || {})[row.id]) || (pane === 'mesh' ? 1 : 3);
         const count = Math.max(1, Math.min(desired, row.num_blades || 1, (data || {}).copy_limit || 1));
-        settings[row.id] = {copies: count, surfaces: surfaces || [],
-        edges: (edges || []).includes('edges')}; });
+        const appearance = (preferences.appearance || {})[row.id] || {};
+        const colors = Object.assign({}, SURFACE_DEFAULTS, {blade: row.role === 'rotor' ? '#ef8c26' : '#477db3'}, appearance.colors || {});
+        settings[row.id] = {copies: count, surfaces: appearance.surfaces || surfaces || [],
+        colors: colors,
+        edges: typeof appearance.edges === 'boolean' ? appearance.edges : (edges || []).includes('edges')}; });
     let inspection = data && data.inspection;
     if (inspection) inspection = shown.includes(inspection.row_id)
-        ? Object.assign({}, inspection, {context: surfaces || []}) : null;
+        ? Object.assign({}, inspection, {context: (settings[inspection.row_id] || {}).surfaces || []}) : null;
     const result = studio.render(data, settings, pane, shown, 0.5, inspection);
     const scene = studio.scenes[pane];
     const mounted = studio.roots[pane];
@@ -321,11 +431,11 @@ _RENDER = r"""function(data, surfaces, preferences, edges, fitClicks) {
 }"""
 
 
-def register_vtk_callbacks(app):
+def register_vtk_callbacks(app, *, panes=None):
     """Bind each static host to the original installed TurboMoC renderer."""
-    for pane in PANES:
+    for pane in PANES if panes is None else panes:
         app.clientside_callback(
-            _RENDER.replace("PANE", json.dumps(pane)),
+            _RENDER.replace("PANE", json.dumps(pane)).replace("SURFACE_DEFAULTS", json.dumps(SURFACE_COLORS)),
             Output(f"{pane}-vtk-render-token", "children"), Output(f"{pane}-vtk-note", "children"),
             Input(f"{pane}-vtk-data", "data"), Input(f"{pane}-vtk-surfaces", "value"),
             Input(f"{pane}-vtk-display-state", "data"), Input(f"{pane}-vtk-edges", "value"),
@@ -338,12 +448,7 @@ def register_vtk_callbacks(app):
             if not (data or {}).get("rows"):
                 return no_update, no_update, no_update
             options, visible, rows = display_rows(data, preferences, pane=current_pane)
-            controls = [html.Div([
-                html.Label(row["label"], style={"flex": "1", "marginBottom": 0}),
-                dcc.Input(id={"type": "vtk-row-copies", "pane": current_pane, "row": row["row"]},
-                          type="number", min=1, max=row["max"], step=1, value=row["value"], debounce=True,
-                          style={"width": "65px"}),
-            ], className="td-display-row-count") for row in rows]
+            controls = row_display_controls(data, preferences, pane=current_pane)
             return options, visible, controls
 
         app.callback(
@@ -352,17 +457,74 @@ def register_vtk_callbacks(app):
             Input(f"{pane}-vtk-data", "data"), State(f"{pane}-vtk-display-state", "data"),
         )(row_controls)
 
-        def save_display(visible, counts, identifiers, previous):
+        def save_display(visible, counts, surface_values, colors, edges, presets,
+                         identifiers, surface_ids, color_ids, edge_ids, preset_ids,
+                         previous, data, current_pane=pane):
             if not identifiers:
-                return no_update
-            return display_preferences(visible, counts, identifiers, previous)
+                return no_update, no_update
+            updated = display_preferences(visible, counts, identifiers, previous)
+            rebuild = False
+            # Dash may coalesce several control changes in one request. Apply
+            # each trigger in its supplied order instead of dropping every
+            # appearance edit after the first one.
+            for trigger in ctx.triggered_prop_ids.values():
+                if not isinstance(trigger, dict):
+                    continue
+                row = next((row for row in (data or {}).get("rows", []) if row["id"] == trigger["row"]), None)
+                if row is not None:
+                    for kind, values, ids in (("surface", surface_values, surface_ids), ("color", colors, color_ids),
+                                               ("edges", edges, edge_ids), ("preset", presets, preset_ids)):
+                        if trigger["type"] != "vtk-row-" + kind or trigger not in ids:
+                            continue
+                        value = values[ids.index(trigger)]
+                        if kind == "preset":
+                            if not value:
+                                continue
+                            value = trigger["action"]
+                            rebuild = True
+                        updated = update_appearance(updated, row, kind, value, surface=trigger.get("surface"),
+                                                    pane=current_pane)
+            if updated == previous:
+                return no_update, no_update
+            return updated, row_display_controls(data, updated, pane=current_pane) if rebuild else no_update
 
         app.callback(
-            Output(f"{pane}-vtk-display-state", "data"), Input(f"{pane}-vtk-rows", "value"),
+            Output(f"{pane}-vtk-display-state", "data"),
+            Output(f"{pane}-vtk-copy-controls", "children", allow_duplicate=True),
+            Input(f"{pane}-vtk-rows", "value"),
             Input({"type": "vtk-row-copies", "pane": pane, "row": ALL}, "value"),
+            Input({"type": "vtk-row-surface", "pane": pane, "row": ALL, "surface": ALL}, "value"),
+            Input({"type": "vtk-row-color", "pane": pane, "row": ALL, "surface": ALL}, "data"),
+            Input({"type": "vtk-row-edges", "pane": pane, "row": ALL}, "value"),
+            Input({"type": "vtk-row-preset", "pane": pane, "row": ALL, "action": ALL}, "n_clicks"),
             State({"type": "vtk-row-copies", "pane": pane, "row": ALL}, "id"),
+            State({"type": "vtk-row-surface", "pane": pane, "row": ALL, "surface": ALL}, "id"),
+            State({"type": "vtk-row-color", "pane": pane, "row": ALL, "surface": ALL}, "id"),
+            State({"type": "vtk-row-edges", "pane": pane, "row": ALL}, "id"),
+            State({"type": "vtk-row-preset", "pane": pane, "row": ALL, "action": ALL}, "id"),
             State(f"{pane}-vtk-display-state", "data"),
+            State(f"{pane}-vtk-data", "data"), prevent_initial_call=True,
         )(save_display)
+
+        def synchronize_copies(count, slider, maximum):
+            trigger = ctx.triggered_id or {}
+            value = slider if trigger.get("type") == "vtk-row-slider" else count
+            bounded = clamp_display_count(value, maximum)
+            return bounded, bounded
+
+        app.callback(
+            Output({"type": "vtk-row-copies", "pane": pane, "row": MATCH}, "value"),
+            Output({"type": "vtk-row-slider", "pane": pane, "row": MATCH}, "value"),
+            Input({"type": "vtk-row-copies", "pane": pane, "row": MATCH}, "value"),
+            Input({"type": "vtk-row-slider", "pane": pane, "row": MATCH}, "value"),
+            State({"type": "vtk-row-slider", "pane": pane, "row": MATCH}, "max"),
+            prevent_initial_call=True,
+        )(synchronize_copies)
+
+        app.callback(
+            Output({"type": "vtk-row-picker", "pane": pane, "row": MATCH, "surface": MATCH}, "data-color"),
+            Input({"type": "vtk-row-color", "pane": pane, "row": MATCH, "surface": MATCH}, "data"),
+        )(lambda color: color)
 
         def update_legend(data):
             return quality_legend((data or {}).get("quality"))

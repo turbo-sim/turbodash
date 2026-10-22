@@ -10,9 +10,10 @@ from matplotlib.lines import Line2D
 import numpy as np
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parent))
-from parametrization_blades.blade_geometry import analysis as geometry
-from parametrization_blades.blade_geometry.thickness import denton_body
+REPO = HERE.parents[2]
+sys.path.insert(0, str(REPO))
+from turbodash.geometry.blade_parametrization import analysis as geometry
+from turbodash.geometry.blade_parametrization.thickness import denton_body
 
 VALUES = (-.5, -.25, 0., .25, .5)
 COLORS = ("#256995", "#5998ac", "#424b51", "#c28e41", "#b95532")

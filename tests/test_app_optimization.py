@@ -803,6 +803,8 @@ class WorkspaceTests(unittest.TestCase):
             expected_stage_values = {}
             for index, stage in enumerate(optimized.config["inputs"]["stages"]):
                 for key in module.STAGE_DEFAULTS:
+                    if key.endswith("wedge_angle"):
+                        continue
                     if "." in key:
                         row, parameter = key.split(".", 1)
                         value = stage["blade_geometry"][row][parameter]
@@ -839,7 +841,7 @@ class WorkspaceTests(unittest.TestCase):
                 overall, values, applied, overall_ids, stage_ids, stages)
             self.assertEqual(jobs.fingerprint(rendered[7]), delivered[0]["target"])
             expected_results = dict(optimized.turbine_results, optimization=optimized.config["optimization"])
-            expected = module.render_results(expected_results, rendered[8])
+            expected = module.render_results(expected_results, rendered[8], include_blades=False)
             self.assertEqual(json.dumps(rendered[:9], cls=PlotlyJSONEncoder),
                              json.dumps(expected, cls=PlotlyJSONEncoder))
             self.assertEqual(len(module.update_triangles(rendered[7], "mach")), 2)

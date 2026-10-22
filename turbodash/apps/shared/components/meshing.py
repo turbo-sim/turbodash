@@ -17,6 +17,7 @@ from plotly.utils import PlotlyJSONEncoder
 
 from turbodash.meshing import turbomoc as meshing
 from turbodash.apps.shared import mesh_jobs
+from turbodash.apps.shared.geometry_workflow import pending_geometry_reason
 from turbodash.visualization.plotly_mesh import (
     plot_profile_preview,
     plot_geometry_meridional,
@@ -289,7 +290,7 @@ def _engineering_plot(title, graph_id, *, hint=None):
     )
 
 
-def mesh_row_panels(stages, values=None, ids=None, *, precise_inputs=False):
+def mesh_row_panels(stages, values=None, ids=None, *, precise_inputs=False, modeller=False):
     """Each mounted row owns its settings, independently of the active row."""
     existing = {
         (item["stage"], item["row"], item["key"]): value
@@ -301,6 +302,8 @@ def mesh_row_panels(stages, values=None, ids=None, *, precise_inputs=False):
         for row in ("stator", "rotor"):
             fields = []
             for key, label, default, minimum, maximum, step in _SETTINGS:
+                if modeller and key in {"inlet_chords", "outlet_chords", "profile_points"}:
+                    continue
                 if precise_inputs:
                     step = 1 if key in {"span_layers", "profile_points"} else "any"
                 fields.append(
@@ -355,6 +358,11 @@ def mesh_row_panels(stages, values=None, ids=None, *, precise_inputs=False):
                     ),
                 ]
             )
+            if modeller:
+                fields.insert(0, html.P(
+                    "Edit passage extensions and blade sampling in Turbine geometry.",
+                    className="small text-muted",
+                ))
             rows.append(
                 html.Details(
                     [html.Summary(row.title()), *fields],
@@ -772,9 +780,17 @@ def _named_stage_options(results):
     ]
 
 
-def register_meshing_callbacks(app, *, precise_inputs=False):
+def register_meshing_callbacks(app, *, precise_inputs=False, results_store="result_store", modeller=False):
     """Register the shared workflow; presentation refinements are opt-in."""
-    vtk.register_vtk_callbacks(app)
+    vtk.register_vtk_callbacks(app, panes=("mesh",) if modeller else None)
+
+    def availability(results, signature, values):
+        # Optional journal dependency is appended after the existing live
+        # meanline fields, keeping the stable edition callback contract intact.
+        pending = values[-1] if modeller else None
+        live = values[:-1] if modeller else values
+        reason = _unavailable(results, signature, input_signature(*live))
+        return reason or pending_geometry_reason(results, pending)
 
     def geometry_meridional(preview):
         if precise_inputs:
@@ -790,7 +806,7 @@ def register_meshing_callbacks(app, *, precise_inputs=False):
         State({"scope": "mesh-row", "stage": ALL, "row": ALL, "key": ALL}, "id"),
     )
     def render_mesh_rows(stages, values, ids):
-        return mesh_row_panels(stages, values, ids, precise_inputs=precise_inputs)
+        return mesh_row_panels(stages, values, ids, precise_inputs=precise_inputs, modeller=modeller)
 
     @app.callback(
         Output("mesh_row_choice", "data"),
@@ -809,7 +825,7 @@ def register_meshing_callbacks(app, *, precise_inputs=False):
         Output("mesh_stage", "options"),
         Output("mesh_stage", "value"),
         Output("mesh_row", "value"),
-        Input("result_store", "data"),
+        Input(results_store, "data"),
         Input("mesh_row_choice", "data"),
         State("geometry_stage", "value"),
         State("mesh_stage", "value"),
@@ -850,74 +866,75 @@ def register_meshing_callbacks(app, *, precise_inputs=False):
         return tuple(no_update if selected.get(key, defaults[key]) == old else selected.get(key, defaults[key])
                      for key, old in zip(_OPTION_KEYS, current))
 
-    @app.callback(
-        Output("geometry_profile", "figure"),
-        Output("geometry-vtk-data", "data"),
-        Output("geometry_message", "children"),
-        Output("geometry_download_button", "disabled"),
-        Output("geometry_meridional", "figure"),
-        Input("result_store", "data"),
-        Input("result_input_signature", "data"),
-        Input("geometry_stage", "value"),
-        Input("geometry_row", "value"),
-        Input("geometry_pane", "style"),
-        *[Input(*item) for item in _LIVE],
-    )
-    def update_geometry(results, signature, stage, row, pane_style, *live):
-        reason = _unavailable(results, signature, input_signature(*live))
-        if reason:
-            return _empty(reason), vtk.empty_data(reason), reason, True, _empty(reason)
-        if not _visible(pane_style):
-            raise PreventUpdate
-        try:
-            preview = _cached_preview(_preview_key(results), stage, row)
-            metadata = preview.get("metadata", {})
-            message = (
-                " ".join(metadata.get("notes", []))
-                or "Constant-radius, constant-span blade row."
-            )
-            message = (
-                _hint(str(message), "geometry-preview-note")
-                if precise_inputs
-                else str(message)
-            )
-            return (
-                plot_profile_preview(preview),
-                vtk.geometry_data(preview),
-                message,
-                False,
-                geometry_meridional(preview),
-            )
-        except Exception as error:
-            _LOG.exception("Geometry preview failed")
-            message = f"Could not build this blade row: {error}"
-            return (
-                _empty(message),
-                vtk.empty_data(message),
-                message,
-                True,
-                _empty(message),
-            )
+    if not modeller:
+        @app.callback(
+            Output("geometry_profile", "figure"),
+            Output("geometry-vtk-data", "data"),
+            Output("geometry_message", "children"),
+            Output("geometry_download_button", "disabled"),
+            Output("geometry_meridional", "figure"),
+            Input(results_store, "data"),
+            Input("result_input_signature", "data"),
+            Input("geometry_stage", "value"),
+            Input("geometry_row", "value"),
+            Input("geometry_pane", "style"),
+            *[Input(*item) for item in _LIVE],
+        )
+        def update_geometry(results, signature, stage, row, pane_style, *live):
+            reason = _unavailable(results, signature, input_signature(*live))
+            if reason:
+                return _empty(reason), vtk.empty_data(reason), reason, True, _empty(reason)
+            if not _visible(pane_style):
+                raise PreventUpdate
+            try:
+                preview = _cached_preview(_preview_key(results), stage, row)
+                metadata = preview.get("metadata", {})
+                message = (
+                    " ".join(metadata.get("notes", []))
+                    or "Constant-radius, constant-span blade row."
+                )
+                message = (
+                    _hint(str(message), "geometry-preview-note")
+                    if precise_inputs
+                    else str(message)
+                )
+                return (
+                    plot_profile_preview(preview),
+                    vtk.geometry_data(preview),
+                    message,
+                    False,
+                    geometry_meridional(preview),
+                )
+            except Exception as error:
+                _LOG.exception("Geometry preview failed")
+                message = f"Could not build this blade row: {error}"
+                return (
+                    _empty(message),
+                    vtk.empty_data(message),
+                    message,
+                    True,
+                    _empty(message),
+                )
 
-    @app.callback(
-        Output("overview-vtk-data", "data"), Input("result_store", "data"),
-        Input("result_input_signature", "data"), Input("geometry_pane", "style"),
-        *[Input(*item) for item in _LIVE],
-    )
-    def update_overview(results, signature, pane_style, *live):
-        reason = _unavailable(results, signature, input_signature(*live))
-        if reason:
-            return vtk.empty_data(reason)
-        if not _visible(pane_style):
-            raise PreventUpdate
-        try:
-            key = _preview_key(results)
-            previews = [_cached_preview(key, stage, row)
-                        for stage in range(len(results["stages_performance"])) for row in ("stator", "rotor")]
-            return vtk.turbine_data(previews)
-        except Exception as error:
-            _LOG.exception("Whole-turbine preview failed")
-            return vtk.empty_data(f"Could not build the turbine overview: {error}")
+        @app.callback(
+            Output("overview-vtk-data", "data"), Input(results_store, "data"),
+            Input("result_input_signature", "data"), Input("geometry_pane", "style"),
+            *[Input(*item) for item in _LIVE],
+        )
+        def update_overview(results, signature, pane_style, *live):
+            reason = _unavailable(results, signature, input_signature(*live))
+            if reason:
+                return vtk.empty_data(reason)
+            if not _visible(pane_style):
+                raise PreventUpdate
+            try:
+                key = _preview_key(results)
+                previews = [_cached_preview(key, stage, row)
+                            for stage in range(len(results["stages_performance"])) for row in ("stator", "rotor")]
+                return vtk.turbine_data(previews)
+            except Exception as error:
+                _LOG.exception("Whole-turbine preview failed")
+                return vtk.empty_data(f"Could not build the turbine overview: {error}")
 
     @app.callback(
         Output("mesh_profile", "figure"),
@@ -925,7 +942,7 @@ def register_meshing_callbacks(app, *, precise_inputs=False):
         Output("mesh_2d_message", "children"),
         Input("mesh_job", "data"),
         Input("mesh_status", "data"),
-        Input("result_store", "data"),
+        Input(results_store, "data"),
         Input("result_input_signature", "data"),
         Input("mesh_stage", "value"),
         Input("mesh_row", "value"),
@@ -968,16 +985,29 @@ def register_meshing_callbacks(app, *, precise_inputs=False):
             message = f"Could not display the row sections: {error}"
             return _empty(message), _empty(message), message
 
+    if modeller:
+        @app.callback(
+            Output("geometry_download_button", "disabled"),
+            Input(results_store, "data"),
+            Input("result_input_signature", "data"),
+            *[Input(*item) for item in _LIVE],
+            Input("blade_modeller_events", "data"),
+        )
+        def geometry_export_available(results, signature, *live):
+            return bool(availability(results, signature, live))
+
     @app.callback(
         Output("geometry_download", "data"), Output("geometry_download_error", "children"),
-        Input("geometry_download_button", "n_clicks"), State("result_store", "data"),
+        Input("geometry_download_button", "n_clicks"), State(results_store, "data"),
         State("result_input_signature", "data"), State("geometry_stage", "value"), State("geometry_row", "value"),
-        *[State(*item) for item in _LIVE], prevent_initial_call=True,
+        *[State(*item) for item in _LIVE],
+        *([State("blade_modeller_events", "data")] if modeller else []),
+        prevent_initial_call=True,
     )
     def download_geometry(clicks, results, signature, stage, row, *live):
         if not clicks:
             raise PreventUpdate
-        reason = _unavailable(results, signature, input_signature(*live))
+        reason = availability(results, signature, live)
         if reason:
             return no_update, reason
         try:
@@ -990,26 +1020,29 @@ def register_meshing_callbacks(app, *, precise_inputs=False):
     @app.callback(
         Output("mesh_job", "data"), Output("mesh_status", "data"), Output("mesh_poll", "disabled"),
         Input("mesh_generate", "n_clicks"), Input("mesh_poll", "n_intervals"),
-        Input("result_store", "data"), Input("result_input_signature", "data"),
+        Input(results_store, "data"), Input("result_input_signature", "data"),
         Input("mesh_stage", "value"), Input("mesh_row", "value"),
         *[Input(f"mesh_{key}", "value") for key in _OPTION_KEYS],
-        *[Input(*item) for item in _LIVE], State("mesh_job", "data"),
+        *[Input(*item) for item in _LIVE],
+        *([Input("blade_modeller_events", "data")] if modeller else []),
+        State("mesh_job", "data"),
     )
     def manage_mesh(clicks, ticks, results, signature, stage, row, *values):
         options = _options(values[:len(_OPTION_KEYS)])
         live = values[len(_OPTION_KEYS):-1]
-        reason = _unavailable(results, signature, input_signature(*live))
+        reason = availability(results, signature, live)
         return advance_mesh_job(ctx.triggered_id, results, stage, row, options, values[-1], reason=reason)
 
     @app.callback(
         Output("mesh_generate", "disabled"), Output("mesh_availability", "children"),
         Output("mesh_status_text", "children"), Output("mesh_progress", "value"),
         Output("mesh_summary", "children"), Output("mesh_download_button", "disabled"),
-        Input("mesh_status", "data"), Input("result_store", "data"), Input("result_input_signature", "data"),
+        Input("mesh_status", "data"), Input(results_store, "data"), Input("result_input_signature", "data"),
         *[Input(*item) for item in _LIVE],
+        *([Input("blade_modeller_events", "data")] if modeller else []),
     )
     def display_status(status, results, signature, *live):
-        reason = _unavailable(results, signature, input_signature(*live))
+        reason = availability(results, signature, live)
         status = status or {}
         state = status.get("state", "idle")
         summary = status.get("summary", {})
@@ -1076,15 +1109,16 @@ def register_meshing_callbacks(app, *, precise_inputs=False):
     @app.callback(
         Output("mesh_download", "data"), Output("mesh_download_error", "children"),
         Input("mesh_download_button", "n_clicks"), State("mesh_job", "data"),
-        State("result_store", "data"), State("result_input_signature", "data"),
+        State(results_store, "data"), State("result_input_signature", "data"),
         State("mesh_stage", "value"), State("mesh_row", "value"),
         *[State(f"mesh_{key}", "value") for key in _OPTION_KEYS], *[State(*item) for item in _LIVE],
+        *([State("blade_modeller_events", "data")] if modeller else []),
         prevent_initial_call=True,
     )
     def download_mesh(clicks, handle, results, signature, stage, row, *values):
         if not clicks:
             raise PreventUpdate
-        reason = _unavailable(results, signature, input_signature(*values[len(_OPTION_KEYS):]))
+        reason = availability(results, signature, values[len(_OPTION_KEYS):])
         options = _options(values[:len(_OPTION_KEYS)])
         if reason:
             return no_update, reason

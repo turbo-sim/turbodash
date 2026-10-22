@@ -95,26 +95,24 @@ def test_axial_boundaries_connect_every_station_and_gap_without_mutation(stage_c
 
 
 @pytest.mark.parametrize("theme", ["light", "dark"])
-def test_axial_channel_and_blades_share_origins_and_view_range(monkeypatch, theme):
-    origins = []
-
-    def profile(**kwargs):
-        origins.append(kwargs["x1"])
-        return np.array([kwargs["x1"], kwargs["x1"] + kwargs["chord_ax"]]), np.array(
-            [0.0, 0.0]
-        )
-
-    monkeypatch.setattr(plots, "compute_blade_coordinates_cartesian", profile)
-    results = result()
+def test_axial_channel_and_blades_share_origins_and_view_range(theme):
+    from turbodash.geometry.meanline import state_for_stage_row, section_from_state
+    from turbodash.geometry.blade import section_coordinates
+    path = Path(__file__).parents[1] / "demos/basic_demo/demo_axial_turbine.yaml"
+    results = yaml.safe_load(path.read_text(encoding="utf-8"))
     channel = plots.plot_turbine_meridional_channel(results, theme=theme)
     blades = plots.plot_turbine_blades(results, N_blades_plot=1, theme=theme)
-    assert origins == pytest.approx([0, 0.036, 0.065, 0.101])
-    assert list(channel.layout.xaxis.range) == pytest.approx([-54.8, 160.8])
-    assert blades.layout.xaxis.range == channel.layout.xaxis.range
+    positions = plots._axial_row_layout(results["stages_performance"])
+    for index, row in enumerate(positions):
+        section = section_from_state(state_for_stage_row(row["stage"], row["row"]))
+        expected = section_coordinates(section)[:, 0]+row["start"]
+        assert np.allclose(blades.data[4*index].x, 1000*expected)
+    assert blades.layout.xaxis.range == pytest.approx(channel.layout.xaxis.range)
     assert blades.layout.showlegend is False
     for blade in blades.data:
         assert blade.showlegend is False
         assert blade.fill == "toself"
+        assert blade.line.simplify is False
         assert blade.fillcolor == plots._ROW_FILLS[blade.name]
         assert blade.line.color == (plots.COLOR_STATOR if blade.name == "Stator" else plots.COLOR_ROTOR)
         assert blade.x[0] == blade.x[-1] and blade.y[0] == blade.y[-1]

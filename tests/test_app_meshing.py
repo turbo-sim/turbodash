@@ -188,8 +188,9 @@ def test_three_tab_layout_keeps_controls_and_stores_mounted():
     assert all(not getattr(tab, "children", None) for tab in tabs)
     ids = [component.id for component in all_components if isinstance(getattr(component, "id", None), str)]
     assert len(ids) == len(set(ids))
-    assert {"result_store", "result_input_signature", "stage_data_store", "mesh_job", "mesh_figure", "geometry_overview", "turbogrid_export_button"} <= set(ids)
-    assert {"geometry-scene", "overview-scene", "mesh-scene", "geometry-vtk-data", "overview-vtk-data", "mesh-vtk-data"} <= set(ids)
+    assert {"result_store", "result_input_signature", "stage_data_store", "mesh_job", "mesh_figure", "blade_modeller_preview", "geometry_state", "geometry_committed", "turbogrid_export_button"} <= set(ids)
+    assert {"mesh-scene", "mesh-vtk-data", "geometry-scene", "geometry-vtk-data", "blade_modeller_preview"} <= set(ids)
+    assert "overview-vtk-data" not in ids
     graphs = {component.id for component in all_components if isinstance(component, dcc.Graph)}
     assert {"geometry_profile", "geometry_meridional", "meridional_plot"} <= graphs
     assert not {"geometry_model", "geometry_overview", "mesh_figure"} & graphs
@@ -245,30 +246,21 @@ def _components(component):
             yield from _components(child)
 
 
-@pytest.mark.parametrize("turbine_type", ["axial", "radial"])
-def test_geometry_editors_match_every_mounted_meanline_parameter(turbine_type):
-    from turbodash.apps.app_turbine_experimental.app import geometry_stage_panel, make_stage_accordion_item, stage_defaults_for
-
-    values = stage_defaults_for(turbine_type)
-    meanline = make_stage_accordion_item(1, values, turbine_type)
-    geometry = geometry_stage_panel(1, values, turbine_type)
-
-    def parameters(component, element):
-        return {item.id["key"]: item.value for item in _components(component)
-                if isinstance(getattr(item, "id", None), dict) and item.id.get("elem") == element}
-
-    assert parameters(meanline, "input") == parameters(geometry, "geometry")
-    assert ("stator.aspect_ratio" in parameters(geometry, "geometry")) == (turbine_type == "axial")
+def test_geometry_editor_does_not_duplicate_meanline_controls():
+    from turbodash.apps.shared.components.blade_modeller import geometry_panel
+    items = list(_components(geometry_panel()))
+    identifiers = [item.id for item in items if isinstance(getattr(item, "id", None), dict)]
+    assert any(identity.get("type") == "blade-parameter" for identity in identifiers)
+    assert not any(identity.get("scope") == "stage" for identity in identifiers)
 
 
-@pytest.mark.parametrize("element,value", [("geometry", 0.45), ("slider", 0.25), ("input", 0.35)])
-def test_geometry_meanline_and_slider_use_one_value(monkeypatch, element, value):
+@pytest.mark.parametrize("element,value", [("slider", 0.25), ("input", 0.35)])
+def test_meanline_slider_uses_one_value_without_geometry_feedback(monkeypatch, element, value):
     from turbodash.apps.app_turbine_experimental import app as app_experimental
-
     monkeypatch.setattr(app_experimental, "ctx", SimpleNamespace(triggered_id={"elem": element}))
-    assert app_experimental.sync_stage_slider_input(.25, .35, .45) == (value, value, value)
-    monkeypatch.setattr(app_experimental, "ctx", SimpleNamespace(triggered_id={"elem": "geometry"}))
-    assert app_experimental.sync_stage_slider_input(.25, .35, None) == (no_update, None, None)
+    assert app_experimental.sync_stage_slider_input(.25, .35) == (value, value)
+    monkeypatch.setattr(app_experimental, "ctx", SimpleNamespace(triggered_id={"elem": "input"}))
+    assert app_experimental.sync_stage_slider_input(.25, None) == (no_update, None)
 
 
 def test_row_mesh_settings_persist_independently_and_ignore_inactive_edits(callbacks):

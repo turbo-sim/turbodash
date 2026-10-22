@@ -24,7 +24,8 @@ from turbodash.apps.shared.fluid_inputs import (
     property_pair_options,
     pair_fields,
 )
-from turbodash.apps.shared.components.meshing import geometry_panel, mesh_panel
+from turbodash.apps.shared.components.meshing import mesh_panel
+from turbodash.apps.shared.components.blade_modeller import geometry_panel
 from .opt_panel import (
     actions as optimization_actions,
     panel as optimization_panel,
@@ -147,7 +148,8 @@ def stage_editor(stages, turbine_type, stage_fields, blade_fields, defaults):
             controls = [
                 stage_field(f"{row}.{key}", label, lo, hi, step)
                 for key, label, lo, hi, step in blade_fields
-                if key != "aspect_ratio" or turbine_type != "radial"
+                if (key != "aspect_ratio" or turbine_type != "radial")
+                and not key.endswith("wedge_angle")
             ]
             rows.append(
                 html.Div(controls, **{"data-blade-row": row}, hidden=row != "stator")
@@ -477,12 +479,6 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
     mesh_side = next(child for child in mesh.children if isinstance(child, html.Aside))
     geometry.children.remove(geometry_side)
     mesh.children.remove(mesh_side)
-    # No duplicate model editor: the common Stage design section is available in every workspace.
-    for child in geometry_side.children:
-        if getattr(child, "id", None) == "geometry_rows_container":
-            child.children = []
-        if isinstance(child, html.P):
-            child.children = ""
     for child in mesh_side.children:
         if isinstance(child, html.P):
             child.children = ""

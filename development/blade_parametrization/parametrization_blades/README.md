@@ -4,7 +4,7 @@ The model constructs a camberline and two offset surfaces in the conformal $(m',
 
 The construction sequence is: **stream-surface definition; camberline integration; rational Denton thickness; edge rounding and relief; conformal normal offsets; physical mapping**. Subsequent sections describe CAD interpolation, diagnostics, and passage-width postprocessing.
 
-The application and both sensitivity studies call `build_section`. The governing implementation is [geometry.py](blade_geometry/geometry.py) and [thickness.py](blade_geometry/thickness.py), with input validation in [parameters.py](blade_geometry/parameters.py). The [parameter guide](parameter_guide.md) provides design-oriented descriptions of the controls; the [directory overview](../README.md) summarizes development status and production integration.
+The application and both sensitivity studies call production `build_section`. The governing implementation is [geometry.py](../../../turbodash/geometry/blade_parametrization/geometry.py) and [thickness.py](../../../turbodash/geometry/blade_parametrization/thickness.py), with input validation in [parameters.py](../../../turbodash/geometry/blade_parametrization/parameters.py). The [parameter guide](parameter_guide.md) provides design-oriented descriptions of the controls; the [directory overview](../README.md) summarizes development status and production integration.
 
 ## Notation and units
 
@@ -36,17 +36,18 @@ Both fullness controls range from -0.5 to 0.5, independently. Their defaults and
 
 ## Package and integration
 
-- `blade_geometry/geometry.py`: camberline, rounding, relief, conformal sections, physical thickness measurements, and geometry checks.
-- `blade_geometry/thickness.py`: the single rational Denton body law and admissibility check.
-- `blade_geometry/parameters.py`: defaults, inherited meanline snapshots, sparse overrides, validation, and YAML persistence.
-- `blade_geometry/analysis.py`: axial unit conversion and sampled diagnostics for studies, calling the same section builder.
-- `blade_geometry/app.py`, `plots.py`, `passage.py`, and `assets/`: GUI and geometric postprocessing.
-- `blade_geometry/turbomoc_adapter.py` and `meshing.py`: optional downstream preview/CAD/mesh integration.
-- `blade_geometry/cases/`: runtime presets; `app.py` and `launch.py`: entry points.
+- `turbodash/geometry/blade_parametrization/geometry.py`: camberline, rounding, relief, conformal sections, XYZ mapping, physical thickness measurements, and geometry checks.
+- `turbodash/geometry/blade_parametrization/thickness.py`: the single rational Denton body law and admissibility check.
+- `turbodash/geometry/blade_parametrization/parameters.py`: defaults, inherited source snapshots, sparse overrides, validation, and YAML persistence.
+- `turbodash/geometry/blade_parametrization/analysis.py`: axial unit conversion and sampled diagnostics for studies, calling the same section builder.
+- `turbodash/geometry/blade_parametrization/plots.py` and `passage.py`: Plotly views and optional passage postprocessing.
+- `turbodash/geometry/blade_parametrization/turbomoc_adapter.py` and `meshing.py`: optional downstream preview/CAD/mesh integration.
+- `turbodash/geometry/blade_parametrization/cases/`: bundled development example inputs. Production meanline initialization selects shape controls separately and preserves solver dimensions.
+- Development `blade_geometry/app.py` and `assets/`: standalone GUI; `app.py` and `launch.py`: development entry points.
 
-The kernel imports no Dash or TurboMoC. Port `blade_geometry` as a package, preserving its assets and cases for the app. Resolve a `ParameterState` before calling `build_section`; refresh inherited values with `with_source` and retain explicit overrides. This avoids duplicate editable meanline/geometry parameters.
+Resolve a `ParameterState` before calling `build_section`. `with_source` deliberately retains explicit overrides for the standalone source-refresh action; a newly accepted production meanline solution creates new row states with empty overrides. Geometry edits never write back to solver results. Generic defaults and bundled cases use 601 base points plus added edge stations. Optional CAD modules import TurboMoC only when called.
 
-The [camberline sensitivity](../parametrization_camberline/README.md) and [thickness sensitivity](../parametrization_thickness/README.md) import this package directly. The two studies provide reproducible figures and numerical results; historical validation counts are summarized in the directory overview.
+The [camberline sensitivity](../parametrization_camberline/README.md) and [thickness sensitivity](../parametrization_thickness/README.md) import `turbodash.geometry.blade_parametrization` directly. Running either script by its file path adds the repository root to its import path. The two studies provide reproducible figures and numerical results; historical validation counts are summarized in the directory overview.
 
 ## 1. Stream-surface metric and conformal coordinates
 
@@ -528,7 +529,7 @@ The fitted-error threshold is the larger of $10^{-7}$ mm and $5\times10^{-4}$ of
 
 The passage-placement optimizer scores an error-bounded polygon with fewer points, while its guides are constructed from the full contour. Its tolerance is $10^{-4}$ of the dimensional reference chord. This reduces interactive update time without changing the blade's CAD or scientific samples. The final placement is checked against the full contour; an unsuccessful proposal or one whose containment margin is at most ten times that tolerance falls back to the original dense search. Placement-only polygon tolerance, measured deviation, sample count and fallback status are recorded in the CAD diagnostics. This placement optimization is distinct from simplifying or coarsening the blade used for mapping and meshing.
 
-`map_section` maps the original authoritative paired samples through `MeridionalChannel`. The preview uses the compatible fitted `Design` and TurboMoC's existing surface generator. Its small display overhang at endwalls is excluded from thickness checks and authoritative mapping. Consult the mesh result metadata for export units; the geometry kernel uses metres and the TurboMoC reference plane uses millimetres.
+`map_section` maps the original authoritative paired samples through `MeridionalChannel`. `geometry.map_section_coordinates` supplies the same supported axial/radial physical maps directly, without optional CAD dependencies, and preserves the sampled section at any span. The standalone preview uses the compatible fitted `Design` and TurboMoC's existing surface generator. Its small display overhang at endwalls is excluded from thickness checks and authoritative mapping. Consult the mesh result metadata for export units; the geometry kernel uses metres and the TurboMoC reference plane uses millimetres.
 
 ## 8. Numerical construction and validity
 
@@ -577,9 +578,9 @@ The default concentration and edge exponents improve regularity; the permitted b
 
 The section module receives an effective geometry model. `ParameterState` stores a source snapshot and sparse dotted overrides; defaults fill omissions. Source refresh replaces inherited values, explicit overrides survive, and a per-field reset removes an override. Dependent geometry is calculated after resolution. No solver result is updated by a geometry edit.
 
-The main TurboDash turbine solver already separates continuous meanline geometry from integer physical realization. The model follows its default ceiling policy when only a continuous source count is provided, while allowing an explicit integer realization. Future integration should likewise distinguish meanline performance from a modified CFD geometry and preserve the original solver provenance.
+The main TurboDash turbine solver separates continuous meanline geometry from integer physical realization. The model follows its default ceiling policy when only a continuous source count is provided, while allowing an explicit integer realization. Production integration retains the solver provenance and separates meanline performance from a modified CFD geometry.
 
-In particular, copied derived quantities can become inconsistent: changing a radius alters pitch and surface mapping; changing height changes aspect ratio at fixed chord. The model stores only the chosen independent dimensions and shape controls. An eventual meanline-to-geometry adapter must specify which measures it inherits and how it converts physical targets to these conformal controls. Unsupported flaring must be disclosed or rejected rather than silently conformal.
+In particular, copied derived quantities can become inconsistent: changing a radius alters pitch and surface mapping; changing height changes aspect ratio at fixed chord. The model stores only the chosen independent dimensions and shape controls. The production meanline adapter specifies inherited measures and their conversion to conformal controls. Flaring and other unsupported stream surfaces must be disclosed or rejected rather than silently treated as conformal cylinders or radial planes.
 
 The metric identities, axial/radial maps, and paired-distance expressions above are geometric derivations. The turning distribution, Denton-based continuous factors retained from earlier work, and local relief window are modeling choices. The relief law is this prototype's modification and is not attributed to Denton or the Turner literature. The directory overview summarizes the historical choices; this document defines the current convention rather than superseded offset laws.
 
@@ -587,7 +588,7 @@ The metric identities, axial/radial maps, and paired-distance expressions above 
 
 The 2D views evaluate the same analytic model with at least 601 cosine-spaced base points, plus edge/shoulder/peak samples. Plotly line simplification is disabled. This is display refinement, not cosmetic curve fitting or a guarantee of higher mathematical smoothness. Intersection validation and diagnostics use the independently selected `numerics.number_of_points`; increasing display density does not silently claim denser intersection validation. The meridional envelope remains the validated section projection. Live slider events are coalesced; CAD and 3D preview generation run only on committed edits.
 
-All implementation modules, app assets, and bundled presets live in the reusable `blade_geometry` subpackage. The geometry API has no Dash or TurboMoC import dependency; those remain optional app/adapter layers.
+Reusable implementation modules and bundled presets live in `turbodash.geometry.blade_parametrization`. Standalone GUI assets remain in the development directory. Equation modules do not import Dash or TurboMoC; those remain app/adapter concerns. Importing the top-level `turbodash` package still uses its normal package initialization.
 
 ## 11. Passage-width postprocessing
 

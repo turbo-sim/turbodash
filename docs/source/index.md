@@ -19,6 +19,7 @@ verbatim.
 installation
 guides/calculations
 guides/optimization
+guides/blade_geometry
 theory/meanline
 theory/efficiency_definition
 validation/index

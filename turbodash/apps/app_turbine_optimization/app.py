@@ -41,6 +41,7 @@ from dash import (
 )
 from dash.exceptions import PreventUpdate
 from turbodash.apps.shared.assets import register_app_assets
+from turbodash.apps.shared.geometry_workflow import register_geometry_workflow
 from turbodash.apps.shared.components.turbogrid import register_turbogrid_callbacks
 from turbodash.apps.shared.components.meshing import (
     input_signature,
@@ -103,8 +104,9 @@ def initialize_session():
 
 
 register_vtk_assets(app)
-register_turbogrid_callbacks(app)
-register_meshing_callbacks(app, precise_inputs=True)
+register_turbogrid_callbacks(app, results_store="geometry_results_store", modeller=True)
+register_meshing_callbacks(app, precise_inputs=True, results_store="geometry_results_store", modeller=True)
+register_geometry_workflow(app)
 
 
 def configure(config_path):
@@ -712,19 +714,30 @@ def stage_choices(stages, active):
     State({"scope": "overall", "key": ALL}, "id"),
     State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "id"),
     State("stage_data_store", "data"),
+    State("td-stage-model-type", "data"),
     prevent_initial_call="initial_duplicate",
 )
 def update_turbine(
-    overall_values, stage_values, applied, overall_ids, stage_ids, store_stages
+    overall_values, stage_values, applied, overall_ids, stage_ids, store_stages,
+    stage_model_type=None,
 ):
-    if any(
+    changed = list(ctx.triggered_prop_ids.values())
+    type_changed = any(
         isinstance(identity, dict)
         and identity.get("key") == "turbine_type"
-        for identity in ctx.triggered_prop_ids.values()
-    ):
-        # Wait for the transaction that replaces stage defaults. Shaft-speed
-        # mode and its value already arrive together as one canonical update.
-        raise PreventUpdate
+        for identity in changed
+    )
+    if type_changed:
+        stages_changed = any(isinstance(identity, dict) and identity.get("scope") == "stage"
+                             and identity.get("elem") == "input" for identity in changed)
+        turbine_type = next((value for identity, value in zip(overall_ids, overall_values)
+                             if identity.get("key") == "turbine_type"), None)
+        if not stages_changed or stage_model_type != turbine_type:
+            # Wait for the accepted structural transaction and its rendered
+            # stage inputs. Dash may combine that final input event with the
+            # original type change; accepting the combined event avoids losing
+            # the only calculation after a configuration upload.
+            raise PreventUpdate
     try:
         cfg = live_config(
             overall_values, stage_values, overall_ids, stage_ids, store_stages
@@ -741,7 +754,7 @@ def update_turbine(
             raise PreventUpdate
         else:
             out = core.compute_turbine_performance(cfg)
-        rendered = render_results(out, signature)
+        rendered = render_results(out, signature, include_blades=False)
     except PreventUpdate:
         raise
     except Exception as error:
@@ -802,12 +815,12 @@ def live_config(overall_values, stage_values, overall_ids, stage_ids, store_stag
     return _assemble_cfg(overall, stages)
 
 
-def render_results(out, signature):
+def render_results(out, signature, *, include_blades=True):
     fig_meridional = _plotting.plot_turbine_meridional_channel(out)
     try:
-        fig_blades = _plotting.plot_turbine_blades(
-            out, N_points=500, N_blades_plot=8
-        )
+        fig_blades = (_plotting.plot_turbine_blades(
+            out, N_points=601, N_blades_plot=8
+        ) if include_blades else no_update)
     except ValueError as error:
         # Physical profile construction must not discard a meanline solve.
         fig_blades = {"data": [], "layout": {"annotations": [{

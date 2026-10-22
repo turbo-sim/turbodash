@@ -1,8 +1,8 @@
-# Blade parametrization: status and integration plan
+# Blade parametrization: development studies and production kernel
 
-This directory contains the standalone blade geometry implementation and sensitivity studies for its camberline and thickness controls. The model generates complete sections in the conformal $(m',\theta)$ plane and maps them onto axial cylindrical or radial planar stream surfaces.
+This directory contains the standalone geometry modeller and sensitivity studies for its camberline and thickness controls. They import the production kernel in `turbodash.geometry.blade_parametrization`. The model generates complete sections in the conformal $(m',\theta)$ plane and maps them onto axial cylindrical or radial planar stream surfaces.
 
-**The standalone application is implemented. Integration into TurboDash's production meanline and geometry views remains the next development task.** The workflow described below is the agreed integration plan, not current production behavior.
+**The reusable implementation now lives in the TurboDash source package.** Development GUI assets remain here; the standalone app and both sensitivity studies use the same production geometry laws as the integrated application.
 
 ## Documentation and implementation
 
@@ -12,7 +12,7 @@ This directory contains the standalone blade geometry implementation and sensiti
 | [Parameter guide](parametrization_blades/parameter_guide.md) | Parameter definitions, valid ranges, defaults, and design guidance suitable for application help. |
 | [Camberline study](parametrization_camberline/README.md) | Turning-location and concentration sensitivities for impulse and reaction sections. |
 | [Thickness study](parametrization_thickness/README.md) | Rational Denton modification and independent LE/TE fullness sensitivities. |
-| [Reusable geometry package](parametrization_blades/blade_geometry/) | The single implementation used by the standalone app and both studies. |
+| [Reusable geometry package](../../turbodash/geometry/blade_parametrization/) | The single implementation used by production, the standalone app and both studies. |
 
 From the TurboDash repository root:
 
@@ -75,18 +75,20 @@ Recorded validation before documentation consolidation included 189 passing auto
 
 ## Production integration and scope
 
-The standalone implementation has not replaced TurboDash's existing production generator. Its equations are independent of Dash and TurboMoC; the adapter supplies downstream coordinate/unit conversion, CAD transfer, preview, and meshing interfaces.
+The production implementation is in `turbodash/geometry/blade_parametrization/`. Its equation modules do not import Dash or TurboMoC; `geometry.map_section_coordinates` maps sampled geometry to XYZ metres without optional rendering dependencies. The adapter supplies downstream coordinate/unit conversion, CAD transfer, preview, and meshing interfaces. The standalone app keeps its GUI and assets in `parametrization_blades/blade_geometry/`, with direct production imports and no copied kernels.
 
 Supported surfaces are axial cylinders and radial planes between parallel endwalls. General mixed-flow geometry, flaring, and arbitrary spanwise section variation require further implementation. Unsupported configurations must be identified explicitly during production integration.
 
-The agreed integration workflow is:
+The production integration workflow is:
 
 1. A successful meanline calculation initializes each blade row from meanline dimensions and metal angles, supplemented by shape presets for parameters not provided by the meanline model.
-2. Presets interpolate between reaction-like and impulse-like endpoints using the existing loss-model classification $z=-\beta_{in}/\beta_{out}$, after verifying its exact conventions. The proposed weight is $w=\operatorname{clip}(z,0,1)$. Undefined ratios require an explicit fallback.
+2. Presets interpolate between reaction-like and impulse-like endpoints using the existing loss-model classification $z=-\beta_{in}/\beta_{out}$ and weight $w=\operatorname{clip}(z,0,1)$. The production adapter documents the angle convention, source quantity normalization, endpoint values, and undefined-ratio fallback.
 3. The geometry pane edits one shared effective geometry state. Its changes update both the detailed geometry views and the meanline blade display without modifying or rerunning the thermodynamic solution.
 4. A subsequent successful meanline calculation replaces the geometry baseline and clears overrides. Failed calculations preserve the previous valid geometry; tab changes and unrelated callbacks preserve edits.
 5. The modeller follows the optimization app's existing layout and style. Production code and development studies import one geometry implementation.
 
-The current standalone state model already separates inherited values from explicit overrides. Its **Refresh source** action preserves overrides; the planned reset after a successful meanline solve is a distinct application-level operation.
+The standalone state model separates inherited values from explicit overrides. Its **Refresh source** action preserves overrides; resetting after a successful production meanline solve is a distinct application-level operation that creates fresh row states.
 
-The superseded production generator should move into `legacy/` outside the active geometry subpackage. The integration should establish one authoritative geometry state across meanline visualization, detailed modelling, and CFD preparation.
+The superseded production generator is archived in `turbodash/geometry/legacy_parametrization/blade.py` and is not used by the active geometry workflow. Meanline visualization, detailed modelling, and CFD preparation consume the authoritative geometry state rather than running separate parametrizations.
+
+The promotion was checked with `tests/test_blade_parametrization_kernel.py` and reruns of both study scripts: 30 camberline and 10 thickness sensitivity cases. These checks cover independent analytical equations, fullness admissibility, geometry diagnostics, axial/radial mapping, state precision, and shared imports. Scripts write figures and result JSON to their existing `figures/` and `results/` directories. The earlier 189-test result above remains historical, not the current production test count.

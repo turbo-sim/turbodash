@@ -3,7 +3,7 @@
 # 12 blades are a realization choice; mean radius gives the requested pitch exactly.
 # Both edge ratios are derived for a 0.5 mm limiting tip radius (not a circular cap).
 # R30.2 is not enforced: the current camber/thickness family approximates the outline.
-# See ../../../validation_blades/impulse_reference.md and ../../../validation_blades/validation/impulse_reference_fit.json.
+# Historical reference-fit artifacts are no longer present; this is a geometric example.
 schema_version: 2
 label: Impulse blade — reference crescent, symmetric ends
 source:
@@ -44,7 +44,7 @@ source:
     preserve_physical_thickness: false
     warning_tolerance: 0.01
   numerics:
-    number_of_points: 401
+    number_of_points: 601
   flow_domain:
     inlet_chords: 0.5
     outlet_chords: 1.0

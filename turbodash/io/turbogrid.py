@@ -10,7 +10,7 @@ import numpy as np
 import yaml
 
 from turbodash.geometry.sections import _make_section, _positive, _station_geometry
-from turbodash.core.turbine import get_blade_row_geometry
+from turbodash.geometry.meanline import physical_row_geometry
 
 
 def _profile_curve(sections, row):
@@ -46,8 +46,8 @@ def build_turbogrid_files(
     blade_rows=("stator", "rotor"),
     span_sections=11,
     profile_points=800,
-    camberline_type="curvature_based",
-    thickness_model="NACA",
+    camberline_type="conformal",
+    thickness_model="rational_denton",
     hub_shroud_offset_fraction=0.01,
     inlet_extension_fraction=1.0,
     outlet_extension_fraction=2.0,
@@ -55,7 +55,7 @@ def build_turbogrid_files(
     """Return relative filenames mapped to text for all selected axial blade rows.
 
     Each row has its own local axial origin, X rotation axis, millimetre curves,
-    free-vortex span sections, and cylindrical endwall envelope. The files are
+    constant-angle cylindrical span sections, and cylindrical endwall envelope. The files are
     independent row imports, not a coupled multistage mesh. Input results are
     read without modification; this function does not write to disk.
     """
@@ -95,14 +95,14 @@ def build_turbogrid_files(
                     _make_section(stage, row, span, profile_points, camberline_type, thickness_model)
                     for span in spans
                 ]
-                geometry = get_blade_row_geometry(stage, row, turbine_type="axial", discrete=True)
+                geometry = physical_row_geometry(stage, row)
                 chord = _positive(geometry["chord_meridional"], "Meridional chord")
                 blade_count = _positive(geometry["blade_count"], "Blade count")
                 if not blade_count.is_integer():
                     raise ValueError("Blade count must be an integer.")
                 inlet_index = 0 if row == "stator" else 2
                 stations = stage["flow_stations"][inlet_index:inlet_index + 2]
-                endwalls = [_station_geometry(station) for station in stations]
+                endwalls = [(geometry["radius_in"], geometry["height"])] * 2
                 hub_radius = min(radius - height / 2.0 for radius, height in endwalls)
                 shroud_radius = max(radius + height / 2.0 for radius, height in endwalls)
                 blade_min = min(float(np.min(section["points"][:, 0])) for section in sections)
@@ -137,10 +137,10 @@ def build_turbogrid_files(
                 "blade_count": int(blade_count),
                 "axis_of_rotation": "X",
                 "geometry_units": "MM",
-                "spanwise_model": "free_vortex_constant_meridional_velocity",
+                "spanwise_model": "constant_midspan_metal_angles",
                 "angle_reference": "absolute" if row == "stator" else "relative",
-                "camberline_type": camberline_type,
-                "thickness_model": thickness_model,
+                "camberline_type": "conformal",
+                "thickness_model": "rational_denton",
                 "span_sections": int(span_sections),
                 "profile_points_requested": int(profile_points),
                 "profile_points_written_per_section": len(sections[0]["points"]),
@@ -173,7 +173,7 @@ def build_turbogrid_files(
         "Coordinates use millimetres and the rotation axis is X. Each row has\n"
         "its own local axial origin; these are not positioned assembly files\n"
         "or a coupled multistage mesh.\n\n"
-        "Span sections use free vortex with constant meridional velocity.\n"
+        "Span sections retain the shared midspan angles on cylindrical surfaces.\n"
         "Stators use absolute angles; rotors use relative angles. The hub and\n"
         "shroud are constant-radius envelopes, as in the standalone exporter.\n"
         "All metadata lengths are metres. Inspect the geometry and passage\n"

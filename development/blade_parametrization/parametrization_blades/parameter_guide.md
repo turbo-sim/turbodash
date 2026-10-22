@@ -329,7 +329,7 @@ A practical editing sequence is: dimensions and metal angles; turning distributi
 
 **Design guidance:** Increase this to resolve small features and investigate sampling-sensitive diagnostics, at a greater computational cost. The kernel adds extra edge and shoulder points, so the final point count is larger. The 2D display independently uses at least 601 base points for smooth plotting. A denser plot does not mean the intersection check used that same density. This changes numerical resolution, not the intended shape law.
 
-**Generic default:** 401. **Allowed input:** Integer; at least 21.
+**Generic default:** 601. **Allowed input:** Integer; at least 21.
 
 ### Inlet extension / chord
 
@@ -366,7 +366,7 @@ A practical editing sequence is: dimensions and metal angles; turning distributi
 | Control | Suggested tooltip / explanation |
 | --- | --- |
 | Reaction / impulse preset | Load an example blade and clear the previous overrides. These are blade-shape examples, not a switch that changes the turbine's computed reaction. |
-| Refresh source | Refresh the inherited baseline while keeping explicit geometry overrides. This is the current standalone behavior; the planned reset after a new successful meanline solve is different. |
+| Refresh source | Refresh the inherited baseline while keeping explicit geometry overrides. This standalone action differs from production, where a new successful meanline calculation creates fresh row baselines and clears overrides. |
 | Reset one parameter | Remove this override and return to its current inherited or default value. |
 | Reset all | Remove all geometry overrides and return to the current source. |
 | Load YAML | Load a saved source and overrides after validation. Invalid files do not replace the current state. |

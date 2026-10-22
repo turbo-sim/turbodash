@@ -10,6 +10,7 @@ from dash.exceptions import PreventUpdate
 
 from turbodash.io.turbogrid import export_turbogrid_zip
 from turbodash.io.turbogrid_assembly import export_turbogrid_assembly_zip
+from turbodash.apps.shared.geometry_workflow import pending_geometry_reason
 
 
 def turbogrid_export_panel():
@@ -19,7 +20,7 @@ def turbogrid_export_panel():
             dbc.CardBody(
                 [
                     html.P(
-                        "Download the latest successfully calculated design as a ZIP, "
+                        "Download the current blade geometry as a ZIP, "
                         "with separate stator and rotor files for every stage. "
                         "Axial turbines only."
                     ),
@@ -111,19 +112,22 @@ def _parse_row_gaps(value, results):
     return gaps
 
 
-def register_turbogrid_callbacks(app):
+def register_turbogrid_callbacks(app, *, results_store="result_store", modeller=False):
     @app.callback(
         Output("turbogrid_export_button", "disabled"),
         Output("turbogrid_export_help", "children"),
         Output("turbogrid_assembly_options", "style"),
-        Input("result_store", "data"),
+        Input(results_store, "data"),
         Input({"scope": "overall", "key": "turbine_type"}, "value"),
         Input("turbogrid_export_mode", "value"),
         Input("turbogrid_row_gaps", "value"),
+        *([Input("blade_modeller_events", "data")] if modeller else []),
     )
-    def update_export_availability(results, turbine_type, export_mode, gap_text):
+    def update_export_availability(results, turbine_type, export_mode, gap_text, *pending):
         style = {} if export_mode == "assembly" else {"display": "none"}
         reason = _export_unavailable_reason(results, turbine_type)
+        if not reason and modeller:
+            reason = pending_geometry_reason(results, pending[0] if pending else None)
         if not reason:
             if export_mode == "assembly":
                 try:
@@ -143,16 +147,19 @@ def register_turbogrid_callbacks(app):
         Output("turbogrid_export_error", "children"),
         Output("turbogrid_export_error", "is_open"),
         Input("turbogrid_export_button", "n_clicks"),
-        State("result_store", "data"),
+        State(results_store, "data"),
         State({"scope": "overall", "key": "turbine_type"}, "value"),
         State("turbogrid_export_mode", "value"),
         State("turbogrid_row_gaps", "value"),
+        *([State("blade_modeller_events", "data")] if modeller else []),
         prevent_initial_call=True,
     )
-    def download_turbogrid(n_clicks, results, turbine_type, export_mode, gap_text):
+    def download_turbogrid(n_clicks, results, turbine_type, export_mode, gap_text, *pending):
         if not n_clicks:
             raise PreventUpdate
         reason = _export_unavailable_reason(results, turbine_type)
+        if not reason and modeller:
+            reason = pending_geometry_reason(results, pending[0] if pending else None)
         if reason:
             return no_update, reason, True
         try:

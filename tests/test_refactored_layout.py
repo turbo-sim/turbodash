@@ -119,7 +119,13 @@ def test_four_yaml_cases_serve_and_calculate_via_dash(name, monkeypatch):
         assert result["inputs"] == case["inputs"]
         expected = turbine.compute_turbine_performance(case)
         compare(result["overall_performance"], expected["overall_performance"])
-        assert response["blades_plot"]["figure"]["data"]
+        if name == "app_turbine_experimental":
+            from turbodash.geometry.meanline import initialize_geometry
+            render = next(entry["callback"].__wrapped__ for entry in module.app.callback_map.values()
+                          if entry.get("callback") and entry["callback"].__wrapped__.__name__ == "meanline_blades")
+            assert render(initialize_geometry(result), {"display": "block"}, result).data
+        else:
+            assert response["blades_plot"]["figure"]["data"]
 
 
 @pytest.mark.parametrize("name", APPLICATIONS)

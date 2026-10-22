@@ -35,8 +35,10 @@ from dash import (
     dash_table,
 )
 from dash.exceptions import PreventUpdate
+from turbodash.apps.shared.geometry_workflow import register_geometry_workflow
 from turbodash.apps.shared.components.turbogrid import register_turbogrid_callbacks
-from turbodash.apps.shared.components.meshing import geometry_panel, input_signature, mesh_panel, register_meshing_callbacks
+from turbodash.apps.shared.components.blade_modeller import geometry_panel
+from turbodash.apps.shared.components.meshing import input_signature, mesh_panel, register_meshing_callbacks
 from turbodash.visualization.vtk_assets import register_vtk_assets
 
 
@@ -51,8 +53,9 @@ app = Dash(
 )
 server = app.server
 register_vtk_assets(app)
-register_turbogrid_callbacks(app)
-register_meshing_callbacks(app)
+register_turbogrid_callbacks(app, results_store="geometry_results_store", modeller=True)
+register_meshing_callbacks(app, results_store="geometry_results_store", modeller=True)
+register_geometry_workflow(app)
 
 
 def configure(config_path):
@@ -405,7 +408,8 @@ def make_stage_accordion_item(stage_idx, stage_values, turbine_type):
                 ),
             )
             for key, label, lo, hi, step in BLADE_GEOMETRY_FIELDS
-            if key != "aspect_ratio" or turbine_type != "radial"
+            if (key != "aspect_ratio" or turbine_type != "radial")
+            and not key.endswith("wedge_angle")
         ]
         geometry_items.append(
             dbc.AccordionItem(
@@ -432,35 +436,6 @@ def make_stage_accordion_item(stage_idx, stage_values, turbine_type):
     )
 
 
-def geometry_stage_panel(stage_idx, stage_values, turbine_type):
-    """Mirror the live stage inputs through the shared three-way sync callback."""
-    def field(key, label, lo, hi, step):
-        value = stage_values.get(key, STAGE_DEFAULTS[key])
-        if "." in key:
-            row, parameter = key.split(".", 1)
-            value = stage_values.get(key, stage_values.get("blade_geometry", {}).get(row, {}).get(parameter, value))
-        return html.Div([
-            html.Label(label),
-            dbc.Input(id={"scope": "stage", "stage": stage_idx, "key": key, "elem": "geometry"},
-                      type="number", value=value, min=lo, max=hi, step=step, debounce=True),
-        ], className="td-parameter")
-
-    groups = [html.Details([html.Summary("Stage design"),
-                           *[field(key, label, lo, hi, step) for key, label, lo, hi, step in STAGE_FIELDS]],
-                          className="td-row-settings")]
-    for row in ("stator", "rotor"):
-        controls = list(field(f"{row}.{key}", label, lo, hi, step)
-                        for key, label, lo, hi, step in BLADE_GEOMETRY_FIELDS
-                        if key != "aspect_ratio" or turbine_type != "radial")
-        groups.append(html.Details([html.Summary(row.title()), *controls],
-                                   open=stage_idx == 0 and row == "stator", className="td-row-settings"))
-    return html.Details([html.Summary(f"Stage {stage_idx + 1}"), *groups], open=stage_idx == 0,
-                        className="td-row-settings")
-
-
-# =========================
-# Controls: overall accordion + dynamic stage accordion
-# =========================
 def stage_count_row():
     return html.Div(
         style={
@@ -983,20 +958,18 @@ def update_stage_store(
 @app.callback(
     Output({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "slider"}, "value"),
     Output({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "input"}, "value"),
-    Output({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "geometry"}, "value"),
     Input({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "slider"}, "value"),
     Input({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "input"}, "value"),
-    Input({"scope": "stage", "stage": MATCH, "key": MATCH, "elem": "geometry"}, "value"),
     prevent_initial_call=True,
 )
-def sync_stage_slider_input(slider_val, input_val, geometry_val):
+def sync_stage_slider_input(slider_val, input_val):
     trigger = ctx.triggered_id
     if trigger is None:
         raise PreventUpdate
-    val = {"slider": slider_val, "input": input_val, "geometry": geometry_val}[trigger.get("elem")]
+    val = {"slider": slider_val, "input": input_val}[trigger.get("elem")]
     if val is None:
-        return no_update, None, None
-    return val, val, val
+        return no_update, None
+    return val, val
 
 
 # =========================================
@@ -1022,7 +995,7 @@ def render_stage_accordion(stages, turbine_type):
         always_open=True,
         children=items,
     )
-    geometry = [geometry_stage_panel(i, sv, turbine_type) for i, sv in enumerate(stages)]
+    geometry = []  # Geometry now owns independent downstream overrides.
     return accordion, str(len(stages)), geometry
 
 
@@ -1079,9 +1052,7 @@ def update_turbine(overall_values, stage_values, overall_ids, stage_ids, store_s
 
         fig_meridional = _plotting.plot_turbine_meridional_channel(out)
         try:
-            fig_blades = _plotting.plot_turbine_blades(
-                out, N_points=500, N_blades_plot=8
-            )
+            fig_blades = no_update  # Shared modeller state renders the blade view.
         except ValueError as error:
             # Physical profile construction must not discard a meanline solve.
             fig_blades = {"data": [], "layout": {"annotations": [{
@@ -1128,12 +1099,10 @@ def update_turbine(overall_values, stage_values, overall_ids, stage_ids, store_s
             input_signature(overall_values, stage_values, overall_ids, stage_ids, store_stages),
         )
 
-    except Exception as e:
-        print("\n=== ERROR IN update_turbine CALLBACK ===")
-        print(repr(e))
-        print("cfg was:", cfg)
-        print("========================================\n")
-        raise
+    except Exception:
+        # Retain the last successful result and its geometry after a failed draft.
+        return (no_update,) * 10
+
 
 
 def _assemble_cfg(overall, stages):

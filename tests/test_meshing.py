@@ -52,6 +52,32 @@ def test_row_adapter_preserves_midspan_profile_chord_and_periodicity(solved, bac
     assert metadata["metal_angle_in_deg"] == pytest.approx(np.degrees(np.arctan2(tangential, station["v_m"])))
 
 
+@pytest.mark.parametrize("options", [None, {"inlet_chords": .5, "outlet_chords": 1., "profile_points": 60}])
+def test_shared_modeller_domain_is_used_by_cad_and_mesh_adapter(solved, backend, options):
+    from turbodash.geometry.meanline import initialize_geometry, update_geometry_override, effective_results
+    state = initialize_geometry(solved)
+    row_id = state["rows"][0]["id"]
+    for path, value in (("flow_domain.inlet_chords", .73456789),
+                        ("flow_domain.outlet_chords", 1.23456789)):
+        state = update_geometry_override(state, row_id, path, value)
+    projected = effective_results(solved, state)
+    original = deepcopy(projected)
+    design, metadata = meshing.build_blade_row(projected, options=options)
+    assert design.flow_domain["inlet_chords"] == .73456789
+    assert design.flow_domain["outlet_chords"] == 1.23456789
+    assert metadata["options"]["inlet_chords"] == .73456789
+    assert metadata["options"]["outlet_chords"] == 1.23456789
+    assert metadata["options"]["profile_points"] == 601
+    assert projected == original
+
+
+def test_legacy_unprojected_mesh_domain_options_remain_available(solved, backend):
+    design, metadata = meshing.build_blade_row(solved, options={"inlet_chords": .7, "outlet_chords": 1.3})
+    assert design.flow_domain["inlet_chords"] == .7
+    assert design.flow_domain["outlet_chords"] == 1.3
+    assert metadata["options"]["inlet_chords"] == .7
+
+
 @pytest.mark.parametrize("change,match", [
     ({"stage_index": -1}, "stage_index"),
     ({"row": "unknown"}, "row must"),
@@ -120,7 +146,8 @@ def test_selected_row_meridional_preview_uses_the_same_cylindrical_design(solved
     metadata = preview["metadata"]
     envelope = figure.data[0]
     assert min(envelope.x) == pytest.approx(0.)
-    assert max(envelope.x) == pytest.approx(metadata["profile_chord_mm"])
+    assert max(envelope.x) == pytest.approx(metadata["nominal_chord_mm"])
+    assert metadata["profile_chord_mm"] >= metadata["nominal_chord_mm"]
     assert min(envelope.y) == pytest.approx(metadata["hub_radius_mm"])
     assert max(envelope.y) == pytest.approx(metadata["shroud_radius_mm"])
     assert figure.layout.meta["basis"] == "sampled geometry stations"

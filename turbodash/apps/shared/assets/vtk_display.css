@@ -1,0 +1,37 @@
+/* Scope display controls to TurboDash's stable TurboMoC viewport. */
+.td-vtk-display input[type="text"] {max-width:85px;padding:4px 6px;}
+.td-display-surface-row {display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid #e4ebee;font-size:12px;}
+.td-vtk-display .surface-color-picker input {width:32px;height:26px;padding:1px;border:1px solid #bacbd3;border-radius:4px;cursor:pointer;}
+.td-display-presets {display:flex;gap:5px;flex-wrap:wrap;margin:10px 0;}
+.td-display-presets button {font-size:11px;padding:5px 7px;}
+.td-vtk-display .rc-slider {margin-top:5px;margin-bottom:18px;}
+
+/* Optional navigation supplied by newer installed TurboMoC bundles. */
+.td-vtk-host .orientation-widget {position:absolute;bottom:10px;left:10px;width:168px;z-index:2;border:1px solid #d6e1e6;border-radius:9px;background:#ffffffeb;box-shadow:0 2px 8px #173c5010;user-select:none;touch-action:none;color:#345563;}
+.td-vtk-host .orientation-widget[hidden] {display:none;}
+.td-vtk-host .orientation-widget svg {display:block;width:100%;height:auto;overflow:visible;border-radius:8px;}
+.td-vtk-host .orientation-widget svg:focus-visible {outline:2px solid #477db3;outline-offset:2px;}
+.td-vtk-host .orientation-face,.td-vtk-host .orientation-control {cursor:pointer;outline:none;}
+.td-vtk-host .orientation-face-fill {stroke:#8298a2;stroke-width:.8;stroke-linejoin:round;fill:#eff4f6;}
+.td-vtk-host .orientation-face-fill[data-axis=X] {fill:#edf3f8;}
+.td-vtk-host .orientation-face-fill[data-axis=Y] {fill:#e4edef;}
+.td-vtk-host .orientation-face-fill[data-axis=Z] {fill:#fafcfd;}
+.td-vtk-host .orientation-face text {font:600 12px system-ui,sans-serif;fill:#345563;pointer-events:none;}
+.td-vtk-host .orientation-edge .orientation-face-fill {fill:#d9e3e8;}
+.td-vtk-host .orientation-corner .orientation-face-fill {fill:#c9d7df;}
+.td-vtk-host .orientation-face:hover polygon,.td-vtk-host .orientation-face:focus-visible polygon {fill:#c9e5ef;stroke:#376a7d;stroke-width:1.7;}
+.td-vtk-host .orientation-control circle {fill:#f8fafb;stroke:#dce5e9;stroke-width:.8;}
+.td-vtk-host .orientation-control path {fill:none;stroke:#647f8d;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;}
+.td-vtk-host .orientation-control:hover circle,.td-vtk-host .orientation-control:focus-visible circle {fill:#e1eff5;stroke:#648d9f;}
+.td-vtk-host .orientation-control:hover path,.td-vtk-host .orientation-control:focus-visible path {stroke:#244f65;}
+.td-vtk-host .orientation-axis {stroke-width:1.8;stroke-linecap:round;}
+.td-vtk-host .orientation-axis[data-axis=X] {stroke:#b65353;}
+.td-vtk-host .orientation-axis[data-axis=Y] {stroke:#3b8765;}
+.td-vtk-host .orientation-axis[data-axis=Z] {stroke:#477db3;}
+.td-vtk-host .orientation-axis-label {font:600 10px system-ui,sans-serif;text-anchor:middle;}
+.td-vtk-host .orientation-axis-label[data-axis=X] {fill:#b65353;}
+.td-vtk-host .orientation-axis-label[data-axis=Y] {fill:#3b8765;}
+.td-vtk-host .orientation-axis-label[data-axis=Z] {fill:#477db3;}
+.td-vtk-host .orientation-footer {display:flex;align-items:center;justify-content:flex-end;padding:0 9px 8px;gap:6px;}
+.td-vtk-host .orientation-footer button {font-size:9px;font-weight:600;letter-spacing:.3px;padding:3px 6px;border-radius:4px;min-width:0;}
+.td-vtk-host .orientation-footer button:focus-visible {outline:2px solid #477db3;outline-offset:2px;}

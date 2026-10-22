@@ -67,6 +67,7 @@ _UNITS = {
     # --- efficiencies / dimensionless ---
     "efficiency_tt": ("%", 100.0),
     "efficiency_ts": ("%", 100.0),
+    "efficiency_ts_with_recovery": ("%", 100.0),
     "pressure_ratio_ts": ("-", 1.0),
     "volume_ratio_ts": ("-", 1.0),
     "flow_coefficient": ("-", 1.0),
@@ -481,6 +482,9 @@ def meanline_calculator(config_name, fluid_name, property_pair,
     return [
         ["Total-to-total efficiency [%]", round(_num(op["efficiency_tt"]) * 100.0, 2)],
         ["Total-to-static efficiency [%]", round(_num(op["efficiency_ts"]) * 100.0, 2)],
+        ["Efficiency with exhaust recovery [%]",
+         round(_num(op["efficiency_ts_with_recovery"]) * 100.0, 2)
+         if op.get("efficiency_ts_with_recovery") is not None else None],
         ["Actual power [kW]", round(_num(op["power_actual"]) * 1e-3, 2)],
         ["Actual speed [rpm]", round(_num(op["rotational_speed"]), 2)],
         ["Specific speed [-]", round(_num(op["specific_speed"]), 3)],

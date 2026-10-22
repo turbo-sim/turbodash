@@ -46,6 +46,10 @@ inputs:
           leading_edge_wedge_angle: 30
           solidity_chord: 1.216757241009723
 
+  # Assumed exhaust recovery: 0 gives total-to-static, 1 total-to-total.
+  diffuser:
+    kinetic_energy_recovery_fraction: 0.60
+
 optimization:
   # Paths address fields inside inputs; stages.0 is the first stage.
   # Removing or commenting out a variable leaves its input value fixed.

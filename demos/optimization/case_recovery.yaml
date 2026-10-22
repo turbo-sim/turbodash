@@ -46,6 +46,10 @@ inputs:
         trailing_edge_thickness_to_opening: 0.02
         trailing_edge_wedge_angle: 5
         leading_edge_wedge_angle: 30
+  # Assumed exhaust recovery: 0 gives total-to-static, 1 total-to-total.
+  diffuser:
+    kinetic_energy_recovery_fraction: 0.60
+
 optimization:
   design_variables:
     rotational_speed:

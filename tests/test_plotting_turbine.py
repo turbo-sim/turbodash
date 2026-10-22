@@ -229,12 +229,14 @@ def test_empty_turbine_rejected_with_useful_error(plot):
 @pytest.mark.parametrize("turbine_type", ["axial", "radial_inflow"])
 @pytest.mark.parametrize("stage_count", [1, 2])
 @pytest.mark.parametrize("loss_model", ["benner", "isentropic"])
-def test_efficiency_penalties_close_solved_total_to_static_balance(
-    turbine_type, stage_count, loss_model
+@pytest.mark.parametrize("recovery", [0, .6, 1])
+def test_efficiency_penalties_close_solved_recovery_adjusted_balance(
+    turbine_type, stage_count, loss_model, recovery
 ):
     path = Path(__file__).parents[1] / f"demos/basic_demo/demo_{turbine_type}_turbine.yaml"
     inputs = yaml.safe_load(path.read_text(encoding="utf-8"))["inputs"]
     inputs["loss_model"] = loss_model
+    inputs["diffuser"] = {"kinetic_energy_recovery_fraction": recovery}
     # Unequal work allocation exercises a common overall normalization rather
     # than an accidental sum of individually normalized stage penalties.
     first_stage = deepcopy(inputs["stages"][0])
@@ -246,15 +248,16 @@ def test_efficiency_penalties_close_solved_total_to_static_balance(
     figure = plots.plot_turbine_loss_distribution(solved)
     energies = np.asarray([trace.y for trace in figure.data])
     assert energies.sum() == pytest.approx(
-        100 * (1 - solved["overall_performance"]["efficiency_ts"]), abs=1e-8
+        100 * (1 - solved["overall_performance"]["efficiency_ts_with_recovery"]), abs=1e-8
     )
     assert len(figure.data[0].x) == 2 * stage_count + 1
-    assert figure.data[0].x[-1] == "Exit kinetic energy"
-    reference_drop = solved["overall_performance"]["isentropic_enthalpy_drop"]
-    exit_energy = trace_named(figure, "Exit kinetic energy")
+    assert figure.data[0].x[-1] == "Unrecovered exit kinetic energy"
+    leaving_energy = 0.5 * solved["stages_performance"][-1]["flow_stations"][3]["v"] ** 2
+    reference_drop = solved["overall_performance"]["isentropic_enthalpy_drop"] - recovery * leaving_energy
+    exit_energy = trace_named(figure, "Unrecovered exit kinetic energy")
     assert list(exit_energy.y[:-1]) == [0] * (2 * stage_count)
     assert exit_energy.y[-1] == pytest.approx(
-        100 * 0.5 * solved["stages_performance"][-1]["flow_stations"][3]["v"] ** 2
+        100 * (1 - recovery) * leaving_energy
         / reference_drop
     )
     for index, stage in enumerate(solved["stages_performance"]):
@@ -287,6 +290,7 @@ def test_loss_components_include_incidence_and_preserve_unallocated_totals(remai
     losses["loss_error"] = -losses["loss_total"]
     losses["diagnostics"] = {"primary_loss_unweighted": 10.0}
     solved = {
+        "inputs": {"diffuser": {"kinetic_energy_recovery_fraction": 0}},
         "overall_performance": {"isentropic_enthalpy_drop": 10000.0},
         "stages_performance": [{
             "losses": {"stator": deepcopy(losses), "rotor": deepcopy(losses)},
@@ -310,7 +314,7 @@ def test_loss_components_include_incidence_and_preserve_unallocated_totals(remai
     assert solved == before
 
 
-def test_loss_palette_follows_blue_orange_app_themes_without_changing_penalties():
+def test_loss_palette_follows_plasma_app_themes_without_changing_penalties():
     solved = {
         "overall_performance": {"isentropic_enthalpy_drop": 10000.0},
         "stages_performance": [{
@@ -335,22 +339,32 @@ def test_efficiency_trends_and_design_points_use_percent_and_blade_colors():
         "blade_velocity_ratio": [0.2, 0.4, 0.6],
         "eta_tt": [0.72, 0.89, 0.91],
         "eta_ts": [0.65, 0.82, 0.85],
+        "eta_ts_with_recovery": [0.69, 0.86, 0.885],
     }
     solved = {
         "inputs": {"blade_velocity_ratio": 0.4},
-        "overall_performance": {"efficiency_tt": 0.89, "efficiency_ts": 0.82},
+        "overall_performance": {"efficiency_tt": 0.89, "efficiency_ts": 0.82,
+                                "efficiency_ts_with_recovery": .86},
     }
     before = deepcopy((trends, solved))
     figure = plots.plot_turbine_efficiency_trends(trends, solved)
     total = trace_named(figure, "Total-to-total")
     static = trace_named(figure, "Total-to-static")
+    recovered = trace_named(figure, "With exhaust recovery")
     design = trace_named(figure, "Design point")
     assert list(total.y) == pytest.approx([72, 89, 91])
     assert list(static.y) == pytest.approx([65, 82, 85])
-    assert list(design.y) == pytest.approx([89, 82])
-    assert list(design.x) == [0.4, 0.4]
+    assert list(recovered.y) == pytest.approx([69, 86, 88.5])
+    assert list(design.y) == pytest.approx([89, 82, 86])
+    assert list(design.x) == [0.4, 0.4, 0.4]
+    assert recovered.line.color == plots.COLOR_ETA_RECOVERY
+    assert recovered.line.dash in (None, "solid")
+    for theme, color in (("dark", "#75ce9a"), ("light", plots.COLOR_ETA_RECOVERY)):
+        plots.apply_plot_theme(figure, theme)
+        assert recovered.line.color == color
+        assert list(recovered.y) == pytest.approx([69, 86, 88.5])
     assert total.line.color == plots.COLOR_ROTOR
-    assert static.line.color == plots.COLOR_STATOR
+    assert static.line.color == plots.COLOR_ETA_TS
     assert figure.layout.yaxis.title.text == "Efficiency [%]"
     assert figure.layout.yaxis.range == (0.0, 100.0)
     assert all("%{y:.2f}%" in trace.hovertemplate for trace in figure.data)

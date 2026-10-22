@@ -33,6 +33,16 @@ from .opt_panel import (
 )
 
 
+EXHAUST_RECOVERY_HELP = (
+    "0% recovery gives the total-to-static efficiency; 100% gives the "
+    "total-to-total efficiency. A value in between represents partial recovery "
+    "of the final rotor's exit kinetic energy in a downstream diffuser, "
+    "providing a system-efficiency estimate between these limits. "
+    "This assumption changes only the efficiency with exhaust recovery; "
+    "it does not calculate a diffuser outlet state or change shaft power."
+)
+
+
 def identity_id(identity):
     return (
         json.dumps(identity, sort_keys=True, separators=(",", ":"))
@@ -64,7 +74,7 @@ def field(label, control, *, aliases="", hint=None, label_id=None):
                 ],
                 className="td-field-label",
             ),
-            html.Div(control, className="td-field-control"),
+            html.Div(control, className="td-field-control", title=hint),
         ],
         className="td-field",
         **{
@@ -284,6 +294,7 @@ def metric_cards(results):
     specs = [
         ("Total-to-static efficiency", formatted("efficiency_ts", 100), "%"),
         ("Total-to-total efficiency", formatted("efficiency_tt", 100), "%"),
+        ("Efficiency with exhaust recovery", formatted("efficiency_ts_with_recovery", 100), "%"),
         ("Shaft speed", formatted("rotational_speed", places=0), "rpm"),
         ("Power", power, unit),
     ]
@@ -465,7 +476,7 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
     opt = optimization_panel()
     # Preserve the existing callback IDs and job ownership, with one disclosure.
     opt.children[0].children = [
-        html.Span("05", className="td-section-number"),
+        html.Span("06", className="td-section-number"),
         "Optimization",
         html.Span("SLSQP", className="td-opt-badge"),
     ]
@@ -527,6 +538,16 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
                         section(2, "Operating point", operating, "operating"),
                         section(3, "Shaft speed", speed, "speed"),
                         section(4, "Stage design", stage, "stage"),
+                        section(5, "Diffuser", [field(
+                            "Exhaust kinetic-energy recovery [%]",
+                            dcc.Input(
+                                id={"scope": "overall", "key": "diffuser_kinetic_energy_recovery_percent"},
+                                type="number", min=0, max=100, step="any", debounce=True,
+                                value=defaults["diffuser_kinetic_energy_recovery_percent"],
+                            ),
+                            aliases="diffuser exhaust recovery fraction efficiency",
+                            hint=EXHAUST_RECOVERY_HELP,
+                        )], "diffuser"),
                         opt,
                     ], **{"data-controls-workspace": "meanline"}),
                     *extras,

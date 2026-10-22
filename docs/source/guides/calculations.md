@@ -13,6 +13,14 @@ choose a named stage, then expand **Aerodynamic design** or
 edited. These controls remain inside the stage section, and changing the
 editing context preserves the other stage and row values.
 
+In **Diffuser**, set the assumed exhaust kinetic-energy recovery (default 60%).
+The fifth headline result, **Efficiency with exhaust recovery**, interpolates
+between the total-to-static reference at 0% and the total-to-total reference at
+100%. It accounts for partial recovery through its reference enthalpy drop;
+shaft power and the turbine flow solution are unchanged. See
+[exhaust recovery settings](optimization.md#account-for-exhaust-recovery) for
+the equation, YAML section, and optimization objective.
+
 The stage work-fraction inputs are relative weights; the model normalizes them
 internally. All stages share a shaft speed. The global blade velocity ratio
 sets the reference radius, while each stage has a local blade velocity ratio
@@ -36,30 +44,40 @@ It is a sensitivity curve, not an off-design map or a new correlation evaluation
 at every point.
 
 The efficiency trends display total-to-total efficiency in blue and
-total-to-static efficiency in orange, with efficiency expressed in percent.
+total-to-static efficiency in orange, plus a solid green curve for efficiency
+with exhaust recovery. All three have design-point markers and use percent.
+The recovery fraction stays fixed throughout the velocity-ratio sweep.
 
 The loss distribution expresses profile, incidence, trailing-edge, secondary,
 and tip-clearance losses as turbine efficiency penalties in percentage points.
-Each displayed contribution uses the overall inlet-total to outlet-static
-isentropic enthalpy drop:
+Each displayed contribution uses the recovery-adjusted reference enthalpy drop,
+$D_f = \Delta h_{s,\mathrm{turbine}} - f_{\mathrm{rec}} v_{\mathrm{exit}}^2/2$:
 
 $$
-\Delta\eta_j[\%]=100\frac{\Delta h_{\mathrm{loss},j}}{\Delta h_{s,\mathrm{turbine}}},
+\Delta\eta_j[\%]=100\frac{\Delta h_{\mathrm{loss},j}}{D_f},
 \qquad
 \Delta\eta_{\mathrm{exit}}[\%]=
-100\frac{v_{\mathrm{exit}}^2/2}{\Delta h_{s,\mathrm{turbine}}}.
+100\frac{(1-f_{\mathrm{rec}})v_{\mathrm{exit}}^2/2}{D_f}.
 $$
 
-The chart also includes the final exit kinetic-energy penalty. Its complete
+The final bar shows **Unrecovered exit kinetic energy**, after the prescribed
+diffuser recovery. The displayed row-loss percentages use the same reference;
+the underlying row loss energies are unchanged. The complete
 loss budget satisfies
 
 $$
 \sum_j\Delta\eta_j[\%]+\Delta\eta_{\mathrm{exit}}[\%]
-=100(1-\eta_{ts}),
+=100(1-\eta_{\mathrm{recovery}}),
 $$
 
-where $\eta_{ts}$ in the formula is a fraction. The chart colors follow the
-application palette.
+where $\eta_{\mathrm{recovery}}$ in the formula is a fraction. At zero recovery
+this reduces to the original total-to-static loss budget; at full recovery
+the final exit bar is zero. Blade-row mechanisms use five fixed Plasma samples
+from purple through orange, with slate for unrecovered kinetic energy. The
+Plasma colors stay consistent between light and dark themes; thin separators
+follow the panel background. Colors identify mechanisms, not loss magnitudes.
+Efficiency curves retain their blue, orange and green identities, using lighter
+shades in dark mode.
 
 The velocity triangles are stacked by stage. Use the **Mach numbers** or
 **Velocity [m/s]** toggle to choose the displayed scale.

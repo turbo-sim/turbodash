@@ -121,8 +121,8 @@ Use the row YAML controls to save/load geometry separately from the header's
 meanline design file. See the [blade geometry guide](../../docs/source/guides/blade_geometry.md)
 for mapping, presets, state ownership, launch instructions and limitations.
 
-Five numbered sections start collapsed: **Turbine setup**, **Operating point**,
-**Shaft speed**, **Stage design**, and **Optimization**. The stage
+Six numbered sections start collapsed: **Turbine setup**, **Operating point**,
+**Shaft speed**, **Stage design**, **Diffuser**, and **Optimization**. The stage
 selector uses saved names; Stator/Rotor switches the visible blade fields while
 all stage inputs remain mounted. Continuous inputs accept full floating-point
 precision and display at least three decimal places, preserving extra supplied
@@ -137,8 +137,12 @@ new values and requests fresh input. Invalid drafts retain the last successful
 results and prevent saving a stale design. Save design includes the current
 optimization editor, including unsolved settings and precise bounds.
 
-The overview reports total-to-static/total-to-total efficiency, shaft speed in
-rpm, and adaptive W/kW/MW power. Detailed reports retain all rows and offer CSV
+The overview reports total-to-static/total-to-total efficiency, efficiency with
+exhaust recovery, shaft speed in rpm, and adaptive W/kW/MW power. The Diffuser
+section assumes 60% exit kinetic-energy recovery by default; 0% recovers the
+total-to-static metric and 100% the total-to-total metric. This changes only the
+recovery-adjusted efficiency. YAML stores `diffuser.kinetic_energy_recovery_fraction`
+after `stages`, and older cases use the same default. Detailed reports retain all rows and offer CSV
 exports. Meridional and blade-to-blade views appear side by side on desktop;
 reset/autoscale restores a zero radial baseline while deliberate zoom is allowed.
 The channel has upstream/downstream display extensions and smooth guide

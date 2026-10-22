@@ -16,6 +16,7 @@ import math
 
 from turbodash.optimization import read_path
 from turbodash.optimization.slsqp import normalize_solver_options
+from turbodash.core.diffuser import normalize_diffuser_inputs
 
 
 # The same order is used for loading, launching and exporting the editor.
@@ -84,7 +85,7 @@ GEOMETRY = {
 def flat_config(config):
     """Use one numeric speed path without mutating the app's nested schema."""
     result = deepcopy(config)
-    inputs = result["inputs"]
+    inputs = result["inputs"] = normalize_diffuser_inputs(result["inputs"])
     rotation = inputs.get("rotational_speed")
     if isinstance(rotation, dict):
         inputs["rotational_speed_type"] = rotation["type"]
@@ -271,7 +272,7 @@ def _constraint_default(path, scale):
         return "<=", 10
     if quantity == "height":
         return ">=", .001
-    if quantity in ("efficiency_ts", "efficiency_tt"):
+    if quantity in ("efficiency_ts", "efficiency_tt", "efficiency_ts_with_recovery"):
         return ">=", .8
     return "=", scale
 
@@ -292,6 +293,9 @@ def output_catalog(config, results=None):
 
     for key, (label, scale) in PERFORMANCE.items():
         add(f"$overall_performance.{key}", f"Overall · {label}", scale, label, ["Overall"], True)
+    add("$overall_performance.efficiency_ts_with_recovery",
+        "Overall · Efficiency with exhaust recovery [-]", 1,
+        "Efficiency with exhaust recovery [-]", ["Overall"], True)
     scopes = [("*", "All stages", "All stages")]
     scopes += [(str(i), f"Stage {i + 1}", _stage_title(i, stage))
                for i, stage in enumerate(config["inputs"]["stages"])]

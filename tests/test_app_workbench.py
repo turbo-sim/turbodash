@@ -219,6 +219,7 @@ def test_metrics_use_solved_overall_values_not_kinematic_trends():
         "overall_performance": {
             "efficiency_ts": 0.834567,
             "efficiency_tt": 0.912345,
+            "efficiency_ts_with_recovery": 0.879123,
             "rotational_speed": 31234.2,
             "power_actual": 1350000,
             "eta_ts": 0.1,
@@ -228,13 +229,28 @@ def test_metrics_use_solved_overall_values_not_kinematic_trends():
         "efficiency_ts": 0.2,
     }
     cards = application.update_metrics(results)
-    assert len(cards) == 4
+    assert len(cards) == 5
     assert [text_content(card) for card in cards] == [
         "Total-to-static efficiency 83.46 %",
         "Total-to-total efficiency 91.23 %",
+        "Efficiency with exhaust recovery 87.91 %",
         "Shaft speed 31,234 rpm",
         "Power 1.35 MW",
     ]
+
+
+def test_diffuser_percent_control_round_trips_yaml_and_legacy_defaults(live_form):
+    edit(live_form, "diffuser_kinetic_energy_recovery_percent", 72.123456789)
+    config = application.live_config(**live_form)
+    assert config["inputs"]["diffuser"]["kinetic_energy_recovery_fraction"] == pytest.approx(.72123456789)
+    ids = [{"scope": "overall", "key": "diffuser_kinetic_energy_recovery_percent"}]
+    assert application.loaded_overall_values(config, ids) == pytest.approx([72.123456789])
+    config["inputs"].pop("diffuser")
+    assert application.loaded_overall_values(config, ids) == [60]
+    for invalid in (-1, 101):
+        edit(live_form, "diffuser_kinetic_energy_recovery_percent", invalid)
+        with pytest.raises(ValueError, match="between 0 and 1"):
+            application.live_config(**live_form)
 
 
 @pytest.mark.parametrize(
@@ -256,7 +272,7 @@ def test_power_uses_adaptive_units_and_two_decimal_rounding(value, expected):
     assert workbench.format_power(value) == expected
 
 
-def test_layout_has_five_numbered_closed_sections_and_no_studio_brand():
+def test_layout_has_six_numbered_closed_sections_and_no_studio_brand():
     mounted = list(components(application.app.layout))
     sections = [
         item
@@ -265,13 +281,14 @@ def test_layout_has_five_numbered_closed_sections_and_no_studio_brand():
         and "td-section" in getattr(item, "className", "").split()
         and "td-blade-group" not in getattr(item, "className", "").split()
     ]
-    assert len(sections) == 5
+    assert len(sections) == 6
     assert all(item.open is False for item in sections)
     expected = [
         "Turbine setup",
         "Operating point",
         "Shaft speed",
         "Stage design",
+        "Diffuser",
         "Optimization",
     ]
     for index, (section, title) in enumerate(zip(sections, expected), 1):

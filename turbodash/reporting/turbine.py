@@ -478,6 +478,7 @@ def _print_overall_performance(out):
 
     row("Efficiency t-t", "-", "efficiency_tt", prec=4)
     row("Efficiency t-s", "-", "efficiency_ts", prec=4)
+    row("Efficiency with exhaust recovery", "-", "efficiency_ts_with_recovery", prec=4, stage=False)
     row("Pressure ratio t-s", "-", "pressure_ratio_ts", prec=2)
     row("Volume ratio t-s", "-", "volume_ratio_ts", prec=2)
     row("Mass flow rate", "kg/s", "mass_flow_rate", prec=2)
@@ -703,6 +704,7 @@ def overall_performance_table(out):
     row_specs = [
         ("Efficiency t-t", "-", "efficiency_tt", 4, 1.0),
         ("Efficiency t-s", "-", "efficiency_ts", 4, 1.0),
+        ("Efficiency with exhaust recovery", "-", "efficiency_ts_with_recovery", 4, 1.0),
         ("Pressure ratio t-s", "-", "pressure_ratio_ts", 2, 1.0),
         ("Volume ratio t-s", "-", "volume_ratio_ts", 2, 1.0),
         ("Mass flow rate", "kg/s", "mass_flow_rate", 2, 1.0),

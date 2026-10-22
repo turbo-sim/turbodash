@@ -2,6 +2,7 @@ from copy import deepcopy
 
 import numpy as np
 import jaxprop as jxp
+from .diffuser import normalize_diffuser_inputs, diffuser_settings
 
 from .errors import (
     ModelDomainError, ModelConsistencyError, model_context,
@@ -1375,7 +1376,8 @@ def compute_turbine_performance(cfg):
     # ---------------------------------------------------------------
     # 0. Unpack cfg and validate the stages list
     # ---------------------------------------------------------------
-    inp = cfg.get("inputs", cfg)
+    normalized_inputs = normalize_diffuser_inputs(cfg.get("inputs", cfg))
+    inp = normalized_inputs
 
     if "stages" not in inp or not isinstance(inp["stages"], list):
         raise ValueError(
@@ -1636,6 +1638,13 @@ def compute_turbine_performance(cfg):
     power_isentropic_tt = mass_flow_rate * dh_is_tt
     efficiency_tt = power_actual / power_isentropic_tt
 
+    # Prescribed recovery changes only this overall efficiency reference.
+    # No diffuser outlet state, pressure recovery, or shaft work is solved.
+    recovery = inp["diffuser"]["kinetic_energy_recovery_fraction"]
+    dh_is_with_recovery = dh_is_total - recovery * 0.5 * v_4_out**2
+    require_positive(dh_is_with_recovery, "overall_enthalpy_drop_with_exhaust_recovery", station="exit")
+    efficiency_ts_with_recovery = power_actual / (mass_flow_rate * dh_is_with_recovery)
+
     # Single shaft -> one omega shared by every stage
     omega = rotational_speed * 2.0 * np.pi / 60.0
     shaft_torque = power_actual / omega
@@ -1656,6 +1665,7 @@ def compute_turbine_performance(cfg):
         # --- efficiencies ---
         "efficiency_ts": efficiency_ts,
         "efficiency_tt": efficiency_tt,
+        "efficiency_ts_with_recovery": efficiency_ts_with_recovery,
         # --- flow / power ---
         "mass_flow_rate": mass_flow_rate,
         "power_isentropic": power_isentropic_ts,
@@ -1680,7 +1690,7 @@ def compute_turbine_performance(cfg):
     }
 
     return {
-        "inputs": cfg["inputs"],
+        "inputs": normalized_inputs,
         "overall_performance": overall,
         "stages_performance": stages_output,
     }
@@ -1736,6 +1746,9 @@ def compute_turbine_efficiency_trends(results, blade_velocity_ratio):
            eta_ts = W / dh_is_total
            eta_tt = W / (dh_is_total - 0.5 * v_4_last^2).
 
+       With prescribed recovery fraction f, the third reference is
+       ``eta_ts_with_recovery = W / (dh_is_total - f * 0.5 * v_4_last^2)``.
+
     Scaling with the sweep
     ----------------------
     Each stage keeps its own local ``nu_i = U_4_i / v0_i``; the global ``nu``
@@ -1769,6 +1782,7 @@ def compute_turbine_efficiency_trends(results, blade_velocity_ratio):
         - ``"blade_velocity_ratio"`` : the input overall nu array.
         - ``"eta_tt"`` : overall total-to-total efficiency trend.
         - ``"eta_ts"`` : overall total-to-static efficiency trend.
+        - ``"eta_ts_with_recovery"`` : efficiency trend with prescribed exhaust recovery.
         - ``"loss_total"`` : summed cascade enthalpy loss, normalized by
           ``dh_is_total``.
         - ``"leaving_kinetic_energy"`` : last-stage exit kinetic energy,
@@ -1860,11 +1874,18 @@ def compute_turbine_efficiency_trends(results, blade_velocity_ratio):
     # Both efficiencies share the same actual work; only the reference differs.
     eta_ts_overall = work_actual / dh_is_total
     eta_tt_overall = work_actual / (dh_is_total - leaving_ke)
+    recovery = diffuser_settings(results["inputs"])["kinetic_energy_recovery_fraction"]
+    recovery_reference = dh_is_total - recovery * leaving_ke
+    eta_recovery = np.divide(
+        work_actual, recovery_reference, out=np.full_like(work_actual, np.nan),
+        where=np.isfinite(recovery_reference) & (recovery_reference > 0),
+    )
 
     return {
         "blade_velocity_ratio": nu_overall,
         "eta_tt": eta_tt_overall,
         "eta_ts": eta_ts_overall,
+        "eta_ts_with_recovery": eta_recovery,
         "loss_total": loss_total,
         "leaving_kinetic_energy": leaving_ke,
     }

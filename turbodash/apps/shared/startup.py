@@ -3,6 +3,7 @@ from pathlib import Path
 
 import yaml
 from dash.development.base_component import Component
+from turbodash.core.diffuser import normalize_diffuser_inputs, diffuser_settings
 
 
 def components(node):
@@ -28,6 +29,7 @@ def configure(module, filename, kind):
         raise ValueError("An app case must contain an 'inputs' mapping.")
     if kind == "turbine":
         case = module.core.convert_turbine_config_to_solidity(case)
+        case["inputs"] = normalize_diffuser_inputs(case["inputs"])
     elif kind == "stage":
         case = module.core.convert_stage_config_to_solidity(case)
     values = case["inputs"]
@@ -39,6 +41,9 @@ def configure(module, filename, kind):
             raise ValueError("A turbine app case requires at least one stage.")
         overall = dict(module.OVERALL_DEFAULTS)
         overall.update(values)
+        overall["diffuser_kinetic_energy_recovery_percent"] = (
+            100 * diffuser_settings(values)["kinetic_energy_recovery_fraction"]
+        )
         rotation = values.get("rotational_speed", {})
         if not isinstance(rotation, dict):
             rotation = {"type": values.get("rotational_speed_type", "specific"), "value": rotation}

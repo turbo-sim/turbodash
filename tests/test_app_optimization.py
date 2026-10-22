@@ -798,6 +798,9 @@ class WorkspaceTests(unittest.TestCase):
             expected_overall = dict(loaded["inputs"])
             rotation = expected_overall.pop("rotational_speed")
             expected_overall.update(rotational_speed_type=rotation["type"], rotational_speed_value=rotation["value"])
+            expected_overall["diffuser_kinetic_energy_recovery_percent"] = (
+                100 * expected_overall["diffuser"]["kinetic_energy_recovery_fraction"]
+            )
             self.assertEqual({identity["key"]: value for identity, value in zip(overall_ids, overall)},
                              {identity["key"]: expected_overall[identity["key"]] for identity in overall_ids})
             expected_stage_values = {}

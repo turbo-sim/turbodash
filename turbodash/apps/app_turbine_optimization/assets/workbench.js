@@ -162,20 +162,22 @@
         });
         const traceUpdates = {};
         const lossColors = {
-            loss_profile: ["#2462D1", "#88B7FF"],
-            loss_trailing: ["#4B84E5", "#6D9DE8"],
-            loss_secondary: ["#7AA6EC", "#B3CEFF"],
-            loss_clearance: ["#FF7F0E", "#FFAD5C"],
-            loss_incidence: ["#F5AD66", "#F3C48F"],
-            loss_exit_kinetic: ["#647892", "#A0B2CA"],
+            loss_profile: ["#8f0da4", "#8f0da4"],
+            loss_trailing: ["#b7318a", "#b7318a"],
+            loss_secondary: ["#d6556d", "#d6556d"],
+            loss_clearance: ["#ee7b51", "#ee7b51"],
+            loss_incidence: ["#fca636", "#fca636"],
+            loss_exit_kinetic: ["#64748B", "#A9BACD"],
             loss_unallocated: ["#8995A5", "#BCC6D4"]
         };
         (graph.data || []).forEach((trace, index) => {
             const role = trace.meta && trace.meta.theme_role, colors = {};
             if (role === "endwall") colors["line.color"] = currentTheme === "dark" ? "#a0b2ca" : "#647892";
+            else if (role === "efficiency_ts") colors["line.color"] = currentTheme === "dark" ? "#ffad5c" : "#d97706";
             else if (trace.line && neutral.test(trace.line.color)) colors["line.color"] = ink;
             else if (trace.line && ["#1f77b4", "#69a9e2"].includes(trace.line.color)) colors["line.color"] = currentTheme === "dark" ? "#69a9e2" : "#1f77b4";
             else if (trace.line && ["#ff7f0e", "#ffad5c"].includes(trace.line.color)) colors["line.color"] = currentTheme === "dark" ? "#ffad5c" : "#ff7f0e";
+            else if (role === "efficiency_recovery") colors["line.color"] = currentTheme === "dark" ? "#75ce9a" : "#238b62";
             if (trace.marker && typeof trace.marker.color === "string" && neutral.test(trace.marker.color)) colors["marker.color"] = ink;
             else if (trace.marker && ["#1f77b4", "#69a9e2"].includes(trace.marker.color)) colors["marker.color"] = currentTheme === "dark" ? "#69a9e2" : "#1f77b4";
             else if (trace.marker && ["#ff7f0e", "#ffad5c"].includes(trace.marker.color)) colors["marker.color"] = currentTheme === "dark" ? "#ffad5c" : "#ff7f0e";

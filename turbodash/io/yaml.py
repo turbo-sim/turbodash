@@ -1,6 +1,7 @@
 """Readable turbine YAML exports without rounding numerical values."""
 
 import yaml
+from turbodash.core.diffuser import normalize_diffuser_inputs
 
 
 class _TurbineDumper(yaml.SafeDumper):
@@ -51,6 +52,8 @@ def _typed_values(value, continuous=False):
 
 def dump_turbine_yaml(document):
     """Use at least two decimal places for floats, retaining full precision."""
+    if isinstance(document.get("inputs"), dict) and "stages" in document["inputs"]:
+        document = dict(document, inputs=normalize_diffuser_inputs(document["inputs"]))
     return yaml.dump(
         _typed_values(document), Dumper=_TurbineDumper,
         sort_keys=False, default_flow_style=False,

@@ -156,7 +156,10 @@ def exercise(context, address, output):
             identity = control["id"]
             key = identity["key"]
             if identity["scope"] == "overall":
-                value = flat_speed(expected)[1] if key == "rotational_speed_value" else expected[key]
+                if key == "diffuser_kinetic_energy_recovery_percent":
+                    value = 100 * expected["diffuser"]["kinetic_energy_recovery_fraction"]
+                else:
+                    value = flat_speed(expected)[1] if key == "rotational_speed_value" else expected[key]
             else:
                 stage = expected["stages"][identity["stage"]]
                 row, _, parameter = key.partition(".")

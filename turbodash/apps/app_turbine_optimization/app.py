@@ -20,6 +20,7 @@ import json
 import yaml
 import numpy as np
 from turbodash.core import turbine as core
+from turbodash.core.diffuser import DEFAULT_RECOVERY_FRACTION, diffuser_settings
 from turbodash.io.yaml import dump_turbine_yaml
 from turbodash.visualization import plotly_turbine as _plotting
 from turbodash.reporting import turbine as reporting
@@ -143,6 +144,7 @@ OVERALL_DEFAULTS = dict(
     blade_velocity_ratio=0.6,
     rotational_speed_type="specific",
     rotational_speed_value=0.7,
+    diffuser_kinetic_energy_recovery_percent=100 * DEFAULT_RECOVERY_FRACTION,
 )
 
 BLADE_GEOMETRY_DEFAULTS = {
@@ -916,7 +918,13 @@ def _assemble_cfg(overall, stages):
             }
             for i, sv in enumerate(stages)
         ],
+        "diffuser": {
+            "kinetic_energy_recovery_fraction": overall.get(
+                "diffuser_kinetic_energy_recovery_percent", 100 * DEFAULT_RECOVERY_FRACTION
+            ) / 100,
+        },
     }
+    diffuser_settings(inputs)
     return {"inputs": inputs}
 
 
@@ -1041,6 +1049,8 @@ def loaded_overall_values(cfg, overall_ids):
                     "value", OVERALL_DEFAULTS["rotational_speed_value"]
                 )
             )
+        elif key == "diffuser_kinetic_energy_recovery_percent":
+            out_values.append(100 * diffuser_settings(inp)["kinetic_energy_recovery_fraction"])
         else:
             out_values.append(inp.get(key, OVERALL_DEFAULTS.get(key)))
     return out_values

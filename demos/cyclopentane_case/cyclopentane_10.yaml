@@ -44,4 +44,8 @@ inputs:
         trailing_edge_wedge_angle: 5.00
         leading_edge_wedge_angle: 5.00
         solidity_chord: 2.1539034913192463
+  # Assumed exhaust recovery: 0 gives total-to-static, 1 total-to-total.
+  diffuser:
+    kinetic_energy_recovery_fraction: 0.60
+
   rotational_speed_type: specific

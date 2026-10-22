@@ -3,6 +3,7 @@ import plotly.graph_objects as go
 from scipy.interpolate import PchipInterpolator
 from plotly.subplots import make_subplots
 from turbodash.core.turbine import get_blade_row_geometry
+from turbodash.core.diffuser import diffuser_settings
 
 from turbodash.geometry.meanline import state_for_stage_row, section_from_state
 from turbodash.geometry.blade import section_coordinates
@@ -107,10 +108,17 @@ def apply_plot_theme(fig, theme="light"):
             trace.fillcolor = palette["channel"]
         elif role == "flow_guide":
             trace.line.color = palette["guide"]
+        elif role == "efficiency_tt":
+            trace.line.color = "#69a9e2" if theme == "dark" else COLOR_ETA_TT
+        elif role == "efficiency_ts":
+            trace.line.color = "#ffad5c" if theme == "dark" else COLOR_ETA_TS
+        elif role == "efficiency_recovery":
+            trace.line.color = "#75ce9a" if theme == "dark" else COLOR_ETA_RECOVERY
         elif role in _LOSS_COLORS:
             trace.marker.color = (
                 _LOSS_COLORS_DARK if theme == "dark" else _LOSS_COLORS
             )[role]
+            trace.marker.line.color = palette["surface"]
         for part_name in ("line", "marker"):
             part = getattr(trace, part_name, None)
             color = getattr(part, "color", None)
@@ -715,38 +723,32 @@ _LOSS_LABELS = {
 }
 
 _LOSS_COLORS = {
-    "loss_profile": "#2462D1",
-    "loss_trailing": "#4B84E5",
-    "loss_secondary": "#7AA6EC",
-    "loss_clearance": "#FF7F0E",
-    "loss_incidence": "#F5AD66",
-    "loss_exit_kinetic": "#647892",
+    # Plasma samples at 0.30, 0.425, 0.55, 0.675 and 0.80. These are fixed
+    # categorical colors; they do not encode the magnitude of each loss.
+    "loss_profile": "#8f0da4",
+    "loss_trailing": "#b7318a",
+    "loss_secondary": "#d6556d",
+    "loss_clearance": "#ee7b51",
+    "loss_incidence": "#fca636",
+    "loss_exit_kinetic": "#64748B",
     "loss_unallocated": "#8995A5",
 }
-_LOSS_COLORS_DARK = {
-    "loss_profile": "#88B7FF",
-    "loss_trailing": "#6D9DE8",
-    "loss_secondary": "#B3CEFF",
-    "loss_clearance": "#FFAD5C",
-    "loss_incidence": "#F3C48F",
-    "loss_exit_kinetic": "#A0B2CA",
-    "loss_unallocated": "#BCC6D4",
-}
+_LOSS_COLORS_DARK = dict(_LOSS_COLORS, loss_exit_kinetic="#A9BACD", loss_unallocated="#BCC6D4")
 
 
 def plot_turbine_loss_distribution(results):
-    r"""Plot contributions to the overall total-to-static efficiency deficit.
+    r"""Plot contributions to the efficiency deficit after exhaust recovery.
 
-    Every component uses the same overall isentropic enthalpy drop, so the
+    Every component uses the same recovery-adjusted reference drop, so the
     blade-row columns are directly comparable across stages:
 
-    ``delta_eta = loss_component * 0.5 * row_exit_speed**2 / dh_is_total``.
+    ``delta_eta = loss_component * 0.5 * row_exit_speed**2 / (dh_is_total - f * KE_exit)``.
 
     Stators use absolute exit speed and rotors use relative exit speed, exactly
     as in ``compute_stage_performance``. Only the final rotor's absolute exit
-    kinetic energy is unrecovered overall; intermediate exit kinetic energy is
+    kinetic energy remaining after prescribed recovery is included; intermediate exit kinetic energy is
     carried into the next stage and must not be counted again. The sum of all
-    columns therefore equals ``100 * (1 - overall efficiency_ts)`` in efficiency
+    columns therefore equals ``100 * (1 - overall efficiency_ts_with_recovery)`` in efficiency
     percentage points for the solved model. Coefficients and energies in the
     result dictionary retain their original units.
 
@@ -766,6 +768,12 @@ def plot_turbine_loss_distribution(results):
     reference_drop = float(results["overall_performance"]["isentropic_enthalpy_drop"])
     if not np.isfinite(reference_drop) or reference_drop <= 0:
         raise ValueError("The overall isentropic enthalpy drop must be positive and finite.")
+    recovery = diffuser_settings(results.get("inputs", {}))["kinetic_energy_recovery_fraction"]
+    leaving_energy = 0.5 * float(stages[-1]["flow_stations"][3]["v"]) ** 2
+    reference_drop -= recovery * leaving_energy
+    if not np.isfinite(reference_drop) or reference_drop <= 0:
+        raise ValueError("The enthalpy drop with exhaust recovery must be positive and finite.")
+    exit_label = "Unrecovered exit kinetic energy"
 
     labels, row_losses, row_energy = [], [], []
     for i, st in enumerate(stages, 1):
@@ -775,7 +783,7 @@ def plot_turbine_loss_distribution(results):
             labels.append(label)
             row_losses.append(st["losses"][row])
             row_energy.append(0.5 * float(st["flow_stations"][station][velocity]) ** 2)
-    labels.append("Exit kinetic energy")
+    labels.append(exit_label)
     component_energy = {
         component: [
             float(losses.get(component, 0.0)) * energy
@@ -790,7 +798,6 @@ def plot_turbine_loss_distribution(results):
     ] + [0.0]
     # Ignore floating-point summation noise only; custom totals remain explicit.
     has_remainder = any(abs(value / reference_drop) > 1e-12 for value in remainder)
-    leaving_energy = 0.5 * float(stages[-1]["flow_stations"][3]["v"]) ** 2
 
     fig = go.Figure()
 
@@ -804,7 +811,7 @@ def plot_turbine_loss_distribution(results):
                 meta=dict(theme_role=role),
                 marker=dict(
                     color=_LOSS_COLORS[role],
-                    line=dict(color="black", width=0.75),
+                    line=dict(color=_PLOT_THEMES["light"]["surface"], width=0.75),
                 ),
                 hovertemplate=(
                     "%{x}<br>Δη: %{y:.2f}% (efficiency percentage points)"
@@ -821,8 +828,8 @@ def plot_turbine_loss_distribution(results):
     if has_remainder:
         add_component("Other / unallocated", remainder, "loss_unallocated")
     add_component(
-        "Exit kinetic energy",
-        [0.0] * len(row_losses) + [leaving_energy],
+        exit_label,
+        [0.0] * len(row_losses) + [(1 - recovery) * leaving_energy],
         "loss_exit_kinetic",
     )
     contributions = np.asarray([trace.y for trace in fig.data])
@@ -876,12 +883,13 @@ def plot_turbine_loss_distribution(results):
 # =============================================================================
 # Use the same blue/orange series colors as the blade and velocity views.
 COLOR_ETA_TT = COLOR_ROTOR
-COLOR_ETA_TS = COLOR_STATOR
+COLOR_ETA_TS = "#d97706"
+COLOR_ETA_RECOVERY = "#238b62"
 
 
 def plot_turbine_efficiency_trends(trends, results=None):
     """
-    Single plot of the overall total-to-total and total-to-static efficiency
+    Single plot of overall total-to-total, total-to-static and exhaust-recovery efficiency
     trends in percent as a function of the (overall) blade-velocity ratio.
     Input efficiencies remain fractions; only plotted values are multiplied by 100.
 
@@ -889,7 +897,8 @@ def plot_turbine_efficiency_trends(trends, results=None):
     ----------
     trends : dict
         Output of ``compute_turbine_efficiency_trends`` (core module). Must
-        provide ``"blade_velocity_ratio"``, ``"eta_tt"`` and ``"eta_ts"``.
+        provide ``"blade_velocity_ratio"``, ``"eta_tt"``, ``"eta_ts"``
+        and ``"eta_ts_with_recovery"``.
 
     results : dict, optional
         Output of ``compute_turbine_performance``. If given, the current
@@ -903,6 +912,7 @@ def plot_turbine_efficiency_trends(trends, results=None):
     nu = np.asarray(trends["blade_velocity_ratio"], dtype=float)
     eta_tt = 100.0 * np.asarray(trends["eta_tt"], dtype=float)
     eta_ts = 100.0 * np.asarray(trends["eta_ts"], dtype=float)
+    eta_recovery = 100.0 * np.asarray(trends["eta_ts_with_recovery"], dtype=float)
 
     fig = go.Figure()
 
@@ -913,6 +923,7 @@ def plot_turbine_efficiency_trends(trends, results=None):
             mode="lines",
             line=dict(color=COLOR_ETA_TT, width=2),
             name="Total-to-total",
+            meta=dict(theme_role="efficiency_tt"),
             hovertemplate="Blade velocity ratio: %{x:.3f}<br>Efficiency: %{y:.2f}%"
                           "<extra>%{fullData.name}</extra>",
         )
@@ -925,10 +936,19 @@ def plot_turbine_efficiency_trends(trends, results=None):
             mode="lines",
             line=dict(color=COLOR_ETA_TS, width=2),
             name="Total-to-static",
+            meta=dict(theme_role="efficiency_ts"),
             hovertemplate="Blade velocity ratio: %{x:.3f}<br>Efficiency: %{y:.2f}%"
                           "<extra>%{fullData.name}</extra>",
         )
     )
+
+    fig.add_trace(go.Scatter(
+        x=nu, y=eta_recovery, mode="lines",
+        line=dict(color=COLOR_ETA_RECOVERY, width=2),
+        name="With exhaust recovery", meta=dict(theme_role="efficiency_recovery"),
+        hovertemplate="Blade velocity ratio: %{x:.3f}<br>Efficiency: %{y:.2f}%"
+                      "<extra>%{fullData.name}</extra>",
+    ))
 
     # Mark the current design operating point if the full results are provided.
     if results is not None:
@@ -936,6 +956,7 @@ def plot_turbine_efficiency_trends(trends, results=None):
         nu0 = float(results["inputs"]["blade_velocity_ratio"])
         eta_tt0 = 100.0 * float(results["overall_performance"]["efficiency_tt"])
         eta_ts0 = 100.0 * float(results["overall_performance"]["efficiency_ts"])
+        eta_recovery0 = 100.0 * float(results["overall_performance"]["efficiency_ts_with_recovery"])
 
         # Vertical line at design blade velocity ratio
         fig.add_vline(
@@ -945,8 +966,8 @@ def plot_turbine_efficiency_trends(trends, results=None):
 
         fig.add_trace(
             go.Scatter(
-                x=[nu0, nu0],
-                y=[eta_tt0, eta_ts0],
+                x=[nu0, nu0, nu0],
+                y=[eta_tt0, eta_ts0, eta_recovery0],
                 mode="markers",
                 marker=dict(
                     size=9,

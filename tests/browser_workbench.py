@@ -63,7 +63,7 @@ def main():
             page.reload()
             page.wait_for_selector("#perf_table .dash-table-container", timeout=90000)
             page.wait_for_function("window.TurbodashWorkbench && document.querySelector('#meridional_plot .js-plotly-plot').layout.font.color === '#18314d'")
-            expect(page.locator(".td-inspector .td-section")).to_have_count(5)
+            expect(page.locator(".td-inspector .td-section")).to_have_count(6)
             expect(page.locator(".td-inspector .td-section[open]")).to_have_count(0)
             expect(page.locator("#td-inlet-pair input")).to_have_attribute("aria-label", "Inlet property pair")
             assert page.locator(".td-brand").inner_text() == "turbodash"
@@ -153,10 +153,10 @@ def main():
             assert loss.evaluate("graph => graph.data.some(trace => /exit kinetic/i.test(trace.name))")
             assert loss.evaluate("graph => graph.layout.yaxis.title.text.includes('[%]')")
             total_penalty = loss.evaluate("graph => graph.data.reduce((total, trace) => total + trace.y.reduce((sum, value) => sum + value, 0), 0)")
-            assert abs(total_penalty - 100 * (1 - results[-1]["overall_performance"]["efficiency_ts"])) < 1e-8
-            assert loss.evaluate("graph => graph.data.find(trace => trace.meta.theme_role === 'loss_profile').marker.color") == "#2462D1"
+            assert abs(total_penalty - 100 * (1 - results[-1]["overall_performance"]["efficiency_ts_with_recovery"])) < 1e-8
+            assert loss.evaluate("graph => graph.data.find(trace => trace.meta.theme_role === 'loss_profile').marker.color") == "#8f0da4"
             trends = page.locator("#efficiency_trends_plot .js-plotly-plot")
-            assert trends.evaluate("graph => graph.layout.yaxis.title.text.includes('[%]') && graph.data[0].line.color === '#1f77b4' && graph.data[1].line.color === '#ff7f0e'")
+            assert trends.evaluate("graph => graph.layout.yaxis.title.text.includes('[%]') && graph.data[0].line.color === '#1f77b4' && graph.data[1].line.color === '#d97706'")
             page.locator("#td-efficiency-plots").scroll_into_view_if_needed()
             page.screenshot(path=output / "workbench_performance.png", full_page=True)
             checks.append("Velocity/Mach toggle redraws cached arrows; efficiency and loss budget use percent, with blue/orange app colors and final exit energy")
@@ -169,7 +169,7 @@ def main():
             page.wait_for_function("document.querySelector('#meridional_plot .js-plotly-plot').layout.font.color === '#e7eff9'")
             page.wait_for_function("document.querySelector('#efficiency_trends_plot .js-plotly-plot').data[0].line.color === '#69a9e2'")
             assert trends.evaluate("graph => graph.data[1].line.color === '#ffad5c'")
-            assert loss.evaluate("graph => graph.data.find(trace => trace.meta.theme_role === 'loss_profile').marker.color") == "#88B7FF"
+            assert loss.evaluate("graph => graph.data.find(trace => trace.meta.theme_role === 'loss_profile').marker.color") == "#8f0da4"
             assert page.evaluate("document.querySelector('#meridional_plot .js-plotly-plot').layout.yaxis.range[0]") == 40
             assert_geometry_presentation()
             page.locator('.td-theme-toggle [data-theme="light"]').click()

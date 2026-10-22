@@ -20,6 +20,43 @@ print(result.success, result.message)
 Run this example from a repository checkout. The basic demo explains reporting
 and exports; the advanced demo compares step fractions and recovery policies.
 
+## Account for exhaust recovery
+
+After the `stages` section, turbine inputs include a prescribed diffuser recovery:
+
+```yaml
+inputs:
+  # Operating conditions...
+  stages:
+    # Stage definitions...
+  diffuser:
+    kinetic_energy_recovery_fraction: 0.60
+```
+
+In **Meanline > 05 Diffuser**, enter **Exhaust kinetic-energy recovery [%]**
+between 0 and 100. The default is 60%, including for older cases without this
+section. Saving a design writes the fraction between 0 and 1 after `stages`.
+
+The fifth headline result, **Efficiency with exhaust recovery**, uses
+
+$$
+\eta_{\mathrm{recovery}} =
+\frac{P_{\mathrm{shaft}}}
+{\dot m\left(\Delta h_{\mathrm{is,ts}} - f_{\mathrm{rec}} V_{\mathrm{exit}}^2/2\right)}.
+$$
+
+The absolute velocity at the final rotor exit includes meridional and tangential
+components. At 0% recovery this equals total-to-static efficiency; at 100% it
+equals TurboDash's total-to-total efficiency. Intermediate values represent
+partial recovery of exhaust kinetic energy and provide an efficiency estimate
+between those limits. This prescribed assumption does not solve a diffuser
+outlet state or modify shaft power, turbine flow, or the exit-pressure boundary.
+
+The overall result key is `efficiency_ts_with_recovery`. It is available as an
+optimization objective or constraint under **Overall**. The recovery fraction
+is an assumption held fixed during optimization, not a design variable. The
+original total-to-static and total-to-total metrics remain available.
+
 ## Configure the solver
 
 In the workbench, **Optimization > Configuration** shows the iteration limit

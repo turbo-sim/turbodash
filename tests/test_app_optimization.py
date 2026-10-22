@@ -227,7 +227,7 @@ class EditorTests(unittest.TestCase):
                                   edited_fields={"row": {"initial"}})
         self.assertEqual(result[0]["lower"], 55.1234567)
         self.assertEqual(result[0]["initial"], 60.1234567)
-        self.assertEqual(result[0]["upper"], 80)
+        self.assertEqual(result[0]["upper"], 70)
         outputs = output_catalog(case())
         before = [dict(id="limit", path="$overall_performance.efficiency_ts", target=0, scale=1, comparison="=")]
         live = [dict(before[0], path="$overall_performance.power_actual", target=12345.6789, comparison=">=")]

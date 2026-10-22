@@ -16,6 +16,12 @@ def exercise(context, address, output):
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.goto(address)
     page.wait_for_selector("#perf_table .dash-table-container")
+    objective_state = page.evaluate("""() => {
+        const state = window.store.getState();
+        return state.paths.strs['opt-objective'].reduce((node, key) => node[key], state.layout).props;
+    }""")
+    assert objective_state['value'] == '$overall_performance.efficiency_ts_with_recovery'
+    assert objective_state['options'][0]['value'] == objective_state['value']
     expect(page.locator("#td-metrics .td-metric")).to_have_count(5)
     section = page.locator("#td-section-diffuser")
     section.locator(":scope > summary").click()
@@ -91,7 +97,8 @@ def exercise(context, address, output):
     page.locator("#opt-panel > summary").click()
     page.get_by_role("tab", name="Configuration", exact=True).click()
     page.locator("#opt-objective").click()
-    expect(page.get_by_text("Overall · Efficiency with exhaust recovery [-]", exact=True)).to_be_visible()
+    expect(page.locator("#opt-objective .VirtualizedSelectOption").first).to_have_text(
+        "Overall · Efficiency with exhaust recovery [-]")
     page.keyboard.press("Escape")
     page.get_by_role("tab", name="Constraints", exact=True).click()
     menu = open_picker(page, "constraint")
@@ -102,6 +109,24 @@ def exercise(context, address, output):
     page.locator('.td-theme-toggle [data-theme="dark"]').click()
     page.wait_for_function("""() => document.querySelector('#efficiency_trends_plot .js-plotly-plot')
         .data.find(trace => trace.name === 'With exhaust recovery').line.color === '#75ce9a'""")
+    page.get_by_role("tab", name="Configuration", exact=True).click()
+    page.locator("#opt-objective").click()
+    search = page.locator("#opt-objective .Select-input input")
+    search.fill("exhaust")
+    expect(page.locator("#opt-objective .VirtualizedSelectOption").first).to_have_text(
+        "Overall · Efficiency with exhaust recovery [-]")
+    assert page.locator("#opt-objective").evaluate("""dropdown => {
+        const control = getComputedStyle(dropdown.querySelector('.Select-control'));
+        const input = getComputedStyle(dropdown.querySelector('.Select-input input'));
+        const expected = document.createElement('span');
+        expected.style.backgroundColor = 'var(--td-input)'; expected.style.color = 'var(--td-ink)';
+        dropdown.append(expected);
+        const theme = getComputedStyle(expected);
+        const readable = control.backgroundColor === theme.backgroundColor && input.color === theme.color;
+        expected.remove(); return readable;
+    }""")
+    page.screenshot(path=str(output / "objective_search_dark.png"), full_page=True)
+    search.press("Escape")
     plasma_dark = page.locator('#loss_plot .js-plotly-plot').evaluate(
         "graph => graph.data.filter(trace => trace.meta.theme_role !== 'loss_exit_kinetic').map(trace => trace.marker.color)")
     assert plasma_dark == ['#8f0da4', '#b7318a', '#d6556d', '#ee7b51', '#fca636']

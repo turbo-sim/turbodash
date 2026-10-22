@@ -27,7 +27,7 @@ from .opt_model import (
 from .opt_selection import apply_selection_operations, picker_signature, picker_tree, selector_menu
 
 
-DEFAULT_OBJECTIVE = "$overall_performance.efficiency_ts"
+DEFAULT_OBJECTIVE = "$overall_performance.efficiency_ts_with_recovery"
 DEFAULT_CONSTRAINT = "$stages_performance.*.geometry_meanline.*.flaring_angle"
 
 
@@ -303,7 +303,10 @@ def register_callbacks(app, live_config, render_results):
             variables=variables, constraints=outputs, fingerprint=jobs.fingerprint(config),
             groups=dict(variable=variable_groups(config, variables),
                         constraint=constraint_groups(config, outputs)),
-        ), _dropdown_options({k: v for k, v in outputs.items() if v["objective"]})
+        ), sorted(
+            _dropdown_options({k: v for k, v in outputs.items() if v["objective"]}),
+            key=lambda option: option["value"] != DEFAULT_OBJECTIVE,
+        )
 
     app.clientside_callback(
         """function(config, selection, previous) {

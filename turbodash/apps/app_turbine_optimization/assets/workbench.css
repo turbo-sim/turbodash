@@ -135,8 +135,8 @@
 .td-workbench .td-inspector .row > [class*="col"] { width: 100%; flex: 0 0 100%; max-width: 100%; padding-left: 0; padding-right: 0; }
 .td-workbench .td-inspector :is(input[type="number"],input[type="text"],select,.form-control,.form-select) { width: 100%; min-width: 0; min-height: 39px; font-size: 13px; }
 .td-workbench .td-inspector .td-field :is(input[type="number"],input[type="text"],select,.form-control,.form-select) { min-height: 34px; padding: 6px 7px; font-size: 12px; }
-.td-workbench :is(.form-control,.form-select,input[type="number"],textarea) { color: var(--td-ink); background-color: var(--td-input); border: 1px solid var(--td-line); border-radius: 5px; padding: 8px 10px; box-shadow: none; font-variant-numeric: tabular-nums; }
-.td-workbench :is(.form-control,.form-select,input[type="number"],textarea):focus { color: var(--td-ink); background-color: var(--td-input); border-color: var(--td-accent); box-shadow: 0 0 0 3px color-mix(in srgb,var(--td-accent) 13%,transparent); }
+.td-workbench :is(.form-control,.form-select,input[type="number"],input[type="text"],input[type="search"],textarea) { color: var(--td-ink); background-color: var(--td-input); border: 1px solid var(--td-line); border-radius: 5px; padding: 8px 10px; box-shadow: none; font-variant-numeric: tabular-nums; }
+.td-workbench :is(.form-control,.form-select,input[type="number"],input[type="text"],input[type="search"],textarea):focus { color: var(--td-ink); background-color: var(--td-input); border-color: var(--td-accent); box-shadow: 0 0 0 3px color-mix(in srgb,var(--td-accent) 13%,transparent); }
 .td-workbench input::placeholder, .td-workbench textarea::placeholder { color: var(--td-muted); opacity: .8; }
 .td-workbench input[type="number"] { appearance: textfield; }
 .td-workbench input[type="number"]::-webkit-inner-spin-button, .td-workbench input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -153,10 +153,26 @@
 .td-workbench .Select-arrow { border-top-color: var(--td-muted); }
 .td-workbench .is-open > .Select-control .Select-arrow { border-bottom-color: var(--td-muted); }
 .td-workbench .Select.is-focused > .Select-control { border-color: var(--td-accent); box-shadow: 0 0 0 2px color-mix(in srgb,var(--td-accent) 12%,transparent); }
+/* Own every React Select interaction state, including searchable hover and
+   pseudo-focus, rather than inheriting its white default surfaces. */
+.td-workbench .Select > .Select-control,
+.td-workbench .Select:is(:hover,.is-open,.is-focused,.is-pseudo-focused,.is-searchable) > .Select-control {
+  background: var(--td-input); color: var(--td-ink);
+}
+.td-workbench .Select.is-disabled > .Select-control { background: var(--td-canvas); color: var(--td-muted); }
+.td-workbench .Select .Select-menu { background: var(--td-panel); color: var(--td-ink); }
+.td-workbench .Select .Select-noresults { background: var(--td-panel); color: var(--td-muted); }
+.td-workbench .Select.Select--multi .Select-value { background: var(--td-tint); color: var(--td-ink); border-color: var(--td-line); }
+.td-workbench .Select.Select--multi .Select-value-icon { border-color: var(--td-line); }
+.td-workbench .Select.Select--multi .Select-value-icon:hover { background: var(--td-input); color: var(--td-accent); }
 /* React Select sizes its search input to the typed text (only a few pixels
    when empty). Paint focus on the outer control, not on this inner input. */
+.td-workbench .Select .Select-input {
+  /* Non-searchable menus use a focusable div with an inline white background. */
+  background: transparent !important; color: var(--td-ink);
+}
 .td-workbench .Select .Select-input > input {
-  background: transparent; border: 0; outline: none; outline-offset: 0;
+  background: transparent; color: var(--td-ink); caret-color: var(--td-ink); border: 0; outline: none; outline-offset: 0;
   box-shadow: none; min-height: 0; padding: 0; font: inherit;
 }
 .td-workbench .td-field .Select { font-size: 12px; }

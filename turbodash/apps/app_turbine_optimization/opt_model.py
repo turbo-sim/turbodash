@@ -80,6 +80,10 @@ GEOMETRY = {
     "solidity_chord": ("Solidity [-]", 1),
     "blade_count_continuous": ("Continuous blade count [-]", 50),
 }
+AXIAL_GEOMETRY = {
+    "hub_tip_ratio_in": ("Inlet hub-to-tip ratio [-]", 1),
+    "hub_tip_ratio_out": ("Outlet hub-to-tip ratio [-]", 1),
+}
 
 
 def flat_config(config):
@@ -156,7 +160,7 @@ def variable_catalog(config):
         hierarchy_title = _stage_title(i, stage)
         for key, label, lo, hi in (
             ("degree_reaction", "Reaction [-]", 0, .75),
-            ("stator_exit_angle", "Stator exit flow angle [deg]", 50, 80),
+            ("stator_exit_angle", "Stator exit flow angle [deg]", 40, 70),
             ("work_fraction_split", "Work fraction weight [-]", .1, 2),
             *((f"meridional_velocity_ratio_{pair}", f"Meridional velocity ratio {pair} [-]", .5, 1.5)
               for pair in ("12", "23", "34")),
@@ -189,7 +193,7 @@ def variable_catalog(config):
             row_path = prefix + f"blade_geometry.{row}."
             hierarchy = [hierarchy_title, f"{row.title()} geometry"]
             if not radial:
-                add(row_path + "aspect_ratio", f"{row_title} · Axial aspect ratio [-]", 1, 4,
+                add(row_path + "aspect_ratio", f"{row_title} · Axial aspect ratio [-]", 1.5, 2.5,
                     "Axial aspect ratio [-]", hierarchy)
             add(row_path + "solidity_chord", f"{row_title} · Solidity [-]", .5, 2,
                 "Solidity [-]", hierarchy)
@@ -272,6 +276,8 @@ def _constraint_default(path, scale):
         return "<=", 10
     if quantity == "height":
         return ">=", .001
+    if quantity in AXIAL_GEOMETRY:
+        return ">=", .8
     if quantity in ("efficiency_ts", "efficiency_tt", "efficiency_ts_with_recovery"):
         return ">=", .8
     return "=", scale
@@ -280,6 +286,9 @@ def _constraint_default(path, scale):
 def output_catalog(config, results=None):
     """Scalar objectives and scalar/wildcard constraints with physical scales."""
     catalog = {}
+    geometry = dict(GEOMETRY)
+    if config["inputs"].get("turbine_type") == "axial":
+        geometry.update(AXIAL_GEOMETRY)
 
     def add(path, label, scale, short_label, hierarchy, objective=False):
         if results:
@@ -305,7 +314,7 @@ def output_catalog(config, results=None):
                 scale, label, [hierarchy_title, "Performance"])
         for row in ("*", "stator", "rotor"):
             row_title = "Both rows" if row == "*" else row.title()
-            for key, (label, scale) in GEOMETRY.items():
+            for key, (label, scale) in geometry.items():
                 add(f"$stages_performance.{index}.geometry_meanline.{row}.{key}",
                     f"{title} · {row_title} · {label}", scale, label,
                     [hierarchy_title, f"{row_title} geometry"])
@@ -343,6 +352,10 @@ def constraint_groups(config, catalog=None):
                 row(prefix + "flaring_angle", "<=", 10),
                 row(prefix + "height", ">=", .001)]
 
+    def hub_tip_limits(scope):
+        return [row(f"$stages_performance.{scope}.geometry_meanline.{blade_row}.{quantity}")
+                for blade_row in ("stator", "rotor") for quantity in AXIAL_GEOMETRY]
+
     add("subsonic", "Maximum Mach number",
         "Keep blade-row Mach numbers at or below 1: absolute in stators, relative in rotors.",
         [row("$overall_performance.maximum_mach_number")], ["Overall"])
@@ -352,7 +365,15 @@ def constraint_groups(config, catalog=None):
     add("minimum_height", "Minimum blade height",
         "Require at least 1 mm mean blade height in every row; edit this allowance as needed.",
         geometry_limits("*")[2:], ["All stages"])
+    hub_tip_description = (
+        "Require hub radius / tip radius of at least 0.8 at the stator and rotor "
+        "inlets and outlets. Edit each comparison and target independently."
+    )
+    add("hub_tip_ratios", "Hub-to-tip ratios", hub_tip_description,
+        hub_tip_limits("*"), ["All stages"])
     for i, stage in enumerate(config["inputs"].get("stages", [])):
+        add(f"stage_{i}_hub_tip_ratios", "Hub-to-tip ratios", hub_tip_description,
+            hub_tip_limits(str(i)), [_stage_title(i, stage)])
         add(f"stage_{i}_limits", "Mach, flaring and blade-height limits",
             "Use editable starting limits: maximum Mach 1, flaring ±10° and blade height at least 1 mm.",
             [row(f"$stages_performance.{i}.stage_performance.maximum_mach_number"),

@@ -19,7 +19,7 @@ from urllib.request import urlopen
 import yaml
 import numpy as np
 from playwright.sync_api import sync_playwright, expect
-from browser_picker_helpers import choose_path
+from browser_picker_helpers import choose_group, choose_path
 
 from turbodash.visualization import plotly_turbine
 
@@ -127,6 +127,18 @@ def exercise(context, address, output):
     page.get_by_role("button", name="Remove variable", exact=True).last.click()
     expect(page.locator('#opt-variable-rows .td-opt-row')).to_have_count(1)
     page.get_by_role("tab", name="Constraints", exact=True).click()
+    choose_group(page, "constraint", "hub_tip_ratios")
+    expect(page.locator('#opt-constraint-rows .td-opt-row')).to_have_count(4)
+    for boundary in ("Inlet", "Outlet"):
+        expect(page.locator('#opt-constraint-rows .Select-value-label').filter(
+            has_text=f"{boundary} hub-to-tip ratio")).to_have_count(2)
+    target = page.locator('#opt-constraint-rows input[type="number"]').first
+    expect(target).to_have_js_property("valueAsNumber", .8)
+    target.fill("0.72")
+    target.blur()
+    expect(target).to_have_js_property("valueAsNumber", .72)
+    choose_group(page, "constraint", "hub_tip_ratios", selected=False)
+    expect(page.locator('#opt-constraint-rows .td-opt-row')).to_have_count(0)
     choose_path(page, "constraint", "$stages_performance.*.geometry_meanline.*.flaring_angle")
     expect(page.locator('#opt-constraint-rows .td-opt-row')).to_have_count(1)
     choose_path(page, "constraint", "$overall_performance.maximum_mach_number")

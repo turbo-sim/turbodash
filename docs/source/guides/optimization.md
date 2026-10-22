@@ -57,7 +57,30 @@ optimization objective or constraint under **Overall**. The recovery fraction
 is an assumption held fixed during optimization, not a design variable. The
 original total-to-static and total-to-total metrics remain available.
 
+## Constrain hub-to-tip ratios
+
+For axial turbines, open **Meanline > Optimization > Constraints > + Add groups**.
+Under **All stages**, activate **Hub-to-tip ratios** to add four limits: stator
+inlet, stator outlet, rotor inlet, and rotor outlet. Each starts at a minimum of
+0.8 with comparison **≥** and applies to every stage. This is an editable starting value, not a
+mandatory design limit; the group is off until selected.
+
+The same group is available under each individual stage. Using **+ Add constraint**,
+you can also select **Inlet hub-to-tip ratio** or **Outlet hub-to-tip ratio** under the stator or
+rotor geometry quantities. Change each comparison and target independently to
+set a minimum, maximum, or equality constraint. The ratio is hub radius divided
+by tip radius at that row boundary, with normalization scale 1.
+
+These are calculated meanline quantities, so they constrain optimization rather
+than directly setting blade geometry. They are omitted for radial turbines,
+where the current model fixes both ratios at 1. Constraints are retained when
+saving and loading the design's optimization settings.
+
 ## Configure the solver
+
+The default workbench objective is **Efficiency with exhaust recovery**, listed
+first in the objective menu. Loading a design with an explicit objective
+preserves that selection.
 
 In the workbench, **Optimization > Configuration** shows the iteration limit
 and solver tolerance (`ftol`). **Show expert settings** reveals feasibility

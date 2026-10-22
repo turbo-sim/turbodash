@@ -17,6 +17,7 @@ from turbodash.apps.app_turbine_optimization.opt_model import (
     variable_groups,
 )
 from turbodash.core.turbine import compute_turbine_performance
+from turbodash.apps.app_turbine_optimization.opt_selection import apply_selection_operations
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -250,3 +251,75 @@ def test_group_generation_honors_filtered_catalogs_without_mutation():
     assert output_subset == before
     assert variable_groups(config, {}) == {}
     assert constraint_groups(config, {}) == {}
+
+
+def test_hub_tip_constraints_resolve_all_four_boundaries_in_each_stage():
+    config = case(count=2)
+    result = compute_turbine_performance(config)
+    catalog = output_catalog(config, result)
+    groups = constraint_groups(config, catalog)
+    rows = groups["hub_tip_ratios"]["rows"]
+    assert len(rows) == 4
+    for blade_row in ("stator", "rotor"):
+        for boundary in ("in", "out"):
+            path = f"$stages_performance.*.geometry_meanline.{blade_row}.hub_tip_ratio_{boundary}"
+            assert path in groups["hub_tip_ratios"]["paths"]
+            for stage in range(2):
+                individual = path.replace(".*.", f".{stage}.")
+                assert individual in groups[f"stage_{stage}_hub_tip_ratios"]["paths"]
+                assert catalog[individual]["scale"] == 1
+                assert catalog[individual]["comparison"] == ">="
+                assert catalog[individual]["target"] == .8
+    settings = build_settings(
+        config, [dict(path="blade_velocity_ratio", lower=.5, upper=.7)], rows,
+        "$overall_performance.efficiency_ts", "maximize", 1e-8, 50, 1e-6, result,
+    )
+    equalities, inequalities, report = opt.evaluate_constraints(result, settings["constraints"])
+    assert len(equalities) == 0
+    assert len(inequalities) == len(report) == 8
+    expected = [
+        result["stages_performance"][i]["geometry_meanline"][row][f"hub_tip_ratio_{end}"]
+        for row in ("stator", "rotor") for end in ("in", "out") for i in range(2)
+    ]
+    np.testing.assert_allclose(inequalities, .8 - np.array(expected))
+    # A maximum and an equality are supported independently of the preset minimum.
+    edited = deepcopy(groups["stage_1_hub_tip_ratios"]["rows"])
+    edited[0].update(comparison="<=", target=.9)
+    edited[1].update(comparison="=", target=.8)
+    settings = build_settings(
+        config, [], edited, "$overall_performance.efficiency_ts", "maximize",
+        1e-8, 50, 1e-6, result, require_variables=False,
+    )
+    equalities, inequalities, report = opt.evaluate_constraints(result, settings["constraints"])
+    assert len(equalities) == 1 and len(inequalities) == 3
+    geometry = result["stages_performance"][1]["geometry_meanline"]["stator"]
+    assert inequalities[0] == pytest.approx(geometry["hub_tip_ratio_in"] - .9)
+    assert equalities[0] == pytest.approx(geometry["hub_tip_ratio_out"] - .8)
+
+
+def test_hub_tip_group_toggle_preserves_targets_and_other_constraints():
+    config = case()
+    catalog = output_catalog(config)
+    groups = constraint_groups(config, catalog)
+    rows = apply_selection_operations([], catalog, groups, "constraint", [
+        dict(kind="constraint", group="subsonic", selected=True),
+        dict(kind="constraint", group="hub_tip_ratios", selected=True),
+    ])
+    assert len(rows) == 5
+    rows[1]["target"] = .7123456789
+    before = deepcopy(rows)
+    assert apply_selection_operations(rows, catalog, groups, "constraint", [
+        dict(kind="constraint", group="hub_tip_ratios", selected=True),
+    ]) == before
+    remaining = apply_selection_operations(rows, catalog, groups, "constraint", [
+        dict(kind="constraint", group="hub_tip_ratios", selected=False),
+    ])
+    assert remaining == before[:1]
+
+
+@pytest.mark.parametrize("kind", ["radial", "radial_inflow", "radial_outflow"])
+def test_radial_model_does_not_offer_fixed_hub_tip_ratios(kind):
+    config = case("radial")
+    config["inputs"]["turbine_type"] = kind
+    assert not any("hub_tip_ratio" in path for path in output_catalog(config))
+    assert not any("hub_tip_ratio" in key for key in constraint_groups(config))

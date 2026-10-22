@@ -1,5 +1,8 @@
 # Blade geometry
 
+See the [illustrated blade profile controls](blade_geometry_controls.md) for
+one-at-a-time reaction/impulse geometry sweeps and reproducible figures.
+
 ## Production modules
 
 `turbodash.geometry.blade_parametrization` owns the conformal camberline,

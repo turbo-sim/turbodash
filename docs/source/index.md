@@ -20,6 +20,7 @@ installation
 guides/calculations
 guides/optimization
 guides/blade_geometry
+guides/blade_geometry_controls
 theory/meanline
 theory/efficiency_definition
 validation/index

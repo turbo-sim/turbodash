@@ -130,6 +130,17 @@ def exercise(context, address, output):
     plasma_dark = page.locator('#loss_plot .js-plotly-plot').evaluate(
         "graph => graph.data.filter(trace => trace.meta.theme_role !== 'loss_exit_kinetic').map(trace => trace.marker.color)")
     assert plasma_dark == ['#8f0da4', '#b7318a', '#d6556d', '#ee7b51', '#fca636']
+    for width in (1100, 1200, 1700):
+        page.set_viewport_size({'width': width, 'height': 1100})
+        page.wait_for_function('''() => {
+            const graph = document.querySelector('#loss_plot .js-plotly-plot');
+            return graph && Math.abs(graph._fullLayout.width - graph.clientWidth) < 2;
+        }''')
+        assert page.locator('#loss_plot .js-plotly-plot').evaluate('''graph =>
+            graph.data[0].x.at(-1) === 'Exit' && graph.layout.xaxis.tickangle === 0 &&
+            graph._fullLayout._size.h >= 180 && graph.layout.legend.orientation === 'h'
+        '''), f'Loss plot must keep readable plot height at {width}px'
+        page.locator('#td-efficiency-plots').screenshot(path=str(output / f'loss_layout_{width}_dark.png'))
     page.screenshot(path=str(output / "diffuser_plots_dark.png"), full_page=True)
     page.locator('.td-theme-toggle [data-theme="light"]').click()
     page.wait_for_function("""() => document.querySelector('#efficiency_trends_plot .js-plotly-plot')

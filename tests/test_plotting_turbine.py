@@ -251,10 +251,10 @@ def test_efficiency_penalties_close_solved_recovery_adjusted_balance(
         100 * (1 - solved["overall_performance"]["efficiency_ts_with_recovery"]), abs=1e-8
     )
     assert len(figure.data[0].x) == 2 * stage_count + 1
-    assert figure.data[0].x[-1] == "Unrecovered exit kinetic energy"
+    assert figure.data[0].x[-1] == "Exit"
     leaving_energy = 0.5 * solved["stages_performance"][-1]["flow_stations"][3]["v"] ** 2
     reference_drop = solved["overall_performance"]["isentropic_enthalpy_drop"] - recovery * leaving_energy
-    exit_energy = trace_named(figure, "Unrecovered exit kinetic energy")
+    exit_energy = trace_named(figure, "Exit kinetic energy")
     assert list(exit_energy.y[:-1]) == [0] * (2 * stage_count)
     assert exit_energy.y[-1] == pytest.approx(
         100 * (1 - recovery) * leaving_energy

@@ -290,6 +290,12 @@
 .td-workbench .td-kpi-value { font-size: 27px; font-weight: 600; letter-spacing: -.7px; font-variant-numeric: tabular-nums; white-space: nowrap; line-height: 1.2; }
 .td-workbench .td-kpi-unit { font-size: 12px; font-weight: 400; color: var(--td-muted); margin-left: 5px; letter-spacing: 0; }
 .td-workbench .td-plot-pair { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; align-items: stretch; }
+.td-workbench #td-efficiency-plots { container: td-efficiency / inline-size; }
+/* Keep the loss legend from consuming the plot in a narrow results pane,
+   including when the inspector has been widened on a large screen. */
+@container td-efficiency (max-width: 960px) {
+  .td-workbench #td-efficiency-plots > .td-plot-pair { grid-template-columns: minmax(0,1fr); }
+}
 .td-workbench .td-results-disclosure { margin-bottom: 21px; border: 1px solid var(--td-line); border-radius: 7px; background: var(--td-panel); }
 .td-workbench .td-results-disclosure > summary { padding: 16px 18px; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--td-ink); }
 .td-workbench .td-results-disclosure[open] > summary { border-bottom: 1px solid var(--td-line); margin-bottom: 16px; }

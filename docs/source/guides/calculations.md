@@ -60,7 +60,7 @@ $$
 100\frac{(1-f_{\mathrm{rec}})v_{\mathrm{exit}}^2/2}{D_f}.
 $$
 
-The final bar shows **Unrecovered exit kinetic energy**, after the prescribed
+The final bar, labelled **Exit**, shows unrecovered exit kinetic energy after the prescribed
 diffuser recovery. The displayed row-loss percentages use the same reference;
 the underlying row loss energies are unchanged. The complete
 loss budget satisfies

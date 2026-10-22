@@ -773,7 +773,7 @@ def plot_turbine_loss_distribution(results):
     reference_drop -= recovery * leaving_energy
     if not np.isfinite(reference_drop) or reference_drop <= 0:
         raise ValueError("The enthalpy drop with exhaust recovery must be positive and finite.")
-    exit_label = "Unrecovered exit kinetic energy"
+    exit_label = "Exit"
 
     labels, row_losses, row_energy = [], [], []
     for i, st in enumerate(stages, 1):
@@ -828,9 +828,14 @@ def plot_turbine_loss_distribution(results):
     if has_remainder:
         add_component("Other / unallocated", remainder, "loss_unallocated")
     add_component(
-        exit_label,
+        "Exit kinetic energy",
         [0.0] * len(row_losses) + [(1 - recovery) * leaving_energy],
         "loss_exit_kinetic",
+    )
+    fig.data[-1].hovertemplate = (
+        "Exit: unrecovered kinetic energy after diffuser recovery"
+        "<br>Δη: %{y:.2f}% (efficiency percentage points)"
+        "<br>Specific energy: %{customdata:.3f} J/kg<extra></extra>"
     )
     contributions = np.asarray([trace.y for trace in fig.data])
     positive_totals = np.maximum(contributions, 0).sum(axis=0)
@@ -845,6 +850,8 @@ def plot_turbine_loss_distribution(results):
         bargap=0.5,
         legend=dict(
             orientation="h",
+            entrywidth=140,
+            entrywidthmode="pixels",
             x=0.0,
             y=1.03,
             xanchor="left",
@@ -857,6 +864,7 @@ def plot_turbine_loss_distribution(results):
     )
     fig.update_xaxes(
         title_text="Blade row / final exit",
+        tickangle=0,
         title_font=dict(size=AXIS_FONT_SIZE),
         tickfont=dict(size=TICK_FONT_SIZE),
         showline=True,

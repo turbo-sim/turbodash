@@ -172,9 +172,13 @@ production kernel through its coordinate adapters.
    validates the draft and applies its effective values as overrides of the current
    row, preserving the current meanline source for reset. Errors stay visible in
    the dialog and leave the last valid geometry intact. Close discards unapplied
-   text; reopening shows the current row. The main header's
-   **Save design** remains the meanline/optimization design file; save row YAML
-   as well to retain CFD geometry edits.
+   text; reopening shows the current row. In the optimization edition, the main
+   header's **Save design** saves meanline inputs, optimization settings and all
+   stages' stator and rotor geometry together. **Load YAML**, or supplying the file
+   as the app's startup case, restores each row's saved source and overrides after
+   the matching meanline calculation. **Row YAML** is useful for transferring a
+   single row. In the experimental edition, use **Row YAML** to save geometry
+   separately from the header's meanline design file.
 6. Download the current axial geometry as independent TurboGrid rows or a
    positioned TurboGrid assembly. This ZIP export does not require optional
    mesh dependencies. The Geometry inspector has no separate 3D-model ZIP button.
@@ -194,6 +198,17 @@ clears their overrides, including when its resulting geometry is unchanged.
 Failed calculations preserve the last successful geometry. Tabs, themes,
 view options and row selection preserve edits. Optimizer trial evaluations and
 progress snapshots do not initialize geometry; only the accepted result does.
+
+The optimization design YAML stores geometry under
+`geometry: {schema_version: 1, stages: [...]}`. Each stage contains `stator` and
+`rotor` parameter-state mappings with their own `source` and `overrides`. Saved
+inputs include the physical integer blade count, dimensions, camberline and
+thickness parametrization, edge rounding and relief, physical-thickness
+correction, flow-domain extensions and integer sampling-point count. Continuous
+values retain their full precision, and loading preserves which fields were
+inherited or edited. Files without a `geometry` section retain the usual meanline
+presets. Geometry rows must match the design's stage count and axial/radial type;
+invalid geometry is rejected before the uploaded design is applied.
 
 `apps/shared/components/blade_modeller.py` owns the editor and its state reducer.
 `geometry_state` contains the live baseline-plus-overrides state for all rows.
@@ -224,7 +239,8 @@ Pending edits travel together in a client transaction journal, so rapidly
 editing two fields does not depend on the first response arriving. Acknowledged
 edits are compacted into the last valid snapshot to bound replay work during
 sustained dragging. Invalid edits are acknowledged without changing geometry.
-Saving row YAML includes a pending numeric edit. CAD/TurboGrid exports, mesh
+Saving row YAML or an optimization design includes a pending numeric edit.
+CAD/TurboGrid exports, mesh
 generation and mesh downloads wait until pending edits have reached the
 committed downstream geometry; an older mesh cannot be downloaded as though it
 represented the newly edited row.

@@ -26,10 +26,11 @@ def pending_geometry_reason(results, event):
     return ""
 
 
-def register_geometry_workflow(app):
+def register_geometry_workflow(app, *, loaded_config_store=None, normalize_inputs=None):
     from .components.blade_modeller import register_callbacks
 
-    register_callbacks(app)
+    register_callbacks(app, loaded_config_store=loaded_config_store,
+                       normalize_inputs=normalize_inputs)
 
     @app.callback(
         Output("geometry_results_store", "data"),

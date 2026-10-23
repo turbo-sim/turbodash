@@ -110,9 +110,10 @@
     }
     window.dash_clientside = Object.assign({}, window.dash_clientside, {
         bladeModeller: {
-            acceptEdit: function (proposal, state, stage, row, resultTimestamp) {
+            acceptEdit: function (proposal, state, stage, row, resultTimestamp, loadedTimestamp) {
                 const no = window.dash_clientside.no_update, skip = Array(13).fill(no);
                 if (!proposal || proposal.result_timestamp !== resultTimestamp) return skip;
+                if ("loaded_timestamp" in proposal && proposal.loaded_timestamp !== (loadedTimestamp ?? null)) return skip;
                 if (state && proposal.epoch === state._epoch && proposal.revision < state.revision) return skip;
                 if (journal.epoch === proposal.epoch && proposal.revision < journal.sequence) return skip;
                 const restoreNoUpdate = value => {

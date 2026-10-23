@@ -12,7 +12,8 @@ Turbodash is an interactive application for the meanline design and optimization
 - Optimize selected design variables with SLSQP, configurable bounds and constraints, recovery from invalid trial designs, and independent feasibility and KKT optimality checks.
 - Inspect meridional channel and blade-to-blade views, velocity triangles in Mach numbers or m/s, efficiency curves, and loss distributions.
 - Compare performance, geometry, and flow-station reports and export their tables.
-- Import and export YAML configurations, including optimization settings.
+- Import and export YAML configurations, including optimization settings and all
+  blade geometry inputs in the optimization app.
 - Work with light and dark themes, collapsible input sections, and background optimization progress.
 
 ## Installation
@@ -44,8 +45,12 @@ poetry run app_turbine_optimization --open-browser
 Its **Geometry** workspace uses the production conformal camberline and rational
 Denton blade modeller. Edits update the geometry and meanline blade views;
 the next successful meanline calculation resets them to fresh interpolated
-presets. See the [blade geometry guide](docs/source/guides/blade_geometry.md)
-for parameter mapping, row YAML, CAD/mesh export, and supported configurations.
+presets. **Save design** includes every stage's stator and rotor geometry,
+including integer blade counts and parametrization settings. **Load YAML** or
+starting the app with that file restores the saved geometry sources and overrides.
+Older files without geometry use the meanline presets. See the
+[blade geometry guide](docs/source/guides/blade_geometry.md) for parameter mapping,
+whole-design and row YAML, CAD/mesh export, and supported configurations.
 
 For a pip installation, use:
 

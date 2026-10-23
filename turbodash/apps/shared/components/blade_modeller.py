@@ -33,6 +33,7 @@ from turbodash.geometry.meanline import (
     get_row_section, initialize_geometry, reset_geometry_overrides,
     row_parameter_state, update_geometry_override,
 )
+from turbodash.geometry.serialization import restore_geometry
 from .meshing import _engineering_plot, geometry_panel as _mesh_geometry_panel
 from .turbogrid import turbogrid_export_panel
 from .blade_help import PARAMETER_HELP
@@ -430,7 +431,8 @@ def evaluate_3d(state, row_id):
     return {"token": state_token(state, row_id), "data": data, "message": note}
 
 
-def register_callbacks(app, *, results_store="result_store"):
+def register_callbacks(app, *, results_store="result_store", loaded_config_store=None,
+                       normalize_inputs=None):
     """Register the sole geometry-state writer and separate live/commit views."""
     app.clientside_callback(
         "function(low, high) { return {[low]: String(low), [high]: String(high)}; }",
@@ -455,7 +457,8 @@ def register_callbacks(app, *, results_store="result_store"):
         State({"type": "blade-parameter", "path": ALL}, "id"),
         State({"type": "blade-reset", "path": ALL}, "id"), prevent_initial_call=True)
 
-    def edit(results, stage, row_name, event, identifiers, slider_ids, current, committed, result_timestamp):
+    def edit(results, stage, row_name, event, identifiers, slider_ids, current, committed, result_timestamp,
+             loaded_cfg=None, loaded_timestamp=None):
         trigger = ctx.triggered_id
         dragging = trigger == "blade_modeller_events" and bool((event or {}).get("dragging"))
         notice, edited_path = "", None
@@ -465,13 +468,35 @@ def register_callbacks(app, *, results_store="result_store"):
         # A queued edit can carry the previous state while the newest accepted
         # meanline result is already in the browser. Its result timestamp wins,
         # including a repeat calculation with identical geometric dimensions.
-        refresh = trigger == results_store or (results and
+        loading = loaded_cfg is not None and (
+            not current or current.get("_loaded_geometry_timestamp") != loaded_timestamp
+            or current.get("_loaded_geometry_pending_result", False))
+        result_after_load = (result_timestamp is not None and loaded_timestamp is not None
+                             and result_timestamp >= loaded_timestamp)
+        loaded_inputs_match = loading and normalize_inputs is not None and results and (
+            normalize_inputs(loaded_cfg) == normalize_inputs(results))
+        if loaded_config_store and trigger == loaded_config_store and not loaded_inputs_match:
+            # The upload arrives before its overall/stage controls and solve.
+            # Keep the previous geometry until the matching result is accepted.
+            raise PreventUpdate
+        refresh = trigger in (results_store, loaded_config_store) or (results and
                   (not current or current.get("_result_timestamp") != result_timestamp))
         if refresh:
             if not results or not results.get("stages_performance"):
                 raise PreventUpdate
             try:
-                state = initialize_geometry(results)
+                if loaded_inputs_match and "geometry" in loaded_cfg:
+                    state = restore_geometry(results, loaded_cfg["geometry"])
+                else:
+                    state = initialize_geometry(results)
+                if loaded_inputs_match:
+                    state["_loaded_geometry_timestamp"] = loaded_timestamp
+                    # Identical meanline controls need no new solve. Restore
+                    # against that accepted result immediately, and retain the
+                    # load if an already queued matching solve arrives later.
+                    state["_loaded_geometry_pending_result"] = not result_after_load
+                elif current and "_loaded_geometry_timestamp" in current:
+                    state["_loaded_geometry_timestamp"] = current["_loaded_geometry_timestamp"]
                 state["_epoch"] = uuid.uuid4().hex
                 state["_result_timestamp"] = result_timestamp
                 dragging = False
@@ -544,14 +569,20 @@ def register_callbacks(app, *, results_store="result_store"):
         Input("blade_modeller_events", "data"),
         State({"type": "blade-parameter", "path": ALL}, "id"), State({"type": "blade-slider", "path": ALL}, "id"),
         State("geometry_state", "data"), State("geometry_committed", "data"),
-        State(results_store, "modified_timestamp"), prevent_initial_call=True,
+        State(results_store, "modified_timestamp"),
+        *([State(loaded_config_store, "data"), Input(loaded_config_store, "modified_timestamp")]
+          if loaded_config_store else []),
+        prevent_initial_call=True,
     )
     def prepare_edit(*args):
         values = edit(*args)
         proposed = values[0] if values[0] is not no_update else args[6]
-        return {"values": values, "stage": args[1] or 0, "row": args[2] or "stator",
-                "epoch": (proposed or {}).get("_epoch"), "revision": (proposed or {}).get("revision", 0),
-                "result_timestamp": args[8]}
+        proposal = {"values": values, "stage": args[1] or 0, "row": args[2] or "stator",
+                    "epoch": (proposed or {}).get("_epoch"), "revision": (proposed or {}).get("revision", 0),
+                    "result_timestamp": args[8]}
+        if loaded_config_store:
+            proposal["loaded_timestamp"] = args[10]
+        return proposal
 
     # Expose the pure transition for unit tests; only acceptEdit writes browser state.
     prepare_edit.transition = edit
@@ -567,7 +598,9 @@ def register_callbacks(app, *, results_store="result_store"):
         Output("blade_modeller_context", "data-row"), Output("blade_modeller_context", "data-epoch"),
         Input("blade_modeller_edit_proposal", "data"), State("geometry_state", "data"),
         State("geometry_stage", "value"), State("geometry_row", "value"),
-        State(results_store, "modified_timestamp"), prevent_initial_call=True)
+        State(results_store, "modified_timestamp"),
+        *([State(loaded_config_store, "modified_timestamp")] if loaded_config_store else []),
+        prevent_initial_call=True)
 
     @app.callback(Output("blade_modeller_2d_proposal", "data"), Input("geometry_state", "data"),
                   Input("geometry_stage", "value"), Input("geometry_row", "value"),

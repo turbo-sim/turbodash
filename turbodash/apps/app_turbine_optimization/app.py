@@ -22,11 +22,13 @@ import numpy as np
 from turbodash.core import turbine as core
 from turbodash.core.diffuser import DEFAULT_RECOVERY_FRACTION, diffuser_settings
 from turbodash.io.yaml import dump_turbine_yaml
+from turbodash.geometry.serialization import export_geometry, validate_geometry
 from turbodash.visualization import plotly_turbine as _plotting
 from turbodash.reporting import turbine as reporting
 import dash_bootstrap_components as dbc
 
 from datetime import datetime
+from uuid import uuid4
 
 from dash import (
     Dash,
@@ -107,7 +109,10 @@ def initialize_session():
 register_vtk_assets(app)
 register_turbogrid_callbacks(app, results_store="geometry_results_store", modeller=True)
 register_meshing_callbacks(app, precise_inputs=True, results_store="geometry_results_store", modeller=True)
-register_geometry_workflow(app)
+register_geometry_workflow(
+    app, loaded_config_store="loaded_cfg_store",
+    normalize_inputs=lambda cfg: geometry_load_inputs(cfg),
+)
 
 
 def configure(config_path):
@@ -958,12 +963,19 @@ def _assemble_cfg(overall, stages):
     State("opt-feasibility", "value"),
     *[State(component_id, "value") for _, component_id in SLSQP_EXTRA_CONTROLS],
     State("opt-solver-options", "data"),
+    State("geometry_state", "data"),
+    State("blade_modeller_events", "data"),
+    State("result_store", "modified_timestamp"),
     prevent_initial_call=True,
 )
 def download_yaml(n_clicks, cfg, signature, ov, sv, oi, si, stages, *editor):
     if cfg is None:
         raise PreventUpdate
     try:
+        # Keep direct callers using the pre-geometry editor arguments working.
+        geometry_state, pending, result_timestamp = None, None, None
+        if len(editor) == 16 + len(SLSQP_EXTRA_CONTROLS) + 3:
+            *editor, geometry_state, pending, result_timestamp = editor
         current = live_config(ov, sv, oi, si, stages)
         if input_signature(ov, sv, oi, si, stages) != signature:
             raise ValueError(
@@ -979,10 +991,22 @@ def download_yaml(n_clicks, cfg, signature, ov, sv, oi, si, stages, *editor):
             require_variables=False,
             solver_options=extra_solver_options(editor[15:-1], editor[-1]),
         )
-    except (ValueError, KeyError) as error:
+        if geometry_state is not None:
+            if geometry_state.get("_result_timestamp") != result_timestamp:
+                raise ValueError("Wait for the current blade geometry before saving.")
+            if (pending and pending.get("epoch") == geometry_state.get("_epoch")
+                    and pending.get("sequence", 0) > geometry_state.get("revision", 0)):
+                from turbodash.apps.shared.components.blade_modeller import fold_edit_journal
+                geometry_state, errors, _ = fold_edit_journal(geometry_state, pending)
+                if errors:
+                    raise ValueError("Resolve the pending invalid geometry edit before saving.")
+        elif result_timestamp is not None:
+            raise ValueError("Wait for the current blade geometry before saving.")
+        geometry = export_geometry(cfg, geometry_state)
+    except (ValueError, KeyError, TypeError) as error:
         set_props("td-load-error", {"children": f"Design was not saved. {error}"})
         return no_update
-    cfg = dict(cfg, inputs=current["inputs"], optimization=settings)
+    cfg = dict(cfg, inputs=current["inputs"], optimization=settings, geometry=geometry)
     set_props("td-load-error", {"children": ""})
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     yaml_str = dump_turbine_yaml(cfg)
@@ -1020,11 +1044,19 @@ def load_design(contents):
                 raise ValueError("Every stage must contain a mapping of design inputs.")
         ids = [{"scope": "overall", "key": key} for key in OVERALL_DEFAULTS]
         live_config(loaded_overall_values(cfg, ids), [], ids, [], loaded_stages(cfg))
+        if "geometry" in cfg:
+            cfg["geometry"] = validate_geometry(
+                cfg["geometry"], len(cfg["inputs"]["stages"]), cfg["inputs"].get("turbine_type", "axial"),
+            )
     except Exception as error:
         set_props("td-load-error", {"children": f"Could not load YAML. {error}"})
         return no_update
     set_props("td-load-error", {"children": ""})
-    return cfg
+    # Reset the upload value so choosing the same file fires its callback again.
+    set_props("load_button", {"contents": None})
+    # dcc.Store timestamps change only when its data changes. Give repeated
+    # uploads of the same file a distinct load event so they restore geometry.
+    return dict(cfg, _load_id=uuid4().hex)
 
 
 # =========================================
@@ -1054,6 +1086,12 @@ def loaded_overall_values(cfg, overall_ids):
         else:
             out_values.append(inp.get(key, OVERALL_DEFAULTS.get(key)))
     return out_values
+
+
+def geometry_load_inputs(cfg):
+    """Compare uploads and accepted results using the app's actual input defaults."""
+    ids = [{"scope": "overall", "key": key} for key in OVERALL_DEFAULTS]
+    return live_config(loaded_overall_values(cfg, ids), [], ids, [], loaded_stages(cfg))["inputs"]
 
 
 register_optimization_callbacks(app, live_config, render_results)

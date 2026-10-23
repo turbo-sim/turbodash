@@ -117,9 +117,16 @@ meanline result plus interpolated reaction/impulse presets. Geometry controls
 edit sparse overrides shared by the blade views and CAD/mesh exporters;
 they never rerun meanline. A successful new calculation clears those overrides,
 while failed calculations, tab changes and optimizer progress retain them.
-Use the row YAML controls to save/load geometry separately from the header's
-meanline design file. See the [blade geometry guide](../../docs/source/guides/blade_geometry.md)
-for mapping, presets, state ownership, launch instructions and limitations.
+In the optimization edition, the header's **Save design** includes every stage's
+stator and rotor geometry in a top-level `geometry` section. Each row retains its
+parameter source and sparse overrides, including integer blade counts, camberline,
+thickness, edge settings, correction, flow-domain extensions and sampling points.
+**Load YAML** and startup case files restore those values and their edited/inherited
+status after the matching meanline calculation. Older YAML without `geometry` uses
+the meanline presets. **Row YAML** remains available for transferring one row.
+The experimental edition still saves geometry separately with **Row YAML**.
+See the [blade geometry guide](../../docs/source/guides/blade_geometry.md) for
+mapping, presets, state ownership, launch instructions and limitations.
 
 Six numbered sections start collapsed: **Turbine setup**, **Operating point**,
 **Shaft speed**, **Stage design**, **Diffuser**, and **Optimization**. The stage

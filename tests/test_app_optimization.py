@@ -558,7 +558,10 @@ class JobTests(unittest.TestCase):
         self.assertEqual(failure["station"], 4)
         self.assertLess(failure["value"], 0)
         self.assertTrue(failure["recoverable"])
-        self.assertIn("Rejected trial", log)
+        self.assertEqual(log.count("Starting optimization process"), 1)
+        self.assertEqual(log.count("Success:"), 1)
+        self.assertIn("Final optimality", log)
+        self.assertNotIn("Starting pysolver SLSQP optimization", log)
         self.assertNotIn("Update 1", log)
         self.assertEqual(result["config"]["optimization"]["solver_options"]["backtrack_factor"], .5)
 

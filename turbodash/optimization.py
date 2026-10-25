@@ -1,4 +1,4 @@
-"""Translate a turbine design problem into SLSQP inputs and physical results.
+"""Map turbine designs to PySolverView's SLSQP optimizer and physical reports.
 
 This module is the bridge between turbine configurations and the generic solver.
 It reads selected design variables, objectives, and constraints from dictionaries
@@ -20,26 +20,33 @@ must evaluate successfully before this recovery mechanism can be used.
 plots, and saved results. Acceptance requires native solver success together
 with the final feasibility and independent optimality checks. Keeping these
 responsibilities here gives the app and standalone studies the same behavior,
-while step control and SciPy internals remain in the solver modules.
+while PySolverView owns step control, the SciPy bridge and KKT mathematics.
 """
 
 from collections import OrderedDict
 from collections.abc import Mapping, MutableMapping
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
-import logging
 import math
-import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pysolver_view as psv
 from scipy.optimize import OptimizeResult
 import yaml
 
 from turbodash.io.yaml import dump_turbine_yaml
 from turbodash.core.errors import ModelDomainError
-from .slsqp import DomainError, Evaluation, minimize_slsqp, normalize_solver_options
+
+
+__all__ = [
+    "OptimizationResult", "TurbineOptimizationProblem", "TurbinePlotCallback",
+    "evaluate_constraints", "evaluate_objective", "load_case",
+    "normalize_solver_options", "optimize_turbine",
+    "plot_turbine", "read_path", "resolve_value", "save_figure",
+    "save_optimization_results", "set_path", "solver_diagnostics",
+]
 
 
 # =============================================================================
@@ -233,6 +240,62 @@ def evaluate_constraints(results, specs):
 # =============================================================================
 
 
+def normalize_solver_options(configured=None, *, feasibility_tolerance=1e-6):
+    """Translate turbine YAML aliases and validate options with PySolverView.
+
+    Turbine variables always use normalized [0, 1] coordinates. Feasibility
+    tolerance belongs to the turbine configuration; numerical defaults and
+    validation come from PySolverView's public ``SLSQPOptions``.
+    """
+    if configured is None:
+        configured = {}
+    if not isinstance(configured, dict):
+        raise ValueError("solver_options must be a dictionary.")
+    configured = deepcopy(configured)
+    configured.pop("max_fd_backtracks", None)
+    for old, new in (
+        ("tolerance", "ftol"),
+        ("max_iterations", "maxiter"),
+        ("derivative_abs_step", "finite_diff_step"),
+    ):
+        if old in configured:
+            value = configured.pop(old)
+            if new in configured and configured[new] != value:
+                raise ValueError(f"Conflicting solver options {old!r} and {new!r}.")
+            configured[new] = value
+    for name, accepted in (
+        ("library", ("pysolver", "scipy")),
+        ("method", ("slsqp",)),
+        ("derivative_method", ("2-point",)),
+    ):
+        if name in configured and str(configured.pop(name)).lower() not in accepted:
+            raise ValueError(
+                f"Turbine optimization requires {name} in {accepted!r}."
+            )
+    if configured.pop("problem_scale", 1.0) != 1.0:
+        raise ValueError(
+            "Turbine optimization uses normalized [0, 1] variables; problem_scale must be 1."
+        )
+    for name in (
+        "print_convergence", "plot_convergence", "plot_scale_constraints",
+        "update_on", "tolerance_check_cache",
+    ):
+        configured.pop(name, None)
+    if "callback_functions" in configured:
+        raise ValueError("Pass application callbacks through optimize_turbine(callback=...).")
+    if configured.get("check_kkt", True) is not True:
+        raise ValueError("Turbine optimization requires check_kkt=True for final acceptance.")
+    configured["feasibility_tol"] = feasibility_tolerance
+    try:
+        options = asdict(psv.SLSQPOptions(**configured))
+        # Turbine acceptance always checks KKT; keep this fixed policy out of
+        # the app's persisted numerical controls and use PySolverView's default.
+        options.pop("check_kkt")
+        return options
+    except TypeError as error:
+        raise ValueError(f"Invalid SLSQP solver options: {error}") from error
+
+
 def load_case(filename):
     """Load a standalone YAML case containing inputs and optimization settings."""
     with Path(filename).open(encoding="utf-8") as stream:
@@ -298,7 +361,7 @@ def _read_design_variables(inputs, specifications, logger=None):
 # =============================================================================
 
 
-class TurbineOptimizationProblem:
+class TurbineOptimizationProblem(psv.OptimizationProblem):
     """Adapt configured turbine variables and responses to a scaled solver problem.
 
     Copies of the configuration keep trial evaluations separate from the input
@@ -306,11 +369,10 @@ class TurbineOptimizationProblem:
     results are cached by the exact physical variable vector so the objective
     and every constraint refer to the same turbine evaluation.
 
-    The adapter retains physical values for reporting and provides normalized
-    coordinates and residuals for SLSQP. Its constraint helpers express
-    inequalities as residuals <= 0; ``evaluate_slsqp`` reverses their sign to
-    meet the generic driver's >= 0 convention. Recognized model-domain errors
-    carry the failing physical variables into the driver's recovery diagnostics.
+    Fitness uses physical inputs and nonpositive inequality residuals, matching
+    PySolverView's public problem contract. PySolverView scales the variables,
+    adapts backend constraint signs, differentiates, and assesses convergence.
+    Recognized model-domain errors retain the failing physical variables.
     """
 
     def __init__(self, config, optimization=None, evaluator=None, logger=None):
@@ -346,6 +408,7 @@ class TurbineOptimizationProblem:
             self.lower_bounds, self.x0, self.upper_bounds,
         ) = _read_design_variables(self.config["inputs"], self.optimization.get("design_variables"), logger)
         self.bound_range = self.upper_bounds - self.lower_bounds
+        self.problem_scale = 1.0
         self.cache = OrderedDict()
         self.n_evaluations = 0
         self.constraint_sizes = None
@@ -356,6 +419,7 @@ class TurbineOptimizationProblem:
         self.evaluator = evaluator
 
         # The initial design must be physically evaluable before taking a step.
+        self.evaluate(self.x0)
         self.fitness(self.x0)
         if self.get_nec() > len(self.variable_names):
             raise ValueError("There are more scalar equality constraints than design variables.")
@@ -403,31 +467,37 @@ class TurbineOptimizationProblem:
         return evaluation
 
     def fitness(self, physical_values):
-        evaluation = self.evaluate(physical_values)
+        """Evaluate public-sign responses and translate recognized domain errors."""
+        try:
+            evaluation = self.evaluate(physical_values)
+        except ModelDomainError as error:
+            metadata = error.to_dict()
+            metadata["design_variables"] = dict(
+                zip(self.variable_names, np.asarray(physical_values).tolist(), strict=True)
+            )
+            raise psv.DomainError(str(error), metadata=metadata) from error
         self.f = self.objective_sign * evaluation["objective"] / self.objective_scale
         self.c_eq = evaluation["equalities"]
         self.c_ineq = evaluation["inequalities"]
-        self.constraint_data = evaluation["constraint_report"]
+        # PySolverView owns satisfaction checks and table formatting. Retain
+        # physical values and named wildcard components in its metadata schema;
+        # the full turbine constraint report remains unchanged in evaluate().
+        self.constraint_data = [
+            {
+                "name": item["variable"].removeprefix("$") + (
+                    "" if item["index"] is None else f"[{item['index']}]"
+                ),
+                "type": (
+                    "=" if item["type"] in ("=", "==")
+                    else ">" if item["type"] in (">", ">=") else "<"
+                ),
+                "value": item["value"],
+                "target": item["target"],
+                "normalized_mismatch": item["normalized_residual"],
+            }
+            for item in evaluation["constraint_report"]
+        ]
         return np.r_[self.f, self.c_eq, self.c_ineq]
-
-    def scale_physical_to_normalized(self, values):
-        return (np.asarray(values, dtype=float) - self.lower_bounds) / self.bound_range
-
-    def scale_normalized_to_physical(self, values):
-        return self.lower_bounds + np.asarray(values, dtype=float) * self.bound_range
-
-    def evaluate_slsqp(self, normalized_values):
-        values = self.scale_normalized_to_physical(normalized_values)
-        try:
-            evaluation = self.evaluate(values)
-        except ModelDomainError as error:
-            metadata = error.to_dict()
-            metadata["design_variables"] = dict(zip(self.variable_names, values.tolist(), strict=True))
-            raise DomainError(str(error), metadata=metadata) from error
-        return Evaluation(
-            self.objective_sign * evaluation["objective"] / self.objective_scale,
-            evaluation["equalities"], -evaluation["inequalities"],
-        )
 
     def get_bounds(self):
         return self.lower_bounds, self.upper_bounds
@@ -441,7 +511,11 @@ class TurbineOptimizationProblem:
 
 @dataclass
 class OptimizationResult:
-    """Physical design, exact evaluated geometry, and the SLSQP result."""
+    """Physical design, detached diagnostics, and the live reporting frontend.
+
+    ``optimizer`` exposes PySolverView's report and plot methods. It is excluded
+    from the explicit YAML exports and app worker payloads.
+    """
 
     config: dict
     turbine_results: dict
@@ -461,6 +535,8 @@ class OptimizationResult:
     initial_turbine_results: dict
     initial_config: dict
     source_config: dict
+    frontend_result: OptimizeResult | None = None
+    optimizer: psv.OptimizationSolver | None = None
 
 
 _SOLVER_DIAGNOSTIC_FIELDS = (
@@ -511,17 +587,12 @@ def optimize_turbine(config, optimization=None, *, evaluator=None, callback=None
     and solver-scaled step and KKT diagnostics.
     Only explicitly identified ModelDomainError failures are recoverable; the
     solver retries their actual trial steps without inventing model values.
-    The optional logger receives one convergence report and recovery diagnostics.
+    PySolverView's main frontend owns numerical work and convergence printing.
+    The optional logger receives its report instead of terminal output.
     """
     problem = TurbineOptimizationProblem(config, optimization, evaluator, logger=logger)
     configured_options = problem.optimization.get("solver_options") or {}
     options = normalize_solver_options(configured_options, feasibility_tolerance=problem.feasibility_tolerance)
-    if logger is None and configured_options.get("print_convergence", True):
-        logger = logging.Logger("turbodash.slsqp", logging.INFO)
-        handler = logging.StreamHandler(sys.stdout)
-        handler.setFormatter(logging.Formatter("%(message)s"))
-        logger.addHandler(handler)
-
     initial = problem.evaluate(problem.x0)
     history = []
     previous_solver_point = None
@@ -561,12 +632,30 @@ def optimize_turbine(config, optimization=None, *, evaluator=None, callback=None
     def solver_callback(record):
         report_progress(problem.scale_normalized_to_physical(record["x"]), record)
 
-    solver = minimize_slsqp(
-        problem.evaluate_slsqp, problem.scale_physical_to_normalized(problem.x0),
-        np.column_stack((np.zeros(len(problem.x0)), np.ones(len(problem.x0)))),
-        options=options, callback=solver_callback, logger=logger,
+    frontend_options = dict(options)
+    frontend = psv.OptimizationSolver(
+        problem,
+        library="pysolver",
+        method="slsqp",
+        problem_scale=1.0,
+        tolerance=frontend_options.pop("ftol"),
+        max_iterations=frontend_options.pop("maxiter"),
+        derivative_method="2-point",
+        derivative_abs_step=options["finite_diff_step"],
+        extra_options=frontend_options,
+        update_on="iteration",
+        check_kkt=True,
+        print_convergence=logger is None and configured_options.get("print_convergence", True),
+        plot_convergence=False,
+        logger=logger,
+        backend_callback=solver_callback,
     )
-    physical_final_values = problem.scale_normalized_to_physical(solver.x)
+    frontend.solve(problem.x0)
+    # Retain the backend's normalized coordinates and KKT sign convention in
+    # the detailed turbine reports. The frontend result exposes physical x and
+    # total model-call accounting, including its finite-difference probes.
+    solver = deepcopy(frontend.backend_result)
+    physical_final_values = np.asarray(frontend.result.x, dtype=float).copy()
     # Reevaluate the returned design, independent of derivative-probe caches.
     final = problem.evaluate(physical_final_values, refresh=True)
     report_progress(physical_final_values, dict(x=solver.x, iteration=solver.nit,
@@ -574,7 +663,8 @@ def optimize_turbine(config, optimization=None, *, evaluator=None, callback=None
                     derivative_rejections=solver.derivative_rejections,
                     **solver_diagnostics(solver)))
     solver.x_final = physical_final_values.copy()
-    solver.library, solver.method = "scipy", "slsqp"
+    solver.library, solver.method = "pysolver", "slsqp"
+    solver.frontend_convergence_history = deepcopy(frontend.convergence_history)
     solver.convergence_history = {
         "iteration": [entry["iteration"] for entry in solver.history],
         "objective_value": [entry["objective"] for entry in solver.history],
@@ -609,14 +699,16 @@ def optimize_turbine(config, optimization=None, *, evaluator=None, callback=None
         history=history, solver=solver, n_evaluations=problem.n_evaluations,
         initial_turbine_results=initial["turbine_results"], initial_config=initial["config"],
         source_config=problem.source_config,
+        frontend_result=deepcopy(frontend.result),
+        optimizer=frontend,
     )
     if configured_options.get("plot_convergence", False):
-        plot_convergence(result, show=True)
+        frontend.plot_convergence_history(showfig=True)
     return result
 
 
 # =============================================================================
-# Turbine and convergence plots
+# Turbine visualization
 # =============================================================================
 
 
@@ -639,22 +731,6 @@ def plot_turbine(turbine_results, title=None, figure=None):
     efficiency = turbine_results["overall_performance"]["efficiency_ts"]
     figure.suptitle(f"{title or 'Turbine'} — total-to-static efficiency {efficiency:.2%}")
     figure.tight_layout(rect=(0, 0, 1, 0.91))
-    return figure
-
-
-def plot_convergence(result, show=False):
-    """Plot accepted physical objectives and normalized constraint violations."""
-    figure, axes = plt.subplots(2, 1, sharex=True, figsize=(7, 6), layout="constrained")
-    iterations = [entry["iteration"] for entry in result.history]
-    axes[0].plot(iterations, [entry["objective"] for entry in result.history], color="#1675d1")
-    axes[0].set_ylabel("Physical objective")
-    axes[1].semilogy(iterations, [max(entry["max_constraint_violation"], 1e-16) for entry in result.history], color="#ef8c35")
-    axes[1].set_ylabel("Normalized constraint violation")
-    axes[1].set_xlabel("Accepted iteration")
-    for axis in axes:
-        axis.grid(alpha=.2)
-    if show:
-        plt.show(block=False)
     return figure
 
 
@@ -734,7 +810,7 @@ def save_optimization_results(result, output_directory):
                 "input_case": "input_case.yaml",
                 "effective_initial_case": "initial_case.yaml",
                 "optimized_case": "optimized_case.yaml",
-                "solver": "turbodash.optimization.slsqp.minimize_slsqp",
+                "solver": "pysolver_view.OptimizationSolver",
                 "library": result.solver.library, "method": result.solver.method,
             },
             "success": result.success, "solver_success": result.solver_success,
@@ -747,6 +823,8 @@ def save_optimization_results(result, output_directory):
             "solver_elapsed_seconds": result.solver.elapsed_time,
             "progress_history": result.history,
             "solver_convergence_history": result.solver.convergence_history,
+            "frontend_result": result.frontend_result,
+            "frontend_convergence_history": result.solver.frontend_convergence_history,
             "solver_status": result.solver.status,
             **solver_diagnostics(result.solver),
             "domain_rejections": result.solver.domain_rejections,

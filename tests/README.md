@@ -8,8 +8,10 @@ python -B -m pytest tests -q -ra
 
 `test_optimization_api.py` contains the API contracts and real axial/radial
 checks formerly kept with the first development example. The input cases now
-live in `demos/optimization/`. The independent KKT maintenance matrix remains
-in `development/optimization/`; see its README for the longer study commands.
+live in `demos/optimization/`. Generic solver and KKT mathematics tests belong
+to PySolverView. Turbodash retains physical scaling, model-domain recovery,
+callback snapshots and export checks, plus the turbine integration
+matrix in `development/optimization/`; see its README for the longer studies.
 
 Native meshing and renderer integration tests require the optional TurboMoC,
 Gmsh, PyVista and Dash VTK dependencies. They skip when those dependencies are

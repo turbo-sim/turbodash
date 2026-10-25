@@ -8,14 +8,14 @@ the overall turbine, individual stages, and blade rows.
 The configuration helpers validate editor values, load current or older YAML
 solver settings, and convert between the app's nested shaft-speed inputs and
 the numeric input format used by the optimizer. The resulting settings are
-passed to the numerical routines in ``turbodash.optimization``.
+passed through ``turbodash.optimization`` to PySolverView's main optimization
+frontend and its controlled SLSQP backend.
 """
 
 from copy import deepcopy
 import math
 
-from turbodash.optimization import read_path
-from turbodash.optimization.slsqp import normalize_solver_options
+from turbodash.optimization import normalize_solver_options, read_path
 from turbodash.core.diffuser import normalize_diffuser_inputs
 
 

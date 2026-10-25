@@ -6,7 +6,7 @@ import numpy as np
 import yaml
 from scipy.optimize import OptimizeResult
 
-from turbodash.optimization import turbine
+from turbodash import optimization as turbine
 
 
 def test_adjacent_solver_points_keep_their_iterations_and_diagnostics(
@@ -39,12 +39,14 @@ def test_adjacent_solver_points_keep_their_iterations_and_diagnostics(
     assert np.array_equal(offset + points[1], offset + points[2])
     snapshots = []
 
-    def driver(evaluate, x0, bounds, *, options, callback, logger):
+    def backend(problem, x0, method, options):
         records = []
         for index, point in enumerate(points):
-            objective = evaluate(point).objective
+            values = problem.fitness(point)
+            objective = values[0]
             optimality = [0.3, 0.2, 0.0][index]
             kkt = dict(
+                x=point.copy(),
                 available=True,
                 passed=optimality == 0.0,
                 stationarity=optimality,
@@ -65,6 +67,7 @@ def test_adjacent_solver_points_keep_their_iterations_and_diagnostics(
             record = dict(
                 iteration=index,
                 x=point.copy(),
+                fitness=values.copy(),
                 objective=objective,
                 max_constraint_violation=0.0,
                 step_norm=(
@@ -90,9 +93,11 @@ def test_adjacent_solver_points_keep_their_iterations_and_diagnostics(
                 },
             )
             records.append(record)
-            callback(deepcopy(record))
+            problem.accepted_callback(deepcopy(record))
         return OptimizeResult(
             x=points[-1].copy(),
+            fitness=values.copy(),
+            fun=values[0],
             success=True,
             solver_success=True,
             feasible=True,
@@ -106,10 +111,16 @@ def test_adjacent_solver_points_keep_their_iterations_and_diagnostics(
             elapsed_time=0.0,
             domain_rejections=0,
             derivative_rejections=0,
-            **turbine.solver_diagnostics(records[-1]),
+            **{
+                name: deepcopy(records[-1][name])
+                for name in ("optimality", "stationarity", "complementarity",
+                             "dual_feasibility", "kkt_residual", "kkt_ratio",
+                             "diagnostics_available", "step_norm", "objective_change", "kkt")
+            },
         )
 
-    monkeypatch.setattr(turbine, "minimize_slsqp", driver)
+    monkeypatch.setitem(turbine.psv.optimization.OPTIMIZATION_LIBRARIES,
+                        "pysolver", backend)
     result = turbine.optimize_turbine(
         case, evaluator=evaluate, callback=snapshots.append
     )

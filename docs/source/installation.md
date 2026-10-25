@@ -15,25 +15,36 @@ The command starts the stable turbine application. For a source checkout:
 ```bash
 git clone https://github.com/turbo-sim/turbodash.git
 cd turbodash
-python -m pip install -e .
-turbodash
+poetry install
+poetry run turbodash
 ```
 
 ## Optimization
 
-Install the optional optimization dependency and start the calculation and
-optimization workbench:
+Optimization is included in the project dependencies. Start the calculation
+and optimization workbench from the installed source environment:
 
 ```bash
-python -m pip install -e ".[optimization]"
-turbodash-optimization
+poetry run turbodash-optimization
 ```
 
-The optimization driver requires SciPy 1.17.1 because its additional step
+PySolverView's optimization driver requires SciPy 1.17.1 because its additional step
 controls use a checked private SLSQP interface. Install the project's declared
 dependencies together; the [optimization guide](guides/optimization.md)
-describes the controls and compatibility requirements. PySolverView remains
-available through `jaxprop` but is not the optimization driver.
+describes the controls and compatibility requirements. The required PyPI
+dependencies include PySolverView `>=0.7.2,<0.8` (Poetry `^0.7.2`) and JAXProp
+`>=0.5.7,<0.6` (Poetry `^0.5.7`). Inspect the active PySolverView installation
+with:
+
+```bash
+poetry run python -c "import pysolver_view as psv; print(psv.__version__); print(psv.__file__)"
+```
+
+The version should satisfy the declared range; the path identifies its installed
+location in the Poetry environment.
+
+The app and demos use the main `pysolver_view.OptimizationSolver` frontend,
+which owns the optimization report as well as solving and KKT diagnostics.
 
 The single-stage constant-loss application remains available with
 `turbodash-stage`.
@@ -72,7 +83,7 @@ For a WSGI host supporting Gunicorn, install the optimization and documentation
 dependencies, build the site, then start the workbench:
 
 ```bash
-poetry install --with dev -E optimization
+poetry install --with dev
 poetry run python docs/build_docs.py --no-autobuild
 poetry run gunicorn turbodash.apps.app_turbine_optimization.app:server
 ```

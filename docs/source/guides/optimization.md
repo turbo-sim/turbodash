@@ -1,8 +1,13 @@
 # Turbine optimization
 
-Turbodash uses SLSQP to improve a selected objective while respecting design
-variable bounds and configured constraints. The Python API and optimization
-workbench use the same solver and acceptance checks.
+Turbodash uses PySolverView's controlled SLSQP optimizer to improve a selected
+objective while respecting design-variable bounds and configured constraints.
+The Python API and optimization workbench use the same public
+`pysolver_view.OptimizationSolver` frontend with `library="pysolver"` and
+`method="slsqp"`, including its shared reporting and acceptance checks.
+Turbodash supplies the turbine problem mapping and physical reports;
+PySolverView supplies derivatives, step controls, recovery, KKT diagnostics,
+and the convergence table and final solver report.
 
 Start with the [calculation workflow](calculations.md) to choose the objective,
 variables, and constraints. For a complete Python example, see
@@ -14,11 +19,15 @@ from turbodash.optimization import load_case, optimize_turbine
 
 case = load_case("demos/optimization/case_axial.yaml")
 result = optimize_turbine(case)
-print(result.success, result.message)
 ```
 
 Run this example from a repository checkout. The basic demo explains reporting
 and exports; the advanced demo compares step fractions and recovery policies.
+
+PySolverView is a required PyPI dependency with version `>=0.7.2,<0.8`
+(Poetry `^0.7.2`). Run `poetry install` from Turbodash before using
+`poetry run python` for the demos. See the [installation guide](../installation.md)
+for checking the installed version and import location.
 
 In the app, **Stop** beside **Start optimization** cancels the running worker.
 The current design and convergence log are retained; the unfinished result is
@@ -232,6 +241,18 @@ The terminal reports the signed, normalized objective that SLSQP minimizes.
 The app and public callback history show physical objectives and variables.
 Step and KKT diagnostics use solver normalization in both places.
 
+The Python API preserves both frontend and backend views of the solve:
+
+| Result | Coordinates and evaluation counts |
+| --- | --- |
+| `result.frontend_result` | Detached PySolverView public result. `x` is physical, `x_solver` is normalized, and `nfev` includes frontend model and derivative-probe calls. |
+| `result.solver` | Raw backend result. `x` and history use normalized coordinates and the driver's KKT convention; `nfev` excludes derivative probes supplied by the frontend. |
+| `result.n_evaluations` | Successful uncached turbine evaluations, including the independent fresh final evaluation. |
+
+The YAML report saves `frontend_result` and `frontend_convergence_history` as
+well as the backend diagnostics. These counters measure different work and
+need not be equal.
+
 | Diagnostic | How to interpret it |
 | --- | --- |
 | `step_norm` | Distance between consecutive accepted designs in normalized coordinates. A small step alone does not establish convergence. |
@@ -258,7 +279,11 @@ Accepted history points contain matching configurations and turbine results;
 rejected trials and derivative probes are excluded. Saved diagnostics include
 evaluation counts, timing, rejection counts, and recovery events. Python callers
 can inspect `result.solver.events` when investigating repeated recovery.
+Recovery events and counts remain available in callbacks and exports; the
+frontend's terminal report does not print the old low-level trial-rejection log.
 
-For the solver architecture, KKT equations, compatibility constraints, and
-maintenance checks, see the repository's
-[optimization maintenance notes](https://github.com/turbo-sim/turbodash/tree/main/development/optimization).
+The solver implementation, independent KKT mathematics, and generic numerical
+audits are maintained in
+[PySolverView](https://github.com/turbo-sim/pysolver_view). Turbodash's integration
+tests check turbine variable mapping, accepted physical snapshots, exports,
+and the app's optimization workflow.

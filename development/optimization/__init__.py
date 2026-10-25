@@ -1,1 +1,1 @@
-"""Independent maintenance audits for turbodash.optimization."""
+"""Physical turbine integration studies using PySolverView optimization."""

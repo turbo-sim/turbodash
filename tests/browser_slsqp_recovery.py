@@ -112,9 +112,10 @@ def exercise(context, address, output):
     assert "Optimization applied" in success_status, success_status
     assert "Recovered 1 invalid trial" in success_status, success_status
     expect(page.locator("#opt-log")).to_contain_text("Success: True")
-    expect(page.locator("#opt-log")).to_contain_text("Rejected trial")
-    expect(page.locator("#opt-log")).to_contain_text("rotor_exit_radicand")
-    for metric in ("Step-norm", "Optimality", "Complement.", "KKT/tol", "Final KKT:"):
+    expect(page.locator("#opt-log")).to_contain_text("Starting optimization process")
+    expect(page.locator("#opt-log")).not_to_contain_text("Starting pysolver SLSQP optimization")
+    for metric in ("Norm of step", "Optimality", "Final constraint violation:",
+                   "Final optimality", "Total model calls:"):
         expect(page.locator("#opt-log")).to_contain_text(metric)
     successful = deepcopy(applied[-1])
     assert successful["diagnostics_available"]
@@ -157,7 +158,7 @@ def exercise(context, address, output):
         checks=["all 14 original variables and flaring constraints loaded", "native control defaults",
                 "live advanced controls exported and reloaded without changes", "adaptive recovery of invalid rotor exit",
                 "optimized design applied with physical efficiency", "structured rejection metadata retained",
-                "native rejection diagnosis visible in terminal", "optimization panel and tab retained",
+                "canonical frontend convergence report", "optimization panel and tab retained",
                 "step and same-point KKT metrics displayed and persisted",
                 "disabled recovery fails cleanly and preserves original inputs"],
         successful_efficiency_percent=100 * successful["objective"],

@@ -5,8 +5,8 @@ the published Sphinx documentation, whose sources are in [`../source/`](../sourc
 
 - [JAX migration assessment](jax_migration.md): backend options, expected benefits,
   effort, verification, and recommended scope.
-- [Optimization maintenance](../../development/optimization/README.md): solver
-  architecture, recovery, independent KKT checks, and validation.
+- [Turbine optimization validation](../../development/optimization/README.md):
+  physical scaling, callback and export integration, and PySolverView-owned reports.
 - [TurboMoC integration](turbomoc_meshing.md): geometry and mesh workflow.
 - [TurboGrid web export](turbogrid_web_export.md): export behavior in the app.
 - [TurboGrid assembly](turbogrid_assembly.md): multistage export conventions.

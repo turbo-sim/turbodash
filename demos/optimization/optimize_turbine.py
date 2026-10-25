@@ -1,4 +1,4 @@
-"""Optimize an axial or radial turbine through the public Python API.
+"""Optimize an axial or radial turbine with PySolverView through the turbine API.
 
 Run ``python demos/optimization/optimize_turbine.py --case axial`` from the
 checkout, or run this file by its absolute path from any working directory.
@@ -47,6 +47,11 @@ def main():
         else EXAMPLE_DIRECTORY / "output" / case_path.stem.removeprefix("case_")
     ).resolve()
 
+    # Remove only the retired demo's extra convergence images. Otherwise an
+    # existing output folder can mix those old plots with PySolverView's output.
+    for extension in ("png", "svg"):
+        (output_directory / f"physical_convergence_history.{extension}").unlink(missing_ok=True)
+
     # This small checkout bootstrap is only needed for direct execution before
     # installing Turbodash. In your own installed-package script, just import
     # turbodash.optimization. No Dash layout or application worker is involved.
@@ -63,7 +68,6 @@ def main():
         TurbinePlotCallback,
         load_case,
         optimize_turbine,
-        plot_convergence,
         plot_turbine,
         save_figure,
         save_optimization_results,
@@ -92,8 +96,10 @@ def main():
         output_directory, show=arguments.show, plot_each_iteration=False,
     )
 
-    # 3. Run the same production meanline calculation and SLSQP driver used by
-    # scripted studies. Optimization settings come from case["optimization"].
+    # 3. Run the production meanline model through PySolverView's main
+    # OptimizationSolver frontend, also used by the app. Its pysolver/SLSQP
+    # backend owns derivatives, recovery, KKT checks and the convergence report.
+    # Settings come from case["optimization"].
     # Alternatively pass a separate dictionary as optimize_turbine(case, settings).
     # The initial design must be evaluable. Recognized invalid line-search
     # trials can be shortened, while unexpected programming errors propagate.
@@ -114,41 +120,38 @@ def main():
     final_title = "Optimized turbine" if result.success else "Final turbine (solve stopped)"
     final_figure = plot_turbine(result.turbine_results, title=final_title)
     save_figure(final_figure, output_directory / "optimized_turbine")
-    convergence_figure = plot_convergence(result)
-    save_figure(convergence_figure, output_directory / "convergence_history")
+    # Convergence rendering and optimization reports belong to PySolverView.
+    # Turbodash's plot_turbine above renders turbine geometry only.
+    optimizer = result.optimizer
+    convergence_figure = optimizer.plot_convergence_history(
+        savefile=True, filename="convergence_history",
+        output_dir=output_directory, showfig=arguments.show,
+    )
+    optimizer.print_convergence_history(
+        savefile=True, filename="convergence_history.txt",
+        output_dir=output_directory, to_console=False,
+    )
+    # The default final report uses the solve's existing KKT assessment and its
+    # separate feasibility/optimality tolerances, without additional model work.
+    optimizer.print_optimization_report(
+        include_design_variables=True, include_constraints=True,
+        include_kkt_conditions=True, include_multipliers=True,
+        savefile=True, filename="optimization_report.txt",
+        output_dir=output_directory, to_console=True,
+    )
 
-    # 5. Use result.success before adopting the design. Native SLSQP termination
-    # (solver_success) alone is insufficient: feasibility and the independent
-    # first-order KKT check must pass too. KKT values use solver normalization;
-    # result.objective and result.history contain the physical objective instead.
+    # 5. PySolverView has printed the solver status, final variables,
+    # constraints, KKT conditions and multipliers. Add physical performance.
+    # Use result.success before adopting a design: PySolverView requires native
+    # convergence, feasibility and the first-order KKT check to pass.
     print(f"\nCase: {case_path}")
-    print(f"Accepted: {result.success}; native solver success: {result.solver_success}; "
-          f"feasible: {result.feasible}; stationary: {result.solver.stationary}")
     print(f"Physical objective: {result.initial_objective:.9g} -> {result.objective:.9g}")
     initial_efficiency = result.initial_turbine_results["overall_performance"]["efficiency_ts"]
     final_efficiency = result.turbine_results["overall_performance"]["efficiency_ts"]
     print(f"Total-to-static efficiency: {initial_efficiency:.2%} -> {final_efficiency:.2%}")
-    print(f"Maximum normalized constraint violation: {result.max_constraint_violation:.3g}")
-    print(f"KKT optimality: {result.solver.optimality:.3g}; "
-          f"stationarity: {result.solver.stationarity:.3g}; "
-          f"complementarity: {result.solver.complementarity:.3g}")
-    print(f"Solver time: {result.solver.elapsed_time:.2f} s; "
-          f"turbine evaluations: {result.n_evaluations}")
-    print(f"Termination: {result.message}")
 
-    # Display the physical values that can be reused in another calculation.
-    # result.config contains final inputs/settings; result.geometry and
-    # result.turbine_results contain the corresponding continuous meanline design.
-    print("Final design variables (physical units):")
-    for name, value in result.design_variables.items():
-        print(f"  {name}: {value:.9g}")
-    print("Constraint residuals (physical units; equality targets are zero residual):")
-    for constraint in result.constraint_report:
-        component = "" if constraint["index"] is None else f"[{constraint['index']}]"
-        print(f"  {constraint['variable']}{component}: "
-              f"{constraint['value']:.6g} {constraint['type']} {constraint['target']:.6g}; "
-              f"residual={constraint['residual']:.3g}")
-    print(f"Saved {len(written)} YAML reports and PNG/SVG figures in {output_directory}")
+    print(f"Saved {len(written)} YAML cases/results, PySolverView reports, "
+          f"and PNG/SVG figures in {output_directory}")
 
     if arguments.show:
         plt.show()

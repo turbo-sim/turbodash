@@ -1331,14 +1331,14 @@ scipy = ">=1.12"
 
 [[package]]
 name = "jaxprop"
-version = "0.5.6"
+version = "0.5.7"
 description = "JAX-compatible thermodynamic property calculations."
 optional = false
 python-versions = "<3.14,>=3.11"
 groups = ["main"]
 files = [
-    {file = "jaxprop-0.5.6-py3-none-any.whl", hash = "sha256:311cccff2476dec871b7dfc4238ce92c0acb7d460d546404d7596334834d1741"},
-    {file = "jaxprop-0.5.6.tar.gz", hash = "sha256:a2a0c5012bdc2afe120556f7e6043df2cadc8c4156ae2fc7882ab3d7168f71d4"},
+    {file = "jaxprop-0.5.7-py3-none-any.whl", hash = "sha256:3c1998a45944b569c4d935f8fc37e05c205360c4166b193aae6aedd29ca05a00"},
+    {file = "jaxprop-0.5.7.tar.gz", hash = "sha256:1ad82775b86b5b0b5b767afe70f41a1bda97b877daf4994accd2bbdf7b91485e"},
 ]
 
 [package.dependencies]
@@ -1350,7 +1350,7 @@ jaxlib = ">=0.6.0,<0.7.0"
 matplotlib = ">=3.10.6,<4.0.0"
 numpy = ">=2.3.0,<3.0.0"
 optimistix = ">=0.0.10,<0.0.11"
-pysolver_view = ">=0.6.8,<0.7.0"
+pysolver_view = ">=0.7.1,<0.8.0"
 scipy = ">=1.16.1,<2.0.0"
 tqdm = ">=4.67.1,<5.0.0"
 
@@ -3069,14 +3069,14 @@ diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "pysolver-view"
-version = "0.6.9"
+version = "0.7.2"
 description = "Visualization of solver convergence evolution"
 optional = false
 python-versions = "<3.14,>=3.10"
 groups = ["main"]
 files = [
-    {file = "pysolver_view-0.6.9-py3-none-any.whl", hash = "sha256:0dde9717b3d4f94378440971134370cd71d373cce14b98f06b3f9d9cbeedfe6d"},
-    {file = "pysolver_view-0.6.9.tar.gz", hash = "sha256:e153dbc986ecf32ae5414f5dde6af15738868bd4900554d9f9c20afd99aa8c9f"},
+    {file = "pysolver_view-0.7.2-py3-none-any.whl", hash = "sha256:d102f49bd56cf095c1b8e55f9cc169a18a61ee8eb7480392a7d90c8b0af7bc75"},
+    {file = "pysolver_view-0.7.2.tar.gz", hash = "sha256:7845cb16fffa3f30664d5cb719a990dbc6a433faf1ff6d5e1486fd9ec2bbd0a0"},
 ]
 
 [package.dependencies]
@@ -3086,11 +3086,12 @@ numpy = ">=2.2.4,<3.0.0"
 openpyxl = ">=3.1.5,<4.0.0"
 pandas = ">=2.2.3,<3.0.0"
 PyYAML = ">=6.0.2,<7.0.0"
-scipy = ">=1.15.2,<2.0.0"
+scipy = {version = "1.17.1", markers = "python_version >= \"3.11\" and python_version < \"3.14\""}
 toml = ">=0.10.2,<0.11.0"
 
 [package.extras]
 jax = ["jax (>=0.5.3,<0.6.0)"]
+thermodynamics = ["CoolProp (>=6.6,<8)"]
 
 [[package]]
 name = "pytest"
@@ -4991,9 +4992,8 @@ type = ["pytest-mypy"]
 
 [extras]
 mesh = ["turbo_moc"]
-optimization = ["pysolver-view"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.14"
-content-hash = "401940f3133e1914fc9d34f4b608349aa305415070b970e85a2d7fc7858626b3"
+content-hash = "6420cf136ee7f307f7f098bc07323bcfcd25bbb01c630a67f3ad1626243b4841"

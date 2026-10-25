@@ -1,8 +1,8 @@
-# Production SLSQP tolerance verification
+# Turbine integration and PySolverView tolerance study
 
 This experiment runs the same `optimize_turbine` entry point used by the app.
-It checks numerical reporting and acceptance, rather than requiring every
-optimization problem to converge successfully.
+It checks the turbine adapter and records PySolverView's diagnostics and
+acceptance flags. It does not require every optimization problem to converge.
 
 From the repository root:
 
@@ -16,8 +16,10 @@ directory keeps independent experiment runs separate. Resume should only be
 used with unchanged code and case definitions.
 `--workers 1` runs in the current process; larger values use a process pool.
 
-The harness and its two audit/report helpers live directly in this directory;
-they import the numerical implementation from `turbodash.optimization`.
+The harness calls the turbine adapter in `turbodash.optimization`, which uses
+`pysolver_view.OptimizationSolver` for optimization. It calls the returned
+frontend directly for convergence plots, convergence tables, and optimization
+reports including design variables, constraints, KKT checks, and multipliers.
 The poor axial start is [case_poor_start.yaml](case_poor_start.yaml), while the
 radial start is the canonical [radial demo](../../demos/optimization/case_radial.yaml).
 Both use the optimizer's numeric shaft-speed input format, with no app imports.
@@ -66,39 +68,46 @@ domain recovery remains enabled. Tolerances apply to normalized residuals: for e
 flaring constraints use a 10-degree scale, so feasibility tolerance 1e-6
 corresponds to a 1e-5-degree allowed residual for those components.
 
-## Independent verification
+## Physical integration validation
 
-[`kkt_checks.py`](kkt_checks.py) does not call the production KKT checker. For each accepted design
-it independently reconstructs constraint signs and normalization from physical
-outputs, multiplier complementarity and dual feasibility, the actual step norm,
-and tolerance ratios. It verifies the physical callback/export history against
-the solver history. At the final point, it evaluates a fresh finite-difference
-Jacobian and reconstructs the Lagrangian gradient from the saved multipliers.
-The independent finite-difference implementation chooses one bound-admissible
-probe per variable before evaluation and never retries a physical-domain
-failure. [`kkt_report.py`](kkt_report.py) renders the saved audit outcomes.
+The harness reevaluates the final turbine design and compares its physical
+objective and constraint data with the returned results. It checks the saved
+design inputs, physical variable bounds, accepted-point and iteration alignment,
+and physical objective scaling in the callback history. It also checks that the
+turbine adapter preserves PySolverView's success, native status, and feasibility
+flags. These checks do not reconstruct KKT residuals or acceptance thresholds.
 
-It also repeats derivatives with half the step, and applies Richardson
-extrapolation when the probes are compatible. This is a sensitivity diagnostic
-using the same multipliers, not an additional acceptance test or a refitted
-KKT solution. A strict tolerance can reveal finite-difference limitations.
+PySolverView supplies all KKT calculations and the reported `kkt_passed`,
+optimality, and tolerance ratios. The former local KKT checker, derivative audit,
+and custom plotting/report helpers have been removed.
 
-The additional analytic tests in `tests/test_kkt_tolerances.py` cover known
+The additional analytic tests in PySolverView
+(`tests/optimization/solvers/test_custom_slsqp_kkt_tolerances.py`) cover known
 derivatives, equality/inequality and bound multiplier signs, and tolerances
 immediately below, equal to, and above the independently computed residual.
 
 ## Results
 
-The generated report at `output/kkt/report.md` distinguishes an accepted optimization
-from a passing audit. A correctly rejected infeasible or insufficiently optimal
-point passes the audit. The script exits nonzero for inconsistent reporting or
-an unexpected experiment error, not for an expected optimization rejection.
+The generated `summary.json` and `summary.csv` distinguish an accepted optimization
+from passing physical integration validation. A rejected infeasible or
+insufficiently optimal point can pass validation. The script exits nonzero for
+an integration mismatch or unexpected experiment error, not for an expected
+optimization rejection.
 
 Each case directory contains its exact `case.yaml`, `solver.log`, saved input
-and final cases, full `optimization_result.yaml`, independent `audit.json`, and
-`summary.json`. The output directory also contains the combined JSON, CSV,
-report, and convergence plots. Failed endpoints are diagnostic designs and
-should not be treated as successful optimized designs.
+and final cases, full `optimization_result.yaml`, physical `validation.json`, and
+`summary.json`. PySolverView writes `convergence_history.png`,
+`convergence_history.svg`, `convergence_history.txt`, and
+`optimization_report.txt` into each case directory. The parent output directory
+contains only combined matrix data in JSON and CSV. Failed endpoints are
+diagnostic designs and should not be treated as successful optimized designs.
+
+`--retry-validation-failures` reruns failed integration checks with `--resume`;
+the old `--retry-audit-failures` spelling remains an alias. Old audit summaries
+are rerun because they lack the current validation schema. `--no-summary`
+(also available as `--no-report`) preserves combined matrix data while still
+saving each case's PySolverView artifacts. Use a fresh output directory to avoid
+mixing older custom plots or reports with the current results.
 
 ## Historical findings addressed in production
 
@@ -113,8 +122,8 @@ YAML exports when distinct normalized floats map to the same physical float.
 Failure messages also now retain enough precision to distinguish a residual
 just above its tolerance. For example, 1.0033539e-6 versus 1e-6 is no longer
 displayed as "1e-6 exceeds 1e-6". One-ULP differences are covered by regression
-tests as well. These historical findings explain the retained independent
-checks; the previous sweep results are not evidence for the current checkout.
+tests as well. These historical findings explain the retained integration
+coverage; the previous sweep results are not evidence for the current checkout.
 
 Changing the independent acceptance tolerances alone does not make native
 SLSQP iterate further. The equality-constraint comparison demonstrates the

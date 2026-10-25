@@ -33,6 +33,8 @@ poetry install
 ```
 
 After updating an existing checkout, rerun `poetry install` to register the application commands.
+PySolverView is a required dependency, installed from PyPI with version
+`>=0.7.2,<0.8` (Poetry `^0.7.2`); no optimization extra is needed.
 
 ## Run the latest optimization app
 

@@ -5,10 +5,11 @@ import json
 from unittest.mock import Mock
 
 import numpy as np
+import pysolver_view as psv
 import pytest
 import yaml
 
-from turbodash.optimization.turbine import (
+from turbodash.optimization import (
     optimize_turbine,
     save_optimization_results,
     solver_diagnostics,
@@ -95,7 +96,130 @@ def test_saved_yaml_contains_named_kkt_and_each_iteration(tmp_path):
     assert len(saved["kkt_multipliers"]["upper"]) == 2
     assert saved["progress_history"][-1]["kkt"]["passed"]
     assert saved["solver_convergence_history"]["step_norm"][0] == 0.0
+    frontend = saved["frontend_result"]
+    np.testing.assert_allclose(frontend["x"], list(result.design_variables.values()))
+    np.testing.assert_allclose(frontend["x_solver"], result.solver.x)
+    assert frontend["nfev"] == frontend["func_count_total"]
+    assert frontend["derivative_func_count"] > 0
+    assert frontend["nfev"] >= result.solver.nfev
+    np.testing.assert_allclose(
+        frontend["kkt"]["multipliers"]["equality"],
+        -np.asarray(saved["kkt_multipliers"]["equality"]),
+    )
+    assert saved["frontend_convergence_history"]["x"]
+    assert isinstance(result.optimizer, psv.OptimizationSolver)
+    assert "optimizer" not in saved
     json.dumps(saved["kkt"], allow_nan=False)
+
+
+def _report_case():
+    """Exercise physical labels with separate acceptance limits and scaling."""
+    case = _case()
+    settings = case["optimization"]
+    settings["feasibility_tolerance"] = 1e-6
+    settings["solver_options"]["optimality_tol"] = 1e-4
+    for constraint, scale in zip(settings["constraints"], (10.0, 2.0, 5.0)):
+        constraint["normalize"] = scale
+    settings["constraints"].append({
+        "variable": "$stages_performance.*.geometry_meanline.*",
+        "type": "<=", "value": 1000.0, "normalize": 1000.0,
+    })
+    return case
+
+
+def test_frontend_constraints_retain_physical_names_components_and_directions():
+    result = optimize_turbine(_report_case(), evaluator=_evaluate)
+    assert result.success, result.message
+    optimizer = result.optimizer
+    data = optimizer.get_constraint_data(optimizer.x_final_norm, 1e-6)
+
+    assert [item["name"] for item in data] == [
+        "overall_performance.sum", "overall_performance.u", "overall_performance.v",
+        "stages_performance.*.geometry_meanline.*[0]",
+        "stages_performance.*.geometry_meanline.*[1]",
+    ]
+    assert [item["type"] for item in data] == ["=", "<", ">", "<", "<"]
+    assert all(item["satisfied"] for item in data)
+    for named, physical in zip(data, result.constraint_report):
+        assert named["value"] == pytest.approx(physical["value"])
+        assert named["target"] == pytest.approx(physical["target"])
+        assert named["normalized_mismatch"] == pytest.approx(physical["normalized_residual"])
+    assert data[2]["value"] == pytest.approx(0.4)
+    assert data[2]["target"] == 0.1
+    assert data[2]["normalized_mismatch"] == pytest.approx(-0.06)
+    assert data[3]["value"] == pytest.approx(result.design_variables["design.x"])
+    assert data[4]["value"] == pytest.approx(result.design_variables["design.y"])
+
+
+def test_frontend_final_reports_and_plot_use_saved_solution_without_model_work(
+    tmp_path, monkeypatch, capsys
+):
+    result = optimize_turbine(_report_case(), evaluator=_evaluate)
+    assert result.success, result.message
+    optimizer = result.optimizer
+    history = deepcopy(optimizer.convergence_history)
+    counts = (
+        optimizer.func_count_tot, optimizer.grad_count, optimizer.kkt_count,
+        optimizer.diagnostic_func_count, optimizer.diagnostic_grad_count,
+        result.n_evaluations,
+    )
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("Final reports and plots must use saved solve data")
+
+    monkeypatch.setattr(optimizer.problem, "fitness", forbidden)
+    monkeypatch.setattr(optimizer.problem, "gradient", forbidden, raising=False)
+    optimizer.print_optimization_report(
+        include_design_variables=True,
+        include_constraints=True,
+        include_kkt_conditions=True,
+        include_multipliers=True,
+        savefile=True,
+        filename="optimization_report.txt",
+        output_dir=tmp_path,
+        to_console=True,
+    )
+    report = (tmp_path / "optimization_report.txt").read_text(encoding="utf-8")
+    assert report in capsys.readouterr().out
+    for title in (
+        "Optimization variables report (physical values)",
+        "Optimization variables report (normalized values)",
+        "Optimization constraints report",
+        "Karush-Kuhn-Tucker (KKT) conditions",
+        "Lagrange multipliers report",
+    ):
+        assert title in report
+    assert "design.x" in report and "design.y" in report
+    assert "1.240e+01" in report and "1.800e+02" in report
+    assert "0.6000" in report and "0.4000" in report
+    assert "stages_performance.*.geometry_meanline.*[0]" in report
+    assert "stages_performance.*.geometry_meanline.*[1]" in report
+    for label, tolerance in (
+        ("First order optimality", "1.000e-04"),
+        ("Equality feasibility", "1.000e-06"),
+        ("Inequality feasibility", "1.000e-06"),
+    ):
+        line = next(line for line in report.splitlines() if label in line)
+        assert tolerance in line
+        assert line.rstrip().endswith("yes")
+
+    optimizer.print_convergence_history(
+        savefile=True, filename="convergence_history.txt", output_dir=tmp_path,
+        to_console=False,
+    )
+    figure = optimizer.plot_convergence_history(
+        savefile=True, filename="convergence_history", output_dir=tmp_path,
+        showfig=False,
+    )
+    assert figure is not None
+    for filename in ("convergence_history.txt", "convergence_history.png", "convergence_history.svg"):
+        assert (tmp_path / filename).stat().st_size > 0
+    assert counts == (
+        optimizer.func_count_tot, optimizer.grad_count, optimizer.kkt_count,
+        optimizer.diagnostic_func_count, optimizer.diagnostic_grad_count,
+        result.n_evaluations,
+    )
+    np.testing.assert_equal(optimizer.convergence_history, history)
 
 
 def test_unavailable_solver_diagnostics_are_strict_json_safe():
@@ -133,6 +257,7 @@ def test_worker_publishes_kkt_assessment_and_finite_json(tmp_path, monkeypatch):
     progress = json.loads((tmp_path / "progress.json").read_text(encoding="utf-8"))
 
     assert published["success"]
+    assert "optimizer" not in published
     assert published["diagnostics_available"]
     assert published["kkt"]["passed"]
     assert published["kkt_ratio"] <= 1.0

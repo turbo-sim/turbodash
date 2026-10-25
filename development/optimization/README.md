@@ -1,238 +1,56 @@
-# Optimization maintenance
+# Turbine optimization integration validation
 
-Production code lives in [turbodash/optimization](../../turbodash/optimization/).
-This directory retains the independent KKT audit, one difficult starting case
-and the reasoning behind the solver interface. User-facing examples belong in
-[demos/optimization](../../demos/optimization/README.md).
+This directory keeps the turbine-specific integration matrix, fixtures, and
+historical evidence after moving numerical optimization to PySolverView.
 
-## Consolidation assessment
+PySolverView owns SLSQP, the SciPy bridge, finite differences, domain recovery,
+KKT checks, convergence plots, and optimization reports. Turbodash retains its
+[physical problem adapter](../../turbodash/optimization.py).
+User examples live in [demos/optimization](../../demos/optimization/README.md).
 
-| Previous material | Decision |
-| --- | --- |
-| Original optimization runner and axial/radial cases | Move into the basic demo. Move useful API contracts to tests/test_optimization_api.py, collected by the production suite. |
-| Standalone optimization_slsqp driver, turbine adapter and SciPy bridge/license | Remove the prototype copies. Production owns the implementation, license and solver regression tests. |
-| Original 14-variable SLSQP comparison | Keep its case in the advanced demo and its compact historical benchmark here. Replace the old runner with the educational comparison. |
-| poor_initial_design, step_fraction_sweep and step_ramp studies/results | Remove the separate studies. Retain the poor-start input for the latest KKT matrix; explain a small set of fraction/recovery policies in the advanced demo. |
-| optimization_troubleshoot hooks, penalty/root workarounds and saved analyses | Remove superseded experiments; retain their conclusions below. |
-| Latest independent KKT validation | Keep the current runner, independent checks, report generation and documented 52-case matrix here. Regenerate results when maintaining the solver. |
+## Why retain this directory
 
-The old API tests are relocated, not discarded. The axial/radial demo cases
-remain inputs to model-domain and app regression tests. This consolidation
-does not change production optimizer or meanline equations.
+The 52-case matrix validates real turbine starts, axial and radial geometries,
+physical selectors and normalization, equalities and inequalities, impossible
+constraints, tolerance profiles, and finite-difference settings. It checks
+physical results and callback/export alignment against the frontend results.
+PySolverView's bundled analytical studies cannot test those turbine boundaries.
 
-## Maintained files
+The former local KKT reconstruction, finite-difference audit, custom convergence
+plots, and optimization report renderer have been removed. Each case calls
+`result.optimizer.plot_convergence_history`, `print_convergence_history`, and
+`print_optimization_report` directly. KKT status and residuals in the matrix
+data come from PySolverView without recalculation.
 
 | File | Purpose |
 | --- | --- |
-| [verify_kkt.py](verify_kkt.py) | Production optimizer over the 52-case acceptance matrix; preflight, filtering, workers and resumption. |
-| [kkt_checks.py](kkt_checks.py) | Independent residual signs/scales, multiplier complementarity, step norms, history alignment and fresh final finite-difference stationarity. Does not call the production KKT checker. |
-| [kkt_report.py](kkt_report.py) | Matrix reports and convergence plots. |
-| [case_poor_start.yaml](case_poor_start.yaml) | Physically evaluable poor initial design used by the matrix. |
-| [kkt_validation.md](kkt_validation.md) | Matrix definitions, tolerance profiles, audit method and findings addressed by regressions. |
-| [historical_benchmark.json](historical_benchmark.json) | Original SciPy 1.17.1 comparison; historical evidence, not a current benchmark or acceptance oracle. |
+| [verify_kkt.py](verify_kkt.py) | Real turbine integration matrix, filtering, workers, and resumption. |
+| [case_poor_start.yaml](case_poor_start.yaml) | Physically evaluable turbine stress fixture. |
+| [kkt_validation.md](kkt_validation.md) | Case definitions, tolerance profiles, and validation interpretation. |
+| [historical_benchmark.json](historical_benchmark.json) | Previous Turbodash-driver evidence, not a current acceptance oracle. |
 
-Generated exports, logs and reports go under ignored output/. No old result
-directories are needed. Resume only runs with unchanged code, inputs and settings;
-use a fresh output directory after changing the solver.
+## Running the checks
 
-## Why the SLSQP interface was needed
+Run from the repository root after `poetry install` has installed the required
+PySolverView PyPI dependency, version `>=0.7.2,<0.8` (Poetry `^0.7.2`):
 
-A turbine can satisfy every variable bound and still have no real velocity
-triangles. The public SciPy SLSQP wrapper does not expose the pending trial
-state needed to shorten that step consistently and retry while retaining the
-solver state. Its iteration callback is too late for that operation.
+```powershell
+poetry run python -B -m pytest tests/test_optimization_api.py tests/test_kkt_history_alignment.py tests/test_kkt_reporting.py -q
+poetry run python -B development/optimization/verify_kkt.py --preflight
+poetry run python -B development/optimization/verify_kkt.py --filter axial_nominal__flaring__standard --workers 1
+poetry run python -B development/optimization/verify_kkt.py --workers 2
+```
 
-The production bridge updates the pending point, direction and line-search
-quantities together. SciPy still performs SLSQP's quadratic subproblems, merit
-line search and BFGS updates. Turbodash handles model evaluation, trial control,
-diagnostics and result acceptance. It does not monkeypatch installed SciPy,
-clip invalid roots or substitute artificial objective penalties. Only recognized
-model-domain failures are recoverable; programming and consistency errors remain
-visible.
+The full matrix is a longer integration study. A rejected optimization can pass
+its physical integration checks. Generated exports, PySolverView reports and
+plots, and JSON/CSV matrix summaries go to ignored `output/`. Use a fresh output
+directory after changing the solver, inputs, or settings. Resume only unchanged
+runs; summaries from the old independent audit are automatically rerun.
 
-| Production module | Responsibility |
-| --- | --- |
-| turbine.py | Physical/configured variables, normalization, responses, callbacks, fresh final reevaluation and YAML exports. |
-| slsqp.py | Evaluation loop, trial fractions, recovery, derivatives, stopping/reporting and independent acceptance. |
-| _slsqp_backend.py | Version-specific SciPy state/workspace and consistent pending-trial shortening. |
-| kkt.py | Feasibility and first-order optimality, including variable bounds. |
-
-## Step fractions and recovery
-
-first_step_fraction scales the first QP direction; max_step_fraction caps
-every direction, including the first. These are fractions in normalized coordinates, not
-absolute physical movement limits. Smaller fractions can help a particular
-start but can also require more iterations.
-
-With domain_backtracking enabled, recognized invalid line-search trials are
-shortened by backtrack_factor, up to max_backtracks times. A finite
-step_growth_factor restores a reduced cap gradually toward the maximum; None
-restores it immediately for the next major direction. Recovery cannot repair
-an invalid initial design or make incompatible constraints feasible.
-
-Finite-difference probes are separate. The current driver evaluates each once
-in a bound-admissible direction. A physically invalid probe ends the derivative
-calculation with a diagnostic; line-search recovery does not retry it. The old
-max_fd_backtracks setting is ignored for legacy inputs and omitted from the
-maintained examples.
-
-The [advanced demo](../../demos/optimization/README.md) shows a small controlled
-comparison. The [SLSQP guide](../../docs/source/guides/optimization.md) documents
-every setting. Current defaults come from SLSQPOptions; the maintenance matrix
-deliberately supplies explicit study settings.
-
-## KKT acceptance and reporting
-
-Native termination, feasibility and final acceptance are distinct:
-result.solver_success records native convergence; result.feasible checks
-normalized residuals and bounds; result.success additionally requires the
-independent first-order assessment. Small steps or objective changes alone
-do not establish stationarity.
-
-The KKT assessment checks primal feasibility, Lagrangian stationarity, multiplier
-dual feasibility and complementarity. Constraint signs, scales and variable
-normalization must agree throughout the solver, multiplier reconstruction and
-exports. When diagnostics are available, kkt_ratio <= 1 summarizes passing the
-configured acceptance limits. Unavailable derivatives must not appear as zero
-optimality.
-
-The audit reconstructs these quantities independently from physical outputs and
-fresh probes. An audit may pass when an optimization is correctly rejected.
-It also checks callback/export history alignment: distinct normalized points
-must not be merged merely because their physical values are nearly equal.
-Focused regressions include tests/test_kkt_history_alignment.py and
-tests/test_kkt_tolerances.py.
-
-## Running maintenance checks
-
-From the repository root, in the project environment:
-
-~~~powershell
-python -B -m pytest tests/test_slsqp.py tests/test_optimization_api.py tests/test_kkt.py tests/test_kkt_tolerances.py tests/test_kkt_history_alignment.py tests/test_kkt_reporting.py -q
-python -B development/optimization/verify_kkt.py --preflight
-python -B development/optimization/verify_kkt.py --filter axial_nominal__flaring__standard --workers 1
-python -B development/optimization/verify_kkt.py --workers 2
-~~~
-
-The full matrix is a maintenance study, not a quick unit test. Its report
-distinguishes audit failures from rejected optimization outcomes. Follow with
-relevant app regressions when changing callback or export contracts.
-
-The private bridge requires SciPy 1.17.1. Upgrades require reviewing its
-interface and workspace layout, then rerunning numerical, recovery, KKT, turbine
-and app checks. The historical benchmark cannot establish compatibility with
-another release.
-
-## Retained historical findings
-
-The original problem used 14 variables, four flaring inequalities and no
-equalities. A full unrecovered first trial left the physical domain. Adaptive
-halving and a half-sized first trial both converged to about 89.811945% efficiency
-in 38 major iterations and 586 valid model evaluations, including final
-derivative verification. Halving every direction took 55 iterations and
-840 evaluations in that recorded comparison.
-
-Those observations motivated recovery and showed the cost of unnecessary
-damping; they are not promises for other inputs or current revisions. The
-advanced demo reruns a small comparison through the current API and reports its
-actual outcomes. The KKT matrix later exposed history-alignment and tolerance
-message issues now covered by production tests. Large old result sweeps and
-private experimental hooks are not needed to retain those lessons.
-
-## Detailed KKT reference and diagnostic fields
-
-Write the normalized problem as minimizing $f(x)$ subject to $h(x)=0$,
-$c(x)\geq 0$, and $l\leq x\leq u$. Equality residuals retain their configured
-sign; inequalities are converted to this nonnegative convention internally.
-The Lagrangian is
-
-$$
-L=f-\lambda^T h-\mu^T c-z_L^T(x-l)-z_U^T(u-x),
-$$
-
-where $\lambda$ is unrestricted and $\mu,z_L,z_U\geq 0$. The check includes
-every finite variable bound, even though SciPy's native QP multipliers omit
-bound multipliers. Absent bounds contribute neither a residual nor a multiplier.
-
-Four infinity-norm residuals are reported:
-
-| Residual | Definition |
-| --- | --- |
-| `stationarity` | $\|\nabla f-J_h^T\lambda-J_c^T\mu-z_L+z_U\|_\infty$ |
-| `primal_feasibility` | Largest equality absolute residual, inequality violation, or bound violation. |
-| `dual_feasibility` | Largest negative part of any inequality or bound multiplier. Equality multipliers have no sign restriction. |
-| `complementarity` | Largest absolute product of an inequality/bound multiplier and its corresponding slack: $\mu_i c_i$, $(z_L)_j(x_j-l_j)$, $(z_U)_j(u_j-x_j)$. |
-
-Turbodash estimates multipliers at each reported design by solving a linear
-minimax problem: minimize the largest stationarity or complementarity residual,
-with unrestricted equality multipliers and nonnegative inequality/bound
-multipliers. All constraints and finite bounds participate. There is no
-arbitrary active-set distance cutoff; an inactive constraint cannot balance
-the objective gradient without also contributing its multiplier-times-slack
-residual. The diagnostic multipliers are independent of SLSQP's native QP
-multipliers, which remain available separately. Multipliers need not be unique
-when constraint gradients are dependent.
-
-`optimality` is the maximum of stationarity, dual feasibility, and
-complementarity. `kkt_residual` is the maximum of all four residuals.
-The tolerance-aware quantity is
-
-$$
-\text{kkt\_ratio}=\max\left(
-\frac{\text{primal\_feasibility}}{\text{feasibility\_tolerance}},
-\frac{\text{optimality}}{\text{optimality\_tol}}\right).
-$$
-
-A ratio at most one passes the independent KKT check. The default feasibility
-tolerance is $10^{-6}$ and optimality tolerance is $10^{-4}$. This separates
-physical constraint satisfaction from first-order accuracy. The native
-`ftol` (default $10^{-9}$) controls SLSQP's own stopping rules; its objective
-and step tests do not imply that every KKT residual is below `ftol`. A small
-step alone cannot pass the independent check. Native solver success is still
-required: a feasible design at the iteration limit is reported as unsuccessful.
-These distinctions follow the [SciPy SLSQP documentation](https://docs.scipy.org/doc/scipy/reference/optimize.minimize-slsqp.html)
-and the stopping tests in the [pinned SciPy 1.17.1 implementation](https://github.com/scipy/scipy/blob/v1.17.1/scipy/optimize/__slsqp.c).
-
-These residuals describe the scaled problem and depend on derivative accuracy.
-The same domain-aware finite differences used by the solver are used for the
-check. Reducing `optimality_tol` far below the derivative error does not create
-additional accuracy; review scaling and derivative step size when tightening
-it. A passing check is numerical evidence of first-order KKT conditions, not
-a proof of global optimality or second-order sufficiency. If derivatives or
-the multiplier assessment are unavailable, the report marks diagnostics
-unavailable, saves null values, and does not claim that the KKT check passed.
-Constraint qualifications also matter: at a degenerate constraint, a local
-optimum need not admit KKT multipliers. A failed check is therefore not by itself
-a proof that a better feasible design exists.
-
-Saved optimization diagnostics include `solver_status`, `step_norm`,
-`objective_change`, all four KKT residuals, `optimality`, `kkt_residual`,
-`kkt_ratio`, `diagnostics_available`, and the complete `kkt` assessment.
-`kkt_multipliers` separates equality, inequality, lower-bound, and upper-bound
-multipliers. Constraint multipliers follow their configured component order;
-bound multipliers follow design-variable order. The same diagnostics accompany
-the accepted history and app job result, alongside evaluation counts, elapsed
-time, `domain_rejections`, `derivative_rejections`, and `recovery_events`.
-Each rejection
-event records solver coordinates in `x` and diagnostic metadata in `failure`;
-turbine failures also include the physical `design_variables`. Python callers
-can inspect the full event list through `result.solver.events`. Inspect these
-when a run needs repeated
-recovery. A smaller trial can avoid a domain boundary, but cannot make an
-incompatible set of physical requirements feasible.
-
-
-## Configuration compatibility
-
-Legacy YAML aliases `tolerance`, `max_iterations`, and `derivative_abs_step`
-map to `ftol`, `maxiter`, and `finite_diff_step`. Legacy `library: scipy` and
-`method: slsqp` select the production driver. PySolverView is an indirect
-installation dependency through `jaxprop`, not the driver of these runs.
-The retired `max_fd_backtracks` field is discarded during YAML normalization
-and is not exported; direct `SLSQPOptions` construction does not accept it.
-
-Domain failures carry structured `ModelDomainError` metadata (`code`,
-`quantity`, `value`, optional `margin`, zero-based `stage_index`, `stage_name`,
-and `station`). Rejection events preserve solver coordinates and the physical
-design variables. Consistency errors have `recoverable=False`; unexpected
-exceptions must remain visible rather than becoming retryable domain failures.
+Generic solver/KKT tests now live in the PySolverView repository under
+`tests/optimization/solvers/` and `tests/diagnostics/`. Turbodash's regular tests
+retain physical-model, scaling, domain-error translation, callback, and export
+coverage. The app and demos use the same public `pysolver_view.OptimizationSolver`
+frontend with its `pysolver` SLSQP backend through the turbine adapter. The
+frontend owns the optimization report and convergence plots. Numerical defaults and validation come
+from `pysolver_view.SLSQPOptions`; SciPy 1.17.1 compatibility is owned there.

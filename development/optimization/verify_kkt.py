@@ -1,4 +1,4 @@
-"""Reproducible turbine matrix for production KKT diagnostics and tolerances.
+"""Real turbine integration matrix using PySolverView diagnostics and reports.
 
 poetry run python development/optimization/verify_kkt.py --workers 2
 """
@@ -6,6 +6,7 @@ poetry run python development/optimization/verify_kkt.py --workers 2
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from copy import deepcopy
 import argparse
+import csv
 import json
 import logging
 import math
@@ -19,13 +20,16 @@ ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT))
 # Keep plotting caches with ignored experiment artifacts, including worker imports.
 os.environ.setdefault("MPLCONFIGDIR", str(HERE / "output/kkt/.cache/matplotlib"))
+os.environ.setdefault("MPLBACKEND", "Agg")
+
+import numpy as np
 
 from turbodash.optimization import (
     load_case,
     optimize_turbine,
     save_optimization_results,
 )
-from turbodash.optimization.turbine import TurbineOptimizationProblem, set_path
+from turbodash.optimization import TurbineOptimizationProblem, read_path, set_path
 from turbodash.io.yaml import dump_turbine_yaml
 
 PROFILES = {
@@ -179,11 +183,72 @@ def _metric_text(value):
     return "unavailable" if value is None else f"{value:.3e}"
 
 
+def validate_turbine_integration(result):
+    """Check physical outputs and adapter alignment without assessing KKT."""
+    problem = TurbineOptimizationProblem(result.source_config)
+    frontend = result.frontend_result
+    physical = np.asarray(frontend.x)
+    fresh = problem.evaluate(physical, refresh=True)
+    checks, errors = [], []
+
+    def check(name, condition):
+        condition = bool(condition)
+        checks.append(dict(name=name, passed=condition))
+        if not condition:
+            errors.append(name)
+
+    check("final physical objective", np.isclose(result.objective, fresh["objective"]))
+    check("final physical design", np.allclose(
+        [result.design_variables[name] for name in problem.variable_names], physical,
+        rtol=0, atol=1e-12,
+    ))
+    check("saved input design", np.allclose(
+        [read_path(result.config["inputs"], path) for path in problem.variable_paths],
+        physical, rtol=0, atol=1e-12,
+    ))
+    check("final design is within physical bounds", np.all(
+        (physical >= problem.lower_bounds) & (physical <= problem.upper_bounds)
+    ))
+    check("final constraint component count",
+          len(result.constraint_report) == len(fresh["constraint_report"]))
+    for index, (saved, current) in enumerate(zip(
+        result.constraint_report, fresh["constraint_report"]
+    )):
+        for field in ("value", "target", "residual", "normalized_residual"):
+            check(f"constraint[{index}] physical {field}", np.isclose(
+                saved[field], current[field], rtol=1e-10, atol=1e-12,
+            ))
+    check("frontend success preserved", result.success == bool(frontend.success))
+    check("frontend native status preserved",
+          result.solver_success == bool(frontend.solver_success))
+    check("frontend feasibility preserved", result.feasible == bool(frontend.feasible))
+
+    history = result.solver.history
+    check("accepted history exists", bool(history))
+    check("physical and native history lengths", len(result.history) == len(history))
+    for number, (physical_row, native_row) in enumerate(zip(result.history, history)):
+        values = np.asarray([
+            physical_row["design_variables"][name] for name in problem.variable_names
+        ])
+        check(f"history[{number}] accepted design alignment", np.allclose(
+            values, problem.scale_normalized_to_physical(native_row["x"]),
+            rtol=0, atol=1e-12,
+        ))
+        check(f"history[{number}] iteration alignment",
+              physical_row["iteration"] == native_row["iteration"])
+        check(f"history[{number}] physical objective alignment", np.isclose(
+            physical_row["objective"],
+            native_row["objective"] * problem.objective_sign * problem.objective_scale,
+            rtol=1e-10, atol=1e-12,
+        ))
+    return dict(
+        passed=not errors, checks=checks, errors=errors,
+        history_records_checked=len(history),
+        validation_model_evaluations=problem.n_evaluations,
+    )
+
+
 def run_one(spec, output):
-    if __package__:
-        from .kkt_checks import audit_result
-    else:
-        from kkt_checks import audit_result
 
     directory = output / spec["id"]
     directory.mkdir(parents=True, exist_ok=True)
@@ -202,16 +267,37 @@ def run_one(spec, output):
             handler = logging.StreamHandler(stream)
             handler.setFormatter(logging.Formatter("%(message)s"))
             logger.addHandler(handler)
-            result = optimize_turbine(spec["case"], logger=logger)
+            try:
+                result = optimize_turbine(spec["case"], logger=logger)
+            finally:
+                logger.removeHandler(handler)
+                handler.close()
         save_optimization_results(result, directory)
-        audit = audit_result(result)
-        (directory / "audit.json").write_text(
-            json.dumps(audit, indent=2, allow_nan=False), encoding="utf-8"
+        optimizer = result.optimizer
+        optimizer.plot_convergence_history(
+            savefile=True, filename="convergence_history", output_dir=directory,
+            showfig=False,
+        )
+        optimizer.print_convergence_history(
+            savefile=True, filename="convergence_history.txt", output_dir=directory,
+            to_console=False,
+        )
+        optimizer.print_optimization_report(
+            include_design_variables=True, include_constraints=True,
+            include_kkt_conditions=True, include_multipliers=True,
+            savefile=True, filename="optimization_report.txt", output_dir=directory,
+            to_console=False,
+        )
+        validation = validate_turbine_integration(result)
+        (directory / "validation.json").write_text(
+            json.dumps(validation, indent=2, allow_nan=False), encoding="utf-8"
         )
         solver = result.solver
         record.update(
+            validation_schema=1,
             success=result.success,
             solver_success=result.solver_success,
+            kkt_passed=result.frontend_result.kkt_passed,
             feasible=result.feasible,
             stationary=bool(solver.stationary),
             status=int(solver.status),
@@ -225,9 +311,9 @@ def run_one(spec, output):
             diagnostics_available=bool(solver.diagnostics_available),
             recoveries=int(solver.domain_rejections),
             seconds=_finite_number(solver.elapsed_time),
-            audit_passed=audit["passed"],
-            audit_errors=audit["errors"],
-            history_records_checked=audit["history_records_checked"],
+            validation_passed=validation["passed"],
+            validation_errors=validation["errors"],
+            history_records_checked=validation["history_records_checked"],
             final_x=solver.x.tolist(),
             history=[
                 dict(
@@ -242,20 +328,32 @@ def run_one(spec, output):
             ],
         )
     except Exception:
-        record.update(success=False, audit_passed=False, error=traceback.format_exc())
+        record.update(
+            validation_schema=1, success=False, validation_passed=False,
+            error=traceback.format_exc(),
+        )
     (directory / "summary.json").write_text(
         json.dumps(record, indent=2, allow_nan=False), encoding="utf-8"
     )
     return record
 
 
-def write_report(records, output):
-    if __package__:
-        from .kkt_report import write_report as render
-    else:
-        from kkt_report import write_report as render
-
-    render(records, output)
+def write_summary(records, output):
+    """Save matrix data; PySolverView renders each case's reports and plots."""
+    (output / "summary.json").write_text(
+        json.dumps(records, indent=2, allow_nan=False), encoding="utf-8"
+    )
+    fields = (
+        "id", "start", "constraints", "profile", "success", "solver_success",
+        "kkt_passed", "feasible", "stationary", "status", "iterations",
+        "initial_efficiency_percent", "efficiency_percent", "violation", "optimality",
+        "kkt_ratio", "diagnostics_available", "recoveries", "seconds",
+        "validation_passed", "history_records_checked", "message", "error",
+    )
+    with (output / "summary.csv").open("w", newline="", encoding="utf-8") as stream:
+        writer = csv.DictWriter(stream, fieldnames=fields, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(records)
 
 
 def main():
@@ -267,14 +365,15 @@ def main():
         "--resume", action="store_true", help="Reuse completed summaries in output"
     )
     parser.add_argument(
-        "--retry-audit-failures",
+        "--retry-validation-failures", "--retry-audit-failures",
+        dest="retry_validation_failures",
         action="store_true",
-        help="With --resume, rerun cases whose independent audit failed",
+        help="With --resume, rerun failed turbine integration checks (legacy audit alias accepted)",
     )
     parser.add_argument(
-        "--no-report",
+        "--no-summary", "--no-report", dest="no_summary",
         action="store_true",
-        help="Save per-case artifacts without overwriting the combined report",
+        help="Save per-case PySolverView artifacts without overwriting matrix summaries",
     )
     parser.add_argument(
         "--preflight", action="store_true", help="Evaluate starts without optimizing"
@@ -301,7 +400,9 @@ def main():
         path = args.output / spec["id"] / "summary.json"
         if args.resume and path.exists():
             row = json.loads(path.read_text(encoding="utf-8"))
-            if args.retry_audit_failures and not row.get("audit_passed"):
+            if row.get("validation_schema") != 1 or (
+                args.retry_validation_failures and not row.get("validation_passed")
+            ):
                 pending.append(spec)
                 continue
             row["tolerances"] = dict(PROFILES[spec["profile"]])
@@ -318,7 +419,7 @@ def main():
         records.append(row)
         print(
             f"[{len(records)}/{len(specs)}] {row['id']}: "
-            f"accepted={row['success']}, audit={row['audit_passed']}, "
+            f"accepted={row['success']}, validation={row['validation_passed']}, "
             f"violation={_metric_text(row.get('violation'))}, "
             f"optimality={_metric_text(row.get('optimality'))}",
             flush=True,
@@ -335,12 +436,9 @@ def main():
             for future in as_completed(tasks):
                 record_finished(future.result())
     records.sort(key=lambda row: row["id"])
-    if not args.no_report:
-        (args.output / "summary.json").write_text(
-            json.dumps(records, indent=2, allow_nan=False), encoding="utf-8"
-        )
-        write_report(records, args.output)
-    return 0 if all(row["audit_passed"] for row in records) else 1
+    if not args.no_summary:
+        write_summary(records, args.output)
+    return 0 if all(row["validation_passed"] for row in records) else 1
 
 
 if __name__ == "__main__":

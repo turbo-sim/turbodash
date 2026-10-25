@@ -55,7 +55,7 @@ about directory names:
 | [Continuous geometry](../../turbodash/core/turbine.py#L506) | The main turbine path separates continuous meanline geometry from integer blade realization. This is favorable for differentiation. |
 | [Older stage API](../../turbodash/core/stage.py#L172) | Also uses HEOS. Its geometry helper still rounds blade count with `ceil` at line 682. Preserve that public behavior, but exclude integer realization from differentiated design outputs. |
 | [Repeating-stage helper](../../turbodash/core/stage.py#L78) | Uses NumPy iteration, scalar casts and SciPy `root_scalar`. This separate root-based helper needs its own plan if it is included in scope. |
-| [SLSQP driver](../../turbodash/optimization/slsqp.py#L214) | Already accepts a combined `jac` callback. The turbine optimization adapter currently does not supply it. |
+| [Optimization frontend](https://github.com/turbo-sim/pysolver_view/blob/main/src/pysolver_view/optimization/solver.py) | Accepts a combined physical `OptimizationProblem.gradient`. The turbine adapter currently relies on finite differences. |
 
 The numeric size is small; the difficulty is preserving contracts across the
 boundary. Examples include `float(...)` conversions in the turbine driver
@@ -364,15 +364,16 @@ These are conditional arithmetic scenarios, not predicted JAX timings. Actual
 AD costs, callbacks, different iteration counts, domain rejection and solver
 overhead determine the result. Even accurate derivatives cannot guarantee fewer
 iterations. They can, however, reduce finite-difference step-size sensitivity;
-[`test_kkt_tolerances.py`](../../tests/test_kkt_tolerances.py) already demonstrates
+[PySolverView KKT tolerance tests](https://github.com/turbo-sim/pysolver_view/blob/main/tests/optimization/solvers/test_custom_slsqp_kkt_tolerances.py) already demonstrate
 finite-difference error limiting strict optimality certification.
 
-To realize this benefit, a small **non-app optimization adapter** must eventually
-pass the derivative callback to `minimize_slsqp`. Migrating only `core` and
-`loss_models` makes derivatives available but does not automatically activate
-them in optimization. Differentiate a fixed vector of signed/scaled objective,
-equalities and SLSQP inequalities; include physical-to-normalized variable
-scaling and inequality sign changes. Resolve selectors and shape outside tracing.
+To realize this benefit, the turbine problem must eventually implement the
+combined physical `gradient` contract used by `OptimizationSolver`. Migrating
+only `core` and `loss_models` makes derivatives available but does not
+automatically activate them in optimization. Differentiate a fixed vector of
+signed/scaled objective, equalities and public nonpositive inequalities against
+physical variables. The frontend applies variable normalization and backend
+sign conversion. Resolve selectors and shape outside tracing.
 Result-dependent targets/normalization must retain their derivative chains.
 Compare forward and reverse Jacobians: the historical case has five output rows
 and fourteen variables, so forward mode is not automatically the best choice.
@@ -514,7 +515,7 @@ The focused test selection can be repeated from the repository root:
 
 ```powershell
 $env:PYTHONDONTWRITEBYTECODE = '1'
-.\.venv\Scripts\python.exe -B -m pytest tests/test_meanline_geometry.py tests/test_production_loss_models.py tests/test_model_domain.py tests/test_ko_profile_interpolation.py tests/test_ko_compressibility.py tests/test_ko_secondary.py tests/test_ko_clearance.py tests/test_ko_trailing.py tests/test_benner_penetration.py tests/test_physical_blade_loading.py tests/test_slsqp.py -q -ra -p no:cacheprovider
+.\.venv\Scripts\python.exe -B -m pytest tests/test_meanline_geometry.py tests/test_production_loss_models.py tests/test_model_domain.py tests/test_ko_profile_interpolation.py tests/test_ko_compressibility.py tests/test_ko_secondary.py tests/test_ko_clearance.py tests/test_ko_trailing.py tests/test_benner_penetration.py tests/test_physical_blade_loading.py tests/test_optimization_api.py -q -ra -p no:cacheprovider
 ```
 
 The official online documentation linked above was checked for API behavior;

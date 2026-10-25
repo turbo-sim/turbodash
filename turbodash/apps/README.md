@@ -88,7 +88,7 @@ From the repository root, install the optimization dependencies and register the
 launch commands once:
 
 ```powershell
-poetry install -E optimization
+poetry install
 ```
 
 Then start the app with:
@@ -192,8 +192,8 @@ as many independent design variables.
 **Start optimization** uses the live design. The sidebar stays busy while a
 subprocess solves and while the successful design is applied to all controls
 and plots. Other panes remain interactive. The expandable **Optimization
-terminal** below the meanline results shows one SLSQP report, plus any
-clipping, recovery, or error diagnostics. Its objective is signed and normalized for
+terminal** below the meanline results shows the main PySolverView frontend's
+single optimization report, plus any clipping or error diagnostics. Its objective is signed and normalized for
 minimization; the separate progress summary shows the physical objective.
 The terminal follows new output until you scroll up.
 
@@ -212,16 +212,21 @@ includes its optimization settings without reapplying old initial overrides.
 constraint menus and applies selection changes while preserving edits;
 `app_turbine_optimization/opt_jobs.py` owns isolated processes, session ownership,
 progress, and logs. Its CSS/JavaScript live in `app_turbine_optimization/assets/` and
-are loaded only by this version. Numerical code lives in the
-`turbodash.optimization` package, independently of Dash. Its optional `logger`
-receives the single SLSQP report and diagnostics without redirecting server stdout.
+are loaded only by this version. The turbine problem adapter and physical
+reports live in the `turbodash.optimization` module, independently of Dash.
+Its optional `logger` receives the single SLSQP report and diagnostics without
+redirecting server stdout.
 Public callback snapshots remain in physical units and include the matching
 configuration and turbine results for future live geometry rendering.
 
-The optimizer uses Turbodash's driver around SciPy 1.17.1; PySolverView remains
-a `jaxprop` dependency but does not run the optimization. Recognized meanline
-domain failures carry metadata so the driver can reject a trial and retry a
-shorter step. Invalid roots are not clipped and no artificial objective penalty
+The optimizer uses PySolverView's public `OptimizationSolver` frontend with
+`library="pysolver"` and `method="slsqp"`. Its shared reporting writes directly
+to the worker logger, so the app terminal shows the same frontend format as
+the demos. PySolverView owns the controlled SciPy 1.17.1 driver, derivatives,
+recovery, and KKT checks. Recognized meanline domain failures are
+translated into PySolverView domain errors with their metadata so the driver
+can reject a trial and retry a shorter step. Invalid roots are not clipped and
+no artificial objective penalty
 is introduced. Invalid starting designs, exhausted recovery budgets, and
 nonrecoverable model consistency errors produce a failed job while retaining
 the displayed design.

@@ -1,9 +1,25 @@
 # Turbine optimization examples
 
 These two commented scripts use the public `turbodash.optimization` API and
-the same meanline model and SLSQP driver as the optimization app. They require
-the normal project environment, including the pinned SciPy 1.17.1 dependency;
-there is no separate example-specific installation or solver implementation.
+the same meanline model and PySolverView `OptimizationSolver` frontend as the
+optimization app. The frontend selects `library="pysolver", method="slsqp"`.
+Turbodash maps turbine inputs and physical reports; PySolverView owns
+optimization, finite differences, domain recovery, independent KKT checks,
+and the convergence table and final solver report.
+
+PySolverView is a required PyPI dependency, with version `>=0.7.2,<0.8`
+(Poetry `^0.7.2`). Install from the Turbodash repository root and inspect the
+version and installation used by its environment:
+
+```powershell
+poetry install
+poetry run python -c "import inspect, pysolver_view as psv; print(psv.__version__); print(psv.__file__); print(inspect.getfile(psv.OptimizationSolver))"
+```
+
+The version should satisfy that range; the paths identify the active PySolverView
+installation in the Poetry environment. SciPy 1.17.1 is required by the controlled
+backend. PySolverView is imported from that installation; there is no separate
+example solver implementation.
 
 Run from the repository root, using `poetry run python` or the environment's
 Python executable. Both scripts save plots without opening windows by default;
@@ -15,9 +31,9 @@ script; absolute paths work as supplied.
 ## 1. Basic API, results and reporting
 
 ```powershell
-python -B demos/optimization/optimize_turbine.py --case axial
-python -B demos/optimization/optimize_turbine.py --case radial
-python -B demos/optimization/optimize_turbine.py --case axial --show
+poetry run python -B demos/optimization/optimize_turbine.py --case axial
+poetry run python -B demos/optimization/optimize_turbine.py --case radial
+poetry run python -B demos/optimization/optimize_turbine.py --case axial --show
 ```
 
 Read [`optimize_turbine.py`](optimize_turbine.py) from top to bottom. It explains
@@ -31,7 +47,6 @@ from turbodash.optimization import load_case, optimize_turbine, save_optimizatio
 case = load_case("demos/optimization/case_axial.yaml")
 result = optimize_turbine(case)
 save_optimization_results(result, "output/my_turbine")
-print(result.success, result.message)
 ```
 
 This short snippet uses paths relative to your shell; the full script resolves
@@ -44,7 +59,51 @@ its own paths. Its default output is `output/axial/` or `output/radial/` here.
 | `optimized_case.yaml` | Final inputs/settings, with initial overrides removed so a restart uses this design. |
 | `optimization_result.yaml` | Physical performance, variables, constraint report, accepted history, solver history, KKT diagnostics, recovery events and evaluation/time counts. |
 | `initial_turbine.png/.svg`, `optimized_turbine.png/.svg` | Initial and final turbine figures. |
-| `convergence_history.png/.svg` | Physical objective and normalized constraint convergence. |
+| `convergence_history.png/.svg` | PySolverView's signed/scaled objective and constraint convergence against accepted iterations. |
+| `convergence_history.txt` | PySolverView's convergence table and final solver status. |
+| `optimization_report.txt` | PySolverView's physical and normalized design variables, named constraints, KKT checks, and Lagrange multipliers. |
+
+A result export identifies `pysolver_view.OptimizationSolver` and the `slsqp`
+method, so it is traceable to the optimizer actually used.
+
+PySolverView prints the optimization status, normalized feasibility and KKT
+optimality, evaluation counts, and timing. After the solve, the basic demo also
+prints and saves its full optimization report, including design-variable bounds,
+each named physical constraint, KKT conditions, and constraint/bound multipliers.
+The final KKT report uses the solve's separate feasibility and optimality limits
+and reuses its saved certificate; rendering the report and convergence plot does
+not run the turbine model again. The basic demo adds physical turbine performance
+and output paths.
+
+The PySolverView convergence plot is saved by default. Run with `--show` to open
+it and the turbine figures interactively; omitting that flag keeps the run
+headless. Its signed objective is negative when maximizing efficiency; physical
+efficiency remains available in the turbine results and YAML exports.
+On rerun, the demo removes the retired `physical_convergence_history.png/.svg`
+files from its output directory so old plots are not mixed with the native output.
+
+The retained main frontend is available as `result.optimizer` for further
+PySolverView plots and reports. For example:
+
+```python
+result.optimizer.print_optimization_report(
+    include_kkt_conditions=True,
+    include_multipliers=True,
+    savefile=True,
+    filename="optimization_report.txt",
+    output_dir="output/my_turbine",
+)
+result.optimizer.plot_convergence_history(
+    savefile=True,
+    filename="convergence_history",
+    output_dir="output/my_turbine",
+    showfig=False,
+)
+```
+
+The default final report uses saved solve data. Explicitly requesting another
+design or a different tolerance is a separate diagnostic request and can perform
+additional model or KKT work.
 
 A final file is written even when a solve is rejected. Check `result.success`
 before adopting its design. `solver_success` is native termination, `feasible`
@@ -58,6 +117,16 @@ rejected trials and derivative probes do not produce progress rows. Physical
 efficiency in `result.history` is positive. The solver minimizes a signed,
 normalized objective, so its objective is negative when maximizing efficiency.
 Step norms and KKT diagnostics use normalized solver coordinates.
+
+`result.optimizer` is the live PySolverView frontend for plotting and reporting;
+it is excluded from YAML and application-worker payloads.
+`result.frontend_result` is PySolverView's detached public result: its `x` is
+physical, `x_solver` is normalized, and `nfev` includes derivative probes.
+The retained `result.solver` contains raw backend diagnostics and normalized
+`x`; its `nfev` excludes derivative probes supplied by the frontend.
+`result.n_evaluations` separately counts successful uncached turbine evaluations,
+including the fresh final check. YAML exports include `frontend_result` and
+`frontend_convergence_history` alongside the backend history and recovery events.
 
 ### Editing the input
 
@@ -81,7 +150,10 @@ include comments about the case schema:
   type remains fixed.
 
 The commented cases retain explicit example settings. Current driver defaults
-are listed by `SLSQPOptions` and can differ from those choices. For additional
+are listed by `pysolver_view.SLSQPOptions` and can differ from those choices.
+The turbine adapter preserves the existing `[0, 1]` coordinates, explicit
+finite-difference step, and separate feasibility and optimality tolerances when
+calling `pysolver_view.OptimizationSolver` with `problem_scale=1.0`. For additional
 selectors, variable choices and control details, see the
 [calculation guide](../../docs/source/guides/calculations.md) and
 [SLSQP guide](../../docs/source/guides/optimization.md).
@@ -89,7 +161,7 @@ selectors, variable choices and control details, see the
 ## 2. Step fractions, failure and recovery
 
 ```powershell
-python -B demos/optimization/compare_slsqp_controls.py
+poetry run python -B demos/optimization/compare_slsqp_controls.py
 ```
 
 [`compare_slsqp_controls.py`](compare_slsqp_controls.py) starts every run from
@@ -116,12 +188,15 @@ The default `output_controls/` contains:
 
 - `summary.csv` and `summary.yaml`, listing settings, acceptance, native status,
   efficiency, violation, KKT ratio, iterations, recovery count and model calls.
-- `comparison.png/.svg`, showing physical efficiency, normalized constraint
-  violation and KKT-to-tolerance ratio against accepted iterations.
-- A subdirectory per policy with `solver.log` and the four API YAML exports.
-  Each export records actual recovery events and its exact input settings.
+- A subdirectory per policy with PySolverView's native
+  `convergence_history.png/.svg`, `optimization_report.txt`, `solver.log`,
+  and the four API YAML exports.
+  The plot shows the signed/scaled objective and constraint violation against
+  accepted iterations. Each export records actual recovery events and exact
+  input settings.
 
-For this supplied case, a real production run observed:
+For this supplied case, a PySolverView run reproduced the previous
+Turbodash driver's outcomes:
 
 | Policy | Accepted | Major iterations | Final efficiency [%] |
 | --- | --- | ---: | ---: |
@@ -132,8 +207,8 @@ For this supplied case, a real production run observed:
 | Gradual restoration | Yes | 39 | 89.811939 |
 
 The rejected row retains its infeasible initial design; its higher efficiency
-does not make it a successful design. Circles mark accepted endpoints and crosses
-mark rejected outcomes. The comparison exits zero when all runs complete with
+does not make it a successful design. The summary records accepted and rejected
+outcomes explicitly. The comparison exits zero when all runs complete with
 controlled outcomes, including that expected failure; unexpected exceptions
 still fail the process. Changed inputs or solver versions can change the results.
 
@@ -143,10 +218,33 @@ KKT diagnostics as well as the efficiency and feasibility curves: small steps
 or objective changes alone do not prove convergence. A ratio above one or
 unavailable final diagnostics does not pass the independent acceptance check.
 
+## 3. Time KKT checks
+
+```powershell
+poetry run python demos/optimization/compare_kkt_timing.py
+poetry run python demos/optimization/compare_kkt_timing.py --case radial --repeats 3
+```
+
+[`compare_kkt_timing.py`](compare_kkt_timing.py) runs the same case with
+PySolverView's `check_kkt` enabled and disabled. It warms up each mode once,
+then times three pairs in alternating order. Each run uses a fresh problem
+and the same initial design, bounds, constraints, tolerances, and step controls.
+Only `solve()` is timed; setup, console output, plots, and reports are excluded.
+
+The console table shows solve time, KKT checker time, iterations, total model
+calls, KKT check counts, outcomes, and physical objective. The final lines compare
+median solve times. `--repeats 1` gives a shorter comparison. The script produces
+no plots or result files and does not change the app's mandatory KKT policy.
+With checks disabled, success requires native convergence and feasibility;
+optimality is unassessed. Different iteration/evaluation counts can also affect
+the measured time difference.
+Small wall-time differences can be timing noise; increase `--repeats` for more
+samples and inspect the separately measured checker time.
+
 ## Development maintenance
 
-The independent 52-case KKT/tolerance audit and a record of why the custom
-interface was necessary are in
+The 52-case turbine integration matrix is retained in
 [`development/optimization`](../../development/optimization/README.md).
-Those tools are for solver maintenance; these demos are the shorter starting
-point for using the API.
+It checks real turbine scaling, physical outputs, callbacks, and exports.
+Its KKT checks, optimization reports, and convergence plots are all delegated
+to PySolverView. These demos are the shorter starting point for the turbine API.

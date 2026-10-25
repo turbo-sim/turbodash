@@ -3,6 +3,7 @@
 import copy
 from contextlib import redirect_stdout
 from io import StringIO
+import logging
 from pathlib import Path
 import unittest
 from unittest.mock import patch
@@ -12,7 +13,10 @@ import numpy as np
 from scipy.optimize import OptimizeResult
 import yaml
 
-from turbodash.optimization import turbine as opt
+import pysolver_view as psv
+
+from turbodash import optimization as opt
+from turbodash.core.errors import ModelDomainError
 
 
 EXAMPLE_DIRECTORY = Path(__file__).resolve().parents[1] / "demos" / "optimization"
@@ -50,7 +54,7 @@ def synthetic_problem():
             "max_iterations": 100,
             "tolerance": 1e-9,
             # These API contracts use full QP steps. Step-growth/recovery
-            # schedules are exercised separately in test_slsqp.py.
+            # schedules are exercised by PySolverView's own solver suite.
             "first_step_fraction": 1.0,
             "max_step_fraction": 1.0,
             "step_growth_factor": None,
@@ -61,17 +65,102 @@ def synthetic_problem():
     return config, optimization
 
 
-def pretend_solver_success(evaluate, initial, bounds, **kwargs):
-    """Return the initial point to check feasibility independently of the solver."""
+def pretend_solver_success(problem, initial, method, options):
+    """Return backend-authoritative values through the real PSV frontend."""
+    values = problem.fitness(initial)
     return OptimizeResult(
         x=np.array(initial, dtype=float), success=True, solver_success=True,
         feasible=True, nit=1, message="Synthetic solver success", status=0,
         domain_rejections=0, derivative_rejections=0, history=[], events=[],
+        fitness=values.copy(), fun=values[0], kkt=None,
         optimality=0.0, elapsed_time=0.0,
     )
 
 
 class OptimizationContractTests(unittest.TestCase):
+    def test_legacy_options_map_to_pysolverview_and_unknown_controls_fail(self):
+        options = opt.normalize_solver_options(
+            dict(
+                library="scipy",
+                method="SLSQP",
+                tolerance=1e-8,
+                max_iterations=50,
+                derivative_abs_step=2e-6,
+                print_convergence=False,
+            ),
+            feasibility_tolerance=3e-6,
+        )
+        self.assertEqual(options["ftol"], 1e-8)
+        self.assertEqual(options["maxiter"], 50)
+        self.assertEqual(options["finite_diff_step"], 2e-6)
+        self.assertEqual(options["feasibility_tol"], 3e-6)
+        self.assertTrue(options["domain_backtracking"])
+        for invalid in (
+            {"method": "BFGS"},
+            {"alpha_max": 0.5},
+            {"ftol": 1e-8, "tolerance": 1e-9},
+            {"problem_scale": 10},
+            {"ftol": True},
+            {"backtrack_factor": "0.5"},
+        ):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                opt.normalize_solver_options(invalid)
+
+    def test_model_domain_errors_recover_in_pysolverview_with_physical_metadata(self):
+        case = {
+            "inputs": {"design": {"x": 0.8}},
+            "optimization": {
+                "design_variables": {
+                    "design.x": {"lower_value": -1.0, "upper_value": 1.0},
+                },
+                "objective_function": {
+                    "variable": "overall_performance.score", "type": "minimize",
+                },
+                "solver_options": {
+                    "first_step_fraction": 1.0,
+                    "step_growth_factor": None,
+                    "ftol": 1e-10,
+                    "print_convergence": False,
+                },
+            },
+        }
+
+        def evaluate(config):
+            x = config["inputs"]["design"]["x"]
+            if x <= 0:
+                raise ModelDomainError(
+                    "Synthetic property requires positive x", code="property_domain",
+                    quantity="design.x", value=x, stage_index=0, row="rotor",
+                )
+            return {
+                "overall_performance": {"score": (np.sqrt(x) - 0.5) ** 2},
+                "stages_performance": [{"geometry_meanline": {"x": x}}],
+            }
+
+        result = opt.optimize_turbine(case, evaluator=evaluate)
+        self.assertTrue(result.success, result.message)
+        self.assertAlmostEqual(result.design_variables["design.x"], 0.25, places=5)
+        self.assertGreater(result.solver.domain_rejections, 0)
+        rejection = next(event for event in result.solver.events
+                         if event["kind"] == "trial_rejection")
+        failure = rejection["failure"]
+        self.assertEqual(failure["code"], "property_domain")
+        self.assertEqual(failure["stage_index"], 0)
+        self.assertEqual(failure["row"], "rotor")
+        self.assertTrue(failure["recoverable"])
+        self.assertEqual(failure["design_variables"]["design.x"], failure["value"])
+
+    def test_unexpected_model_errors_are_not_recovered(self):
+        config, optimization = synthetic_problem()
+
+        def evaluate(candidate):
+            if candidate["inputs"]["design"]["x"] != 11.0:
+                raise RuntimeError("Application calculation failed")
+            return synthetic_turbine(candidate)
+
+        with self.assertRaisesRegex(RuntimeError, "Application calculation failed"):
+            opt.optimize_turbine(config, optimization, evaluator=evaluate)
+
     def test_constrained_optimum_and_geometry_use_same_final_inputs(self):
         config, optimization = synthetic_problem()
         config["overall_performance"] = {"score": "stale saved result"}
@@ -111,6 +200,59 @@ class OptimizationContractTests(unittest.TestCase):
             self.assertLessEqual(candidate["y"], 300.0 + 1e-5)
         self.assertEqual(config, original_config)
         self.assertEqual(optimization, original_optimization)
+
+    def test_main_frontend_prints_one_convergence_report(self):
+        """Canonical PSV reporting owns the solve's header, rows, and footer."""
+        config, optimization = synthetic_problem()
+        optimization["solver_options"]["print_convergence"] = True
+        printed = StringIO()
+        with redirect_stdout(printed):
+            result = opt.optimize_turbine(config, optimization, evaluator=synthetic_turbine)
+        self.assertTrue(result.success, result.message)
+        output = printed.getvalue()
+        self.assertEqual(output.count("Starting optimization process"), 1)
+        self.assertEqual(output.count("Optimization algorithm employed"), 1)
+        self.assertEqual(output.count("Success:"), 1)
+        self.assertEqual(output.count("Final objective:"), 1)
+        self.assertNotIn("Starting pysolver SLSQP optimization", output)
+        self.assertNotIn("KKT/tol Recoveries", output)
+
+    def test_app_logger_receives_frontend_report_without_console_duplicates(self):
+        """An app worker's supplied logger is the single convergence destination."""
+        config, optimization = synthetic_problem()
+        optimization["solver_options"]["print_convergence"] = True
+        logged, printed = StringIO(), StringIO()
+        logger = logging.Logger("turbine-frontend-test", logging.INFO)
+        logger.addHandler(logging.StreamHandler(logged))
+        with redirect_stdout(printed):
+            result = opt.optimize_turbine(
+                config, optimization, evaluator=synthetic_turbine, logger=logger,
+            )
+        self.assertTrue(result.success, result.message)
+        self.assertEqual(printed.getvalue(), "")
+        self.assertEqual(logged.getvalue().count("Starting optimization process"), 1)
+        self.assertEqual(logged.getvalue().count("Success:"), 1)
+        self.assertNotIn("Starting pysolver SLSQP optimization", logged.getvalue())
+
+    def test_physical_callback_can_stop_main_frontend_at_accepted_design(self):
+        """A user stop returns matching physical snapshots and an unsuccessful solve."""
+        config, optimization = synthetic_problem()
+        observed = []
+
+        def stop(entry):
+            observed.append(copy.deepcopy(entry))
+            if entry["iteration"] > 0:
+                raise StopIteration("Stopped by turbine callback")
+
+        result = opt.optimize_turbine(
+            config, optimization, evaluator=synthetic_turbine, callback=stop,
+        )
+        self.assertFalse(result.success)
+        self.assertEqual(result.solver.status, 13)
+        self.assertGreater(len(observed), 1)
+        self.assertEqual(result.design_variables, observed[-1]["design_variables"])
+        self.assertEqual(result.config["inputs"], observed[-1]["config"]["inputs"])
+        self.assertEqual(result.turbine_results, observed[-1]["turbine_results"])
 
     def test_callable_objective_and_explicit_initial_value(self):
         config, optimization = synthetic_problem()
@@ -232,7 +374,8 @@ class OptimizationContractTests(unittest.TestCase):
 
     def test_solver_success_is_checked_against_independent_feasibility(self):
         config, optimization = synthetic_problem()
-        with patch.object(opt, "minimize_slsqp", new=pretend_solver_success):
+        with patch.dict(psv.optimization.OPTIMIZATION_LIBRARIES,
+                        {"pysolver": pretend_solver_success}):
             result = opt.optimize_turbine(config, optimization, evaluator=synthetic_turbine)
         self.assertTrue(result.solver_success)
         self.assertFalse(result.feasible)
@@ -242,15 +385,17 @@ class OptimizationContractTests(unittest.TestCase):
     def test_final_geometry_uses_solver_solution_after_other_trial_evaluations(self):
         config, optimization = synthetic_problem()
 
-        def solve_with_perturbed_last_evaluation(evaluate, initial, bounds, **kwargs):
+        def solve_with_perturbed_last_evaluation(problem, initial, method, options):
             final = np.array([.6, .4])  # Physical [12.4, 180] in normalized bounds.
-            evaluate(final)
-            evaluate(np.array([.6025, .405]))  # Physical [12.41, 181].
-            result = pretend_solver_success(evaluate, final, bounds, **kwargs)
+            final_values = problem.fitness(final)
+            problem.fitness(np.array([.6025, .405]))  # Physical [12.41, 181].
+            result = pretend_solver_success(problem, final, method, options)
+            result.fitness = final_values.copy()
             result.message = "Accepted solution followed by a diagnostic trial"
             return result
 
-        with patch.object(opt, "minimize_slsqp", new=solve_with_perturbed_last_evaluation):
+        with patch.dict(psv.optimization.OPTIMIZATION_LIBRARIES,
+                        {"pysolver": solve_with_perturbed_last_evaluation}):
             result = opt.optimize_turbine(config, optimization, evaluator=synthetic_turbine)
         self.assertTrue(result.success, result.message)
         self.assertEqual(result.config["inputs"]["design"], {"x": 12.4, "y": 180.0})
@@ -282,13 +427,19 @@ class OptimizationContractTests(unittest.TestCase):
             entry["config"]["inputs"]["design"]["x"] = -1000.0
             entry["turbine_results"]["inputs"]["design"]["x"] = -1000.0
 
-        def repeat_same_point(evaluate, initial, bounds, **kwargs):
-            evaluate(initial)
-            evaluate(initial.copy())
-            kwargs["callback"](dict(x=initial.copy(), iteration=0))
-            return pretend_solver_success(evaluate, initial, bounds, **kwargs)
+        def repeat_same_point(problem, initial, method, options):
+            values = problem.fitness(initial)
+            problem.fitness(initial.copy())
+            record = dict(x=initial.copy(), iteration=0, fitness=values.copy(),
+                          objective=values[0], step_norm=0.0,
+                          max_constraint_violation=0.5, objective_change=0.0)
+            problem.accepted_callback(record)
+            result = pretend_solver_success(problem, initial, method, options)
+            result.history = [record]
+            return result
 
-        with patch.object(opt, "minimize_slsqp", new=repeat_same_point):
+        with patch.dict(psv.optimization.OPTIMIZATION_LIBRARIES,
+                        {"pysolver": repeat_same_point}):
             result = opt.optimize_turbine(config, optimization, evaluator=evaluator, callback=callback)
         # Repeated solver requests share the initial evaluation. The returned
         # design is independently reevaluated once before it can be applied.
@@ -324,6 +475,9 @@ class OptimizationContractTests(unittest.TestCase):
             self.assertEqual(documents["initial_case"]["inputs"]["design"]["x"], 12.0)
             self.assertEqual(documents["optimized_case"]["inputs"], result.config["inputs"])
             self.assertIsInstance(documents["optimization_result"], dict)
+            provenance = documents["optimization_result"]["provenance"]
+            self.assertEqual(provenance["solver"], "pysolver_view.OptimizationSolver")
+            self.assertEqual(provenance["library"], "pysolver")
         finally:
             for path in output.iterdir():
                 path.unlink()
@@ -416,10 +570,19 @@ class RealTurbineOptimizationTests(unittest.TestCase):
                     for row in stage["geometry_meanline"].values():
                         self.assertLess(abs(float(row["flaring_angle"])), 1e-4)
                 progress = []
-                # The real API route must not delegate either solve to PSV.
-                with patch("pysolver_view.OptimizationSolver", side_effect=AssertionError("Unexpected PSV optimizer")), \
-                     patch("pysolver_view.NonlinearSystemSolver", side_effect=AssertionError("Unexpected PSV nonlinear solver")):
+                # The adapter must enter the main frontend; its backend owns SLSQP.
+                with patch.object(opt.psv, "OptimizationSolver", wraps=psv.OptimizationSolver) as solve, \
+                     patch.object(opt.psv, "minimize_slsqp",
+                                  side_effect=AssertionError("Direct low-level solver call")):
                     result = opt.optimize_turbine(config, callback=progress.append)
+                solve.assert_called_once()
+                settings = solve.call_args.kwargs
+                self.assertEqual(settings["library"], "pysolver")
+                self.assertEqual(settings["method"], "slsqp")
+                self.assertEqual(settings["problem_scale"], 1.0)
+                self.assertEqual(settings["update_on"], "iteration")
+                self.assertTrue(settings["check_kkt"])
+                self.assertTrue(callable(settings["backend_callback"]))
                 self.assertTrue(result.success, result.message)
                 self.assertTrue(result.feasible)
                 self.assertIsInstance(result.solver, OptimizeResult)

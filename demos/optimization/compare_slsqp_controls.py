@@ -1,7 +1,7 @@
-"""Compare SLSQP step controls on the same flaring-constrained turbine design.
+"""Compare PySolverView SLSQP controls on one flaring-constrained turbine design.
 
 Run directly from any working directory. Outputs are saved without opening a
-window; add --show to inspect the comparison interactively. A rejected solve is
+window; add --show to inspect each native convergence figure. A rejected solve is
 an educational outcome, while unexpected exceptions still stop the script.
 """
 
@@ -32,7 +32,7 @@ POLICIES = (
 
 
 def finite_value(value):
-    """Keep unavailable diagnostics null in summaries and gaps in plots."""
+    """Keep unavailable diagnostics null in summaries."""
     if value is None or not math.isfinite(value):
         return None
     return float(value)
@@ -48,6 +48,9 @@ def write_summary(records, output, source):
     document = {
         "source_case": str(source.resolve()),
         "evaluator": "turbodash.optimization.optimize_turbine",
+        "optimizer": "pysolver_view.OptimizationSolver",
+        "library": "pysolver",
+        "method": "slsqp",
         "note": (
             "Only the four listed step/recovery controls differ between policies. "
             "All runs restart from the same inputs, bounds, objective, constraints "
@@ -60,47 +63,6 @@ def write_summary(records, output, source):
     )
 
 
-def plot_comparison(results, records, output):
-    import matplotlib.pyplot as plt
-    from turbodash.optimization import save_figure
-
-    figure, axes = plt.subplots(3, 1, sharex=True, figsize=(10, 10), layout="constrained")
-    for result, record in zip(results, records):
-        history = result.history  # Accepted physical designs, not rejected trials.
-        iterations = [entry["iteration"] for entry in history]
-        curves = (
-            [100.0 * entry["objective"] for entry in history],
-            [max(entry["max_constraint_violation"], 1e-14) for entry in history],
-            [finite_value(entry.get("kkt_ratio")) for entry in history],
-        )
-        label = record["label"] + (" (rejected)" if not result.success else "")
-        for axis, values in zip(axes, curves):
-            values = [float("nan") if value is None else value for value in values]
-            if axis is axes[2]:
-                values = [max(value, 1e-14) if math.isfinite(value) else value for value in values]
-            line, = axis.plot(iterations, values, label=label, linewidth=1.6)
-            if iterations:
-                axis.plot(
-                    iterations[-1], values[-1], "o" if result.success else "x",
-                    color=line.get_color(), markersize=7,
-                )
-
-    axes[0].set_ylabel("Total-to-static efficiency [%]")
-    axes[0].legend(fontsize=8)
-    axes[1].set_ylabel("Normalized constraint violation")
-    axes[1].set_yscale("log")
-    axes[1].axhline(records[0]["feasibility_tolerance"], color="black", linestyle=":")
-    axes[2].set_ylabel("KKT residual / acceptance limit")
-    axes[2].set_yscale("log")
-    axes[2].axhline(1.0, color="black", linestyle=":")
-    axes[2].set_xlabel("Accepted iteration")
-    for axis in axes:
-        axis.grid(alpha=0.25)
-    figure.suptitle("Same turbine problem, different step and recovery policies")
-    save_figure(figure, output / "comparison")
-    return figure
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -111,7 +73,7 @@ def main():
         "--output", type=Path, default=HERE / "output_controls",
         help="Output directory; relative paths resolve beside this script (default: output_controls).",
     )
-    parser.add_argument("--show", action="store_true", help="Open the saved comparison plot.")
+    parser.add_argument("--show", action="store_true", help="Open PySolverView's convergence figures.")
     args = parser.parse_args()
     if not args.case.is_absolute():
         args.case = HERE / args.case
@@ -135,12 +97,14 @@ def main():
         baseline["inputs"]["rotational_speed"] = speed["value"]
     objective = baseline["optimization"]["objective_function"]
     if objective["variable"].removeprefix("$") != "overall_performance.efficiency_ts":
-        raise ValueError("This comparison plots total-to-static efficiency; select that objective.")
+        raise ValueError("This comparison summarizes total-to-static efficiency; select that objective.")
 
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
+    for extension in ("png", "svg"):
+        (output / f"comparison.{extension}").unlink(missing_ok=True)
     (output / "source_case.yaml").write_bytes(args.case.read_bytes())
-    records, results = [], []
+    records = []
     for name, label, first, maximum, growth, recovery in POLICIES:
         case = deepcopy(baseline)  # Each policy starts independently.
         options = case["optimization"].setdefault("solver_options", {})
@@ -159,13 +123,24 @@ def main():
         logger.addHandler(handler)
         print(f"Running {label} ...", flush=True)
         try:
-            # Recovery shortens recognized invalid model trials. Native merit
-            # line search stays active; neither option repairs the model values.
+            # The main PySolverView frontend writes its report to this logger.
+            # Its controlled SLSQP backend shortens recognized invalid trials;
+            # native merit line search remains active throughout recovery.
             result = optimize_turbine(case, logger=logger)
         finally:
             logger.removeHandler(handler)
             handler.close()
         save_optimization_results(result, destination)
+        result.optimizer.plot_convergence_history(
+            savefile=True, filename="convergence_history",
+            output_dir=destination, showfig=args.show,
+        )
+        result.optimizer.print_optimization_report(
+            include_design_variables=True, include_constraints=True,
+            include_kkt_conditions=True, include_multipliers=True,
+            savefile=True, filename="optimization_report.txt",
+            output_dir=destination, to_console=False,
+        )
 
         # Native status == 0 alone is insufficient: acceptance also requires
         # normalized feasibility and independent first-order KKT checks to pass.
@@ -192,7 +167,6 @@ def main():
             "message": result.message,
         }
         records.append(record)
-        results.append(result)
         write_summary(records, output, args.case)
         print(
             f"  {'accepted' if result.success else 'rejected'}: "
@@ -201,13 +175,9 @@ def main():
             flush=True,
         )
 
-    figure = plot_comparison(results, records, output)
-    print(f"Saved policy results, summary and comparison plot to {output}")
-    print("Circles mark accepted designs; crosses mark controlled solver rejections.")
+    print(f"Saved policy results, summaries, and PySolverView plots/reports to {output}")
     if args.show:
         plt.show()
-    else:
-        plt.close(figure)
     # In the supplied case, the unguarded full trial is expected to fail. A
     # normal solver rejection is therefore not a process error in this demo.
     return 0

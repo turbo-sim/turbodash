@@ -17,7 +17,7 @@ from .visualization.matplotlib_style import *
 from .apps.shared.launchers import launch_app_stage, launch_app_turbine, launch_app_experimental
 
 # Package info
-__version__ = "0.8.4"
+__version__ = "0.8.5"
 PACKAGE_NAME = "turbodash"
 URL_GITHUB = "https://github.com/turbo-sim/turbodash"
 # URL_DOCS = "https://turbo-sim.github.io/turbodash/"

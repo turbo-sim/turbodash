@@ -95,14 +95,20 @@ def test_axial_boundaries_connect_every_station_and_gap_without_mutation(stage_c
 
 
 @pytest.mark.parametrize("theme", ["light", "dark"])
-def test_axial_channel_and_blades_share_origins_and_view_range(theme):
+@pytest.mark.parametrize("spacing", [None, 0.4])
+def test_axial_channel_and_blades_share_origins_and_view_range(theme, spacing):
     from turbodash.geometry.meanline import state_for_stage_row, section_from_state
     from turbodash.geometry.blade import section_coordinates
     path = Path(__file__).parents[1] / "demos/basic_demo/demo_axial_turbine.yaml"
     results = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if spacing is not None:
+        for index, stage in enumerate(results["inputs"]["stages"]):
+            stage["axial_spacing_before_rotor"] = spacing
+            if index:
+                stage["axial_spacing_before_stator"] = spacing
     channel = plots.plot_turbine_meridional_channel(results, theme=theme)
     blades = plots.plot_turbine_blades(results, N_blades_plot=1, theme=theme)
-    positions = plots._axial_row_layout(results["stages_performance"])
+    positions = plots._axial_row_layout(results["stages_performance"], results)
     for index, row in enumerate(positions):
         section = section_from_state(state_for_stage_row(row["stage"], row["row"]))
         expected = section_coordinates(section)[:, 0]+row["start"]
@@ -116,6 +122,60 @@ def test_axial_channel_and_blades_share_origins_and_view_range(theme):
         assert blade.fillcolor == plots._ROW_FILLS[blade.name]
         assert blade.line.color == (plots.COLOR_STATOR if blade.name == "Stator" else plots.COLOR_ROTOR)
         assert blade.x[0] == blade.x[-1] and blade.y[0] == blade.y[-1]
+    if spacing is not None:
+        for upstream, downstream in zip(positions, positions[1:]):
+            assert downstream["start"] - upstream["end"] == pytest.approx(
+                spacing * downstream["geometry"]["chord_meridional"]
+            )
+
+
+def test_all_axial_views_use_the_calculated_interspace_lengths():
+    """Geometry and cascade views place every row using the calculated gaps."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from turbodash.visualization import matplotlib_turbine as mpl_plots
+
+    results = result(stage_count=2)
+    results["stages_performance"][0]["geometry_interspaces"] = {
+        "before_rotor": {"meridional_length": .011},
+    }
+    results["stages_performance"][1]["geometry_interspaces"] = {
+        "before_stator": {"meridional_length": .014},
+        "before_rotor": {"meridional_length": .017},
+    }
+    before = deepcopy(results)
+    expected = [0, .03, .041, .061, .075, .105, .122, .142]
+    channel = plots.plot_turbine_meridional_channel(results)
+    assert np.asarray(trace_named(channel, "Hub").x)[1:-1] == pytest.approx(
+        1000 * np.asarray(expected)
+    )
+    figures = []
+    try:
+        meridional = mpl_plots.plot_turbine_meridional_channel(results)
+        figures.append(meridional)
+        axes = meridional.axes[0]
+        for color, indices in ((mpl_plots.COLOR_STATOR, (0, 4)),
+                               (mpl_plots.COLOR_ROTOR, (2, 6))):
+            row_lines = [line for line in axes.lines if line.get_color() == color]
+            for offset, index in enumerate(indices):
+                assert row_lines[4 * offset].get_xdata() == pytest.approx(expected[index:index + 2])
+        # All three gaps connect station-derived hub and shroud boundaries.
+        connections = [line for line in axes.lines if line.get_color() == "black"]
+        assert len(connections) == 6
+        for pair in ((1, 2), (3, 4), (5, 6)):
+            assert sum(np.allclose(line.get_xdata(), [expected[pair[0]], expected[pair[1]]])
+                       for line in connections) == 2
+
+        cascade = mpl_plots.plot_turbine_blades(results, N_points=21, N_blades_plot=1)
+        figures.append(cascade)
+        lines = cascade.axes[0].lines
+        for index, start in enumerate(expected[::2]):
+            assert lines[5 * index].get_xdata()[0] == pytest.approx(start, abs=1e-12)
+        assert results == before
+    finally:
+        for figure in figures:
+            plt.close(figure)
 
 
 @pytest.mark.parametrize("theme", ["light", "dark"])

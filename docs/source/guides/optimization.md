@@ -130,6 +130,69 @@ than directly setting blade geometry. They are omitted for radial turbines,
 where the current model fixes both ratios at 1. Constraints are retained when
 saving and loading the design's optimization settings.
 
+## Set spacing and constrain interspace flaring
+
+Axial stages specify the gap **before** each row relative to that row's
+meridional chord. For example, a stage after the first can contain:
+
+```yaml
+axial_spacing_before_stator: 0.3
+axial_spacing_before_rotor: 0.3
+```
+
+Both values are dimensionless. A physical gap is
+$L_{\mathrm{gap}}=k_{\mathrm{gap}}c_{\mathrm{m,downstream}}$, so it scales when
+the turbine or row dimensions change. Use finite positive ratios. The first
+stator has no upstream row; omit `axial_spacing_before_stator` there.
+In the workbench these inputs appear in the selected stator or rotor's
+**Blade geometry** controls. They stay
+fixed during optimization and are not offered as design variables, including
+in **Optimize all applicable variables**. Gap length does not change the
+meanline velocity triangles or row losses in the present model.
+
+When loading an older axial case without these inputs, the app and optimization
+API derive each missing ratio once from its initial geometry, using the prior
+nominal gap of 1.5 times the upstream row's continuous meanline opening. The
+resolved ratios are saved explicitly and remain fixed as chords change during
+optimization. New app cases start with a ratio of `0.3`.
+
+An interspace joins the stator outlet to the rotor inlet, or one stage's rotor
+outlet to the next stage's stator inlet. Its signed flaring semi-angle is
+
+$$
+\delta_{\mathrm{fl}}=
+\arctan\left(\frac{H_{\mathrm{out}}-H_{\mathrm{in}}}{2L_{\mathrm{gap}}}\right),
+$$
+
+reported in degrees. Positive values indicate increasing passage height in
+the flow direction. Radial turbines use the same calculation with
+$L_{\mathrm{gap}}=|r_{\mathrm{out}}-r_{\mathrm{in}}|$; they need no axial
+spacing input. The calculation also reports hub and shroud wall angles so
+axial mean-radius movement is visible even when the height-based flaring is
+small. For a radial interspace with zero radial extent, equal endpoint heights
+give zero flaring; a height jump gives signed 90° flaring and is marked
+`degenerate_interspace`. This finite diagnostic lets the configured flaring
+constraints reject the jump.
+
+Under **Constraints > + Add groups**, **Flaring angle ±10°** covers every
+blade row and interspace. The stage-limit groups include that stage's interspaces,
+including the gap before its stator when applicable. Lower and upper limits
+are separate editable constraints, each using a 10° normalization scale.
+
+Calculated interspaces are stored separately from blade rows in
+`stages_performance.<stage>.geometry_interspaces.before_rotor` and, after the
+first stage, `.before_stator`. Each record includes `meridional_length`,
+`flaring_angle`, `hub_wall_angle`, and `shroud_wall_angle`. A YAML constraint
+can select all interspaces with
+`$stages_performance.*.geometry_interspaces.*.flaring_angle`.
+Previously saved constraints that select only `geometry_meanline` retain
+their blade-row-only meaning; add the new group or selector to cover gaps.
+
+Meanline geometry plots use the same resolved gaps as these calculations.
+TurboGrid assembly's **Row gaps [mm]** control has a separate meaning: minimum
+clearance between physical blade envelopes. Those export clearances cannot
+be substituted directly for nominal outlet-to-inlet station-plane spacing.
+
 ## Configure the solver
 
 The default workbench objective is **Efficiency with exhaust recovery**, listed

@@ -189,7 +189,8 @@ def test_every_stage_and_both_rows_remain_mounted_with_continuous_inputs(kind):
     if kind == "radial":
         expected -= {"stator.aspect_ratio", "rotor.aspect_ratio"}
     for index in (0, 1):
-        assert {key for stage, key in identifiers if stage == index} == expected
+        stage_expected = expected - ({"axial_spacing_before_stator"} if index == 0 else set())
+        assert {key for stage, key in identifiers if stage == index} == stage_expected
         assert {
             row.to_plotly_json()["props"].get("data-blade-row")
             for row in components(editors[index])

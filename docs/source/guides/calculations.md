@@ -8,10 +8,18 @@ then set reaction, stator exit angle, radius ratios, meridional velocity ratios,
 and blade geometry for each stage.
 
 The numbered sidebar sections expand in place. Within **Stage design**,
-choose a named stage, then expand **Aerodynamic design** or
-**Blade geometry**. The **Stator / Rotor** selector changes the row being
+choose a named stage, then expand **Aerodynamic design** or **Blade geometry**.
+The **Stator / Rotor** selector changes the row being
 edited. These controls remain inside the stage section, and changing the
 editing context preserves the other stage and row values.
+
+For axial turbines, set the spacing before the selected row inside its
+**Blade geometry** controls. Each value is the physical gap divided
+by the downstream row's meridional chord: `0.3` means 30% of that chord.
+The first stator has no upstream row and therefore no spacing input. Radial
+interspace lengths follow the endpoint radii without axial-spacing inputs.
+See [spacing and flaring](optimization.md#set-spacing-and-constrain-interspace-flaring)
+for the YAML fields and calculated quantities.
 
 In **Diffuser**, set the assumed exhaust kinetic-energy recovery (default 60%).
 The fifth headline result, **Efficiency with exhaust recovery**, interpolates
@@ -154,15 +162,23 @@ Constraint groups provide editable starting limits:
 | Group | Limit | Scale |
 | --- | --- | --- |
 | Maximum Mach number | At most 1, using absolute speed in stators and relative speed in rotors | 1 |
-| Flaring angle | Between −10° and +10° in every blade row | 10° |
+| Flaring angle | Between −10° and +10° in every blade row and interspace | 10° |
 | Minimum blade height | Mean blade height of at least 1 mm in every row | 0.01 m |
-| Stage limits | The same Mach, flaring, and height limits for one named stage | As above |
+| Stage limits | The same Mach, row/interspace flaring, and blade-height limits for one named stage | As above |
 
 The flaring group creates separate lower and upper constraint rows. Presets
 distinguish a constraint by its quantity and comparison, so both directions
 can coexist; reapplying the group preserves edited targets and scales.
 Unchecking an individual constraint quantity removes all bounds for that
 quantity. Choose limits that suit the design being studied.
+
+An interspace belongs to the downstream stage and row: **before rotor**
+connects that stage's stator outlet to rotor inlet, and **before stator**
+connects the preceding rotor outlet to this stator inlet. There is no
+interspace before the first stator or after the final rotor. Spacing ratios
+are fixed configuration inputs and are excluded from all optimization
+variable choices. They change geometry and flaring limits, but the meanline
+model includes no gap-length loss or performance penalty.
 
 ### Run and inspect
 

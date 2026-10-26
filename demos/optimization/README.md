@@ -146,7 +146,8 @@ include comments about the case schema:
 - `objective_function` selects a scalar result and `maximize` or `minimize`.
   The examples maximize total-to-static efficiency.
 - Each wildcard match in a constraint creates a separate scalar constraint.
-  The examples require zero flaring in both rows; that illustrates equality
+  The examples require zero flaring in both rows and bound each interspace to
+  between -10° and +10°. The row-zero requirement illustrates equality
   constraints rather than a universal turbine design rule. A physically valid
   starting point can still be infeasible, and enforcing constraints can reduce
   its original efficiency.
@@ -155,6 +156,31 @@ include comments about the case schema:
 - Specific speed is dimensionless when `rotational_speed_type: specific`;
   `actual` uses rpm. Optimize the numeric `rotational_speed` field while its
   type remains fixed.
+- For axial stages, `axial_spacing_before_rotor` is the gap before the rotor
+  divided by that rotor's meridional chord. Stages after the first also use
+  `axial_spacing_before_stator`, relative to their stator chord. A ratio of
+  `0.3` means a gap equal to 30% of the downstream row's meridional chord.
+  These positive dimensionless inputs stay fixed during optimization, while
+  physical gaps scale with the chords. Radial gaps follow the endpoint radii
+  and require neither input.
+
+For older axial cases without the ratios, the app and optimization API resolve
+them once from the initial geometry's previous `1.5 × upstream opening` gaps
+and save the resulting fixed ratios. Newly created app cases use `0.3`.
+
+Blade-row results remain in `geometry_meanline`. Interspace geometry is in
+each stage's `geometry_interspaces`: `before_rotor`, plus `before_stator` for
+stages after the first. The latter connects the previous rotor outlet to this
+stator inlet. Both turbine types expose signed `flaring_angle`,
+`hub_wall_angle`, `shroud_wall_angle`, and `meridional_length`. The new example
+constraints select `geometry_interspaces.*.flaring_angle`; a selector that only
+names `geometry_meanline` still constrains blade rows alone.
+For zero-length radial interspaces, unchanged height gives zero flaring and a
+height jump gives signed 90° flaring with a `degenerate_interspace` flag.
+
+Meanline plots use these physical gaps. TurboGrid assembly's separate **Row
+gaps [mm]** values measure clearance between physical blade envelopes and have
+a different definition; they are not substituted for the meanline spacing.
 
 The commented cases retain explicit example settings. Current driver defaults
 are listed by `pysolver_view.SLSQPOptions` and can differ from those choices.

@@ -483,6 +483,16 @@ $$
 \tan \delta_{\mathrm{fl}} = \frac{H_{\mathrm{out}} - H_{\mathrm{in}}}{2\,c_{\mathrm{m}}}
 $$
 
+Axial interspace lengths are specified before the downstream row as a
+dimensionless ratio of that row's meridional chord:
+$$
+L_{\mathrm{gap}}=k_{\mathrm{gap}}c_{\mathrm{m,downstream}}.
+$$
+The YAML fields are `axial_spacing_before_rotor` and, for stages after the
+first, `axial_spacing_before_stator`. These ratios remain fixed during
+optimization. They set geometric spacing and flaring; the current meanline
+loss model has no explicit gap-length penalty.
+
 ### Radial turbine geometry
 
 For radial turbines, the meridional chord corresponds directly to the radial extent of the blade row and is given by
@@ -508,6 +518,38 @@ The flaring semi-angle is defined in the same way as for axial turbines:
 $$
 \tan \delta_{\mathrm{fl}} = \frac{H_{\mathrm{out}} - H_{\mathrm{in}}}{2\,c_{\mathrm{m}}}
 $$
+
+### Interspace geometry
+
+Each interspace connects a stator outlet to its rotor inlet, or a rotor outlet
+to the next stage's stator inlet. Use the actual endpoint heights and the
+meridional distance between those endpoints:
+$$
+\delta_{\mathrm{fl}}=
+\arctan\!\left(\frac{H_{\mathrm{out}}-H_{\mathrm{in}}}{2L_{\mathrm{gap}}}\right).
+$$
+For axial turbines, $L_{\mathrm{gap}}$ is the prescribed chord-relative axial
+spacing. For radial turbines, it is $|r_{\mathrm{out}}-r_{\mathrm{in}}|$ and no
+additional spacing input is required. Angles are reported in degrees and are
+signed in the flow direction, positive for increasing passage height. Results
+are stored in each stage's `geometry_interspaces` rather than mixed into its
+blade-row `geometry_meanline` records.
+
+The hub and shroud wall angles are reported separately. For an axial
+interspace, with $r_\mathrm{hub}=r-H/2$ and $r_\mathrm{shroud}=r+H/2$:
+$$
+\theta_\mathrm{hub}=\arctan\!\left(
+\frac{r_{\mathrm{hub,out}}-r_{\mathrm{hub,in}}}{L_{\mathrm{gap}}}\right),
+\qquad
+\theta_\mathrm{shroud}=\arctan\!\left(
+\frac{r_{\mathrm{shroud,out}}-r_{\mathrm{shroud,in}}}{L_{\mathrm{gap}}}\right).
+$$
+These distinguish passage expansion from a change in mean radius. No
+interspace is introduced before the first stator or after the final rotor.
+For a radial interspace with zero radial extent, unchanged height gives zero
+flaring. A nonzero height jump gives signed 90° flaring and a
+`degenerate_interspace` flag, so the flaring constraints can reject that
+geometry without an infinite result.
 
 
 

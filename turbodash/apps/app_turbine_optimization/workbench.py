@@ -152,7 +152,8 @@ def stage_editor(stages, turbine_type, stage_fields, blade_fields, defaults):
                 aliases=key,
             )
 
-        design = [stage_field(*spec) for spec in stage_fields]
+        design = [stage_field(*spec) for spec in stage_fields
+                  if not spec[0].startswith("axial_spacing_")]
         rows = []
         for row in ("stator", "rotor"):
             controls = [
@@ -161,6 +162,9 @@ def stage_editor(stages, turbine_type, stage_fields, blade_fields, defaults):
                 if (key != "aspect_ratio" or turbine_type != "radial")
                 and not key.endswith("wedge_angle")
             ]
+            if turbine_type != "radial" and (row == "rotor" or index > 0):
+                controls.extend(stage_field(*spec) for spec in stage_fields
+                                if spec[0] == f"axial_spacing_before_{row}")
             rows.append(
                 html.Div(controls, **{"data-blade-row": row}, hidden=row != "stator")
             )

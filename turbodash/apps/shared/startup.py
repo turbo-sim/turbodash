@@ -4,6 +4,7 @@ from pathlib import Path
 import yaml
 from dash.development.base_component import Component
 from turbodash.core.diffuser import normalize_diffuser_inputs, diffuser_settings
+from turbodash.core.interspaces import normalize_axial_spacing
 
 
 def components(node):
@@ -30,6 +31,8 @@ def configure(module, filename, kind):
     if kind == "turbine":
         case = module.core.convert_turbine_config_to_solidity(case)
         case["inputs"] = normalize_diffuser_inputs(case["inputs"])
+        if "axial_spacing_before_rotor" in module.STAGE_DEFAULTS:
+            case = normalize_axial_spacing(case)
     elif kind == "stage":
         case = module.core.convert_stage_config_to_solidity(case)
     values = case["inputs"]

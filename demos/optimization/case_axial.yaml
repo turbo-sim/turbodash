@@ -26,6 +26,10 @@ inputs:
       radius_ratio_12: 1
       radius_ratio_23: 1
       radius_ratio_34: 1
+      # Gap before this rotor / its meridional chord; fixed during optimization.
+      axial_spacing_before_rotor: 0.3
+      # Later stages also set axial_spacing_before_stator before their stator.
+      # There is no inter-row gap before the first stator.
       blade_geometry:
         stator:
           aspect_ratio: 2
@@ -108,12 +112,20 @@ optimization:
     variable: $overall_performance.efficiency_ts
     type: maximize
 
-  # Wildcards select every blade row in every stage. Each selected value
-  # becomes its own constraint. Remove/add list entries for other studies.
+  # Wildcards create separate constraints for every blade row or interspace.
+  # Keep row-zero equalities as an example and bound interspace flaring to ±10°.
   constraints:
     - variable: $stages_performance.*.geometry_meanline.*.flaring_angle
       type: '='
       value: 0
+      normalize: 10
+    - variable: $stages_performance.*.geometry_interspaces.*.flaring_angle
+      type: '>='
+      value: -10
+      normalize: 10
+    - variable: $stages_performance.*.geometry_interspaces.*.flaring_angle
+      type: '<='
+      value: 10
       normalize: 10
     # - variable: $overall_performance.maximum_mach_number
     #   type: '<='

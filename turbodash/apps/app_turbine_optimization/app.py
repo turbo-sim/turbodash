@@ -21,6 +21,7 @@ import yaml
 import numpy as np
 from turbodash.core import turbine as core
 from turbodash.core.diffuser import DEFAULT_RECOVERY_FRACTION, diffuser_settings
+from turbodash.core.interspaces import DEFAULT_AXIAL_SPACING, normalize_axial_spacing
 from turbodash.io.yaml import dump_turbine_yaml
 from turbodash.geometry.serialization import export_geometry, validate_geometry
 from turbodash.visualization import plotly_turbine as _plotting
@@ -194,6 +195,8 @@ STAGE_DEFAULTS_AXIAL = dict(
     radius_ratio_12=1.0,
     radius_ratio_23=1.0,
     radius_ratio_34=1.0,
+    axial_spacing_before_stator=DEFAULT_AXIAL_SPACING,
+    axial_spacing_before_rotor=DEFAULT_AXIAL_SPACING,
 )
 
 
@@ -247,6 +250,8 @@ STAGE_FIELDS = [
     ("radius_ratio_12", ["Radius ratio, r₁/r₂"], 0.10, 1.20, 0.001),
     ("radius_ratio_23", ["Radius ratio, r₂/r₃"], 0.10, 1.20, 0.001),
     ("radius_ratio_34", ["Radius ratio, r₃/r₄"], 0.10, 1.20, 0.001),
+    ("axial_spacing_before_stator", ["Spacing before stator / stator meridional chord [-]"], 0.001, None, 0.001),
+    ("axial_spacing_before_rotor", ["Spacing before rotor / rotor meridional chord [-]"], 0.001, None, 0.001),
 ]
 
 # Loss-model dropdown: internal value -> pretty label (Title Case, spaces).
@@ -651,13 +656,14 @@ def update_stage_store(
 
 def loaded_stages(config):
     """Flatten the YAML stage mappings without discarding names or precision."""
+    config = normalize_axial_spacing(config)
     stages = []
     for index, stage in enumerate(config["inputs"]["stages"]):
         values = dict(
             stage_defaults_for(config["inputs"].get("turbine_type")),
             name=stage.get("name", f"stage_{index + 1}"),
         )
-        values.update({key: stage[key] for key in STAGE_DEFAULTS if key in stage})
+        values.update({key: stage[key] for key in values if key in stage})
         for row in ("stator", "rotor"):
             geometry = stage.get("blade_geometry", {}).get(row, {})
             for key, *_ in BLADE_GEOMETRY_FIELDS:
@@ -813,10 +819,16 @@ def live_config(overall_values, stage_values, overall_ids, stage_ids, store_stag
 
     for index, stage in enumerate(stages):
         for key in defaults:
+            if key == "axial_spacing_before_stator" and index == 0:
+                continue
             value = stage.get(key)
             if value is None or isinstance(value, bool) or not np.isfinite(value):
                 raise ValueError(
                     f"{stage.get('name', f'Stage {index + 1}')}: enter a finite {key.replace('_', ' ')}."
+                )
+            if key.startswith("axial_spacing_") and value <= 0:
+                raise ValueError(
+                    f"{stage.get('name', f'Stage {index + 1}')}: {key.replace('_', ' ')} must be greater than zero."
                 )
 
     return _assemble_cfg(overall, stages)
@@ -887,6 +899,7 @@ def update_triangles(results, mode):
 def _assemble_cfg(overall, stages):
     """Translate flat overall dict + stage list into the YAML-style cfg."""
     stages = stages or [dict(STAGE_DEFAULTS)]
+    defaults = stage_defaults_for(overall.get("turbine_type", OVERALL_DEFAULTS["turbine_type"]))
     inputs = {
         "loss_model": overall.get("loss_model", OVERALL_DEFAULTS["loss_model"]),
         "fluid_name": overall.get("fluid_name", OVERALL_DEFAULTS["fluid_name"]),
@@ -912,9 +925,10 @@ def _assemble_cfg(overall, stages):
             {
                 "name": sv.get("name", f"stage_{i + 1}"),
                 **{
-                    k: sv.get(k, STAGE_DEFAULTS[k])
-                    for k in STAGE_DEFAULTS
+                    k: sv.get(k, defaults[k])
+                    for k in defaults
                     if k not in BLADE_GEOMETRY_DEFAULTS
+                    and (i > 0 or k != "axial_spacing_before_stator")
                 },
                 "blade_geometry": {
                     row: {key: sv[f"{row}.{key}"] for key, *_ in BLADE_GEOMETRY_FIELDS}
@@ -1034,7 +1048,7 @@ def load_design(contents):
             or not cfg["inputs"]["stages"]
         ):
             raise ValueError("A design must contain at least one stage.")
-        cfg = nested_config(core.convert_turbine_config_to_solidity(cfg))
+        cfg = normalize_axial_spacing(nested_config(core.convert_turbine_config_to_solidity(cfg)))
         validate_inlet_inputs(cfg["inputs"])
         if "optimization" in cfg:
             options = solver_editor_options(cfg["optimization"])

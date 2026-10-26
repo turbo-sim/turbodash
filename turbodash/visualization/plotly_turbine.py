@@ -3,6 +3,7 @@ import plotly.graph_objects as go
 from scipy.interpolate import PchipInterpolator
 from plotly.subplots import make_subplots
 from turbodash.core.turbine import get_blade_row_geometry
+from turbodash.core.interspaces import get_interspace_geometry
 from turbodash.core.diffuser import diffuser_settings
 
 from turbodash.geometry.meanline import state_for_stage_row, section_from_state
@@ -22,7 +23,6 @@ TICK_FONT_SIZE = 16
 AXIS_LINE_WIDTH = 2
 TICK_LENGTH = 6
 
-INTERCASCADE_GAP_FACTOR = 1.5
 CHANNEL_EXTENSION_CHORDS = 1.5
 _ROW_FILLS = {"Stator": "rgba(255,127,14,0.16)", "Rotor": "rgba(31,119,180,0.18)"}
 
@@ -152,15 +152,20 @@ def apply_plot_theme(fig, theme="light"):
     return fig
 
 
-def _axial_row_layout(stages):
+def _axial_row_layout(stages, results=None):
     """Lightweight nominal row placements shared by channel and cascade views.
 
     Units remain metres here. Unlike physical assembly/export placement this
-    uses the meanline chords and the established 1.5-opening nominal gaps.
+    uses meanline chords and the same interspace lengths as the calculation.
+    Unannotated legacy results retain their original nominal gap convention.
     """
+    results = results if results is not None else {"inputs": {"turbine_type": "axial"},
+                                                  "stages_performance": stages}
     rows, cursor = [], 0.0
     for stage_number, stage in enumerate(stages, 1):
         for row_name, station_index in (("stator", 0), ("rotor", 2)):
+            if rows:
+                cursor += get_interspace_geometry(results, stage_number - 1, row_name)["meridional_length"]
             geometry = get_blade_row_geometry(stage, row_name)
             end = cursor + geometry["chord_meridional"]
             rows.append(
@@ -174,7 +179,7 @@ def _axial_row_layout(stages):
                     end=end,
                 )
             )
-            cursor = end + INTERCASCADE_GAP_FACTOR * geometry["opening"]
+            cursor = end
     return rows
 
 
@@ -282,7 +287,7 @@ def plot_turbine_meridional_channel(results, *, theme="light"):
     palette = _PLOT_THEMES[theme]
     fig = go.Figure()
     if turbine_type == "axial":
-        rows = _axial_row_layout(stages)
+        rows = _axial_row_layout(stages, results)
     else:
         rows = [
             dict(stage=stage, stage_number=number, row=row, station_index=index)
@@ -441,7 +446,7 @@ def plot_turbine_blades(results, N_points=601, N_blades_plot=8, *, theme="light"
     fig = go.Figure()
     cursor, greatest_radius, first_pitch = 0., 0., None
     starts, chords = [], []
-    for stage in stages:
+    for stage_index, stage in enumerate(stages):
         for row in ("stator", "rotor"):
             state = state_for_stage_row(stage, row, turbine_type)
             section = section_from_state(state)
@@ -452,12 +457,14 @@ def plot_turbine_blades(results, N_points=601, N_blades_plot=8, *, theme="light"
             label, color = ("Stator", COLOR_STATOR) if row == "stator" else ("Rotor", COLOR_ROTOR)
             count = params["cascade"]["blade_count"]
             if turbine_type == "axial":
+                if starts:
+                    cursor += get_interspace_geometry(results, stage_index, row)["meridional_length"]
                 pitch = 2*np.pi*params["geometry"]["mean_radius"]/count
                 first_pitch = pitch if first_pitch is None else first_pitch
                 copies = [points+[cursor, (index-1)*pitch] for index in range(N_blades_plot+3)]
                 starts.append(cursor)
                 chords.append(section.meridional_chord)
-                cursor += section.meridional_chord + INTERCASCADE_GAP_FACTOR*get_blade_row_geometry(stage, row)["opening"]
+                cursor += section.meridional_chord
             elif turbine_type == "radial":
                 def rotations():
                     for angle in np.arange(count)*2*np.pi/count:

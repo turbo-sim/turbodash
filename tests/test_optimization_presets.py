@@ -205,8 +205,8 @@ def test_constraint_presets_resolve_into_physical_two_sided_limits(kind):
     catalog = output_catalog(config, result)
     groups = constraint_groups(config, catalog)
     flaring = groups["flaring_limits"]["rows"]
-    assert [(row["comparison"], row["target"]) for row in flaring] == [(">=", -10), ("<=", 10)]
-    assert len(groups["flaring_limits"]["paths"]) == 1
+    assert [(row["comparison"], row["target"]) for row in flaring] == [(">=", -10), ("<=", 10)] * 2
+    assert len(groups["flaring_limits"]["paths"]) == 2
     assert all(row["scale"] == 10 for row in flaring)
     for group in groups.values():
         for row in group["rows"]:
@@ -224,12 +224,13 @@ def test_constraint_presets_resolve_into_physical_two_sided_limits(kind):
         "$overall_performance.efficiency_ts", "maximize", 1e-8, 50, 1e-6, result,
     )
     equalities, inequalities, report = opt.evaluate_constraints(result, settings["constraints"])
-    # Every wildcard flaring/height row expands over two rows in both stages.
-    assert len(settings["constraints"]) == 4
+    # Four blade rows and three interspaces have distinct two-sided limits.
+    assert len(settings["constraints"]) == 6
     assert len(equalities) == 0
-    assert len(inequalities) == len(report) == 13
+    assert len(inequalities) == len(report) == 19
     assert np.all(np.isfinite(inequalities))
     np.testing.assert_allclose(inequalities[1:5] + inequalities[5:9], -2)
+    np.testing.assert_allclose(inequalities[9:12] + inequalities[12:15], -2)
 
 
 def test_group_generation_honors_filtered_catalogs_without_mutation():
@@ -394,3 +395,107 @@ def test_inlet_and_turning_groups_toggle_independently_and_preserve_edits():
     assert apply_selection_operations(rows, catalog, groups, "constraint", [
         dict(kind="constraint", group="rotor_inlet_relative_angle", selected=False),
     ]) == before[:3]
+
+
+@pytest.mark.parametrize("kind", ["axial", "radial"])
+def test_interspace_groups_cover_each_actual_gap_and_spacing_is_never_a_variable(kind):
+    config = case(kind, count=2)
+    if kind == "axial":
+        config["inputs"]["stages"][1]["axial_spacing_before_stator"] = .4123456789
+    result = compute_turbine_performance(config)
+    outputs = output_catalog(config, result)
+    variables = variable_catalog(config)
+    assert not any("axial_spacing" in path for path in variables)
+    assert not any("axial_spacing" in path for path in variable_groups(config)["all"]["paths"])
+    assert not any(".0.geometry_interspaces.before_stator." in path for path in outputs)
+    assert "$stages_performance.1.geometry_interspaces.before_stator.flaring_angle" in outputs
+    assert "$stages_performance.0.geometry_interspaces.before_rotor.flaring_angle" in outputs
+    groups = constraint_groups(config, outputs)
+    assert "interspace_flaring_limits" not in groups
+    group = groups["flaring_limits"]
+    assert len(group["rows"]) == 4
+    gap_rows = [row for row in group["rows"] if ".geometry_interspaces." in row["path"]]
+    assert len(gap_rows) == 2
+    for row in gap_rows:
+        assert row["scale"] == 10
+        assert np.asarray(opt.resolve_value(row["path"], result)).size == 3
+    for index, count in ((0, 1), (1, 2)):
+        rows = groups[f"stage_{index}_limits"]["rows"]
+        gap_rows = [row for row in rows if ".geometry_interspaces." in row["path"]]
+        assert len(gap_rows) == 2
+        assert all(np.asarray(opt.resolve_value(row["path"], result)).size == count for row in gap_rows)
+
+
+def _components(component):
+    if hasattr(component, "to_plotly_json"):
+        yield component
+        yield from _components(getattr(component, "children", None))
+    elif isinstance(component, (list, tuple)):
+        for child in component:
+            yield from _components(child)
+
+
+@pytest.mark.parametrize("kind", ["axial", "radial"])
+def test_spacing_inputs_roundtrip_and_only_mount_applicable_rows(kind):
+    from turbodash.apps.app_turbine_optimization import app as module
+    config = case(kind, count=2)
+    if kind == "axial":
+        config["inputs"]["stages"][0]["axial_spacing_before_rotor"] = .3123456789
+        config["inputs"]["stages"][1]["axial_spacing_before_stator"] = .4123456789
+        config["inputs"]["stages"][1]["axial_spacing_before_rotor"] = .5123456789
+    before = deepcopy(config)
+    stages = module.loaded_stages(config)
+    editor, _, _ = module.render_stage_accordion(stages, kind)
+    inputs = [component for component in _components(editor)
+              if isinstance(getattr(component, "id", None), dict)
+              and component.id.get("elem") == "input"]
+    spacings = {(component.id["stage"], component.id["key"]): component.value
+                for component in inputs if component.id["key"].startswith("axial_spacing_")}
+    expected = {(0, "axial_spacing_before_rotor"): .3123456789,
+                (1, "axial_spacing_before_stator"): .4123456789,
+                (1, "axial_spacing_before_rotor"): .5123456789} if kind == "axial" else {}
+    assert spacings == expected
+    assert not any(getattr(component, "children", None) == "Axial spacing"
+                   for component in _components(editor))
+    for index, stage_editor in enumerate(editor):
+        for row_editor in _components(stage_editor):
+            row = row_editor.to_plotly_json()["props"].get("data-blade-row")
+            if row not in ("stator", "rotor"):
+                continue
+            keys = {component.id["key"] for component in _components(row_editor)
+                    if isinstance(getattr(component, "id", None), dict)
+                    and component.id.get("elem") == "input"}
+            spacing_key = f"axial_spacing_before_{row}"
+            assert (spacing_key in keys) == (kind == "axial" and (row == "rotor" or index > 0))
+    overall_ids = [dict(scope="overall", key=key) for key in module.OVERALL_DEFAULTS]
+    rebuilt = module.live_config(module.loaded_overall_values(config, overall_ids),
+                                 [component.value for component in inputs], overall_ids,
+                                 [component.id for component in inputs], stages)
+    for index, stage in enumerate(rebuilt["inputs"]["stages"]):
+        for field in ("axial_spacing_before_stator", "axial_spacing_before_rotor"):
+            if (index, field) in expected:
+                assert stage[field] == expected[index, field]
+            else:
+                assert field not in stage
+    assert config == before
+    if kind == "axial":
+        bad = deepcopy(stages)
+        bad[0]["axial_spacing_before_rotor"] = 0
+        with pytest.raises(ValueError, match="greater than zero"):
+            module.live_config(module.loaded_overall_values(config, overall_ids), [],
+                               overall_ids, [], bad)
+
+
+def test_legacy_spacing_load_resolves_once_and_preserves_baseline_physical_gaps():
+    from turbodash.apps.app_turbine_optimization import app as module
+    config = case(count=2)
+    for stage in config["inputs"]["stages"]:
+        stage.pop("axial_spacing_before_rotor", None)
+        stage.pop("axial_spacing_before_stator", None)
+    baseline = compute_turbine_performance(config)
+    stages = module.loaded_stages(config)
+    assert "axial_spacing_before_rotor" not in config["inputs"]["stages"][0]
+    for index, row in ((0, "rotor"), (1, "stator"), (1, "rotor")):
+        gap = baseline["stages_performance"][index]["geometry_interspaces"][f"before_{row}"]
+        chord = baseline["stages_performance"][index]["geometry_meanline"][row]["chord_meridional"]
+        assert stages[index][f"axial_spacing_before_{row}"] * chord == pytest.approx(gap["meridional_length"])

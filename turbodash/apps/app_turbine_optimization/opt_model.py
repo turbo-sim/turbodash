@@ -85,6 +85,12 @@ AXIAL_GEOMETRY = {
     "hub_tip_ratio_in": ("Inlet hub-to-tip ratio [-]", 1),
     "hub_tip_ratio_out": ("Outlet hub-to-tip ratio [-]", 1),
 }
+INTERSPACE_GEOMETRY = {
+    "flaring_angle": ("Interspace flaring angle [deg]", 10),
+    "hub_wall_angle": ("Hub wall angle [deg]", 10),
+    "shroud_wall_angle": ("Shroud wall angle [deg]", 10),
+    "meridional_length": ("Interspace meridional length [m]", .01),
+}
 
 
 def flat_config(config):
@@ -273,7 +279,7 @@ def _constraint_default(path, scale):
     quantity = path.rsplit(".", 1)[-1]
     if quantity in ("maximum_mach_number", "Ma_abs", "Ma_rel"):
         return "<=", 1
-    if quantity == "flaring_angle":
+    if quantity in ("flaring_angle", "hub_wall_angle", "shroud_wall_angle"):
         return "<=", 10
     if quantity == "height":
         return ">=", .001
@@ -323,6 +329,14 @@ def output_catalog(config, results=None):
                 add(f"$stages_performance.{index}.geometry_meanline.{row}.{key}",
                     f"{title} · {row_title} · {label}", scale, label,
                     [hierarchy_title, f"{row_title} geometry"])
+        interspaces = [("*", "All interspaces"), ("before_rotor", "Before rotor")]
+        if index != "*" and int(index) > 0:
+            interspaces.append(("before_stator", "Before stator"))
+        for interspace, gap_title in interspaces:
+            for key, (label, scale) in INTERSPACE_GEOMETRY.items():
+                add(f"$stages_performance.{index}.geometry_interspaces.{interspace}.{key}",
+                    f"{title} · {gap_title} · {label}", scale, label,
+                    [hierarchy_title, gap_title])
         for station in ("1", "2", "3", "4"):
             for key, label, scale in (("Ma_abs", "Absolute Mach [-]", 1), ("Ma_rel", "Relative Mach [-]", 1),
                                       ("p", "Pressure [Pa]", 1e5), ("T", "Temperature [K]", 500),
@@ -353,11 +367,15 @@ def constraint_groups(config, catalog=None):
                                paths=list(dict.fromkeys(spec["path"] for spec in rows)),
                                hierarchy=hierarchy)
 
+    def flaring_limits(scope):
+        geometries = ("geometry_meanline", "geometry_interspaces")
+        return [row(f"$stages_performance.{scope}.{geometry}.*.flaring_angle", comparison, target)
+                for geometry in geometries
+                for comparison, target in ((">=", -10), ("<=", 10))]
+
     def geometry_limits(scope):
-        prefix = f"$stages_performance.{scope}.geometry_meanline.*."
-        return [row(prefix + "flaring_angle", ">=", -10),
-                row(prefix + "flaring_angle", "<=", 10),
-                row(prefix + "height", ">=", .001)]
+        return [*flaring_limits(scope),
+                row(f"$stages_performance.{scope}.geometry_meanline.*.height", ">=", .001)]
 
     def hub_tip_limits(scope):
         return [row(f"$stages_performance.{scope}.geometry_meanline.{blade_row}.{quantity}")
@@ -383,11 +401,11 @@ def constraint_groups(config, catalog=None):
         "Keep blade-row Mach numbers at or below 1: absolute in stators, relative in rotors.",
         [row("$overall_performance.maximum_mach_number")], ["Overall"])
     add("flaring_limits", "Flaring angle ±10°",
-        "Bound both positive and negative flaring in every blade row; edit either limit as needed.",
-        geometry_limits("*")[:2], ["All stages"])
+        "Bound both positive and negative flaring in every blade row and interspace; edit either limit as needed.",
+        flaring_limits("*"), ["All stages"])
     add("minimum_height", "Minimum blade height",
         "Require at least 1 mm mean blade height in every row; edit this allowance as needed.",
-        geometry_limits("*")[2:], ["All stages"])
+        [geometry_limits("*")[-1]], ["All stages"])
     hub_tip_description = (
         "Require hub radius / tip radius of at least 0.8 at the stator and rotor "
         "inlets and outlets. Edit each comparison and target independently."
@@ -400,7 +418,8 @@ def constraint_groups(config, catalog=None):
         add(f"stage_{i}_hub_tip_ratios", "Hub-to-tip ratios", hub_tip_description,
             hub_tip_limits(str(i)), [_stage_title(i, stage)])
         add(f"stage_{i}_limits", "Mach, flaring and blade-height limits",
-            "Use editable starting limits: maximum Mach 1, flaring ±10° and blade height at least 1 mm.",
+            "Use editable starting limits: maximum Mach 1, blade-row and interspace flaring ±10° "
+            "and blade height at least 1 mm. Interspaces belong to their downstream stage.",
             [row(f"$stages_performance.{i}.stage_performance.maximum_mach_number"),
              *geometry_limits(str(i))], [_stage_title(i, stage)])
     return groups

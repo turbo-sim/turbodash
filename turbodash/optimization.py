@@ -38,6 +38,7 @@ import yaml
 
 from turbodash.io.yaml import dump_turbine_yaml
 from turbodash.core.errors import ModelDomainError
+from turbodash.core.interspaces import AXIAL_SPACING_FIELDS, normalize_axial_spacing
 
 
 __all__ = [
@@ -151,7 +152,24 @@ def resolve_value(selector, data):
         value = read_path(data, selector)
     else:
         raise TypeError("A selector must be a dotted path or a callable.")
-    array = _numeric_array(value, f"Selection {_label(selector)!r}")
+    label = f"Selection {_label(selector)!r}"
+    try:
+        array = _numeric_array(value, label)
+    except ValueError:
+        if not isinstance(selector, str) or "*" not in selector:
+            raise
+        # Adjacent-passage selections are ragged: the first stage has one
+        # interspace, later stages have two. Preserve all selected components
+        # in traversal order without inventing an inlet passage for stage 1.
+        def components(item):
+            if isinstance(item, (list, tuple)) or (
+                isinstance(item, np.ndarray) and item.ndim != 0
+            ):
+                for child in item:
+                    yield from components(child)
+            else:
+                yield item
+        array = _numeric_array(list(components(value)), label)
     return array.item() if array.ndim == 0 else array
 
 
@@ -328,6 +346,8 @@ def _read_design_variables(inputs, specifications, logger=None):
         if not isinstance(path, str) or "*" in path:
             raise ValueError(f"Design variable {name!r} needs one scalar input path.")
         path = path.strip().removeprefix("$")
+        if path.rsplit(".", 1)[-1] in AXIAL_SPACING_FIELDS:
+            raise ValueError("Axial spacing ratios are fixed geometry inputs, not optimization variables.")
         current = _scalar(read_path(inputs, path), f"Input at {path!r}")
         if path in paths:
             raise ValueError(f"Duplicate design-variable path: {path!r}.")
@@ -440,6 +460,19 @@ class TurbineOptimizationProblem(psv.OptimizationProblem):
             set_path(config["inputs"], path, float(value))
         with np.errstate(invalid="raise", divide="raise", over="raise"):
             turbine_results = self.evaluator(config)
+
+        if self.n_evaluations == 0 and any(
+            "geometry_interspaces" in stage
+            for stage in turbine_results.get("stages_performance", [])
+        ):
+            # Freeze legacy spacing ratios at the effective initial design.
+            # Subsequent trials scale the physical gaps with their row chords
+            # rather than reapplying the old opening-based plotting heuristic.
+            self.config = normalize_axial_spacing(self.config, results=turbine_results)
+            config = normalize_axial_spacing(config, results=turbine_results)
+            turbine_results["inputs"] = normalize_axial_spacing(
+                turbine_results["inputs"], results=turbine_results
+            )
 
         objective = evaluate_objective(turbine_results, self.objective_spec)
         equalities, inequalities, report = evaluate_constraints(turbine_results, self.constraint_specs)

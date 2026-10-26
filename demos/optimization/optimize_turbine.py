@@ -90,7 +90,10 @@ def main():
     # bounds/initial values use physical units; the adapter normalizes them to
     # [0, 1]. Missing initial_value uses inputs, clipped to the selected bounds.
     # Both supplied cases maximize overall_performance.efficiency_ts, with a
-    # separate zero-flaring equality for every stator/rotor selected by `*`.
+    # separate zero-flaring equality for every stator/rotor selected by `*`,
+    # plus separate lower/upper flaring limits for every interspace.
+    # Axial gap / downstream-row meridional-chord ratios are fixed inputs;
+    # radial interspace lengths follow from their endpoint radii.
     # A scale of 10 degrees makes the normalized constraint easier to interpret.
     # Edit the YAML to add/remove variables, change the objective or set limits.
     # Zero flaring is an example constraint, not a universal turbine design rule.

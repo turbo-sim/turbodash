@@ -3,6 +3,7 @@ from copy import deepcopy
 import numpy as np
 import jaxprop as jxp
 from .diffuser import normalize_diffuser_inputs, diffuser_settings
+from .interspaces import AXIAL_SPACING_FIELDS, add_interspace_geometry
 
 from .errors import (
     ModelDomainError, ModelConsistencyError, model_context,
@@ -1362,7 +1363,9 @@ def compute_turbine_performance(cfg):
     - The anchor radius is placed at the rotor inlet of stage 1:
       ``r_3 = nu_global * v_0_total / omega``. All other radii follow from
       the per-stage radius-ratio chain; between stages
-      ``r_0(i+1) = r_4(i)`` with no interstage gap.
+      ``r_0(i+1) = r_4(i)`` before the next stage's inlet radius ratio.
+      Axial row-to-row lengths are set separately by dimensionless
+      ``axial_spacing_before_stator`` / ``axial_spacing_before_rotor`` inputs.
     - The shaft speed is either supplied directly in rpm
       (``rotational_speed_type = "actual"``) or back-computed from a target
       specific speed (``rotational_speed_type = "specific"``). The numeric
@@ -1397,7 +1400,7 @@ def compute_turbine_performance(cfg):
     required = set(_STAGE_REQUIRED_VARS)
     for i, stg_current in enumerate(stages_cfg):
         missing = sorted(required - stg_current.keys())
-        extra = sorted(stg_current.keys() - required - {"zweiffel_stator", "zweiffel_rotor"})
+        extra = sorted(stg_current.keys() - required - {"zweiffel_stator", "zweiffel_rotor", *AXIAL_SPACING_FIELDS})
         problems = []
         if missing:
             problems.append(f"missing required keys: {missing}")
@@ -1531,8 +1534,8 @@ def compute_turbine_performance(cfg):
             r_0 = r_1 * RR_01
             r_4 = r_3 / RR_34
         else:
-            # No gap between stages: station 0 of this stage = station 4 of
-            # the previous one. Walk straight down the chain from there.
+            # The radius-chain reference (station 0) is the previous stage's
+            # outlet. Spatial interspace geometry is calculated separately.
             r_0 = per_stage_radii[-1][4]
             r_1 = r_0 / RR_01
             r_2 = r_1 / RR_12
@@ -1690,11 +1693,12 @@ def compute_turbine_performance(cfg):
         "degree_reaction": None,
     }
 
-    return {
+    result = {
         "inputs": normalized_inputs,
         "overall_performance": overall,
         "stages_performance": stages_output,
     }
+    return add_interspace_geometry(result)
 
 
 

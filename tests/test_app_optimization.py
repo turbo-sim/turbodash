@@ -741,6 +741,8 @@ class WorkspaceTests(unittest.TestCase):
         second_stage = deepcopy(config["inputs"]["stages"][0])
         second_stage["name"] = "stage_2"
         config["inputs"]["stages"].append(second_stage)
+        from turbodash.core.interspaces import normalize_axial_spacing
+        config = normalize_axial_spacing(config)
         config["inputs"].update(rotational_speed_type="actual", rotational_speed=30000)
         variables = [dict(path="blade_velocity_ratio", lower=.62, upper=.64),
                      dict(path="stages.0.degree_reaction", lower=.55, upper=.6),
@@ -849,6 +851,8 @@ class WorkspaceTests(unittest.TestCase):
             for index, stage in enumerate(optimized.config["inputs"]["stages"]):
                 for key in module.STAGE_DEFAULTS:
                     if key.endswith("wedge_angle"):
+                        continue
+                    if index == 0 and key == "axial_spacing_before_stator":
                         continue
                     if "." in key:
                         row, parameter = key.split(".", 1)

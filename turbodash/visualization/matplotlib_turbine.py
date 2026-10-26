@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 from matplotlib.ticker import FormatStrFormatter
 from turbodash.core.turbine import get_blade_row_geometry
+from turbodash.core.interspaces import get_interspace_geometry
 
 from turbodash.geometry.blade import compute_blade_coordinates_radial, compute_blade_coordinates_cartesian
 
@@ -14,7 +15,6 @@ from turbodash.geometry.blade import compute_blade_coordinates_radial, compute_b
 
 COLOR_STATOR = "tab:orange"
 COLOR_ROTOR = "tab:blue"
-INTERCASCADE_GAP_FACTOR = 1.5
 
 
 def plot_turbine_meridional_channel(results, ax=None):
@@ -23,13 +23,13 @@ def plot_turbine_meridional_channel(results, ax=None):
     turbine_type = results["inputs"]["turbine_type"]
 
     def plot_axial(ax):
-        def draw_stage(out, x_offset):
+        def draw_stage(out, x_offset, stage_index):
             fs = out["flow_stations"]
             r = [fs[k]["r"] for k in range(4)]
             H = [fs[k]["H"] for k in range(4)]
             x1 = x_offset
             x2 = x1 + out["geometry"]["stator"]["chord_meridional"]
-            x3 = x2 + out["geometry"]["stator"]["opening"] * INTERCASCADE_GAP_FACTOR
+            x3 = x2 + get_interspace_geometry(results, stage_index, "rotor")["meridional_length"]
             x4 = x3 + out["geometry"]["rotor"]["chord_meridional"]
             hub = [r[k] - H[k] / 2 for k in range(4)]
             tip = [r[k] + H[k] / 2 for k in range(4)]
@@ -37,6 +37,8 @@ def plot_turbine_meridional_channel(results, ax=None):
             ax.plot([x1, x2], [tip[0], tip[1]], color=COLOR_STATOR, lw=1.5)
             ax.plot([x1, x1], [hub[0], tip[0]], color=COLOR_STATOR, lw=1.5)
             ax.plot([x2, x2], [hub[1], tip[1]], color=COLOR_STATOR, lw=1.5)
+            ax.plot([x2, x3], [hub[1], hub[2]], color="black", lw=1)
+            ax.plot([x2, x3], [tip[1], tip[2]], color="black", lw=1)
             ax.plot([x3, x4], [hub[2], hub[3]], color=COLOR_ROTOR, lw=1.5)
             ax.plot([x3, x4], [tip[2], tip[3]], color=COLOR_ROTOR, lw=1.5)
             ax.plot([x3, x3], [hub[2], tip[2]], color=COLOR_ROTOR, lw=1.5)
@@ -44,17 +46,19 @@ def plot_turbine_meridional_channel(results, ax=None):
             return x4
 
         x_cursor, r_max = 0.0, 0.0
-        for st in stages:
-            x_exit = draw_stage(st, x_offset=x_cursor)
-            last = st["flow_stations"][-1]
-            r_max = max(r_max, last["r"] + last["H"] / 2)
-            x_cursor = (
-                x_exit + INTERCASCADE_GAP_FACTOR * st["geometry"]["rotor"]["opening"]
-            )
-        x_end = (
-            x_cursor
-            - INTERCASCADE_GAP_FACTOR * stages[-1]["geometry"]["rotor"]["opening"]
-        )
+        for index, st in enumerate(stages):
+            if index:
+                previous_exit = x_cursor
+                x_cursor += get_interspace_geometry(results, index, "stator")["meridional_length"]
+                previous, current = stages[index - 1]["flow_stations"][-1], st["flow_stations"][0]
+                for sign in (-1, 1):
+                    ax.plot([previous_exit, x_cursor],
+                            [previous["r"] + sign * previous["H"] / 2,
+                             current["r"] + sign * current["H"] / 2], color="black", lw=1)
+            x_cursor = draw_stage(st, x_offset=x_cursor, stage_index=index)
+            r_max = max(r_max, *(station["r"] + station["H"] / 2
+                                  for station in st["flow_stations"]))
+        x_end = x_cursor
 
         dx = x_end * 0.05
         ax.set_xlim(-dx, x_end + dx)
@@ -187,7 +191,7 @@ def plot_turbine_blades(results, ax=None, N_points=201, N_blades_plot=8):
                 geom=rotor_geom,
                 x0=x_offset
                 + stator_geom["chord_meridional"]
-                + INTERCASCADE_GAP_FACTOR * stator_geom["opening"],
+                + get_interspace_geometry(results, stage_idx, "rotor")["meridional_length"],
                 beta_in=out["flow_stations"][2]["beta"],
                 beta_out=out["flow_stations"][3]["beta"],
                 color=COLOR_ROTOR,
@@ -196,25 +200,16 @@ def plot_turbine_blades(results, ax=None, N_points=201, N_blades_plot=8):
             return (
                 x_offset
                 + stator_geom["chord_meridional"]
-                + INTERCASCADE_GAP_FACTOR * stator_geom["opening"]
+                + get_interspace_geometry(results, stage_idx, "rotor")["meridional_length"]
                 + rotor_geom["chord_meridional"]
             )
 
         x_cursor = 0.0
         for j, st in enumerate(stages):
+            if j:
+                x_cursor += get_interspace_geometry(results, j, "stator")["meridional_length"]
             x_cursor = draw_stage(st, x_offset=x_cursor, stage_idx=j)
-            x_cursor += INTERCASCADE_GAP_FACTOR * st["geometry"]["rotor"]["opening"]
-
-        x_mer = 0.0
-        for st in stages:
-            x_mer += st["geometry"]["stator"]["chord_meridional"]
-            x_mer += st["geometry"]["stator"]["opening"] * INTERCASCADE_GAP_FACTOR
-            x_mer += st["geometry"]["rotor"]["chord_meridional"]
-            x_mer += INTERCASCADE_GAP_FACTOR * st["geometry"]["rotor"]["opening"]
-        x_end = (
-            x_mer
-            - INTERCASCADE_GAP_FACTOR * stages[-1]["geometry"]["rotor"]["opening"]
-        )
+        x_end = x_cursor
         dx = 0.25 * x_end
 
         ax.set_aspect("equal", adjustable="box")

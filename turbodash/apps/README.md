@@ -196,7 +196,8 @@ terminal** stays below the outputs on the right, with its header always visible.
 It starts closed and opens only when clicked; runs preserve your choice.
 It shows PySolverView's convergence history and then its final design-variable,
 constraint, KKT, and multiplier reports, plus any clipping or error diagnostics.
-The final report reuses the completed solve's cached assessment. Its objective
+The 120-character final report preserves full names, wrapping longer ones, and
+reuses the completed solve's cached assessment. Its objective
 is signed and normalized for minimization; the separate progress summary shows
 the physical objective. The terminal follows new output until you scroll up.
 

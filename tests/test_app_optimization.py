@@ -486,6 +486,7 @@ class JobTests(unittest.TestCase):
             self.assertIn("Success: True", log)
             self.assertIn("Grad-eval", log)
             self.assertIn("Exit message:", log)
+            self.assertIn("-" * jobs.OPTIMIZATION_REPORT_WIDTH, log)
             for title in (
                 "Optimization variables report (physical values)",
                 "Optimization variables report (normalized values)",
@@ -570,6 +571,10 @@ class JobTests(unittest.TestCase):
         self.assertEqual(log.count("Starting optimization process"), 1)
         self.assertEqual(log.count("Success:"), 1)
         self.assertIn("Final optimality", log)
+        for name in config["optimization"]["design_variables"]:
+            self.assertIn(name, log)
+        final_report = log[log.index("Karush-Kuhn-Tucker (KKT) conditions"):]
+        self.assertLessEqual(max(map(len, final_report.splitlines())), jobs.OPTIMIZATION_REPORT_WIDTH)
         self.assertNotIn("Starting pysolver SLSQP optimization", log)
         self.assertNotIn("Update 1", log)
         self.assertEqual(result["config"]["optimization"]["solver_options"]["backtrack_factor"], .5)

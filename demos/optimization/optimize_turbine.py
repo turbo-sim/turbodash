@@ -148,6 +148,7 @@ def main():
     optimizer.print_optimization_report(
         include_design_variables=True, include_constraints=True,
         include_kkt_conditions=True, include_multipliers=True,
+        width=120,
         savefile=True, filename="optimization_report.txt",
         output_dir=output_directory, to_console=True,
     )

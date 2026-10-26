@@ -24,8 +24,8 @@ result = optimize_turbine(case)
 Run this example from a repository checkout. The basic demo explains reporting
 and exports; the advanced demo compares step fractions and recovery policies.
 
-PySolverView is a required PyPI dependency with version `>=0.7.2,<0.8`
-(Poetry `^0.7.2`). Run `poetry install` from Turbodash before using
+PySolverView is a required PyPI dependency with version `>=0.7.4,<0.8`
+(Poetry `^0.7.4`). Run `poetry install` from Turbodash before using
 `poetry run python` for the demos. See the [installation guide](../installation.md)
 for checking the installed version and import location.
 
@@ -311,6 +311,11 @@ convergence history is followed by PySolverView's final report of physical and
 normalized design variables, constraints, KKT conditions, and multipliers. This
 also applies to completed unsuccessful solves. Reporting reuses the cached
 final assessment without additional model or derivative evaluations.
+The app uses a 120-character final report so turbine variable and constraint
+names have more room. PySolverView wraps longer names without shortening them.
+In your own scripts, choose `result.optimizer.print_optimization_report(width=80)`,
+`width=100`, or `width=120`. This controls final report tables, independently
+of the live convergence table's column widths.
 
 The Python API preserves both frontend and backend views of the solve:
 

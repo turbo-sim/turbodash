@@ -7,8 +7,8 @@ Turbodash maps turbine inputs and physical reports; PySolverView owns
 optimization, finite differences, domain recovery, independent KKT checks,
 and the convergence table and final solver report.
 
-PySolverView is a required PyPI dependency, with version `>=0.7.2,<0.8`
-(Poetry `^0.7.2`). Install from the Turbodash repository root and inspect the
+PySolverView is a required PyPI dependency, with version `>=0.7.4,<0.8`
+(Poetry `^0.7.4`). Install from the Turbodash repository root and inspect the
 version and installation used by its environment:
 
 ```powershell
@@ -94,6 +94,7 @@ PySolverView plots and reports. For example:
 
 ```python
 result.optimizer.print_optimization_report(
+    width=120,
     include_kkt_conditions=True,
     include_multipliers=True,
     savefile=True,

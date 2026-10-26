@@ -32,7 +32,7 @@ data come from PySolverView without recalculation.
 ## Running the checks
 
 Run from the repository root after `poetry install` has installed the required
-PySolverView PyPI dependency, version `>=0.7.2,<0.8` (Poetry `^0.7.2`):
+PySolverView PyPI dependency, version `>=0.7.4,<0.8` (Poetry `^0.7.4`):
 
 ```powershell
 poetry run python -B -m pytest tests/test_optimization_api.py tests/test_kkt_history_alignment.py tests/test_kkt_reporting.py -q

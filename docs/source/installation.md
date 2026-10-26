@@ -32,7 +32,7 @@ PySolverView's optimization driver requires SciPy 1.17.1 because its additional 
 controls use a checked private SLSQP interface. Install the project's declared
 dependencies together; the [optimization guide](guides/optimization.md)
 describes the controls and compatibility requirements. The required PyPI
-dependencies include PySolverView `>=0.7.2,<0.8` (Poetry `^0.7.2`) and JAXProp
+dependencies include PySolverView `>=0.7.4,<0.8` (Poetry `^0.7.4`) and JAXProp
 `>=0.5.7,<0.6` (Poetry `^0.5.7`). Inspect the active PySolverView installation
 with:
 

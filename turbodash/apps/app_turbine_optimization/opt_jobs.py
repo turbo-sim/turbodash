@@ -38,6 +38,7 @@ CACHE_ROOT = Path(tempfile.gettempdir()) / "turbodash_optimization_jobs"
 TIMEOUT_SECONDS = 600
 RETENTION_SECONDS = 24 * 3600
 MAX_ACTIVE_JOBS = 2
+OPTIMIZATION_REPORT_WIDTH = 120
 _PROCESSES = {}
 
 
@@ -293,7 +294,7 @@ def _run_worker(request_path):
         result.optimizer.print_optimization_report(
             include_design_variables=True, include_constraints=True,
             include_kkt_conditions=True, include_multipliers=True,
-            to_console=False,
+            to_console=False, width=OPTIMIZATION_REPORT_WIDTH,
         )
         payload = dict(config=result.config, turbine_results=result.turbine_results,
                        success=result.success, solver_success=result.solver_success, feasible=result.feasible,

@@ -79,6 +79,13 @@ The PySolverView convergence plot is saved by default. Run with `--show` to open
 it and the turbine figures interactively; omitting that flag keeps the run
 headless. Its signed objective is negative when maximizing efficiency; physical
 efficiency remains available in the turbine results and YAML exports.
+
+Before creating any figures, the basic demo calls Turbodash's
+`set_plot_options()` to configure Matplotlib's shared style. Turbodash draws the
+two turbine geometry figures; the convergence figure is created directly by
+`result.optimizer.plot_convergence_history()` in PySolverView, using the same
+Matplotlib defaults and PySolverView's own axis and curve settings.
+
 On rerun, the demo removes the retired `physical_convergence_history.png/.svg`
 files from its output directory so old plots are not mixed with the native output.
 

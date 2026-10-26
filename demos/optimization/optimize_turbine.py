@@ -5,6 +5,10 @@ checkout, or run this file by its absolute path from any working directory.
 ``--case radial`` selects the other example; ``--case my_case.yaml`` loads a
 custom case beside this script. Figures are saved without opening windows
 unless ``--show`` is supplied. See README.md for the case format and outputs.
+
+Turbodash draws the initial and final turbine geometry. PySolverView draws the
+convergence history and prints/saves the optimization reports. All figures use
+the Matplotlib defaults configured by Turbodash's ``set_plot_options()``.
 """
 
 import argparse
@@ -57,13 +61,14 @@ def main():
     # turbodash.optimization. No Dash layout or application worker is involved.
     sys.path.insert(0, str(EXAMPLE_DIRECTORY.parents[1]))
 
-    # Select a noninteractive backend BEFORE importing pyplot or the API, which
-    # uses it for reports. The default is suitable for terminals and batch jobs.
+    # Select a noninteractive backend BEFORE importing pyplot or Turbodash,
+    # which also imports pyplot. The default suits terminals and batch jobs.
     import matplotlib
     if not arguments.show:
         matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
+    from turbodash import set_plot_options
     from turbodash.optimization import (
         TurbinePlotCallback,
         load_case,
@@ -72,6 +77,10 @@ def main():
         save_figure,
         save_optimization_results,
     )
+
+    # Apply the shared Matplotlib style before creating any figures, including
+    # the convergence figure rendered by PySolverView's own plotting method.
+    set_plot_options()
 
     # 1. Load ordinary dictionaries. The YAML contains both `inputs` for the
     # meanline model and `optimization` for this particular design study.
@@ -97,8 +106,8 @@ def main():
     )
 
     # 3. Run the production meanline model through PySolverView's main
-    # OptimizationSolver frontend, also used by the app. Its pysolver/SLSQP
-    # backend owns derivatives, recovery, KKT checks and the convergence report.
+    # OptimizationSolver frontend, also used by the app. The frontend and its
+    # pysolver/SLSQP backend own derivatives, recovery, KKT checks and reports.
     # Settings come from case["optimization"].
     # Alternatively pass a separate dictionary as optimize_turbine(case, settings).
     # The initial design must be evaluable. Recognized invalid line-search

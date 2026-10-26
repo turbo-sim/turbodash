@@ -502,9 +502,12 @@
             if (nav && nav !== root && (nav.closest(".td-workspace-rail") || nav.classList.contains("td-brand"))) {
                 event.preventDefault(); setWorkspace(nav.dataset.workspace); return;
             }
-            if (event.target.closest("#td-collapse-all")) {
+            const expandAll = event.target.closest("#td-expand-all");
+            if (expandAll || event.target.closest("#td-collapse-all")) {
                 root.querySelectorAll('.td-inspector [data-controls-workspace="' + root.dataset.workspace + '"] details')
-                    .forEach(details => { details.open = false; }); return;
+                    .forEach(details => {
+                        if (!expandAll || !details.closest(".td-opt-picker")) details.open = !!expandAll;
+                    }); return;
             }
             if (event.target.closest("#td-inspector-toggle")) { setDrawer(!root.classList.contains("td-inspector-open")); return; }
             if (event.target.closest(".td-inspector-backdrop")) { setDrawer(false); return; }

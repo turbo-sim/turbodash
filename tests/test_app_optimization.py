@@ -908,14 +908,14 @@ class WorkspaceTests(unittest.TestCase):
                     *poll_arguments(delivered[0], overall, values, stages, config))
             rendered = invoke("opt-applied-result.data", module.update_turbine,
                 overall, values, applied, overall_ids, stage_ids, stages)
-            self.assertEqual(jobs.fingerprint(rendered[7]), delivered[0]["target"])
+            self.assertEqual(jobs.fingerprint(rendered[6]), delivered[0]["target"])
             expected_results = dict(optimized.turbine_results, optimization=optimized.config["optimization"])
-            expected = module.render_results(expected_results, rendered[8], include_blades=False)
-            self.assertEqual(json.dumps(rendered[:9], cls=PlotlyJSONEncoder),
+            expected = module.render_results(expected_results, rendered[7], include_blades=False)
+            self.assertEqual(json.dumps(rendered[:8], cls=PlotlyJSONEncoder),
                              json.dumps(expected, cls=PlotlyJSONEncoder))
-            self.assertEqual(len(module.update_triangles(rendered[7], "mach")), 2)
+            self.assertEqual(len(module.update_triangles(rendered[6], "mach")), 2)
             acknowledged = invoke("opt-poll.n_intervals", poll,
-                *poll_arguments(delivered[0], overall, values, stages, rendered[7]))
+                *poll_arguments(delivered[0], overall, values, stages, rendered[6]))
             self.assertIsNone(acknowledged[0])
             self.assertIn("Optimization applied", acknowledged[1])
             self.assertEqual(acknowledged[8], "success")
@@ -927,8 +927,8 @@ class WorkspaceTests(unittest.TestCase):
         edited[ratio_index] = .61
         prop_id = json.dumps(overall_ids[ratio_index], sort_keys=True, separators=(",", ":")) + ".value"
         updated = invoke(prop_id, module.update_turbine, edited, values, applied, overall_ids, stage_ids, stages)
-        self.assertEqual(updated[7]["inputs"]["blade_velocity_ratio"], .61)
-        self.assertNotEqual(updated[8], rendered[8])
+        self.assertEqual(updated[6]["inputs"]["blade_velocity_ratio"], .61)
+        self.assertNotEqual(updated[7], rendered[7])
 
     def test_failed_or_infeasible_result_never_changes_loaded_design(self):
         from dash._callback_context import context_value
@@ -963,9 +963,9 @@ class WorkspaceTests(unittest.TestCase):
         result = opt.optimize_turbine(config, settings(config, variables))
         self.assertTrue(result.success, result.message)
         rendered = module.render_results(result.turbine_results, "two-stages")
-        self.assertEqual(len(module.update_triangles(rendered[7], "mach")), 2)
-        self.assertEqual(len(rendered[7]["stages_performance"]), 2)
-        self.assertEqual(rendered[7]["inputs"], result.config["inputs"])
+        self.assertEqual(len(module.update_triangles(rendered[6], "mach")), 2)
+        self.assertEqual(len(rendered[6]["stages_performance"]), 2)
+        self.assertEqual(rendered[6]["inputs"], result.config["inputs"])
 
     def test_new_app_is_independent_and_success_renders_every_output(self):
         from turbodash.apps.app_turbine import app as turbine
@@ -980,9 +980,9 @@ class WorkspaceTests(unittest.TestCase):
         result = opt.optimize_turbine(config, settings(config))
         self.assertTrue(result.success)
         rendered = module.render_results(result.turbine_results, "signature")
-        self.assertEqual(len(rendered), 9)
-        self.assertEqual(rendered[7]["inputs"], result.config["inputs"])
-        self.assertEqual(rendered[8], "signature")
+        self.assertEqual(len(rendered), 8)
+        self.assertEqual(rendered[6]["inputs"], result.config["inputs"])
+        self.assertEqual(rendered[7], "signature")
         values = module.loaded_overall_values(result.config, [{"key": "blade_velocity_ratio"}, {"key": "rotational_speed_type"}])
         self.assertEqual(values, [result.config["inputs"]["blade_velocity_ratio"], "specific"])
 

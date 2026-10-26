@@ -121,12 +121,16 @@ def _stage_title(index, stage):
     return f"{title} · {name}" if name else title
 
 
-def _radius_bounds(value, blade_row):
-    """Keep a radial blade row on its current side of zero radial chord."""
+def _radius_bounds(value, pair):
+    """Use outflow presets below unity; preserve inflow row direction above it."""
+    blade_row = pair in ("12", "34")
+    if value < 1:
+        if blade_row:
+            return .75, .85
+        if pair == "23":
+            return .925, .975
     if not blade_row:
         return min(.9, .8 * value), max(1.4, 1.2 * value)
-    if value < 1:
-        return min(.7, .8 * value), max(.99, (1 + value) / 2)
     if value == 1:
         return 1.01, 1.4
     return min(1.01, (1 + value) / 2), max(1.4, 1.2 * value)
@@ -153,13 +157,19 @@ def variable_catalog(config):
 
     add("blade_velocity_ratio", "Global · Blade velocity ratio [-]", .25, 1,
         "Blade velocity ratio [-]", ["Overall"])
+    radial = inputs.get("turbine_type") in ("radial", "radial_inflow", "radial_outflow")
+    row_ratios = [stage.get(f"radius_ratio_{pair}")
+                  for stage in inputs.get("stages", []) for pair in ("12", "34")]
+    radial_outflow = radial and bool(row_ratios) and all(
+        isinstance(ratio, (int, float)) and 0 < ratio < 1 for ratio in row_ratios
+    )
     actual = inputs.get("rotational_speed_type") == "actual"
     speed = inputs.get("rotational_speed", .7)
     speed_label = "Rotational speed [rpm]" if actual else "Specific speed [-]"
     add("rotational_speed", f"Global · {speed_label}",
-        max(1, speed * .5) if actual else .2, speed * 1.5 if actual else 1.5,
+        max(1, speed * .5) if actual else .2,
+        speed * 1.5 if actual else (1 if radial_outflow else 1.5),
         speed_label, ["Overall"])
-    radial = inputs.get("turbine_type") in ("radial", "radial_inflow", "radial_outflow")
     empirical = inputs.get("loss_model", "benner") in ("benner", "moustapha", "kacker_okapuu")
     for i, stage in enumerate(inputs.get("stages", [])):
         prefix = f"stages.{i}."
@@ -191,7 +201,7 @@ def variable_catalog(config):
                     ratio = finite(read_path(inputs, path), path)
                 except (ValueError, KeyError, TypeError, IndexError):
                     continue
-                lo, hi = _radius_bounds(ratio, pair in ("12", "34"))
+                lo, hi = _radius_bounds(ratio, pair)
                 label = f"Radius ratio {pair} [-]"
                 add(path, f"{title} · {label}", lo, hi, label,
                     [hierarchy_title, "Stage inputs"])

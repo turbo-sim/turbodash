@@ -14,6 +14,7 @@ from turbodash.apps.shared.paths import SHARED_ASSETS_DIRECTORY
 from turbodash.apps.shared.documentation import register_documentation
 from turbodash.apps.shared.cli import run_app, run_cli
 from turbodash.apps.shared.loss_controls import register_loss_callbacks
+from turbodash.apps.shared.meridional_controls import register_meridional_callbacks
 from turbodash.loss_models.options import validate_exit_mach_correction
 
 from pathlib import Path
@@ -713,7 +714,6 @@ def stage_choices(stages, active):
 # stage's number box), so it updates on every edit without touching the store.
 # =========================================
 @app.callback(
-    Output("meridional_plot", "figure"),
     Output("blades_plot", "figure"),
     Output("efficiency_trends_plot", "figure"),
     Output("loss_plot", "figure"),
@@ -776,7 +776,7 @@ def update_turbine(
         raise
     except Exception as error:
         return (
-            *((no_update,) * 9),
+            *((no_update,) * 8),
             f"Results retained from the last valid design. {error}",
             {"valid": False, "message": str(error)},
             no_update,
@@ -841,7 +841,6 @@ def live_config(overall_values, stage_values, overall_ids, stage_ids, store_stag
 
 
 def render_results(out, signature, *, include_blades=True):
-    fig_meridional = _plotting.plot_turbine_meridional_channel(out)
     try:
         fig_blades = (_plotting.plot_turbine_blades(
             out, N_points=601, N_blades_plot=8
@@ -874,7 +873,6 @@ def render_results(out, signature, *, include_blades=True):
     stn_tbl = make_data_table(stn_cols, stn_data)
 
     return (
-        fig_meridional,
         fig_blades,
         fig_efficiency_trends,
         fig_loss,
@@ -884,6 +882,9 @@ def render_results(out, signature, *, include_blades=True):
         out,
         signature,
     )
+
+
+update_meridional = register_meridional_callbacks(app)
 
 
 @app.callback(

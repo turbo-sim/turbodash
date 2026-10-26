@@ -42,7 +42,7 @@ def test_radial_upload_combined_event_waits_for_accepted_stage_inputs(monkeypatc
 
     monkeypatch.setattr(module.core, "compute_turbine_performance", solve)
     monkeypatch.setattr(module, "render_results", lambda output, signature, **kwargs:
-                        (*((no_update,) * 7), output, signature))
+                        (*((no_update,) * 6), output, signature))
     try:
         if not ready:
             with pytest.raises(PreventUpdate):
@@ -51,8 +51,8 @@ def test_radial_upload_combined_event_waits_for_accepted_stage_inputs(monkeypatc
         else:
             result = module.update_turbine(overall_values, stage_values, None, overall_ids, stage_ids, stages, accepted_type)
             assert len(calls) == 1
-            assert result[7]["inputs"]["turbine_type"] == "radial"
-            assert result[7]["inputs"]["stages"][0]["radius_ratio_12"] == 1.1
-            assert result[10]["valid"] is True
+            assert result[6]["inputs"]["turbine_type"] == "radial"
+            assert result[6]["inputs"]["stages"][0]["radius_ratio_12"] == 1.1
+            assert result[9]["valid"] is True
     finally:
         context_value.reset(token)

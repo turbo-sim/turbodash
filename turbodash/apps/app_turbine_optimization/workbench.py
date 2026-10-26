@@ -27,6 +27,7 @@ from turbodash.apps.shared.fluid_inputs import (
 from turbodash.apps.shared.components.meshing import mesh_panel
 from turbodash.apps.shared.components.blade_modeller import geometry_panel
 from turbodash.apps.shared.loss_controls import exit_mach_control
+from turbodash.apps.shared.meridional_controls import CONTOUR_HELP, contour_control
 from .opt_panel import (
     actions as optimization_actions,
     panel as optimization_panel,
@@ -339,6 +340,8 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
                 className="td-segmented",
             ),
         ),
+        field("Hub and shroud contours", contour_control(), hint=CONTOUR_HELP,
+              aliases="hub shroud endwall spline contour degree"),
         html.Div(
             [
                 html.Label("Number of stages"),
@@ -518,7 +521,10 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
                     html.Div(
                         [
                             html.H2("Meanline inputs", id="td-inputs-title"),
-                            html.Button("Collapse all", id="td-collapse-all"),
+                            html.Div([
+                                html.Button("Expand all", id="td-expand-all"),
+                                html.Button("Collapse all", id="td-collapse-all"),
+                            ], className="td-inspector-actions"),
                         ],
                         className="td-inspector-title",
                     ),

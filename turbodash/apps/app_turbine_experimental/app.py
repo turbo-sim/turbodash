@@ -7,6 +7,7 @@ until they are ready to become the default.
 from turbodash.apps.shared.paths import SHARED_ASSETS_DIRECTORY, DOCUMENTATION_FILE
 from turbodash.apps.shared.cli import run_app, run_cli
 from turbodash.apps.shared.loss_controls import exit_mach_control, register_loss_callbacks
+from turbodash.apps.shared.meridional_controls import contour_control, register_meridional_callbacks
 from turbodash.loss_models.options import validate_exit_mach_correction
 
 from pathlib import Path
@@ -59,6 +60,7 @@ register_vtk_assets(app)
 register_turbogrid_callbacks(app, results_store="geometry_results_store", modeller=True)
 register_meshing_callbacks(app, results_store="geometry_results_store", modeller=True)
 register_geometry_workflow(app)
+update_meridional = register_meridional_callbacks(app)
 
 
 def configure(config_path):
@@ -484,6 +486,7 @@ def overall_accordion():
                 style=dict(display="flex", gap="14px"),
             ),
         ),
+        labeled("Hub/shroud contours", contour_control()),
         # 2. Number of stages
         stage_count_row(),
         # 3. Loss model (pretty labels, internal values)
@@ -1009,7 +1012,6 @@ def render_stage_accordion(stages, turbine_type):
 # stage's number box), so it updates on every edit without touching the store.
 # =========================================
 @app.callback(
-    Output("meridional_plot", "figure"),
     Output("blades_plot", "figure"),
     Output("triangles_container", "children"),
     Output("efficiency_trends_plot", "figure"),
@@ -1055,7 +1057,6 @@ def update_turbine(overall_values, stage_values, overall_ids, stage_ids, store_s
     try:
         out = core.compute_turbine_performance(cfg)
 
-        fig_meridional = _plotting.plot_turbine_meridional_channel(out)
         try:
             fig_blades = no_update  # Shared modeller state renders the blade view.
         except ValueError as error:
@@ -1092,7 +1093,6 @@ def update_turbine(overall_values, stage_values, overall_ids, stage_ids, store_s
         stn_tbl = make_data_table(stn_cols, stn_data)
 
         return (
-            fig_meridional,
             fig_blades,
             triangles_children,
             fig_efficiency_trends,
@@ -1106,7 +1106,7 @@ def update_turbine(overall_values, stage_values, overall_ids, stage_ids, store_s
 
     except Exception:
         # Retain the last successful result and its geometry after a failed draft.
-        return (no_update,) * 10
+        return (no_update,) * 9
 
 
 

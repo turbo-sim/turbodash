@@ -236,6 +236,44 @@ def test_inward_radial_outlet_extension_never_crosses_rotation_axis():
     assert min(hub.y) > 0
 
 
+@pytest.mark.parametrize("degree", [2, 3])
+@pytest.mark.parametrize("turbine_type,inward", [("axial", False), ("radial", False), ("radial", True)])
+def test_spline_walls_share_row_fills_station_endpoints_and_straight_extensions(
+    degree, turbine_type, inward
+):
+    results = result(turbine_type, inward=inward)
+    before = deepcopy(results)
+    linear = plots.plot_turbine_meridional_channel(results)
+    curved = plots.plot_turbine_meridional_channel(results, contour_degree=degree, theme="dark")
+    row_traces = [trace for trace in curved.data if trace.name in ("Stator", "Rotor")]
+    for wall, reverse in (("Hub", False), ("Shroud", True)):
+        reference = trace_named(linear, wall)
+        trace = trace_named(curved, wall)
+        original = np.column_stack((reference.x, reference.y))
+        sampled = np.column_stack((trace.x, trace.y))
+        # Extension endpoints and the actual first/last blade-row stations remain exact.
+        assert np.array_equal(sampled[[0, 1, -2, -1]], original[[0, 1, -2, -1]])
+        start = 1
+        for row, polygon in enumerate(row_traces):
+            points = np.column_stack((polygon.x, polygon.y))[:-1]
+            count = len(points) // 2
+            wall_points = points[count:][::-1] if reverse else points[:count]
+            assert count > 2
+            assert np.array_equal(wall_points, sampled[start:start + count])
+            assert np.array_equal(wall_points[[0, -1]], original[2 * row + 1:2 * row + 3])
+            start += count
+        assert trace.line.simplify is False
+        assert trace.line.color == plots._PLOT_THEMES["dark"]["wall"]
+    hub, shroud = trace_named(curved, "Hub"), trace_named(curved, "Shroud")
+    for fraction, guide in zip(np.linspace(.16, .84, 5),
+                               (t for t in curved.data if t.name == "Flow guides")):
+        assert np.allclose(guide.x, (1 - fraction) * np.asarray(hub.x) + fraction * np.asarray(shroud.x))
+        assert np.allclose(guide.y, (1 - fraction) * np.asarray(hub.y) + fraction * np.asarray(shroud.y))
+    assert curved.layout.meta["contour_degree"] == degree
+    assert curved.layout.yaxis.scaleanchor == "x"
+    assert results == before
+
+
 def test_theme_roundtrip_preserves_coordinates_zoom_and_geometry_presentation():
     figure = plots.plot_turbine_meridional_channel(result())
     initial = figure.to_dict()

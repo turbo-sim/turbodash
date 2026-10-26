@@ -103,6 +103,25 @@ def test_presets_are_applicable_bounded_and_hold_one_work_weight_fixed(kind, cou
     assert config == before
 
 
+@pytest.mark.parametrize("kind", ["axial", "radial_inflow", "radial_outflow"])
+@pytest.mark.parametrize("speed_type,speed", [("specific", .7), ("actual", 30000)])
+def test_specific_speed_upper_bound_is_one_only_for_radial_outflow(kind, speed_type, speed):
+    config = case("axial" if kind == "axial" else "radial")
+    config["inputs"].update(rotational_speed_type=speed_type, rotational_speed=speed)
+    if kind == "radial_outflow":
+        config["inputs"]["stages"][0].update(
+            radius_ratio_12=.8, radius_ratio_23=.95, radius_ratio_34=.8,
+        )
+    catalog = variable_catalog(config)
+    rows = apply_selection_operations([], catalog, variable_groups(config, catalog), "variable", [
+        dict(kind="variable", group="overall", selected=True),
+    ])
+    selected = next(row for row in rows if row["path"] == "rotational_speed")
+    expected = speed * 1.5 if speed_type == "actual" else (1 if kind == "radial_outflow" else 1.5)
+    assert selected["upper"] == expected
+    assert selected["lower"] == (speed * .5 if speed_type == "actual" else .2)
+
+
 @pytest.mark.parametrize("ratio", [.5, .999, 1.001, 1.8])
 @pytest.mark.parametrize("turbine_type", ["radial", "radial_inflow", "radial_outflow"])
 def test_radial_row_bounds_keep_direction_and_avoid_zero_chord(ratio, turbine_type):
@@ -113,11 +132,35 @@ def test_radial_row_bounds_keep_direction_and_avoid_zero_chord(ratio, turbine_ty
     catalog = variable_catalog(config)
     for pair in ("12", "34"):
         entry = catalog[f"stages.0.radius_ratio_{pair}"]
-        assert entry["lower"] < ratio < entry["upper"]
         if ratio < 1:
-            assert 0 < entry["lower"] < entry["upper"] < 1
+            assert (entry["lower"], entry["upper"]) == (.75, .85)
         else:
+            assert entry["lower"] < ratio < entry["upper"]
             assert 1 < entry["lower"] < entry["upper"]
+
+
+@pytest.mark.parametrize("group", ["radial_radii", "all"])
+def test_radial_outflow_groups_use_requested_radius_variable_bounds(group):
+    config = case("radial", count=3)
+    for stage in config["inputs"]["stages"]:
+        stage.update(radius_ratio_12=.8, radius_ratio_23=.95, radius_ratio_34=.8)
+    original = deepcopy(config)
+    catalog = variable_catalog(config)
+    groups = variable_groups(config, catalog)
+    rows = apply_selection_operations([], catalog, groups, "variable", [
+        dict(kind="variable", group=group, selected=True),
+    ])
+    selected = {row["path"]: row for row in rows}
+    for index in range(3):
+        for pair, bounds in (("12", (.75, .85)), ("23", (.925, .975)), ("34", (.75, .85))):
+            row = selected[f"stages.{index}.radius_ratio_{pair}"]
+            assert (row["lower"], row["upper"]) == bounds
+    # Reapplying a group preserves bounds the user has already edited.
+    selected["stages.0.radius_ratio_12"]["lower"] = .78
+    assert apply_selection_operations(rows, catalog, groups, "variable", [
+        dict(kind="variable", group=group, selected=True),
+    ]) == rows
+    assert config == original
 
 
 def test_radial_catalog_skips_only_unused_initial_radius_link():

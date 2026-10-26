@@ -8,6 +8,7 @@ from turbodash.core.diffuser import diffuser_settings
 
 from turbodash.geometry.meanline import state_for_stage_row, section_from_state
 from turbodash.geometry.blade import section_coordinates
+from turbodash.geometry.endwalls import interpolate_endwalls
 
 # =============================================================================
 # Styling constants (mirror of the mpl module's intent, plotly idiom)
@@ -269,12 +270,14 @@ def _style_axes(fig, *, xtitle, ytitle, equal=False, row=None, col=None):
 # =============================================================================
 # Plot turbine meridional channel (multistage)
 # =============================================================================
-def plot_turbine_meridional_channel(results, *, theme="light"):
+def plot_turbine_meridional_channel(results, *, theme="light", contour_degree=1):
     """Plot the station-derived meanline channel, not a generated mesh.
 
-    Piecewise-linear hub/shroud boundaries connect every row and stage gap.
-    Constant-section inlet/outlet extensions frame the blade rows. Smooth guide
-    streamlines illustrate passage shape; they are not computed CFD results.
+    Degree 1 retains piecewise-linear hub/shroud boundaries. Degrees 2 and 3
+    interpolate each row with B-splines tangent to the adjoining straight gaps.
+    At the first inlet and last outlet the wall tangents already align with the
+    purely axial/radial straight extensions. All prescribed stations are exact.
+    Guide streamlines illustrate passage shape; they are not CFD results.
     Coordinates are in millimetres with physical aspect ratio preserved. The
     initial/reset radial range includes zero; users remain free to zoom in.
     """
@@ -295,7 +298,7 @@ def plot_turbine_meridional_channel(results, *, theme="light"):
             for row, index in (("stator", 0), ("rotor", 2))
         ]
 
-    hub, shroud, row_points = [], [], []
+    hub, shroud = [], []
     for row in rows:
         stations = row["stage"]["flow_stations"][
             row["station_index"] : row["station_index"] + 2
@@ -315,8 +318,11 @@ def plot_turbine_meridional_channel(results, *, theme="light"):
             outer = [(+station["H"] / 2, station["r"]) for station in stations]
         hub.extend(inner)
         shroud.extend(outer)
-        row_points.append((row, np.asarray(inner), np.asarray(outer)))
-    hub, shroud = _extend_channel(np.asarray(hub), np.asarray(shroud), rows, turbine_type)
+    contours = interpolate_endwalls(hub, shroud, turbine_type=turbine_type,
+                                    degree=contour_degree)
+    row_points = [(row, contours.hub[span], contours.shroud[span])
+                  for row, span in zip(rows, contours.row_slices)]
+    hub, shroud = _extend_channel(contours.hub, contours.shroud, rows, turbine_type)
 
     def polygon(points, *, color, name, role=None, linecolor=None, hover=None):
         points = np.vstack((points, points[0])) * 1000.0
@@ -327,7 +333,8 @@ def plot_turbine_meridional_channel(results, *, theme="light"):
                 mode="lines",
                 fill="toself",
                 fillcolor=color,
-                line=dict(color=linecolor or color, width=1 if linecolor else 0),
+                line=dict(color=linecolor or color, width=1 if linecolor else 0,
+                          simplify=False),
                 name=name,
                 legendgroup=name,
                 showlegend=False,
@@ -397,11 +404,14 @@ def plot_turbine_meridional_channel(results, *, theme="light"):
             hover=f"{stage_name} · {label}<br>Meanline channel<extra></extra>",
         )
 
-    for guide in _channel_guides(hub, shroud, turbine_type):
+    guides = (_channel_guides(hub, shroud, turbine_type) if contour_degree == 1 else
+              (hub * (1 - fraction) + shroud * fraction
+               for fraction in np.linspace(.16, .84, 5)))
+    for guide in guides:
         fig.add_trace(go.Scatter(
             x=1000 * guide[:, 0], y=1000 * guide[:, 1], mode="lines",
             name="Flow guides", legendgroup="Flow guides", showlegend=False,
-            line=dict(color=palette["guide"], width=1.15),
+            line=dict(color=palette["guide"], width=1.15, simplify=False),
             meta=dict(theme_role="flow_guide"),
             hovertemplate="Geometry-based guide streamline<br>Illustrative passage path; not a CFD solution<extra></extra>",
         ))
@@ -413,7 +423,7 @@ def plot_turbine_meridional_channel(results, *, theme="light"):
                 y=1000 * points[:, 1],
                 mode="lines",
                 name=label,
-                line=dict(color=palette["wall"], width=2, dash="solid"),
+                line=dict(color=palette["wall"], width=2, dash="solid", simplify=False),
                 showlegend=False,
                 meta=dict(theme_role="endwall"),
                 hovertemplate=f"{label}<br>%{{x:.3f}} mm, %{{y:.3f}} mm<extra></extra>",
@@ -430,6 +440,7 @@ def plot_turbine_meridional_channel(results, *, theme="light"):
     fig.update_layout(
         margin=dict(l=45, r=20, t=20, b=55),
         showlegend=False,
+        meta=dict(contour_degree=int(contour_degree)),
     )
     return apply_plot_theme(fig, theme)
 

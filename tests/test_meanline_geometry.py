@@ -279,12 +279,12 @@ def test_app_callback_retains_meanline_result_when_physical_plot_fails(monkeypat
     overall = app.OVERALL_DEFAULTS
     ids = [{"key": key} for key in overall]
     outputs = app.update_turbine(list(overall.values()), [], ids, [], [app.stage_defaults_for(overall["turbine_type"])])
-    result = outputs[8]
+    result = outputs[7]
     assert result["stages_performance"][0]["geometry_discrete"] is None
     assert result["overall_performance"]["efficiency_ts"] > 0
     if profile_failure:
         if app_name == "app_turbine_experimental":
             from dash import no_update
-            assert outputs[1] is no_update  # Shared geometry callback owns this plot.
+            assert outputs[0] is no_update  # Shared geometry callback owns this plot.
         else:
-            assert "Example invalid physical profile" in outputs[1]["layout"]["annotations"][0]["text"]
+            assert "Example invalid physical profile" in outputs[0]["layout"]["annotations"][0]["text"]

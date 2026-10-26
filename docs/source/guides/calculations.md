@@ -7,7 +7,9 @@ shaft-speed specification, and blade velocity ratio. Add the required stages,
 then set reaction, stator exit angle, radius ratios, meridional velocity ratios,
 and blade geometry for each stage.
 
-The numbered sidebar sections expand in place. Within **Stage design**,
+The numbered sidebar sections expand in place. **Expand all** and **Collapse all**
+beside the inputs heading open or close the sections in the current workspace.
+Within **Stage design**,
 choose a named stage, then expand **Aerodynamic design** or **Blade geometry**.
 The **Stator / Rotor** selector changes the row being
 edited. These controls remain inside the stage section, and changing the
@@ -85,6 +87,22 @@ The geometry plots visualize the solved meanline and its blade profiles.
 They are preliminary design representations. Physical exports realize integer
 blade counts separately from the continuous blade spacing used during
 optimization.
+
+In **Turbine setup**, **Hub/shroud contours** applies one contour shape to all
+rows in the meridional view. **Linear** retains the straight segments;
+**Smooth** uses cubic interpolating B-splines through every row
+inlet and outlet. Interspaces remain straight, and each curved row meets the
+adjoining interspace at its hub/shroud wall angle. At the first inlet and final
+rotor exit, the spline tangents already point purely axially for axial turbines
+or purely radially for radial turbines, joining straight extensions in those
+directions. The assembled smooth contours have continuous tangents; curvature
+can change at row/interspace joins. Coincident row interfaces share a tangent,
+and equal-radius radial height steps retain their transverse direction.
+
+The selection is retained for the browser session and redraws the latest result
+without recalculating the turbine. Row fills and illustrative flow guides follow
+the same contours. Spline overshoot is not limited. This setting controls the
+meanline plot; it does not change the solver, 3D geometry, meshing, or exports.
 
 The efficiency-versus-blade-velocity-ratio curve holds the solved row loss
 coefficients and other design inputs fixed while varying the velocity triangles.

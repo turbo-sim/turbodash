@@ -361,11 +361,11 @@ def test_invalid_draft_retains_all_results_and_displays_essential_error(
         live_form["stage_ids"],
         live_form["store_stages"],
     )
-    assert all(value is no_update for value in result[:9])
-    assert len(result) == 12
+    assert all(value is no_update for value in result[:8])
+    assert len(result) == 11
     compute.assert_not_called()
-    assert result[10]["valid"] is False
-    assert "Low-pressure stage" in result[9]
+    assert result[9]["valid"] is False
+    assert "Low-pressure stage" in result[8]
     assert changes == {}, "Calculation status must use ordered callback outputs"
 
 

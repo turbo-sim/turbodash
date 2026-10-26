@@ -98,6 +98,12 @@ def exercise(context, address, output):
     page.on("response", capture)
     page.goto(address)
     page.wait_for_selector("#perf_table .dash-table-container")
+    page.locator("#td-section-setup > summary").click()
+    page.locator("#td-contour-degree").get_by_text("Smooth", exact=True).click()
+    page.wait_for_function(
+        "document.querySelector('#meridional_plot .js-plotly-plot').layout.meta?.contour_degree === 3"
+    )
+    page.locator("#td-section-setup > summary").click()
     assert page.evaluate("""() => {
         const stages = document.getElementById('stages_accordion_container');
         const panel = document.getElementById('opt-panel');
@@ -183,19 +189,35 @@ def exercise(context, address, output):
             expected_fields = {key for key, value in stage.items() if isinstance(value, (int, float))}
             expected_fields.update(f"{row}.{key}" for row in ("stator", "rotor")
                                    for key in stage["blade_geometry"][row]
-                                   if key != "aspect_ratio" or expected["turbine_type"] != "radial")
+                                   if (key != "aspect_ratio" or expected["turbine_type"] != "radial")
+                                   and not key.endswith("wedge_angle"))
             assert {key for stage_index, key in stage_fields if stage_index == index} == expected_fields
         assert page.locator('#stages_accordion_container .rc-slider').count() == 0
 
         # The primary callback publishes the model and overview figures; the
-        # independent triangle callback renders that model in the selected units.
-        # Derive its expected figures from the published model, avoiding a stale
-        # triangle callback snapshot while the optimized design is being applied.
+        # independent contour/triangle callbacks render it using current display
+        # settings. Derive those figures from the published model, avoiding stale
+        # callback snapshots while the optimized design is being applied.
         figures = {}
         published = rendered_results[-1]
         for identity, props in published.items():
             if "figure" in props:
                 figures[identity] = props["figure"]
+        contour_label = page.locator("#td-contour-degree label:has(input:checked)").text_content()
+        degree = {"Linear": 1, "Smooth": 3}[contour_label.strip()]
+        figures["meridional_plot"] = json.loads(
+            plotly_turbine.plot_turbine_meridional_channel(
+                published["result_store"]["data"], contour_degree=degree
+            ).to_json()
+        )
+        if "blades_plot" not in figures:
+            # The geometry workflow also owns the accepted-result blade redraw.
+            # This scenario has no manual geometry overrides.
+            figures["blades_plot"] = json.loads(
+                plotly_turbine.plot_turbine_blades(
+                    published["result_store"]["data"], N_points=601, N_blades_plot=8
+                ).to_json()
+            )
         selected_units = page.locator("#td-triangle-mode label:has(input:checked)").inner_text()
         mode = {"Mach numbers": "mach", "Velocity [m/s]": "velocity"}[selected_units.strip()]
         for index, figure in enumerate(
@@ -358,7 +380,9 @@ def exercise(context, address, output):
     second.goto(address)
     second.wait_for_selector("#perf_table .dash-table-container")
     second_log = second.locator("#opt-log").text_content()
-    assert second_log.startswith("Convergence output will appear"), second_log
+    assert second_log == (
+        "Convergence output and the final optimization report will appear here when you start a run."
+    ), second_log
     assert context.cookies()[0]["value"] != other.cookies()[0]["value"]
     other.close()
     assert not errors, errors

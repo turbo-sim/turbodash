@@ -164,6 +164,79 @@ All **30 cases (5 impulse and 25 reaction)** passed positive thickness, a single
 
 Intersections are checked at the plotted resolution; thickness extrema and normal-map margin use a separate dense section with 16001 base stations. The script also checks the endpoint angles and half-turning condition, compares the written turning equation against the implementation, and verifies the endpoint integral using independent adaptive quadrature. The maximum endpoint discrepancy was below $4.1\times10^{-7}$ mm. These are geometric checks; aerodynamic loading and passage area require their own assessment.
 
+## 6. Compact location/concentration sensitivity
+
+The additional [turning sensitivity script](turning_sensitivity.py) fixes the inlet
+and outlet metal angles at $0^\circ$ and $70^\circ$, using `angle` interpolation.
+It generates two **5 by 3 figures**: rows fix the half-turning location at
+$\ell=0.3,0.4,0.5,0.6,0.7$; columns show $\beta(\xi)$, $d\beta/d\xi$, and the integrated
+camberline $\theta(m')$, respectively. The overview overlays concentrations
+$q=1.0,1.5,2.0,2.5,3.0$. The detailed study overlays solid curves at
+$q=1.0,1.1,1.2,1.3,1.4,1.5$ and dashed exploratory curves at $q=0.8,0.9$.
+Both figures use `plasma` colors sampled between 0.2 and 0.8.
+The script applies `turbodash.set_plot_options`; a boxed legend above the plots
+uses one decimal place for every concentration.
+
+The axial geometry uses a 15 mm meridional chord and a 50 mm radius, so
+$c'=c/R=0.3$. The last column plots the actual tangential/azimuth angle $\theta$
+against conformal meridional position $m'$, both in radians and with equal axis
+scales. It therefore preserves the camberline shape and its prescribed tangent
+directions. Open markers on the angle plots and colored dots on the camberlines
+identify the half-turning stations, where $\beta=35^\circ$ for every concentration.
+The figure defines both controls and annotates how higher concentration sharpens
+the transition. A callout identifies the special linear-angle case at $q=1$,
+$\ell=0.5$. All rows share the same limits within each column.
+
+![Compact camberline sensitivity matrix](figures/turning_sensitivity.png)
+[Open vector figure](figures/turning_sensitivity.svg).
+
+![Detailed turning-concentration sensitivity](figures/turning_sensitivity_detail.png)
+[Open detailed vector figure](figures/turning_sensitivity_detail.svg).
+
+For $0<q<1$, the angle law remains finite, continuous, and monotonic, with the
+same endpoint angles and half-turning condition. However, $d\beta/d\xi$ diverges
+at both endpoints: its leading behavior is proportional to $\xi^{q-1}$ at the
+inlet and $(1-\xi)^{q-1}$ at the outlet. Camberline tangent directions remain
+finite, but endpoint curvature is unbounded for this $0^\circ$ to $70^\circ$ case.
+These values illustrate an extension of the angle law; the production section
+builder still requires $q\ge1$. The script evaluates the exploratory angles
+directly without changing that requirement or building a finite-thickness blade.
+
+The detailed gradient panels retain limits set by the $q\ge1$ curves. Infinite
+endpoint samples are omitted from the dashed gradient lines, and upward markers
+show where their branches leave the plotted range. This displays the divergence
+without treating the endpoints as zero or drawing an artificial finite plateau.
+
+This matrix illustrates **both interior shape controls** and their interaction.
+It holds the two endpoint angles and the discrete interpolation choice fixed;
+separate angle sweeps and an `angle` versus `slope` comparison would be needed to
+illustrate every camberline input. Chord and radius additionally set the scale
+of the conformal coordinates. Thickness and blade count do not enter this study.
+
+Concentration $q=1$ gives a straight **angle-distribution** line only when
+$\ell=0.5$; at the other locations even this lowest concentration has a nonlinear
+angle distribution. Every geometric camberline here is curved because its inlet
+and outlet directions differ. The plotted derivative is with respect to normalized
+meridional position, not arclength, and is therefore distinct from curvature.
+
+Run from the repository root:
+
+```powershell
+.\.venv\Scripts\python.exe development/blade_parametrization/parametrization_camberline/turning_sensitivity.py
+```
+
+The script evaluates the production turning-angle function and integrates
+$d\theta/dm'=\tan\beta$ without building thickness or a cascade. It saves PNG/SVG
+figures and JSON check records for the [overview](results/turning_sensitivity.json)
+and [detailed study](results/turning_sensitivity_detail.json). There are 25 overview
+cases and 40 detailed cases, including 10 exploratory cases. Cosine-spaced samples
+resolve the endpoint behavior while keeping the integration tolerance fixed.
+Checks cover
+the endpoint and half-turning angles, monotonicity, the analytic derivative
+(using interior finite differences and exact endpoint limits), total angle change
+using adaptive quadrature, and camberline integration
+against adaptive quadrature and the linear-angle case's closed-form integral.
+
 ## Reproduce
 
 From the TurboDash repository root:

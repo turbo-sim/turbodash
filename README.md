@@ -9,6 +9,9 @@ Turbodash is an interactive application for the meanline design and optimization
 
 - Design single-stage and multistage axial and radial turbines.
 - Adjust operating conditions, reaction, velocity and radius ratios, blade geometry, and loss models.
+- Toggle the supersonic exit Mach profile-loss correction for Kacker-Okapuu,
+  Moustapha, and Benner in the app or YAML (off by default). See the
+  [loss correction settings](docs/source/guides/calculations.md#exit-mach-number-correction).
 - Optimize selected design variables with SLSQP, configurable bounds and constraints, recovery from invalid trial designs, and independent feasibility and KKT optimality checks.
 - Inspect meridional channel and blade-to-blade views, velocity triangles in Mach numbers or m/s, efficiency curves, and loss distributions.
 - Compare performance, geometry, and flow-station reports and export their tables.

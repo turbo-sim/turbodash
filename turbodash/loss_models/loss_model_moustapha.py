@@ -76,7 +76,9 @@ def compute_losses(input_parameters):
     Parameters
     ----------
     input_parameters : dict
-        A dictionary containing containing the keys, ``flow``, ``geometry`` and ``loss_model``.
+        A dictionary containing the keys ``flow``, ``geometry`` and ``loss_model``.
+        In ``loss_model``, optional boolean ``exit_mach_correction`` enables
+        the shared KO supersonic exit profile-loss multiplier (default False).
 
     Returns
     -------
@@ -97,20 +99,27 @@ def compute_losses(input_parameters):
     }
     geom_jax = {k: jnp.asarray(v) for k, v in geometry.items() if k in _GEOM_KEYS}
     losses = _compute_losses_moustapha_jit(
-        flow_jax, geom_jax, cascade_type_id, beta_des
+        flow_jax, geom_jax, cascade_type_id, beta_des,
+        exit_mach_correction=input_parameters.get("loss_model", {}).get(
+            "exit_mach_correction", False
+        ),
     )
     return losses
 
 
 def _compute_losses_moustapha_jit(
-    flow_parameters, geometry, cascade_type_id: int, beta_des
+    flow_parameters, geometry, cascade_type_id: int, beta_des, *,
+    exit_mach_correction=False,
 ):
     r"""
     Assemble Kacker–Okapuu profile, trailing, clearance and secondary components;
     multiply secondary by the Moustapha incidence correction and add own incidence.
     Historical name retained; no active JIT decoration.
     """
-    Y_p = lm_ko.get_profile_loss(flow_parameters, geometry, cascade_type_id)
+    Y_p = lm_ko.get_profile_loss(
+        flow_parameters, geometry, cascade_type_id,
+        exit_mach_correction=exit_mach_correction,
+    )
     Y_s = lm_ko.get_secondary_loss(flow_parameters, geometry, cascade_type_id)
     Y_cl = lm_ko.get_tip_clearance_loss(flow_parameters, geometry, cascade_type_id)
     Y_te = lm_ko.get_trailing_edge_loss(flow_parameters, geometry)

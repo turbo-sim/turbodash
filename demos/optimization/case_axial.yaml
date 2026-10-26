@@ -2,6 +2,7 @@
 # Geometry inputs use true-chord solidity c/s. Angles are in degrees.
 inputs:
   loss_model: benner
+  exit_mach_correction: false  # Enable the extra supersonic-exit profile-loss penalty.
   fluid_name: Air
   turbine_type: axial
   inlet_property_pair: PT_INPUTS

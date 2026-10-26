@@ -26,6 +26,7 @@ from turbodash.apps.shared.fluid_inputs import (
 )
 from turbodash.apps.shared.components.meshing import mesh_panel
 from turbodash.apps.shared.components.blade_modeller import geometry_panel
+from turbodash.apps.shared.loss_controls import exit_mach_control
 from .opt_panel import (
     actions as optimization_actions,
     panel as optimization_panel,
@@ -375,6 +376,7 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
                 clearable=False,
             ),
         ),
+        exit_mach_control(defaults),
     ]
     operating = [
         field(

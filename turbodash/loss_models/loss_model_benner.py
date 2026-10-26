@@ -89,7 +89,9 @@ def compute_losses(input_parameters):
     Parameters
     ----------
     input_parameters : dict
-        A dictionary containing containing the keys, ``flow``, ``geometry`` and ``loss_model``.
+        A dictionary containing the keys ``flow``, ``geometry`` and ``loss_model``.
+        In ``loss_model``, optional boolean ``exit_mach_correction`` enables
+        the shared KO supersonic exit profile-loss multiplier (default False).
 
     Returns
     -------
@@ -133,6 +135,7 @@ def compute_losses(input_parameters):
         options.get(
             "penetration_transition_half_width", PENETRATION_TRANSITION_HALF_WIDTH
         ),
+        exit_mach_correction=options.get("exit_mach_correction", False),
     )
     return losses
 
@@ -144,6 +147,8 @@ def _compute_losses_benner_jit(
     delta_height_ref,
     beta_des,
     penetration_transition_half_width=PENETRATION_TRANSITION_HALF_WIDTH,
+    *,
+    exit_mach_correction=False,
 ):
     r"""
     Assemble Benner with Kacker–Okapuu profile, trailing and clearance helpers.
@@ -163,7 +168,10 @@ def _compute_losses_benner_jit(
         delta_height,
         transition_half_width=penetration_transition_half_width,
     )
-    Y_p = lm_ko.get_profile_loss(flow_parameters, geometry, cascade_type_id)
+    Y_p = lm_ko.get_profile_loss(
+        flow_parameters, geometry, cascade_type_id,
+        exit_mach_correction=exit_mach_correction,
+    )
     Y_te = lm_ko.get_trailing_edge_loss(flow_parameters, geometry)
     Y_s = get_secondary_loss(flow_parameters, geometry, delta_height)
     Y_cl = lm_ko.get_tip_clearance_loss(flow_parameters, geometry, cascade_type_id)

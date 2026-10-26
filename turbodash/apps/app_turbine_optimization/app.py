@@ -13,6 +13,8 @@ into the same input fields and result views used for manual calculations.
 from turbodash.apps.shared.paths import SHARED_ASSETS_DIRECTORY
 from turbodash.apps.shared.documentation import register_documentation
 from turbodash.apps.shared.cli import run_app, run_cli
+from turbodash.apps.shared.loss_controls import register_loss_callbacks
+from turbodash.loss_models.options import validate_exit_mach_correction
 
 from pathlib import Path
 import base64
@@ -98,6 +100,7 @@ register_app_assets(
     app, Path(__file__).resolve().parent / "assets", "turbine-optimization"
 )
 server = app.server
+register_loss_callbacks(app)
 documentation_url = register_documentation(app)
 optimization_jobs.configure_sessions(server)
 
@@ -139,6 +142,7 @@ def cli(argv=None):
 # Overall (turbine-level) defaults.
 OVERALL_DEFAULTS = dict(
     loss_model="benner",
+    exit_mach_correction=False,
     fluid_name="Air",
     turbine_type="axial",
     inlet_property_pair="PT_INPUTS",
@@ -789,7 +793,9 @@ def live_config(overall_values, stage_values, overall_ids, stage_ids, store_stag
     overall = {d["key"]: v for d, v in zip(overall_ids or [], overall_values or [])}
     validate_inlet_inputs(overall)
     for key, value in overall.items():
-        if isinstance(OVERALL_DEFAULTS.get(key), (float, int)):
+        if isinstance(OVERALL_DEFAULTS.get(key), (float, int)) and not isinstance(
+            OVERALL_DEFAULTS.get(key), bool
+        ):
             if value is None or isinstance(value, bool) or not np.isfinite(value):
                 raise ValueError(f"Enter a finite value for {key.replace('_', ' ')}.")
     for key in (
@@ -902,6 +908,9 @@ def _assemble_cfg(overall, stages):
     defaults = stage_defaults_for(overall.get("turbine_type", OVERALL_DEFAULTS["turbine_type"]))
     inputs = {
         "loss_model": overall.get("loss_model", OVERALL_DEFAULTS["loss_model"]),
+        "exit_mach_correction": validate_exit_mach_correction(
+            overall.get("exit_mach_correction", False)
+        ),
         "fluid_name": overall.get("fluid_name", OVERALL_DEFAULTS["fluid_name"]),
         "turbine_type": overall.get("turbine_type", OVERALL_DEFAULTS["turbine_type"]),
         "inlet_property_pair": overall.get(

@@ -39,6 +39,46 @@ loss distribution**, and **Velocity triangles**. Expand **Performance reports**
 for numerical turbine, stage, and flow-station results. Save a design before
 changing operating conditions if you want to retain both versions.
 
+## Exit Mach number correction
+
+For **Kacker-Okapuu**, **Moustapha**, and **Benner**, the **Exit Mach number
+correction** checkbox appears beneath the loss-model selector. It is unchecked
+by default. The corresponding YAML input applies to every stator and rotor:
+
+```yaml
+inputs:
+  loss_model: benner
+  exit_mach_correction: false
+  # Other turbine inputs follow.
+```
+
+Set `exit_mach_correction: true` to multiply each row's profile-loss coefficient
+by the following factor, using absolute exit Mach number for a stator and
+relative exit Mach number for a rotor:
+
+$$
+f_{\mathrm{Ma}} =
+\begin{cases}
+1, & M_{\mathrm{exit}} \leq 1, \\
+1 + 60(M_{\mathrm{exit}}-1)^2, & M_{\mathrm{exit}} > 1.
+\end{cases}
+$$
+
+The penalty increases rapidly: the multiplier is 3.4 at Mach 1.2 and 16 at
+Mach 1.5. It represents conventional converging blading. Leave it unchecked
+when the stator or rotor is expected to have a supersonic design, such as
+converging-diverging blades designed using the method of characteristics.
+Hover over the question mark beside the checkbox for this guidance in the app.
+
+The multiplier acts on the complete profile term, including its inlet-shock
+contribution, before Benner's existing penetration weighting. It does not
+multiply secondary, trailing-edge, clearance, or incidence losses. Unchecking
+sets only this multiplier to one; the other compressibility and shock
+corrections remain active. The isentropic and custom loss models ignore this
+option. Files that omit the option retain the previous disabled behavior.
+Saving, loading, and starting a turbine app from YAML preserve the boolean.
+Optimization uses the chosen setting throughout the run.
+
 ## Read the results
 
 The geometry plots visualize the solved meanline and its blade profiles.

@@ -4,6 +4,7 @@ import numpy as np
 import jaxprop as jxp
 from .diffuser import normalize_diffuser_inputs, diffuser_settings
 from .interspaces import AXIAL_SPACING_FIELDS, add_interspace_geometry
+from ..loss_models.options import validate_exit_mach_correction
 
 from .errors import (
     ModelDomainError, ModelConsistencyError, model_context,
@@ -414,6 +415,7 @@ def compute_loss_coefficient(
     loss_coefficient="kinetic_energy",
     inlet_displacement_thickness_height_ratio=0.011,
     loss_model="benner",
+    exit_mach_correction=False,
 ):
     """
     Pack the {flow, geometry, loss_model} dict for one blade row and evaluate
@@ -422,6 +424,9 @@ def compute_loss_coefficient(
     empirical model uses the shared revised KO components. All
     thermodynamic/kinematic quantities are supplied by the
     caller (compute_stage_performance), so this function does no EOS work.
+
+    ``exit_mach_correction`` enables the additional supersonic exit
+    profile-loss multiplier in the three empirical models; default False.
  
     Under isentropic reconstruction the isentropic exit relative stagnation
     pressure equals the actual one, so p0_rel_is defaults to p0_rel_out.
@@ -465,6 +470,7 @@ def compute_loss_coefficient(
  
     loss_model = {
         "model": loss_model,
+        "exit_mach_correction": exit_mach_correction,
         "loss_coefficient": loss_coefficient,
         "inlet_displacement_thickness_height_ratio": (
             inlet_displacement_thickness_height_ratio
@@ -830,6 +836,7 @@ def compute_stage_performance(
     blade_geometry=None,
     turbine_type="axial",
     loss_model="benner",
+    exit_mach_correction=False,
 ):
     """
     Meanline turbine stage model with geometry sizing.
@@ -847,6 +854,10 @@ def compute_stage_performance(
     - Geometry (heights, height-to-radius ratio) from continuity
     - Continuous blade count from prescribed true-chord solidity
 
+    ``exit_mach_correction`` (default False) enables the supersonic exit
+    profile-loss multiplier for both rows, using absolute stator Mach and
+    relative rotor Mach. It affects Kacker--Okapuu, Moustapha and Benner only.
+
     Station numbering:
       1 = stator inlet
       2 = stator exit / rotor inlet
@@ -857,6 +868,7 @@ def compute_stage_performance(
     # ------------------------------------------------------------------
     # Inlet total state and local spouting velocity
     # ------------------------------------------------------------------
+    exit_mach_correction = validate_exit_mach_correction(exit_mach_correction)
     s_1 = state_in_0["s"]
     h_01 = state_in_0["h"]
     h_4s = state_out_s["h"]
@@ -1125,6 +1137,7 @@ def compute_stage_performance(
         gamma_out=state_2.heat_capacity_ratio,
         cascade_type="stator",
         loss_model=loss_model,
+        exit_mach_correction=exit_mach_correction,
     )
     total_loss_stator = stator_losses["loss_total"]
 
@@ -1147,6 +1160,7 @@ def compute_stage_performance(
         gamma_out=state_4.heat_capacity_ratio,
         cascade_type="rotor",
         loss_model=loss_model,
+        exit_mach_correction=exit_mach_correction,
     )
     total_loss_rotor = rotor_losses["loss_total"]
  
@@ -1374,6 +1388,9 @@ def compute_turbine_performance(cfg):
       ``nu`` only sets the anchor.
     - ``work_fraction_split`` values are relative weights, normalised
       internally.
+    - ``exit_mach_correction`` is an optional boolean, default False. When
+      True, Kacker--Okapuu, Moustapha and Benner apply the supersonic exit
+      profile-loss multiplier to every stator and rotor in every stage.
     - The interstage duct is loss-free: stagnation enthalpy and flow angle are
       conserved, and the rotor-exit swirl carries into the next stator inlet.
     """
@@ -1382,6 +1399,9 @@ def compute_turbine_performance(cfg):
     # ---------------------------------------------------------------
     normalized_inputs = normalize_diffuser_inputs(cfg.get("inputs", cfg))
     inp = normalized_inputs
+    exit_mach_correction = validate_exit_mach_correction(
+        inp.get("exit_mach_correction", False)
+    )
 
     if "stages" not in inp or not isinstance(inp["stages"], list):
         raise ValueError(
@@ -1602,6 +1622,7 @@ def compute_turbine_performance(cfg):
                 zweiffel_rotor=stg_current.get("zweiffel_rotor"),
                 turbine_type=turbine_type,
                 loss_model=inp["loss_model"],
+                exit_mach_correction=exit_mach_correction,
                 blade_geometry=stg_current["blade_geometry"],
             )
             # Label the stage. The only per-stage identifier carried in the output;

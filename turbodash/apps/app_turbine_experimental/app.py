@@ -6,6 +6,8 @@ until they are ready to become the default.
 
 from turbodash.apps.shared.paths import SHARED_ASSETS_DIRECTORY, DOCUMENTATION_FILE
 from turbodash.apps.shared.cli import run_app, run_cli
+from turbodash.apps.shared.loss_controls import exit_mach_control, register_loss_callbacks
+from turbodash.loss_models.options import validate_exit_mach_correction
 
 from pathlib import Path
 import os
@@ -52,6 +54,7 @@ app = Dash(
     external_stylesheets=[dbc.themes.BOOTSTRAP],
 )
 server = app.server
+register_loss_callbacks(app)
 register_vtk_assets(app)
 register_turbogrid_callbacks(app, results_store="geometry_results_store", modeller=True)
 register_meshing_callbacks(app, results_store="geometry_results_store", modeller=True)
@@ -81,6 +84,7 @@ def cli(argv=None):
 # Overall (turbine-level) defaults.
 OVERALL_DEFAULTS = dict(
     loss_model="benner",
+    exit_mach_correction=False,
     fluid_name="Air",
     turbine_type="axial",
     inlet_property_pair="PT_INPUTS",
@@ -494,6 +498,7 @@ def overall_accordion():
                 clearable=False,
             ),
         ),
+        exit_mach_control(OVERALL_DEFAULTS),
         # 4. Working fluid and the rest
         labeled(
             "Working fluid",
@@ -1110,6 +1115,9 @@ def _assemble_cfg(overall, stages):
     stages = stages or [dict(STAGE_DEFAULTS)]
     inputs = {
         "loss_model": overall.get("loss_model", OVERALL_DEFAULTS["loss_model"]),
+        "exit_mach_correction": validate_exit_mach_correction(
+            overall.get("exit_mach_correction", False)
+        ),
         "fluid_name": overall.get("fluid_name", OVERALL_DEFAULTS["fluid_name"]),
         "turbine_type": overall.get("turbine_type", OVERALL_DEFAULTS["turbine_type"]),
         "inlet_property_pair": overall.get(

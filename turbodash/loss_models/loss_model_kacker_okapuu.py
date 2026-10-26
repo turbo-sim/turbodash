@@ -22,6 +22,7 @@ from ._backend import jnp
 from . import _trailing_edge as trailing_edge
 from . import _blade_loading as blade_loading
 from .. import math
+from .options import validate_exit_mach_correction
 
 # Shared row identifiers: translate input names to the integer convention used
 # throughout the loss helpers and the Benner/Moustapha model wrappers.
@@ -78,7 +79,9 @@ def compute_losses(input_parameters):
     Parameters
     ----------
     input_parameters : dict
-        A dictionary containing containing the keys, ``flow``, ``geometry`` and ``loss_model``.
+        A dictionary containing the keys ``flow``, ``geometry`` and ``loss_model``.
+        In ``loss_model``, optional boolean ``exit_mach_correction`` enables
+        the supersonic exit profile-loss multiplier (default False).
 
     Returns
     -------
@@ -97,16 +100,26 @@ def compute_losses(input_parameters):
         k: jnp.asarray(v) for k, v in flow_parameters.items() if k in _FLOW_KEYS
     }
     geom_jax = {k: jnp.asarray(v) for k, v in geometry.items() if k in _GEOM_KEYS}
-    losses = _compute_losses_jit(flow_jax, geom_jax, cascade_type_id)
+    losses = _compute_losses_jit(
+        flow_jax, geom_jax, cascade_type_id,
+        exit_mach_correction=input_parameters.get("loss_model", {}).get(
+            "exit_mach_correction", False
+        ),
+    )
     return losses
 
 
-def _compute_losses_jit(flow_parameters, geometry, cascade_type_id: int):
+def _compute_losses_jit(
+    flow_parameters, geometry, cascade_type_id: int, *, exit_mach_correction=False
+):
     r"""
     Assemble the four Kacker–Okapuu components and zero incidence. Historical function
     name retained; this function is not JIT compiled.
     """
-    Y_p = get_profile_loss(flow_parameters, geometry, cascade_type_id)
+    Y_p = get_profile_loss(
+        flow_parameters, geometry, cascade_type_id,
+        exit_mach_correction=exit_mach_correction,
+    )
     Y_s = get_secondary_loss(flow_parameters, geometry, cascade_type_id)
     Y_cl = get_tip_clearance_loss(flow_parameters, geometry, cascade_type_id)
     Y_te = get_trailing_edge_loss(flow_parameters, geometry)
@@ -120,12 +133,14 @@ def _compute_losses_jit(flow_parameters, geometry, cascade_type_id: int):
     }
 
 
-def get_profile_loss(flow_parameters, geometry, cascade_type_id: int):
+def get_profile_loss(
+    flow_parameters, geometry, cascade_type_id: int, *, exit_mach_correction=False
+):
     r"""Return the Kacker--Okapuu profile pressure-loss coefficient.
 
     .. math::
 
-        Y_p=0.914f_\mathrm{Re}\left[\frac23 B(z;R,I)F_t(z,\tau)K_p
+        Y_p=0.914f_\mathrm{Re}f_\mathrm{Ma}\left[\frac23 B(z;R,I)F_t(z,\tau)K_p
                                    +Y_\mathrm{shock}\right],
         \qquad \tau=t_\mathrm{max}/c.
 
@@ -168,9 +183,13 @@ def get_profile_loss(flow_parameters, geometry, cascade_type_id: int):
     reference and shock terms; its nonzero high-Re limit keeps both
     contributions present during extreme size extrapolation.
 
-    K1,K2,Kp use their documented smooth continuations. The optional
-    1+60*(M2-1)^2 supersonic multiplier is disabled. No separate cap is
-    imposed on the complete Yp.
+    K1,K2,Kp use their documented smooth continuations. When
+    ``exit_mach_correction=True``, f_Ma=1+60*(M2-1)^2 above M2=1 and one
+    otherwise. This multiplier represents conventional converging blading;
+    leave it disabled for blades designed for supersonic operation, such as
+    converging-diverging sections designed with the method of characteristics.
+    The default is False (f_Ma=1). It multiplies the complete profile term,
+    including inlet shock loss. No separate cap is imposed on the complete Yp.
 
     Inputs
     ------
@@ -184,6 +203,7 @@ def get_profile_loss(flow_parameters, geometry, cascade_type_id: int):
     valid complex-step perturbations are retained. Invalid geometry,
     Machs or pressure states are not silently made physically admissible.
     """
+    exit_mach_correction = validate_exit_mach_correction(exit_mach_correction)
     Re = flow_parameters["Re_out"]
     Ma_rel_out = flow_parameters["Ma_rel_out"]
     Ma_rel_in = flow_parameters["Ma_rel_in"]
@@ -193,8 +213,6 @@ def get_profile_loss(flow_parameters, geometry, cascade_type_id: int):
     theta_in = geometry["leading_edge_angle"]
     t_max = geometry["maximum_thickness"]
     f_Re = get_reynolds_correction_factor(Re)
-    # The optional 1+60*(M2-1)^2 supersonic multiplier is deliberately
-    # disabled for now; keep f_Ma=1 rather than activating that extra growth.
     Y_shock = get_shock_loss(flow_parameters, geometry, cascade_type_id)["Y_shock"]
     Kp, K2, K1 = get_compressible_correction_factors(Ma_rel_in, Ma_rel_out)
     metal_angle_out = geometry.get("metal_angle_out", 1.)
@@ -207,9 +225,24 @@ def get_profile_loss(flow_parameters, geometry, cascade_type_id: int):
     thickness_factor = get_profile_thickness_factor(z, t_max / c)
     Y_p = Y_p * thickness_factor
     Y_p = 0.914 * (2 / 3 * Y_p * Kp + Y_shock)
-    f_Ma = 1.0
+    f_Ma = (
+        get_exit_mach_correction_factor(Ma_rel_out) if exit_mach_correction else 1.0
+    )
     Y_p = f_Re * f_Ma * Y_p
     return Y_p
+
+
+def get_exit_mach_correction_factor(Ma_rel_out):
+    """Return 1 below sonic exit and 1 + 60*(M_exit - 1)**2 above it.
+
+    Mach number is in the blade-row frame: absolute for a stator, relative
+    for a rotor. Arrays and complex-step perturbations are supported; the
+    real part selects the branch, preserving derivatives above Mach one.
+    This optional multiplier represents conventional converging blading.
+    """
+    mach = jnp.asarray(Ma_rel_out)
+    excess = jnp.where(jnp.real(mach) > 1.0, mach - 1.0, 0.0)
+    return 1.0 + 60.0 * excess**2
 
 
 # Common numerical angle coordinates, also used by clearance and secondary.

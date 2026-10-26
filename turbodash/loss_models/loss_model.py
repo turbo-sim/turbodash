@@ -10,6 +10,7 @@ from . import loss_model_benner as br
 from . import loss_model_kacker_okapuu as ko
 from . import loss_model_moustapha as mo
 from ._backend import jnp
+from .options import validate_exit_mach_correction
 
 LOSS_MODELS = ["kacker_okapuu", "moustapha", "benner", "isentropic", "custom"]
 LOSS_COEFFICIENTS = ["stagnation_pressure", "kinetic_energy"]
@@ -40,6 +41,9 @@ def _normalize_loss_options(loss_model_options):
     opts.setdefault("loss_coefficient", "stagnation_pressure")
     opts.setdefault("inlet_displacement_thickness_height_ratio", 0.011)
     opts.setdefault("tuning_factors", {})
+    opts["exit_mach_correction"] = validate_exit_mach_correction(
+        opts.get("exit_mach_correction", False)
+    )
     if opts["model"] == "custom" and "custom_value" not in opts:
         raise ValueError(
             "custom loss model requires 'custom_value' in loss_model_options"
@@ -75,7 +79,9 @@ def evaluate_loss_model(loss_model_options, input_parameters):
     loss_model_options : str or dict
         Model name or mapping containing ``model``, ``loss_coefficient``,
         optional reference inlet displacement-thickness ratio and optional
-        ``tuning_factors``. A custom model also requires ``custom_value``.
+        ``tuning_factors``. Set ``exit_mach_correction=True`` to enable the
+        supersonic exit profile-loss multiplier in Kacker--Okapuu, Moustapha
+        and Benner (default False). A custom model also requires ``custom_value``.
     input_parameters : dict
         Row-frame ``flow`` values and ``geometry``. Normalized options are
         supplied to the component model under the ``loss_model`` key.

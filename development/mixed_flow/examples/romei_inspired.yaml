@@ -1,0 +1,28 @@
+# Illustrative Romei-inspired slopes; not a reproduction of the paper geometry.
+# Engineering inputs: lengths in metres; angles in degrees.
+dimensions:
+  inlet_hub_radius: 0.025
+  inlet_shroud_radius: 0.065
+  outlet_radius: 0.100
+  outlet_width: 0.008
+  axial_length: 0.060
+  inlet_flow_angle_deg: 0.0
+  outlet_flow_angle_deg: 90.0
+hub:
+  inlet_angle_deg: 10.0
+  outlet_angle_deg: 90.0
+  inlet_tangent_fraction: 0.45
+  outlet_tangent_fraction: 0.45
+  bow: 0.0
+shroud:
+  inlet_angle_deg: 0.0
+  outlet_angle_deg: 85.0
+  inlet_tangent_fraction: 0.45
+  outlet_tangent_fraction: 0.45
+  bow: 0.0
+blade:
+  leading_hub: 0.10
+  leading_shroud: 0.0
+  trailing_hub: 1.0
+  trailing_shroud: 1.0
+splitter_start: 0.25

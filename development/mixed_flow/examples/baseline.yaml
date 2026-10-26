@@ -1,0 +1,13 @@
+# Engineering inputs: lengths in metres; angles in degrees.
+dimensions:
+  inlet_hub_radius: 0.025
+  inlet_shroud_radius: 0.065
+  outlet_radius: 0.1
+  outlet_width: 0.008
+  axial_length: 0.06
+  inlet_flow_angle_deg: 0.0
+  outlet_flow_angle_deg: 90.0
+hub: {}
+shroud: {}
+blade: {}
+splitter_start: 0.25

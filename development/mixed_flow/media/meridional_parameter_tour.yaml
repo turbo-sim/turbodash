@@ -1,0 +1,173 @@
+title: Meridional channel engineering parameter tour
+duration_seconds: 44.0
+frames_per_second: 12
+rendered_frames: 528
+video_resolution:
+- 1200
+- 720
+gif_resolution:
+- 960
+- 576
+formats:
+- gif
+length_units: m
+angle_units: degrees from positive axial direction
+baseline:
+  dimensions:
+    inlet_hub_radius: 0.025
+    inlet_shroud_radius: 0.065
+    outlet_radius: 0.1
+    outlet_width: 0.008
+    axial_length: 0.06
+    outlet_flow_angle_deg: 90.0
+    inlet_flow_angle_deg: 0.0
+  hub:
+    inlet_angle_deg: null
+    outlet_angle_deg: null
+    inlet_tangent_fraction: 0.45
+    outlet_tangent_fraction: 0.45
+    bow: 0.0
+  shroud:
+    inlet_angle_deg: null
+    outlet_angle_deg: null
+    inlet_tangent_fraction: 0.45
+    outlet_tangent_fraction: 0.45
+    bow: 0.0
+  blade:
+    leading_hub: 0.0
+    leading_shroud: 0.0
+    trailing_hub: 1.0
+    trailing_shroud: 1.0
+    leading_bow: 0.0
+    trailing_bow: 0.0
+  splitter_start: 0.25
+motion: Each chapter holds baseline, smoothly reaches the target, holds, and returns
+  to baseline.
+chapters:
+- start_seconds: 0.0
+  end_seconds: 4.0
+  title: Channel proportions
+  group: dimensions
+  field: axial_length
+  baseline: 0.06
+  target: 0.08
+  label: Axial length
+  units: mm
+  note: Change the axial distance between the inlet and outlet stations.
+  scale: 1000
+- start_seconds: 4.0
+  end_seconds: 8.0
+  title: Outlet passage width
+  group: dimensions
+  field: outlet_width
+  baseline: 0.008
+  target: 0.014
+  label: Outlet width
+  units: mm
+  note: The outlet radius stays fixed while the discharge passage opens.
+  scale: 1000
+- start_seconds: 8.0
+  end_seconds: 12.0
+  title: Inclined inlet
+  group: dimensions
+  field: inlet_flow_angle_deg
+  baseline: 0
+  target: 25
+  label: Inlet inclination
+  units: °
+  note: The inlet station and inherited wall tangents rotate together.
+  scale: 1.0
+- start_seconds: 12.0
+  end_seconds: 16.0
+  title: Mixed-flow outlet
+  group: dimensions
+  field: outlet_flow_angle_deg
+  baseline: 90
+  target: 55
+  label: Outlet inclination
+  units: °
+  note: Move continuously from a radial outlet towards mixed flow.
+  scale: 1.0
+- start_seconds: 16.0
+  end_seconds: 20.0
+  title: Independent hub slope
+  group: hub
+  field: inlet_angle_deg
+  baseline: 0
+  target: 20
+  label: Hub inlet tangent
+  units: °
+  note: Only the hub wall changes; its inlet and outlet points stay fixed.
+  scale: 1.0
+- start_seconds: 20.0
+  end_seconds: 24.0
+  title: Shroud turning distribution
+  group: shroud
+  field: outlet_tangent_fraction
+  baseline: 0.45
+  target: 0.75
+  label: Shroud outlet tangent reach
+  units: ''
+  note: Extend the influence of the outlet tangent without moving the endpoints.
+  scale: 1.0
+- start_seconds: 24.0
+  end_seconds: 28.0
+  title: Independent shroud bow
+  group: shroud
+  field: bow
+  baseline: 0
+  target: 0.05
+  label: Shroud bow / chord
+  units: ''
+  note: Add normal displacement while preserving endpoint positions and slopes.
+  scale: 1.0
+- start_seconds: 28.0
+  end_seconds: 32.0
+  title: Blade leading-edge sweep
+  group: blade
+  field: leading_hub
+  baseline: 0
+  target: 0.27
+  label: Hub leading-edge fraction
+  units: ''
+  note: Move the hub leading edge downstream; the channel walls do not change.
+  scale: 1.0
+- start_seconds: 32.0
+  end_seconds: 36.0
+  title: Bowed leading edge
+  group: blade
+  field: leading_bow
+  baseline: 0
+  target: 0.2
+  label: Leading-edge bow
+  units: ''
+  note: Move the edge interior downstream while keeping both wall intersections fixed.
+  scale: 1.0
+- start_seconds: 36.0
+  end_seconds: 40.0
+  title: Independent blade cutback
+  group: blade
+  field: trailing_hub
+  baseline: 1
+  target: 0.8
+  label: Hub trailing-edge fraction
+  units: ''
+  note: Trim the blade inside the existing channel without changing the casing.
+  scale: 1.0
+- start_seconds: 40.0
+  end_seconds: 44.0
+  title: Splitter placement
+  group: splitter
+  field: start_fraction
+  baseline: 0.25
+  target: 0.5
+  label: Splitter start fraction
+  units: ''
+  note: Shorten the splitter from its inlet; its trailing edge stays with the main
+    blade.
+  scale: 1.0
+notes:
+- Every frame is evaluated and validated by the meridional geometry kernel.
+- Blade edge and splitter fractions use the channel s coordinate, which is normalized
+  wall arclength at hub and shroud.
+- Geometric area excludes blade blockage and is not the blade-passage throat.

@@ -185,7 +185,11 @@ model includes no gap-length loss or performance penalty.
 Use **Start optimization** at the bottom of the left sidebar. The button and
 status remain visible while scrolling or collapsing the Meanline editor.
 On narrow screens, open the parameter drawer to access them. The optimization
-terminal opens at the bottom of the results area when a run starts.
+terminal's expandable header stays at the bottom of the outputs on the right.
+It starts closed and opens only when clicked, with its own scrolling output area.
+Starting or finishing a run preserves your choice. After the solve finishes,
+PySolverView appends the design-variable, constraint, KKT, and multiplier reports
+to the convergence history.
 
 Inspect the termination status, constraint residuals, and resulting design.
 **Applied successfully** means both the sidebar inputs and displayed results

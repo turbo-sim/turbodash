@@ -192,10 +192,13 @@ as many independent design variables.
 **Start optimization** uses the live design. The sidebar stays busy while a
 subprocess solves and while the successful design is applied to all controls
 and plots. Other panes remain interactive. The expandable **Optimization
-terminal** below the meanline results shows the main PySolverView frontend's
-single optimization report, plus any clipping or error diagnostics. Its objective is signed and normalized for
-minimization; the separate progress summary shows the physical objective.
-The terminal follows new output until you scroll up.
+terminal** stays below the outputs on the right, with its header always visible.
+It starts closed and opens only when clicked; runs preserve your choice.
+It shows PySolverView's convergence history and then its final design-variable,
+constraint, KKT, and multiplier reports, plus any clipping or error diagnostics.
+The final report reuses the completed solve's cached assessment. Its objective
+is signed and normalized for minimization; the separate progress summary shows
+the physical objective. The terminal follows new output until you scroll up.
 
 Only converged results that pass final feasibility and first-order checks update the inputs, geometry, performance,
 tables, and downstream geometry/mesh signatures. Failed solves retain the last

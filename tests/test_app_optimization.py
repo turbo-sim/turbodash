@@ -486,6 +486,15 @@ class JobTests(unittest.TestCase):
             self.assertIn("Success: True", log)
             self.assertIn("Grad-eval", log)
             self.assertIn("Exit message:", log)
+            for title in (
+                "Optimization variables report (physical values)",
+                "Optimization variables report (normalized values)",
+                "Optimization constraints report",
+                "Karush-Kuhn-Tucker (KKT) conditions",
+                "Lagrange multipliers report",
+            ):
+                self.assertEqual(log.count(title), 1, log)
+                self.assertGreater(log.index(title), log.index("Exit message:"))
             for duplicate in ("Optimizing turbine ·", "PSV Func-value", "physical objective",
                               "Model evaluations:", "SUCCESS ·"):
                 self.assertNotIn(duplicate, log)
@@ -575,6 +584,10 @@ class JobTests(unittest.TestCase):
         self.assertEqual(result["solver_status"], 11)
         self.assertIn("No valid line-search trial", result["message"])
         self.assertAlmostEqual(result["objective"], .9068481151, places=7)
+        self.assertIn("Success: False", log)
+        self.assertIn("Optimization variables report (physical values)", log)
+        self.assertIn("Optimization constraints report", log)
+        self.assertIn("Karush-Kuhn-Tucker (KKT) conditions", log)
 
     def test_unexpected_worker_exit_and_expired_or_invalid_handles(self):
         config = case()
@@ -663,6 +676,8 @@ class WorkspaceTests(unittest.TestCase):
         self.assertEqual(presentation[1], "false")
         self.assertEqual(presentation[4:], ("Start optimization", "danger"))
         self.assertEqual(running[8], "running")
+        self.assertIs(failed[7], no_update)
+        self.assertIs(running[7], no_update)
         self.assertEqual(outcome_presentation(running[8])[1], "true")
         # Starting a new run clears the green outcome before launch completes.
         self.assertEqual(outcome_presentation("success", launching=True)[-1], "primary")

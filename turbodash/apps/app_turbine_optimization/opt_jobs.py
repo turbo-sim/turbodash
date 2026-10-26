@@ -4,8 +4,9 @@ Each run belongs to a browser session and receives a saved copy of its turbine
 inputs and optimization settings. A separate Python process calls
 ``turbodash.optimization.optimize_turbine``, keeping the web interface responsive
 while publishing the PySolverView frontend's convergence log, physical progress
-snapshots, and the final result. The worker logger receives the frontend report
-directly; the app does not format a separate numerical report.
+snapshots, and the final result. The worker logger receives the frontend's
+convergence history and cached final optimization report directly; the app
+does not format a separate numerical report.
 
 This module manages session ownership, concurrent-run limits, timeouts, and
 expired jobs. Complete JSON snapshots are published through atomic file
@@ -286,6 +287,14 @@ def _run_worker(request_path):
             _write_json(folder / "progress.json", snapshot)
 
         result = optimize_turbine(request["config"], request["optimization"], callback=progress, logger=logger)
+        # PySolverView renders its cached final assessment into the same logger
+        # as the convergence history, including completed unsuccessful solves.
+        # Finish the report before publishing completion to the polling client.
+        result.optimizer.print_optimization_report(
+            include_design_variables=True, include_constraints=True,
+            include_kkt_conditions=True, include_multipliers=True,
+            to_console=False,
+        )
         payload = dict(config=result.config, turbine_results=result.turbine_results,
                        success=result.success, solver_success=result.solver_success, feasible=result.feasible,
                        message=result.message, objective=result.objective, initial_objective=result.initial_objective,

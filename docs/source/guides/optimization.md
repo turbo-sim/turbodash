@@ -304,6 +304,14 @@ The terminal reports the signed, normalized objective that SLSQP minimizes.
 The app and public callback history show physical objectives and variables.
 Step and KKT diagnostics use solver normalization in both places.
 
+The expandable terminal stays anchored below the outputs on the right while
+the results and input panels scroll independently. It starts closed, and runs
+never change whether you have opened or closed it. Once a solve completes, its
+convergence history is followed by PySolverView's final report of physical and
+normalized design variables, constraints, KKT conditions, and multipliers. This
+also applies to completed unsuccessful solves. Reporting reuses the cached
+final assessment without additional model or derivative evaluations.
+
 The Python API preserves both frontend and backend views of the solve:
 
 | Result | Coordinates and evaluation counts |

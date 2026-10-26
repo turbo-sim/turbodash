@@ -17,6 +17,28 @@ from browser_picker_helpers import choose_path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def assert_console_docked(page):
+    """The terminal stays beneath the outputs while the results scroll."""
+    bounds = page.locator("#opt-terminal").evaluate("""terminal => {
+        const rect = terminal.getBoundingClientRect();
+        const summary = terminal.querySelector(':scope > summary');
+        const header = summary.getBoundingClientRect();
+        const canvas = document.querySelector('.td-canvas').getBoundingClientRect();
+        const output = document.querySelector('.td-output-column').getBoundingClientRect();
+        const hit = document.elementFromPoint(header.left + header.width / 2,
+                                              header.top + header.height / 2);
+        return {bottom: rect.bottom, viewport: innerHeight, top: header.top,
+                canvasBottom: canvas.bottom, terminalTop: rect.top,
+                left: rect.left, right: rect.right, outputLeft: output.left, outputRight: output.right,
+                reachable: !!hit && summary.contains(hit)};
+    }""")
+    assert abs(bounds["bottom"] - bounds["viewport"]) <= 1, bounds
+    assert bounds["top"] >= 0 and bounds["reachable"], bounds
+    assert bounds["canvasBottom"] <= bounds["terminalTop"] + 1, bounds
+    assert abs(bounds["left"] - bounds["outputLeft"]) <= 1, bounds
+    assert abs(bounds["right"] - bounds["outputRight"]) <= 1, bounds
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", default="http://127.0.0.1:8062")
@@ -68,6 +90,14 @@ def main():
             expect(page.locator("#td-inlet-pair input")).to_have_attribute("aria-label", "Inlet property pair")
             assert page.locator(".td-brand").inner_text() == "turbodash"
             assert page.evaluate("getComputedStyle(document.getElementById('design-controls')).backgroundColor") == "rgb(248, 250, 253)"
+            assert_console_docked(page)
+            page.locator(".td-canvas").evaluate("canvas => { canvas.scrollTop = canvas.scrollHeight; }")
+            assert_console_docked(page)
+            page.locator("#opt-terminal > summary").click()
+            assert_console_docked(page)
+            page.locator("#opt-terminal > summary").click()
+            page.locator(".td-canvas").evaluate("canvas => { canvas.scrollTop = 0; }")
+            checks.append("Collapsed and expanded console stays docked when the results canvas scrolls")
 
             def assert_optimization_available():
                 button = page.locator(".td-optimization-dock #opt-start")
@@ -345,6 +375,8 @@ def main():
             expect(page.locator("#opt-actions")).to_have_class("td-optimization-dock td-opt-state-success", timeout=120000)
             expect(page.locator("#opt-state-label")).to_contain_text("Applied")
             expect(page.locator("#opt-start")).to_have_class("td-opt-start btn btn-success")
+            expect(page.locator("#opt-terminal")).to_have_js_property("open", False)
+            page.locator("#opt-terminal > summary").click()
             expect(page.locator("#opt-terminal")).to_have_js_property("open", True)
             checks.append("Optimization editor add/remove and real background solve complete through redesigned controls")
             checks.append("Parameter search reveals controls in inactive optimization tabs")
@@ -360,6 +392,7 @@ def main():
             page.locator('.td-theme-toggle [data-theme="light"]').click()
             page.locator("#td-collapse-all").click()
             page.set_viewport_size({"width": 390, "height": 844})
+            assert_console_docked(page)
             expect(page.locator("#design-controls")).to_be_hidden()
             expect(page.locator("#opt-start")).to_be_hidden()
             page.locator("#td-inspector-toggle").click()

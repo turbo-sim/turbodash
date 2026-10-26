@@ -330,7 +330,12 @@ def test_results_disclosures_keep_live_graphs_and_optimization_action_mounted():
     assert by_id["opt-status"] in list(components(dock))
     assert by_id["opt-start"] not in list(components(by_id["opt-panel"]))
     assert dock in list(components(by_id["design-controls"]))
-    assert by_id["opt-terminal"] in list(components(by_id["meanline_pane"]))
+    terminal = by_id["opt-terminal"]
+    assert terminal in by_id["td-output-column"].children
+    assert terminal not in by_id["td-workbench"].children
+    assert terminal not in list(components(by_id["design-controls"]))
+    assert terminal.open is False
+    assert terminal not in list(components(by_id["meanline_pane"]))
     assert sum(getattr(item, "id", None) == "opt-start" for item in mounted) == 1
     assert by_id["td-documentation-link"].href == "/docs/"
     assert by_id["td-documentation-link"].target == "_blank"

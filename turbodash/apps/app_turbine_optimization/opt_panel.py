@@ -108,11 +108,12 @@ def panel():
 
 
 def terminal():
+    """Keep the expandable run log and final report in the workbench's dock."""
     return html.Details([
         html.Summary(["Optimization terminal", html.Span("SLSQP", className="td-opt-badge")]),
-        html.Pre("Convergence output will appear here when you start a run.", id="opt-log", tabIndex=0,
-                 **{"aria-label": "Optimization convergence output"}),
-    ], id="opt-terminal", className="td-opt-terminal")
+        html.Pre("Convergence output and the final optimization report will appear here when you start a run.",
+                 id="opt-log", tabIndex=0, **{"aria-label": "Optimization output and final report"}),
+    ], id="opt-terminal", className="td-opt-terminal", open=False)
 
 
 def actions():
@@ -517,11 +518,11 @@ def register_callbacks(app, live_config, render_results):
                 settings = build_settings(config, variables, constraints, *values[10:15], results=values[15],
                                           solver_options=extra_solver_options(values[16:-1], values[-1]))
                 handle = jobs.start_job(config, settings, owner)
-                return handle, "Optimizing turbine…", "Starting a fresh optimization run…", None, "Preparing initial design…", no_update, no_update, True, "running"
+                return handle, "Optimizing turbine…", "Starting a fresh optimization run…", None, "Preparing initial design…", no_update, no_update, no_update, "running"
             except PreventUpdate:
                 raise
             except Exception as error:
-                return None, f"Could not start: {error}", f"ERROR: {error}", None, "", no_update, no_update, True, "failed"
+                return None, f"Could not start: {error}", f"ERROR: {error}", None, "", no_update, no_update, no_update, "failed"
         if not handle:
             raise PreventUpdate
         try:
@@ -535,7 +536,7 @@ def register_callbacks(app, live_config, render_results):
                     # The inspector remains editable while jobs run. A user may
                     # have changed the design after the optimized values arrived;
                     # never overwrite those edits with the pre-run configuration.
-                    return None, "Optimization application was not confirmed. Current inputs retained.", no_update, no_update, "", no_update, no_update, True, "unconfirmed"
+                    return None, "Optimization application was not confirmed. Current inputs retained.", no_update, no_update, "", no_update, no_update, no_update, "unconfirmed"
                 raise PreventUpdate
             status, log, progress, result = jobs.read_job(handle, owner)
             summary = (f"Update {progress['iteration']} · objective {progress['objective']:.7g} · violation {progress['max_constraint_violation']:.3g}" if progress else "Preparing initial design…")
@@ -568,7 +569,7 @@ def register_callbacks(app, live_config, render_results):
         except PreventUpdate:
             raise
         except Exception as error:
-            return None, f"Optimization stopped: {error}", f"ERROR: {error}", no_update, "", no_update, no_update, True, "failed"
+            return None, f"Optimization stopped: {error}", f"ERROR: {error}", no_update, "", no_update, no_update, no_update, "failed"
 
     @app.callback(
         Output("opt-actions", "className"), Output("opt-actions", "aria-busy"),

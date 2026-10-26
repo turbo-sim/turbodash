@@ -66,7 +66,7 @@
   background: transparent; font-size: 11px;
 }
 .td-workbench .td-theme-toggle button[aria-pressed="true"] { background: var(--td-tint); color: var(--td-accent); font-weight: 650; }
-.td-workbench .td-shell { display: flex; align-items: stretch; flex: 1; min-height: 0; }
+.td-workbench .td-shell { position: relative; display: flex; align-items: stretch; flex: 1; min-height: 0; }
 .td-workbench .td-workspace-rail {
   flex: 0 0 var(--td-rail-width); width: var(--td-rail-width); padding: 17px 9px;
   border-right: 1px solid var(--td-line); background: var(--td-panel);
@@ -266,7 +266,8 @@
 .td-workbench .form-check-label { color: var(--td-ink); }
 .td-workbench .form-check-input { background-color: var(--td-input); border-color: var(--td-muted); }
 .td-workbench .form-check-input:checked { background-color: var(--td-accent); border-color: var(--td-accent); }
-.td-workbench .td-canvas { flex: 1; min-width: 0; overflow-y: auto; padding: 26px 25px 45px; scrollbar-width: thin; }
+.td-workbench .td-output-column { display: flex; flex-direction: column; flex: 1; min-width: 0; min-height: 0; }
+.td-workbench .td-canvas { flex: 1; min-width: 0; min-height: 0; overflow-y: auto; padding: 26px 25px 45px; scrollbar-width: thin; }
 .td-workbench .td-canvas h2 { font-size: 25px; font-weight: 600; }
 .td-workbench .td-canvas h5 { font-size: 14px; font-weight: 600; }
 .td-workbench .td-view-heading { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 21px; }
@@ -358,9 +359,9 @@
 .td-workbench .td-row-settings > summary { padding: 12px 0; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--td-ink); background: var(--td-panel); border-color: var(--td-line); }
 .td-workbench .td-engineering-plot > h5, .td-workbench .td-plot-group > h5 { color: var(--td-ink); background: var(--td-panel); border-color: var(--td-line); }
 .td-workbench .td-row-settings .td-parameter { width: 100%; }
-.td-workbench .td-opt-terminal { border-color: var(--td-line); background: var(--td-panel); }
-.td-workbench .td-opt-terminal > summary { background: var(--td-panel); color: var(--td-ink); font-size: 12px; font-weight: 500; }
-.td-workbench .td-opt-terminal pre { background: var(--td-input); color: var(--td-ink); }
+.td-workbench .td-output-column > .td-opt-terminal { flex: 0 0 auto; min-width: 0; margin: 0; border-width: 1px 0 0; border-radius: 0; border-color: var(--td-line); background: var(--td-panel); }
+.td-workbench .td-output-column > .td-opt-terminal > summary { min-height: 44px; padding: 11px 16px; background: var(--td-panel); color: var(--td-ink); font-size: 12px; font-weight: 500; }
+.td-workbench .td-output-column > .td-opt-terminal pre { height: min(340px,40vh); height: min(340px,40dvh); min-height: 0; max-height: none; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; background: var(--td-input); color: var(--td-ink); }
 .td-workbench .td-optimization-dock { flex: 0 0 auto; display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; border-top: 1px solid var(--td-line); background: var(--td-panel); }
 .td-workbench:not([data-workspace="meanline"]) .td-optimization-dock { display: none; }
 .td-workbench .td-optimization-status { min-width: 0; font-size: 12px; }
@@ -466,9 +467,9 @@
   .td-workbench .td-header-actions { gap: 5px; }
   .td-workbench .td-header .btn, .td-workbench .td-action { padding: 7px 9px; font-size: 11px; }
   .td-workbench #td-inspector-toggle { display: inline-flex; }
-  .td-workbench .td-inspector { display: none; position: fixed; top: var(--td-inspector-top,var(--td-header-height)); bottom: 0; left: var(--td-rail-width); z-index: 60; width: min(380px,calc(100vw - var(--td-rail-width))); box-shadow: var(--td-shadow); }
+  .td-workbench .td-inspector { display: none; position: absolute; top: 0; bottom: 0; left: var(--td-rail-width); z-index: 60; width: min(380px,calc(100vw - var(--td-rail-width))); box-shadow: var(--td-shadow); }
   .td-workbench.td-inspector-open .td-inspector { display: flex; }
-  .td-workbench.td-inspector-open .td-inspector-backdrop { display: block; position: fixed; inset: var(--td-inspector-top,var(--td-header-height)) 0 0 var(--td-rail-width); z-index: 55; background: #08142370; border: 0; }
+  .td-workbench.td-inspector-open .td-inspector-backdrop { display: block; position: absolute; inset: 0 0 0 var(--td-rail-width); z-index: 55; background: #08142370; border: 0; }
   .td-workbench #td-inspector-resize { display: none; }
   .td-workbench .td-canvas { padding: 21px 16px; }
 }

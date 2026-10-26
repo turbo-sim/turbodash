@@ -718,130 +718,135 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
                         className="td-inspector-backdrop",
                         **{"aria-label": "Close design controls"},
                     ),
-                    html.Main(
+                    html.Div(
                         [
-                            html.Div(
-                                id="td-load-error",
-                                role="alert",
-                                className="td-validation",
-                            ),
-                            html.Div(
-                                id="td-calculation-status",
-                                role="status",
-                                className="td-calculation-status",
-                            ),
-                            html.Div(
-                                id="td-job-status",
-                                role="status",
-                                className="td-job-status",
-                            ),
-                            html.Div(
+                            html.Main(
                                 [
                                     html.Div(
-                                        [
-                                            html.Div(
-                                                [
-                                                    html.Span(
-                                                        "TURBINE PERFORMANCE",
-                                                        className="td-eyebrow",
-                                                    ),
-                                                    html.H1("Meanline design"),
-                                                ]
-                                            ),
-                                            html.Span(
-                                                "Waiting for results",
-                                                id="td-results-label",
-                                                className="td-result-badge",
-                                            ),
-                                        ],
-                                        className="td-view-heading",
+                                        id="td-load-error",
+                                        role="alert",
+                                        className="td-validation",
                                     ),
                                     html.Div(
-                                        metric_cards(None),
-                                        id="td-metrics",
-                                        className="td-metrics",
+                                        id="td-calculation-status",
+                                        role="status",
+                                        className="td-calculation-status",
                                     ),
-                                    html.Details(
+                                    html.Div(
+                                        id="td-job-status",
+                                        role="status",
+                                        className="td-job-status",
+                                    ),
+                                    html.Div(
                                         [
-                                            html.Summary("Turbine geometry"),
                                             html.Div(
                                                 [
-                                                    plot_card(
-                                                        "Meridional channel view", "meridional_plot"
+                                                    html.Div(
+                                                        [
+                                                            html.Span(
+                                                                "TURBINE PERFORMANCE",
+                                                                className="td-eyebrow",
+                                                            ),
+                                                            html.H1("Meanline design"),
+                                                        ]
                                                     ),
-                                                    plot_card(
-                                                        "Blade-to-blade view", "blades_plot"
+                                                    html.Span(
+                                                        "Waiting for results",
+                                                        id="td-results-label",
+                                                        className="td-result-badge",
                                                     ),
                                                 ],
-                                                className="td-plot-pair",
+                                                className="td-view-heading",
                                             ),
-                                        ],
-                                        id="td-geometry-plots",
-                                        className="td-results-disclosure",
-                                        open=True,
-                                    ),
-                                    html.Details(
-                                        [
-                                            html.Summary("Efficiency and loss distribution"),
                                             html.Div(
-                                                [
-                                                    plot_card(
-                                                        "Efficiency vs blade velocity ratio",
-                                                        "efficiency_trends_plot",
-                                                    ),
-                                                    plot_card("Efficiency penalties by loss mechanism", "loss_plot"),
-                                                ],
-                                                className="td-plot-pair",
+                                                metric_cards(None),
+                                                id="td-metrics",
+                                                className="td-metrics",
                                             ),
-                                        ],
-                                        id="td-efficiency-plots",
-                                        className="td-results-disclosure",
-                                        open=True,
-                                    ),
-                                    html.Details(
-                                        [
-                                            html.Summary("Velocity triangles"),
-                                            html.Div(
+                                            html.Details(
                                                 [
-                                                    html.Span("Display"),
-                                                    dcc.RadioItems(
-                                                        id="td-triangle-mode",
-                                                        options=[
-                                                            {"label": "Mach numbers", "value": "mach"},
-                                                            {"label": "Velocity [m/s]", "value": "velocity"},
+                                                    html.Summary("Turbine geometry"),
+                                                    html.Div(
+                                                        [
+                                                            plot_card(
+                                                                "Meridional channel view", "meridional_plot"
+                                                            ),
+                                                            plot_card(
+                                                                "Blade-to-blade view", "blades_plot"
+                                                            ),
                                                         ],
-                                                        value="mach",
-                                                        className="td-segmented",
-                                                        persistence=True,
-                                                        persistence_type="session",
+                                                        className="td-plot-pair",
                                                     ),
                                                 ],
-                                                className="td-plot-toolbar",
+                                                id="td-geometry-plots",
+                                                className="td-results-disclosure",
+                                                open=True,
                                             ),
-                                            html.Div(id="triangles_container"),
+                                            html.Details(
+                                                [
+                                                    html.Summary("Efficiency and loss distribution"),
+                                                    html.Div(
+                                                        [
+                                                            plot_card(
+                                                                "Efficiency vs blade velocity ratio",
+                                                                "efficiency_trends_plot",
+                                                            ),
+                                                            plot_card("Efficiency penalties by loss mechanism", "loss_plot"),
+                                                        ],
+                                                        className="td-plot-pair",
+                                                    ),
+                                                ],
+                                                id="td-efficiency-plots",
+                                                className="td-results-disclosure",
+                                                open=True,
+                                            ),
+                                            html.Details(
+                                                [
+                                                    html.Summary("Velocity triangles"),
+                                                    html.Div(
+                                                        [
+                                                            html.Span("Display"),
+                                                            dcc.RadioItems(
+                                                                id="td-triangle-mode",
+                                                                options=[
+                                                                    {"label": "Mach numbers", "value": "mach"},
+                                                                    {"label": "Velocity [m/s]", "value": "velocity"},
+                                                                ],
+                                                                value="mach",
+                                                                className="td-segmented",
+                                                                persistence=True,
+                                                                persistence_type="session",
+                                                            ),
+                                                        ],
+                                                        className="td-plot-toolbar",
+                                                    ),
+                                                    html.Div(id="triangles_container"),
+                                                ],
+                                                id="td-triangle-plots",
+                                                className="td-results-disclosure",
+                                                open=True,
+                                            ),
+                                            html.Details(
+                                                [html.Summary("Performance reports"),
+                                                 html.Div(report_tabs, className="td-report-content")],
+                                                id="tables_container",
+                                                className="td-report-card td-results-disclosure",
+                                                open=True,
+                                            ),
                                         ],
-                                        id="td-triangle-plots",
-                                        className="td-results-disclosure",
-                                        open=True,
+                                        id="meanline_pane",
+                                        style={"display": "block"},
                                     ),
-                                    html.Details(
-                                        [html.Summary("Performance reports"),
-                                         html.Div(report_tabs, className="td-report-content")],
-                                        id="tables_container",
-                                        className="td-report-card td-results-disclosure",
-                                        open=True,
+                                    html.Div(
+                                        geometry, id="geometry_pane", style={"display": "none"}
                                     ),
-                                    optimization_terminal(),
+                                    html.Div(mesh, id="mesh_pane", style={"display": "none"}),
                                 ],
-                                id="meanline_pane",
-                                style={"display": "block"},
+                                className="td-canvas",
                             ),
-                            html.Div(
-                                geometry, id="geometry_pane", style={"display": "none"}
-                            ),
-                            html.Div(mesh, id="mesh_pane", style={"display": "none"}),
+                            optimization_terminal(),
                         ],
-                        className="td-canvas",
+                        id="td-output-column", className="td-output-column",
                     ),
                 ],
                 className="td-shell",

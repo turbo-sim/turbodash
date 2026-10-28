@@ -4,12 +4,14 @@ import copy
 from contextlib import redirect_stdout
 from io import StringIO
 import logging
+import json
 from pathlib import Path
 import unittest
 from unittest.mock import patch
 from uuid import uuid4
 
 import numpy as np
+import pytest
 from scipy.optimize import OptimizeResult
 import yaml
 
@@ -17,7 +19,6 @@ import pysolver_view as psv
 
 from turbodash import optimization as opt
 from turbodash.core.errors import ModelDomainError
-
 
 EXAMPLE_DIRECTORY = Path(__file__).resolve().parents[1] / "demos" / "optimization"
 
@@ -601,6 +602,98 @@ class RealTurbineOptimizationTests(unittest.TestCase):
                 self.assertGreater(len(progress), 1)
                 for entry in progress:
                     self.assertEqual(entry["turbine_results"]["inputs"], entry["config"]["inputs"])
+
+
+@pytest.mark.parametrize("solver_id", ["pounce_ipm", "pounce_sqp"])
+def test_pounce_solver_preserves_physical_result_native_status_and_progress(
+    solver_id, tmp_path
+):
+    """Both native methods solve a real constrained API case with truthful hooks."""
+    pytest.importorskip("pounce")
+    config, optimization = synthetic_problem()
+    optimization["solver"] = solver_id
+    optimization["solver_options"] = {
+        "ftol": 1e-8,
+        "maxiter": 100,
+        "finite_diff_step": 1e-6,
+        "optimality_tol": 1e-6,
+        "print_convergence": False,
+    }
+    snapshots = []
+    result = opt.optimize_turbine(
+        config, optimization, evaluator=synthetic_turbine, callback=snapshots.append
+    )
+    assert result.success, result.message
+    assert result.feasible
+    assert result.objective == pytest.approx(1.6, abs=1e-5)
+    assert result.solver.optimizer_id == solver_id
+    assert result.solver.library == "pounce"
+    assert result.solver.method == ("ipm" if solver_id == "pounce_ipm" else "sqp")
+    assert result.solver.status == 5
+    assert result.solver.stopped_on_kkt
+    assert not result.solver_success
+    assert result.frontend_result.kkt_passed
+    assert result.history[-1]["kkt_ratio"] <= 1
+    assert result.config["optimization"]["solver"] == solver_id
+    assert "first_step_fraction" not in result.config["optimization"]["solver_options"]
+    assert len(snapshots) > 1
+    assert all(row["accepted"] is None for row in snapshots)
+    assert all(row["event_kind"] == "native_iteration" for row in snapshots)
+    assert all(row["solver"] == solver_id for row in snapshots)
+    assert result.solver.native_history
+    np.testing.assert_allclose(
+        result.solver.x_final, list(result.design_variables.values())
+    )
+    assert result.solver.convergence_history["kkt_ratio"][-1] <= 1
+    json.dumps(snapshots, allow_nan=False)
+    written = opt.save_optimization_results(result, tmp_path)
+    exported = yaml.safe_load(
+        written["optimization_result.yaml"].read_text(encoding="utf-8")
+    )
+    assert exported["provenance"]["library"] == "pounce"
+    assert exported["frontend_result"]["stopped_on_kkt"]
+    assert exported["kkt_ratio"] <= 1
+
+
+@pytest.mark.parametrize("solver_id", ["pounce_ipm", "pounce_sqp"])
+def test_pounce_api_cancellation_stops_without_promoting_success(solver_id):
+    """A cancellation request wins, including when the final point is feasible."""
+    pytest.importorskip("pounce")
+    config, optimization = synthetic_problem()
+    optimization["solver"] = solver_id
+    optimization["solver_options"] = {"print_convergence": False}
+    calls = []
+
+    def cancel(state):
+        calls.append(state)
+        return False
+
+    result = opt.optimize_turbine(
+        config, optimization, evaluator=synthetic_turbine, callback=cancel
+    )
+    assert len(calls) == 1
+    assert result.solver.status == 5
+    assert result.solver.termination == "cancelled"
+    assert not result.success
+    assert not result.solver.stopped_on_kkt
+
+
+def test_pounce_option_validation_and_legacy_selection_are_explicit():
+    """Keep legacy SLSQP while preventing accidental cross-solver controls."""
+    assert opt.normalize_optimizer(None) == "slsqp"
+    options = opt.normalize_solver_options(solver="pounce_ipm")
+    assert options["mu_strategy"] == "adaptive"
+    assert options["optimality_tol"] == 1e-6
+    assert "first_step_fraction" not in options
+    for solver_id, settings in [
+        ("pounce_ipm", {"first_step_fraction": 0.2}),
+        ("pounce_ipm", {"mu_strategy": "unknown"}),
+        ("pounce_sqp", {"mu_strategy": "adaptive"}),
+    ]:
+        with pytest.raises(ValueError):
+            opt.normalize_solver_options(settings, solver=solver_id)
+    with pytest.raises(ValueError, match="Unknown optimizer"):
+        opt.normalize_optimizer("unknown")
 
 
 if __name__ == "__main__":

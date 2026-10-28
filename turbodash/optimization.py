@@ -1,4 +1,4 @@
-"""Map turbine designs to PySolverView's SLSQP optimizer and physical reports.
+"""Map turbine designs to PySolverView NLP optimizers and physical reports.
 
 This module is the bridge between turbine configurations and the generic solver.
 It reads selected design variables, objectives, and constraints from dictionaries
@@ -17,10 +17,10 @@ turn arbitrary programming errors into recoverable failures. The initial design
 must evaluate successfully before this recovery mechanism can be used.
 
 ``optimize_turbine`` also assembles physical convergence histories, callbacks,
-plots, and saved results. Acceptance requires native solver success together
-with the final feasibility and independent optimality checks. Keeping these
+plots, and saved results. Acceptance requires native success or a verified
+Pounce user-KKT stop, together with final feasibility and optimality. Keeping these
 responsibilities here gives the app and standalone studies the same behavior,
-while PySolverView owns step control, the SciPy bridge and KKT mathematics.
+while PySolverView owns native solver interfaces, step control and KKT mathematics.
 """
 
 from collections import OrderedDict
@@ -40,19 +40,31 @@ from turbodash.io.yaml import dump_turbine_yaml
 from turbodash.core.errors import ModelDomainError
 from turbodash.core.interspaces import AXIAL_SPACING_FIELDS, normalize_axial_spacing
 
-
 __all__ = [
-    "OptimizationResult", "TurbineOptimizationProblem", "TurbinePlotCallback",
-    "evaluate_constraints", "evaluate_objective", "load_case",
-    "normalize_solver_options", "optimize_turbine",
-    "plot_turbine", "read_path", "resolve_value", "save_figure",
-    "save_optimization_results", "set_path", "solver_diagnostics",
+    "OptimizationResult",
+    "TurbineOptimizationProblem",
+    "TurbinePlotCallback",
+    "evaluate_constraints",
+    "evaluate_objective",
+    "load_case",
+    "normalize_solver_options",
+    "optimize_turbine",
+    "OPTIMIZER_LABELS",
+    "normalize_optimizer",
+    "plot_turbine",
+    "read_path",
+    "resolve_value",
+    "save_figure",
+    "save_optimization_results",
+    "set_path",
+    "solver_diagnostics",
 ]
 
 
 # =============================================================================
 # Numeric result selectors and ThermOpt-style objectives / constraints
 # =============================================================================
+
 
 def _path_parts(path):
     if not isinstance(path, str):
@@ -258,17 +270,40 @@ def evaluate_constraints(results, specs):
 # =============================================================================
 
 
-def normalize_solver_options(configured=None, *, feasibility_tolerance=1e-6):
+OPTIMIZER_LABELS = {
+    "pounce_ipm": "IPM",
+    "pounce_sqp": "SQP",
+    "slsqp": "SLSQP",
+}
+
+
+def normalize_optimizer(solver=None):
+    """Validate the solver selector; unspecified legacy cases retain SLSQP."""
+    solver = "slsqp" if solver is None else solver
+    if not isinstance(solver, str) or solver not in OPTIMIZER_LABELS:
+        raise ValueError(
+            f"Unknown optimizer {solver!r}; choose from {tuple(OPTIMIZER_LABELS)}."
+        )
+    return solver
+
+
+def normalize_solver_options(
+    configured=None, *, feasibility_tolerance=1e-6, solver="slsqp"
+):
     """Translate turbine YAML aliases and validate options with PySolverView.
 
     Turbine variables always use normalized [0, 1] coordinates. Feasibility
     tolerance belongs to the turbine configuration; numerical defaults and
-    validation come from PySolverView's public ``SLSQPOptions``.
+    validation of common numeric fields comes from PySolverView's public
+    ``SLSQPOptions``. Pounce receives only common controls plus its IPM barrier
+    strategy; SLSQP step/recovery controls are rejected for Pounce. ``solver``
+    corresponds to the separate ``optimization.solver`` configuration field.
     """
     if configured is None:
         configured = {}
     if not isinstance(configured, dict):
         raise ValueError("solver_options must be a dictionary.")
+    solver = normalize_optimizer(solver)
     configured = deepcopy(configured)
     configured.pop("max_fd_backtracks", None)
     for old, new in (
@@ -282,27 +317,71 @@ def normalize_solver_options(configured=None, *, feasibility_tolerance=1e-6):
                 raise ValueError(f"Conflicting solver options {old!r} and {new!r}.")
             configured[new] = value
     for name, accepted in (
-        ("library", ("pysolver", "scipy")),
-        ("method", ("slsqp",)),
+        ("library", ("pysolver", "scipy") if solver == "slsqp" else ("pounce",)),
+        (
+            "method",
+            (
+                ("slsqp",)
+                if solver == "slsqp"
+                else ("ipm",) if solver == "pounce_ipm" else ("sqp",)
+            ),
+        ),
         ("derivative_method", ("2-point",)),
     ):
         if name in configured and str(configured.pop(name)).lower() not in accepted:
-            raise ValueError(
-                f"Turbine optimization requires {name} in {accepted!r}."
-            )
+            raise ValueError(f"Turbine optimization requires {name} in {accepted!r}.")
     if configured.pop("problem_scale", 1.0) != 1.0:
         raise ValueError(
             "Turbine optimization uses normalized [0, 1] variables; problem_scale must be 1."
         )
     for name in (
-        "print_convergence", "plot_convergence", "plot_scale_constraints",
-        "update_on", "tolerance_check_cache",
+        "print_convergence",
+        "plot_convergence",
+        "plot_scale_constraints",
+        "update_on",
+        "tolerance_check_cache",
     ):
         configured.pop(name, None)
     if "callback_functions" in configured:
-        raise ValueError("Pass application callbacks through optimize_turbine(callback=...).")
+        raise ValueError(
+            "Pass application callbacks through optimize_turbine(callback=...)."
+        )
     if configured.get("check_kkt", True) is not True:
-        raise ValueError("Turbine optimization requires check_kkt=True for final acceptance.")
+        raise ValueError(
+            "Turbine optimization requires check_kkt=True for final acceptance."
+        )
+    if solver != "slsqp":
+        configured.pop("check_kkt", None)
+        common = (
+            "ftol",
+            "maxiter",
+            "finite_diff_step",
+            "feasibility_tol",
+            "optimality_tol",
+        )
+        allowed = set(common) | ({"mu_strategy"} if solver == "pounce_ipm" else set())
+        unknown = set(configured) - allowed
+        if unknown:
+            raise ValueError(
+                f"Invalid {OPTIMIZER_LABELS[solver]} solver options: {sorted(unknown)}"
+            )
+        strategy = configured.pop("mu_strategy", "adaptive")
+        if strategy not in ("monotone", "adaptive"):
+            raise ValueError("mu_strategy must be 'monotone' or 'adaptive'.")
+        configured.setdefault("ftol", 1e-8)
+        configured.setdefault("finite_diff_step", 1e-6)
+        configured.setdefault("optimality_tol", 1e-6)
+        configured["feasibility_tol"] = feasibility_tolerance
+        try:
+            validated = asdict(psv.SLSQPOptions(**configured))
+        except TypeError as error:
+            raise ValueError(
+                f"Invalid {OPTIMIZER_LABELS[solver]} solver options: {error}"
+            ) from error
+        options = {name: validated[name] for name in common}
+        if solver == "pounce_ipm":
+            options["mu_strategy"] = strategy
+        return options
     configured["feasibility_tol"] = feasibility_tolerance
     try:
         options = asdict(psv.SLSQPOptions(**configured))
@@ -377,7 +456,7 @@ def _read_design_variables(inputs, specifications, logger=None):
 
 
 # =============================================================================
-# Physical turbine problem and normalized SLSQP adapter
+# Physical turbine problem and normalized optimization adapter
 # =============================================================================
 
 
@@ -573,9 +652,17 @@ class OptimizationResult:
 
 
 _SOLVER_DIAGNOSTIC_FIELDS = (
-    "step_norm", "objective_change", "optimality", "stationarity",
-    "primal_feasibility", "dual_feasibility", "complementarity",
-    "kkt_residual", "kkt_ratio", "kkt", "kkt_multipliers",
+    "step_norm",
+    "objective_change",
+    "optimality",
+    "stationarity",
+    "primal_feasibility",
+    "dual_feasibility",
+    "complementarity",
+    "kkt_residual",
+    "kkt_ratio",
+    "kkt",
+    "kkt_multipliers",
 )
 
 
@@ -585,9 +672,13 @@ def solver_diagnostics(record):
     Residuals, displacements, and objective changes use solver coordinates and
     normalization, including when attached to a physical turbine snapshot.
     """
+
     def portable(value):
         if isinstance(value, Mapping):
-            return {key: portable(item) for key, item in value.items()}
+            return {
+                key.item() if isinstance(key, np.generic) else key: portable(item)
+                for key, item in value.items()
+            }
         if isinstance(value, np.ndarray):
             return portable(value.tolist())
         if isinstance(value, (list, tuple)):
@@ -599,9 +690,13 @@ def solver_diagnostics(record):
         return value
 
     record = record or {}
-    diagnostic = {name: portable(record.get(name)) for name in _SOLVER_DIAGNOSTIC_FIELDS}
+    diagnostic = {
+        name: portable(record.get(name)) for name in _SOLVER_DIAGNOSTIC_FIELDS
+    }
     kkt = record.get("kkt") or {}
-    diagnostic["diagnostics_available"] = bool(record.get("diagnostics_available", kkt.get("available", False)))
+    diagnostic["diagnostics_available"] = bool(
+        record.get("diagnostics_available", kkt.get("available", False))
+    )
     if diagnostic["primal_feasibility"] is None:
         diagnostic["primal_feasibility"] = portable(kkt.get("primal_feasibility"))
     if diagnostic["kkt_multipliers"] is None:
@@ -609,37 +704,59 @@ def solver_diagnostics(record):
     return diagnostic
 
 
-def optimize_turbine(config, optimization=None, *, evaluator=None, callback=None, logger=None):
+def optimize_turbine(
+    config, optimization=None, *, evaluator=None, callback=None, logger=None
+):
     """Optimize a case and return its physical design and convergence information.
 
     If optimization is omitted, read config['optimization']. Variables omitted
     from design_variables stay fixed at their current input values. Each active
     variable uses lower_value / upper_value and optionally initial_value.
 
-    Callbacks receive copies of accepted physical designs, recovery counts,
-    and solver-scaled step and KKT diagnostics.
+    Callbacks receive copied physical designs and solver-scaled diagnostics.
+    SLSQP emits accepted points; Pounce emits regular native observations with
+    unknown acceptance. Restoration phases have no original-model point and
+    are excluded. Return False or raise StopIteration to cancel.
     Only explicitly identified ModelDomainError failures are recoverable; the
     solver retries their actual trial steps without inventing model values.
     PySolverView's main frontend owns numerical work and convergence printing.
     The optional logger receives its report instead of terminal output.
     """
     problem = TurbineOptimizationProblem(config, optimization, evaluator, logger=logger)
+    optimizer_id = normalize_optimizer(problem.optimization.get("solver"))
     configured_options = problem.optimization.get("solver_options") or {}
-    options = normalize_solver_options(configured_options, feasibility_tolerance=problem.feasibility_tolerance)
+    options = normalize_solver_options(
+        configured_options,
+        feasibility_tolerance=problem.feasibility_tolerance,
+        solver=optimizer_id,
+    )
+    if optimizer_id != "slsqp":
+        # Published 0.8.0 predates the sufficient-KKT and bounded-probe fixes.
+        # Reject an incompatible installation before starting a native solve.
+        from pysolver_view.optimization.backends import pounce as pounce_backend
+
+        if not hasattr(pounce_backend, "resolve_pounce_controls"):
+            raise RuntimeError(
+                "Pounce requires PySolverView's user-KKT stopping and bound-handling fixes. "
+                "Install PySolverView 0.8.1 or newer before selecting Pounce."
+            )
     initial = problem.evaluate(problem.x0)
     history = []
+    pounce_history = []
     previous_solver_point = None
 
-    def report_progress(physical_values, solver_record):
+    def report_progress(physical_values, solver_record, *, notify=True):
         nonlocal previous_solver_point
         values = np.asarray(physical_values, dtype=float)
         solver_point = np.asarray(solver_record["x"], dtype=float)
-        # Preserve each distinct accepted solver point. Even adjacent normalized
+        # Preserve each distinct reported solver point. Even adjacent normalized
         # floats can round to the same physical values during the affine map.
         # Merging those rows would attach a later step/KKT assessment to an older
         # iteration. Only the exact final-point refresh is a duplicate.
-        if previous_solver_point is not None and np.array_equal(
-            solver_point, previous_solver_point
+        if (
+            previous_solver_point is not None
+            and np.array_equal(solver_point, previous_solver_point)
+            and (optimizer_id == "slsqp" or solver_record.get("event_kind") == "final")
         ):
             if solver_record.get("diagnostics_available"):
                 history[-1].update(solver_diagnostics(solver_record))
@@ -647,6 +764,10 @@ def optimize_turbine(config, optimization=None, *, evaluator=None, callback=None
         evaluation = problem.evaluate(values)
         entry = {
             "iteration": solver_record["iteration"],
+            "solver": optimizer_id,
+            "solver_label": OPTIMIZER_LABELS[optimizer_id],
+            "event_kind": solver_record.get("event_kind", "accepted_iteration"),
+            "accepted": solver_record.get("accepted", True),
             "objective": evaluation["objective"],
             "max_constraint_violation": evaluation["max_constraint_violation"],
             "design_variables": dict(evaluation["design_variables"]),
@@ -656,29 +777,82 @@ def optimize_turbine(config, optimization=None, *, evaluator=None, callback=None
         }
         history.append(entry)
         previous_solver_point = solver_point.copy()
-        if callback is not None:
+        if callback is not None and notify:
             state = deepcopy(entry)
             state["config"] = deepcopy(evaluation["config"])
             state["turbine_results"] = deepcopy(evaluation["turbine_results"])
-            callback(state)
+            return callback(state)
 
     def solver_callback(record):
-        report_progress(problem.scale_normalized_to_physical(record["x"]), record)
+        """Translate regular backend records without changing constraint signs."""
+        if record.get("x") is None:
+            return None  # Restoration has no original-model point to display.
+        if optimizer_id != "slsqp":
+            # Native coordinates are observations, never certified accepted
+            # steps. Use the frontend's same-point assessment when available;
+            # no diagnostic model work is hidden in presentation callbacks.
+            snapshot = frontend.iteration_history[-1]
+            assessment = (
+                snapshot.get("kkt")
+                if np.array_equal(snapshot["x"], record["x"])
+                else None
+            )
+            record = deepcopy(record)
+            record.update(
+                objective=float(record["fitness"][0]),
+                max_constraint_violation=snapshot["constraint_violation"],
+                step_norm=snapshot["norm_step"],
+                objective_change=(
+                    0.0
+                    if not pounce_history
+                    else float(record["fitness"][0] - pounce_history[-1]["objective"])
+                ),
+                kkt=deepcopy(assessment),
+                diagnostics_available=bool(assessment and assessment["available"]),
+            )
+            if assessment:
+                for name in (
+                    "optimality",
+                    "stationarity",
+                    "primal_feasibility",
+                    "dual_feasibility",
+                    "complementarity",
+                    "kkt_residual",
+                    "kkt_ratio",
+                ):
+                    record[name] = assessment.get(name)
+            pounce_history.append(deepcopy(record))
+        return report_progress(
+            problem.scale_normalized_to_physical(record["x"]), record
+        )
 
     frontend_options = dict(options)
+    native_tolerance = frontend_options.pop("ftol")
+    max_iterations = frontend_options.pop("maxiter")
+    if optimizer_id != "slsqp":
+        frontend_options.pop("finite_diff_step")
+        frontend_options.update(
+            stop_on_kkt=True, nlp_scaling_method="none", bound_relax_factor=0.0
+        )
+    library, method = (
+        ("pysolver", "slsqp")
+        if optimizer_id == "slsqp"
+        else ("pounce", "ipm" if optimizer_id == "pounce_ipm" else "sqp")
+    )
     frontend = psv.OptimizationSolver(
         problem,
-        library="pysolver",
-        method="slsqp",
+        library=library,
+        method=method,
         problem_scale=1.0,
-        tolerance=frontend_options.pop("ftol"),
-        max_iterations=frontend_options.pop("maxiter"),
+        tolerance=native_tolerance,
+        max_iterations=max_iterations,
         derivative_method="2-point",
         derivative_abs_step=options["finite_diff_step"],
         extra_options=frontend_options,
         update_on="iteration",
         check_kkt=True,
-        print_convergence=logger is None and configured_options.get("print_convergence", True),
+        print_convergence=logger is None
+        and configured_options.get("print_convergence", True),
         plot_convergence=False,
         logger=logger,
         backend_callback=solver_callback,
@@ -688,20 +862,76 @@ def optimize_turbine(config, optimization=None, *, evaluator=None, callback=None
     # the detailed turbine reports. The frontend result exposes physical x and
     # total model-call accounting, including its finite-difference probes.
     solver = deepcopy(frontend.backend_result)
+    if optimizer_id != "slsqp":
+        solver.native_history = deepcopy(solver.history)
+        solver.history = pounce_history
+        solver.success = bool(frontend.result.success)
+        solver.message = frontend.result.message
+        solver.elapsed_time = frontend.result.elapsed_time
+        solver.domain_rejections = 0
+        solver.derivative_rejections = 0
+        solver.events = []
+        solver.kkt = deepcopy(frontend.result.kkt)
+        solver.diagnostics_available = bool(solver.kkt and solver.kkt["available"])
+        if solver.kkt:
+            for name in (
+                "optimality",
+                "stationarity",
+                "primal_feasibility",
+                "dual_feasibility",
+                "complementarity",
+                "kkt_residual",
+                "kkt_ratio",
+            ):
+                solver[name] = solver.kkt.get(name)
+        for name in ("stopped_on_kkt", "termination", "bound_projection"):
+            solver[name] = deepcopy(frontend.result.get(name))
     physical_final_values = np.asarray(frontend.result.x, dtype=float).copy()
     # Reevaluate the returned design, independent of derivative-probe caches.
     final = problem.evaluate(physical_final_values, refresh=True)
-    report_progress(physical_final_values, dict(x=solver.x, iteration=solver.nit,
-                    domain_rejections=solver.domain_rejections,
-                    derivative_rejections=solver.derivative_rejections,
-                    **solver_diagnostics(solver)))
+    if optimizer_id != "slsqp":
+        solver.fun = frontend.result.fun
+        solver.fitness = frontend.result.fitness.copy()
+        previous = pounce_history[-1] if pounce_history else None
+        same_point = previous is not None and np.array_equal(previous["x"], solver.x)
+        solver.step_norm = (
+            previous["step_norm"]
+            if same_point
+            else (
+                None
+                if previous is None
+                else float(np.linalg.norm(solver.x - previous["x"]))
+            )
+        )
+        solver.objective_change = (
+            previous["objective_change"]
+            if same_point
+            else None if previous is None else float(solver.fun - previous["objective"])
+        )
+    report_progress(
+        physical_final_values,
+        dict(
+            x=solver.x,
+            iteration=solver.nit,
+            event_kind="final",
+            accepted=None,
+            domain_rejections=solver.domain_rejections,
+            derivative_rejections=solver.derivative_rejections,
+            **solver_diagnostics(solver),
+        ),
+        notify=optimizer_id == "slsqp",
+    )
     solver.x_final = physical_final_values.copy()
-    solver.library, solver.method = "pysolver", "slsqp"
+    solver.library, solver.method = library, method
+    solver.optimizer_id = optimizer_id
+    solver.solver_label = OPTIMIZER_LABELS[optimizer_id]
     solver.frontend_convergence_history = deepcopy(frontend.convergence_history)
     solver.convergence_history = {
         "iteration": [entry["iteration"] for entry in solver.history],
         "objective_value": [entry["objective"] for entry in solver.history],
-        "constraint_violation": [entry["max_constraint_violation"] for entry in solver.history],
+        "constraint_violation": [
+            entry["max_constraint_violation"] for entry in solver.history
+        ],
     }
     diagnostic_history = [solver_diagnostics(entry) for entry in solver.history]
     for name in (*_SOLVER_DIAGNOSTIC_FIELDS, "diagnostics_available"):
@@ -710,7 +940,9 @@ def optimize_turbine(config, optimization=None, *, evaluator=None, callback=None
     # A saved optimized case should use its final inputs as the next baseline.
     # Preserve the original overrides in source_config and initial_config.
     final_config = deepcopy(final["config"])
-    final_config["optimization"]["solver_options"] = {key: value for key, value in options.items() if key != "feasibility_tol"}
+    final_config["optimization"]["solver_options"] = {
+        key: value for key, value in options.items() if key != "feasibility_tol"
+    }
     for variable in final_config["optimization"]["design_variables"].values():
         variable.pop("initial_value", None)
 
@@ -723,14 +955,26 @@ def optimize_turbine(config, optimization=None, *, evaluator=None, callback=None
             f" exceeds {problem.feasibility_tolerance:.3g}."
         )
     result = OptimizationResult(
-        config=final_config, turbine_results=final["turbine_results"],
-        geometry=[stage["geometry_meanline"] for stage in final["turbine_results"]["stages_performance"]],
-        design_variables=final["design_variables"], objective=final["objective"],
-        initial_objective=initial["objective"], constraint_report=final["constraint_report"],
-        success=bool(solver.success and feasible), solver_success=solver_success, feasible=bool(feasible),
-        message=message, max_constraint_violation=final["max_constraint_violation"],
-        history=history, solver=solver, n_evaluations=problem.n_evaluations,
-        initial_turbine_results=initial["turbine_results"], initial_config=initial["config"],
+        config=final_config,
+        turbine_results=final["turbine_results"],
+        geometry=[
+            stage["geometry_meanline"]
+            for stage in final["turbine_results"]["stages_performance"]
+        ],
+        design_variables=final["design_variables"],
+        objective=final["objective"],
+        initial_objective=initial["objective"],
+        constraint_report=final["constraint_report"],
+        success=bool(solver.success and feasible),
+        solver_success=solver_success,
+        feasible=bool(feasible),
+        message=message,
+        max_constraint_violation=final["max_constraint_violation"],
+        history=history,
+        solver=solver,
+        n_evaluations=problem.n_evaluations,
+        initial_turbine_results=initial["turbine_results"],
+        initial_config=initial["config"],
         source_config=problem.source_config,
         frontend_result=deepcopy(frontend.result),
         optimizer=frontend,
@@ -818,7 +1062,10 @@ class TurbinePlotCallback:
 def _plain(value):
     """Convert NumPy values to the ordinary Python types accepted by safe YAML."""
     if isinstance(value, dict):
-        return {key: _plain(item) for key, item in value.items()}
+        return {
+            key.item() if isinstance(key, np.generic) else key: _plain(item)
+            for key, item in value.items()
+        }
     if isinstance(value, (list, tuple)):
         return [_plain(item) for item in value]
     if isinstance(value, np.ndarray):
@@ -826,7 +1073,9 @@ def _plain(value):
     if isinstance(value, np.generic):
         return value.item()
     if callable(value):
-        raise TypeError("YAML export requires path selectors; Python callables are not serializable.")
+        raise TypeError(
+            "YAML export requires path selectors; Python callables are not serializable."
+        )
     return value
 
 

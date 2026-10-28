@@ -2,13 +2,17 @@
 
 These two commented scripts use the public `turbodash.optimization` API and
 the same meanline model and PySolverView `OptimizationSolver` frontend as the
-optimization app. The frontend selects `library="pysolver", method="slsqp"`.
+optimization app. These legacy demonstration YAML files retain
+`library="pysolver", method="slsqp"` when no explicit solver is specified.
 Turbodash maps turbine inputs and physical reports; PySolverView owns
 optimization, finite differences, domain recovery, independent KKT checks,
 and the convergence table and final solver report.
 
-PySolverView is a required PyPI dependency, with version `>=0.7.4,<0.8`
-(Poetry `^0.7.4`). Install from the Turbodash repository root and inspect the
+PySolverView is a required PyPI dependency, with version `>=0.8.1,<0.9`
+(Poetry `^0.8.1`), including its `pounce` extra. The workbench keeps SLSQP as
+the default; these demos preserve their SLSQP step and
+recovery studies. The [development study](../../development/pounce_solvers/README.md)
+compares the methods. Install from the Turbodash repository root and inspect the
 version and installation used by its environment:
 
 ```powershell
@@ -20,6 +24,28 @@ The version should satisfy that range; the paths identify the active PySolverVie
 installation in the Poetry environment. SciPy 1.17.1 is required by the controlled
 backend. PySolverView is imported from that installation; there is no separate
 example solver implementation.
+
+To use Pounce in a separate case, select the solver explicitly and provide only
+its supported numeric options:
+
+```yaml
+optimization:
+  solver: pounce_ipm  # pounce_sqp or slsqp are also available
+  feasibility_tolerance: 1.0e-6
+  solver_options:
+    ftol: 1.0e-8
+    maxiter: 200
+    finite_diff_step: 1.0e-6
+    optimality_tol: 1.0e-6
+    mu_strategy: adaptive  # IPM only
+```
+
+Pounce needs PySolverView 0.8.1 or newer for its KKT-stopping and bound fixes;
+the declared dependency includes them. Pounce has no equivalent to
+SLSQP's first-step fraction. Its callbacks describe native observations with
+unknown acceptance, and verified user-KKT convergence may succeed with native
+status 5 and `solver_success=False`. See the
+[solver guide](../../docs/source/guides/optimization.md).
 
 Run from the repository root, using `poetry run python` or the environment's
 Python executable. Both scripts save plots without opening windows by default;

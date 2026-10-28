@@ -65,8 +65,12 @@ from turbodash.visualization.vtk_assets import register_vtk_assets
 from .opt_panel import register_callbacks as register_optimization_callbacks
 from . import opt_jobs as optimization_jobs
 from .opt_model import (
-    nested_config, build_settings, SLSQP_EXTRA_CONTROLS, extra_solver_options,
+    nested_config,
+    build_settings,
+    SLSQP_EXTRA_CONTROLS,
+    extra_solver_options,
     solver_editor_options,
+    editor_solver_arguments,
 )
 from .opt_panel import collect_rows
 from .workbench import (
@@ -113,9 +117,12 @@ def initialize_session():
 
 register_vtk_assets(app)
 register_turbogrid_callbacks(app, results_store="geometry_results_store", modeller=True)
-register_meshing_callbacks(app, precise_inputs=True, results_store="geometry_results_store", modeller=True)
+register_meshing_callbacks(
+    app, precise_inputs=True, results_store="geometry_results_store", modeller=True
+)
 register_geometry_workflow(
-    app, loaded_config_store="loaded_cfg_store",
+    app,
+    loaded_config_store="loaded_cfg_store",
     normalize_inputs=lambda cfg: geometry_load_inputs(cfg),
 )
 
@@ -255,8 +262,20 @@ STAGE_FIELDS = [
     ("radius_ratio_12", ["Radius ratio, r₁/r₂"], 0.10, 1.20, 0.001),
     ("radius_ratio_23", ["Radius ratio, r₂/r₃"], 0.10, 1.20, 0.001),
     ("radius_ratio_34", ["Radius ratio, r₃/r₄"], 0.10, 1.20, 0.001),
-    ("axial_spacing_before_stator", ["Spacing before stator / stator meridional chord [-]"], 0.001, None, 0.001),
-    ("axial_spacing_before_rotor", ["Spacing before rotor / rotor meridional chord [-]"], 0.001, None, 0.001),
+    (
+        "axial_spacing_before_stator",
+        ["Spacing before stator / stator meridional chord [-]"],
+        0.001,
+        None,
+        0.001,
+    ),
+    (
+        "axial_spacing_before_rotor",
+        ["Spacing before rotor / rotor meridional chord [-]"],
+        0.001,
+        None,
+        0.001,
+    ),
 ]
 
 # Loss-model dropdown: internal value -> pretty label (Title Case, spaces).
@@ -400,8 +419,14 @@ def speed_label(mode):
 # server responses for labels can arrive after a newer mode was selected.
 app.clientside_callback(
     """function(values, ids) {
-        const labels = """ + json.dumps({option["value"]: inlet_labels(option["value"])
-                                        for option in property_pair_options()}) + """;
+        const labels = """
+    + json.dumps(
+        {
+            option["value"]: inlet_labels(option["value"])
+            for option in property_pair_options()
+        }
+    )
+    + """;
         const current = Object.fromEntries(ids.map((id, index) => [id.key, values[index]]));
         const pair = labels[current.inlet_property_pair] || labels.PT_INPUTS;
         return [pair[0], pair[1], current.rotational_speed_type === 'specific' ?
@@ -987,6 +1012,8 @@ def _assemble_cfg(overall, stages):
     State("opt-feasibility", "value"),
     *[State(component_id, "value") for _, component_id in SLSQP_EXTRA_CONTROLS],
     State("opt-solver-options", "data"),
+    State("opt-solver", "value"),
+    State("opt-mu-strategy", "value"),
     State("geometry_state", "data"),
     State("blade_modeller_events", "data"),
     State("result_store", "modified_timestamp"),
@@ -998,7 +1025,10 @@ def download_yaml(n_clicks, cfg, signature, ov, sv, oi, si, stages, *editor):
     try:
         # Keep direct callers using the pre-geometry editor arguments working.
         geometry_state, pending, result_timestamp = None, None, None
-        if len(editor) == 16 + len(SLSQP_EXTRA_CONTROLS) + 3:
+        if len(editor) in (
+            16 + len(SLSQP_EXTRA_CONTROLS) + 3,
+            18 + len(SLSQP_EXTRA_CONTROLS) + 3,
+        ):
             *editor, geometry_state, pending, result_timestamp = editor
         current = live_config(ov, sv, oi, si, stages)
         if input_signature(ov, sv, oi, si, stages) != signature:
@@ -1013,17 +1043,25 @@ def download_yaml(n_clicks, cfg, signature, ov, sv, oi, si, stages, *editor):
             *editor[10:15],
             results=cfg,
             require_variables=False,
-            solver_options=extra_solver_options(editor[15:-1], editor[-1]),
+            **editor_solver_arguments(editor, offset=15),
         )
         if geometry_state is not None:
             if geometry_state.get("_result_timestamp") != result_timestamp:
                 raise ValueError("Wait for the current blade geometry before saving.")
-            if (pending and pending.get("epoch") == geometry_state.get("_epoch")
-                    and pending.get("sequence", 0) > geometry_state.get("revision", 0)):
-                from turbodash.apps.shared.components.blade_modeller import fold_edit_journal
+            if (
+                pending
+                and pending.get("epoch") == geometry_state.get("_epoch")
+                and pending.get("sequence", 0) > geometry_state.get("revision", 0)
+            ):
+                from turbodash.apps.shared.components.blade_modeller import (
+                    fold_edit_journal,
+                )
+
                 geometry_state, errors, _ = fold_edit_journal(geometry_state, pending)
                 if errors:
-                    raise ValueError("Resolve the pending invalid geometry edit before saving.")
+                    raise ValueError(
+                        "Resolve the pending invalid geometry edit before saving."
+                    )
         elif result_timestamp is not None:
             raise ValueError("Wait for the current blade geometry before saving.")
         geometry = export_geometry(cfg, geometry_state)

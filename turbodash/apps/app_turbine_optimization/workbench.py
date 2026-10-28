@@ -487,7 +487,7 @@ def build_layout(defaults, stage_defaults, loss_models, documentation_url="/docs
     opt.children[0].children = [
         html.Span("06", className="td-section-number"),
         "Optimization",
-        html.Span("SLSQP", className="td-opt-badge"),
+        opt.children[0].children[-1],
     ]
     opt.className = "td-opt-panel td-section"
     opt.open = False

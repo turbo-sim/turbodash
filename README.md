@@ -12,7 +12,9 @@ Turbodash is an interactive application for the meanline design and optimization
 - Toggle the supersonic exit Mach profile-loss correction for Kacker-Okapuu,
   Moustapha, and Benner in the app or YAML (off by default). See the
   [loss correction settings](docs/source/guides/calculations.md#exit-mach-number-correction).
-- Optimize selected design variables with SLSQP, configurable bounds and constraints, recovery from invalid trial designs, and independent feasibility and KKT optimality checks.
+- Optimize selected variables with controlled SLSQP (the default),
+  Pounce IPM, or Pounce SQP, with bounds, constraints, and independent
+  feasibility and KKT optimality checks.
 - Inspect meridional channel and blade-to-blade views, velocity triangles in Mach numbers or m/s, efficiency curves, and loss distributions.
 - Compare performance, geometry, and flow-station reports and export their tables.
 - Import and export YAML configurations, including optimization settings and all
@@ -37,7 +39,11 @@ poetry install
 
 After updating an existing checkout, rerun `poetry install` to register the application commands.
 PySolverView is a required dependency, installed from PyPI with version
-`>=0.7.4,<0.8` (Poetry `^0.7.4`); no optimization extra is needed.
+`>=0.8.1,<0.9` (Poetry `^0.8.1`), including its `pounce` extra. This includes
+the user-KKT stopping and near-bound derivative fixes required by Pounce.
+The optimizer selector offers **SLSQP**, **IPM**, and **SQP**, with SLSQP kept
+as the default. Saved designs preserve explicit solver choices; legacy YAML
+files also retain SLSQP. See the [solver guide](docs/source/guides/optimization.md).
 
 ## Run the latest optimization app
 

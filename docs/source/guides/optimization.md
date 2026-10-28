@@ -1,10 +1,11 @@
 # Turbine optimization
 
-Turbodash uses PySolverView's controlled SLSQP optimizer to improve a selected
-objective while respecting design-variable bounds and configured constraints.
+Turbodash offers Pounce interior point, Pounce SQP, and controlled SLSQP to
+improve an objective while respecting bounds and configured constraints.
 The Python API and optimization workbench use the same public
-`pysolver_view.OptimizationSolver` frontend with `library="pysolver"` and
-`method="slsqp"`, including its shared reporting and acceptance checks.
+`pysolver_view.OptimizationSolver` frontend, with shared reporting and acceptance
+checks. SLSQP remains the default for new workbench configurations.
+Legacy YAML cases without `optimization.solver` retain SLSQP.
 Turbodash supplies the turbine problem mapping and physical reports;
 PySolverView supplies derivatives, step controls, recovery, KKT diagnostics,
 and the convergence table and final solver report.
@@ -24,8 +25,10 @@ result = optimize_turbine(case)
 Run this example from a repository checkout. The basic demo explains reporting
 and exports; the advanced demo compares step fractions and recovery policies.
 
-PySolverView is a required PyPI dependency with version `>=0.7.4,<0.8`
-(Poetry `^0.7.4`). Run `poetry install` from Turbodash before using
+PySolverView is a required PyPI dependency with version `>=0.8.1,<0.9`
+(Poetry `^0.8.1`) and the `pounce` extra. Version 0.8.1 includes user-KKT
+stopping and the near-bound derivative fixes. Incompatible older installations
+produce an update message instead of silently selecting another solver. Use
 `poetry run python` for the demos. See the [installation guide](../installation.md)
 for checking the installed version and import location.
 
@@ -199,24 +202,63 @@ The default workbench objective is **Efficiency with exhaust recovery**, listed
 first in the objective menu. Loading a design with an explicit objective
 preserves that selection.
 
-In the workbench, **Optimization > Configuration** shows the iteration limit
-and solver tolerance (`ftol`). **Show expert settings** reveals feasibility
-and optimality tolerances, the first step fraction, growth factor, reduction
-factor, and retry limit. Hiding these settings preserves their values.
+In **Optimization > Configuration**, choose the optimizer from the dropdown.
+The current solver also appears in the run status and report. Common controls
+include the iteration limit and native tolerance (`ftol`). **Show expert
+settings** reveals the independent feasibility and optimality limits. SLSQP's
+existing defaults remain `1e-6` and `1e-4`, respectively. Shared numeric edits
+are retained when switching solvers; the Pounce example below uses `1e-6` for
+both checks, matching the stricter turbine comparison.
+IPM adds the adaptive/monotone barrier strategy; SLSQP adds its first-step
+fraction, growth factor, reduction factor, and retry limit. Pounce SQP uses
+damped BFGS without exposing its full native option list. Hiding the expert
+settings preserves their values; changing solvers removes incompatible options.
 
 The defaults are a useful starting point. If a run reaches the iteration limit,
 inspect its convergence history before increasing `maxiter`. If it repeatedly
 encounters invalid designs, review its bounds and try a smaller first step.
 Tightening tolerances alone does not fix either problem.
 
-### YAML and Python controls
+### Pounce YAML and Python controls
+
+Set `optimization.solver` explicitly to select a solver. Pounce IPM uses
+`library="pounce", method="ipm"`; Pounce SQP uses `method="sqp"`.
+
+```yaml
+optimization:
+  solver: pounce_ipm  # Alternatively pounce_sqp or slsqp
+  feasibility_tolerance: 1.0e-6
+  solver_options:
+    ftol: 1.0e-8
+    maxiter: 200
+    finite_diff_step: 1.0e-6
+    optimality_tol: 1.0e-6
+    mu_strategy: adaptive  # IPM only
+```
+
+For Pounce, `ftol` maps to its native stopping tolerance. The independent
+feasibility and optimality checks provide a sufficient additional stop
+condition: passing both requests termination, while any earlier native exit
+also ends the solve. The actual returned design is verified before success.
+Verified user-KKT convergence preserves native status 5
+(`User_Requested_Stop`) and `solver_success=False`, while frontend
+`success=True` records the satisfied user criteria. Explicit cancellation is
+kept separate and unsuccessful. A first-order KKT check does not prove a minimum.
+
+Pounce provides no equivalent of SLSQP's first-step fraction or custom
+backtracking controls. Tiny normalized box excursions up to `1e-8` are
+reconciled consistently for values and derivatives; larger excursions remain
+failures. Bounded finite-difference probes then stay inside the box.
+
+### SLSQP YAML and Python controls
 
 Set the following fields under `optimization` in a case YAML. These are the
-defaults; objectives, design variables, and constraints occupy their usual
+SLSQP defaults; objectives, design variables, and constraints occupy their usual
 neighboring fields.
 
 ```yaml
 optimization:
+  solver: slsqp
   feasibility_tolerance: 1.0e-6
   solver_options:
     ftol: 1.0e-9
@@ -251,7 +293,7 @@ by their configured normalization scales. Inputs and app results retain their
 physical units. Solver tolerances and derivative steps refer to the scaled
 problem, so choose meaningful scales before tightening them.
 
-### Step fractions and recovery
+### SLSQP step fractions and recovery
 
 Step fractions multiply SLSQP's proposed search direction. A fraction of `0.5`
 tries half that direction; it is not a fixed distance in physical units.
@@ -264,7 +306,7 @@ growth resumes from the fraction actually accepted. A small fraction at every
 iteration can make convergence slower. Set `step_growth_factor: null` to return
 to the maximum at the next iteration, or `1.0` to hold the reduced fraction.
 
-The app always enables invalid-trial recovery. `max_step_fraction` and
+With SLSQP selected, the app enables invalid-trial recovery. `max_step_fraction` and
 `finite_diff_step` are YAML/Python controls, preserved when loading and saving
 a design but not shown in the editor. The advanced demo illustrates why these
 policies can produce different histories even for the same starting design.
@@ -275,7 +317,7 @@ A design can satisfy all variable bounds and still have no physical meanline
 solution. For example, a combination of flow angles and velocity ratios can
 require a negative squared velocity component.
 
-For recognized invalid line-search trials, the solver moves back toward the
+For recognized invalid line-search trials, controlled SLSQP moves back toward the
 last accepted design by `backtrack_factor` and tries again, up to
 `max_backtracks` times. Rejected trials do not appear as accepted history
 points. Recovery preserves the model equations; it cannot make incompatible
@@ -300,7 +342,7 @@ identify the physical limit, then reconsider the start, bounds, or constraints.
 
 ## Read the convergence report
 
-The terminal reports the signed, normalized objective that SLSQP minimizes.
+The terminal reports the signed, normalized objective that the selected solver minimizes.
 The app and public callback history show physical objectives and variables.
 Step and KKT diagnostics use solver normalization in both places.
 
@@ -313,16 +355,21 @@ also applies to completed unsuccessful solves. Reporting reuses the cached
 final assessment without additional model or derivative evaluations.
 The app uses a 120-character final report so turbine variable and constraint
 names have more room. PySolverView wraps longer names without shortening them.
-In your own scripts, choose `result.optimizer.print_optimization_report(width=80)`,
+For SLSQP scripts, choose `result.optimizer.print_optimization_report(width=80)`,
 `width=100`, or `width=120`. This controls final report tables, independently
 of the live convergence table's column widths.
+
+The Pounce workbench report renders the saved frontend KKT assessment with
+its configured feasibility and optimality limits. Pounce's general frontend
+reporting methods still follow their generic diagnostic path; the workbench
+uses the saved certificate to avoid additional numerical work.
 
 The Python API preserves both frontend and backend views of the solve:
 
 | Result | Coordinates and evaluation counts |
 | --- | --- |
 | `result.frontend_result` | Detached PySolverView public result. `x` is physical, `x_solver` is normalized, and `nfev` includes frontend model and derivative-probe calls. |
-| `result.solver` | Raw backend result. `x` and history use normalized coordinates and the driver's KKT convention; `nfev` excludes derivative probes supplied by the frontend. |
+| `result.solver` | Backend diagnostics and normalized history. SLSQP retains its driver KKT convention; Pounce uses public constraint signs and preserves original observations in `native_history`. `nfev` excludes frontend derivative probes. |
 | `result.n_evaluations` | Successful uncached turbine evaluations, including the independent fresh final evaluation. |
 
 The YAML report saves `frontend_result` and `frontend_convergence_history` as
@@ -331,15 +378,16 @@ need not be equal.
 
 | Diagnostic | How to interpret it |
 | --- | --- |
-| `step_norm` | Distance between consecutive accepted designs in normalized coordinates. A small step alone does not establish convergence. |
+| `step_norm` | Distance between consecutive accepted SLSQP designs or observed Pounce designs in normalized coordinates. A small step alone does not establish convergence. |
 | `objective_change` | Signed change in the normalized minimized objective. |
 | `primal_feasibility` | Largest normalized constraint or bound violation. Compare with `feasibility_tolerance`. |
 | `optimality` | Independent first-order optimality residual, including stationarity, multiplier signs, and complementarity. Compare with `optimality_tol`. |
 | `kkt_ratio` | Largest ratio of feasibility or optimality residual to its acceptance tolerance. A value at most one passes the independent check. |
 | `diagnostics_available` | Whether the derivatives and multiplier assessment needed for the check were available. Missing values do not count as a pass. |
 
-A successful result requires native SLSQP convergence, a fresh final meanline
-evaluation, and the independent feasibility and first-order optimality checks.
+A successful result requires native convergence or verified Pounce user-KKT
+termination, a fresh final meanline evaluation, and the independent feasibility
+and first-order optimality checks. SLSQP requires its native convergence.
 `ftol` controls SLSQP's stopping rules; `feasibility_tolerance` and
 `optimality_tol` control independent acceptance. Changing one does not silently
 change the others. A feasible design at the iteration limit is still reported
@@ -351,7 +399,11 @@ global optimum. Compare multiple physically plausible starting designs when
 assessing the quality of a solution. Tightening `optimality_tol` below the
 accuracy of the finite differences does not produce more accurate derivatives.
 
-Accepted history points contain matching configurations and turbine results;
+Reported points contain matching configurations and turbine results. SLSQP
+records accepted points. Pounce records regular native observations with
+`accepted=None`; restoration phases have no physical point and are excluded.
+Independent KKT diagnostics remain unavailable until same-point derivatives
+and an assessment exist. Final returned-point checks remain authoritative;
 rejected trials and derivative probes are excluded. Saved diagnostics include
 evaluation counts, timing, rejection counts, and recovery events. Python callers
 can inspect `result.solver.events` when investigating repeated recovery.

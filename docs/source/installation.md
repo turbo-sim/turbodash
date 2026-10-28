@@ -32,8 +32,9 @@ PySolverView's optimization driver requires SciPy 1.17.1 because its additional 
 controls use a checked private SLSQP interface. Install the project's declared
 dependencies together; the [optimization guide](guides/optimization.md)
 describes the controls and compatibility requirements. The required PyPI
-dependencies include PySolverView `>=0.7.4,<0.8` (Poetry `^0.7.4`) and JAXProp
-`>=0.5.7,<0.6` (Poetry `^0.5.7`). Inspect the active PySolverView installation
+dependencies include PySolverView `>=0.8.1,<0.9` with its `pounce` extra
+(Poetry `^0.8.1`) and JAXProp
+`>=0.5.8,<0.6` (Poetry `^0.5.8`). Inspect the active PySolverView installation
 with:
 
 ```bash
@@ -42,6 +43,12 @@ poetry run python -c "import pysolver_view as psv; print(psv.__version__); print
 
 The version should satisfy the declared range; the path identifies its installed
 location in the Poetry environment.
+
+The workbench keeps SLSQP as the default. Select IPM or SQP to use Pounce;
+PySolverView 0.8.1 includes their user-KKT stopping and near-bound derivative
+handling, so no adjacent checkout is needed. An incompatible older
+implementation produces an update message instead of silently changing solvers.
+Saved choices and legacy YAML cases without `optimization.solver` are preserved.
 
 The app and demos use the main `pysolver_view.OptimizationSolver` frontend,
 which owns the optimization report as well as solving and KKT diagnostics.

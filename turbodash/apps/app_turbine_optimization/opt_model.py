@@ -9,15 +9,18 @@ The configuration helpers validate editor values, load current or older YAML
 solver settings, and convert between the app's nested shaft-speed inputs and
 the numeric input format used by the optimizer. The resulting settings are
 passed through ``turbodash.optimization`` to PySolverView's main optimization
-frontend and its controlled SLSQP backend.
+frontend and the selected NLP backend.
 """
 
 from copy import deepcopy
 import math
 
-from turbodash.optimization import normalize_solver_options, read_path
+from turbodash.optimization import (
+    normalize_optimizer,
+    normalize_solver_options,
+    read_path,
+)
 from turbodash.core.diffuser import normalize_diffuser_inputs
-
 
 # The same order is used for loading, launching and exporting the editor.
 SLSQP_EXTRA_CONTROLS = (
@@ -29,34 +32,95 @@ SLSQP_EXTRA_CONTROLS = (
 )
 
 
-def solver_editor_options(settings=None):
-    """Validate and migrate YAML options to the app's native SLSQP controls."""
-    settings = {} if settings is None else settings
+def editor_optimizer(settings=None):
+    """Keep SLSQP as the default and honor explicit saved optimizer choices.
+
+    ``None`` means no optimization section has been loaded. An existing mapping
+    without ``solver`` is a legacy configuration and therefore selects SLSQP.
+    """
+    if settings is None:
+        return "slsqp"
     if not isinstance(settings, dict):
         raise ValueError("Optimization settings must be a mapping.")
+    return normalize_optimizer(settings.get("solver", "slsqp"))
+
+
+def solver_editor_options(settings=None):
+    """Return canonical options for a fresh or loaded optimizer configuration."""
+    solver = editor_optimizer(settings)
+    settings = {} if settings is None else settings
     options = normalize_solver_options(
         settings.get("solver_options", {}),
         feasibility_tolerance=settings.get("feasibility_tolerance", 1e-6),
+        solver=solver,
     )
     options.pop("feasibility_tol")  # YAML has one authoritative feasibility limit.
-    options["domain_backtracking"] = True  # Always enabled for workbench runs.
+    if solver == "slsqp":
+        options["domain_backtracking"] = True  # Always enabled for SLSQP app runs.
     return options
 
 
-def extra_solver_options(values, preserved=None):
+def extra_solver_options(values, preserved=None, *, solver=None, mu_strategy=None):
     """Merge editable expert controls with unexposed YAML settings.
 
     Hiding expert controls does not reset them. The stored options preserve the
     derivative step and maximum step fraction on load/save; the workbench always
-    enables invalid-trial recovery, irrespective of an imported switch value.
+    enables invalid-trial recovery for SLSQP. Hidden SLSQP controls never leak
+    into Pounce options; only the shared optimality tolerance is editable there.
+    An omitted ``solver`` retains the legacy SLSQP calling convention.
     """
-    if not values:  # Also permits clients that use the default controls.
-        return dict(preserved or {}, domain_backtracking=True)
-    if len(values) != len(SLSQP_EXTRA_CONTROLS):
+    selected = normalize_optimizer("slsqp" if solver is None else solver)
+    if values and len(values) != len(SLSQP_EXTRA_CONTROLS):
         raise ValueError("Incomplete SLSQP controls. Reload the app and try again.")
-    return dict(preserved or {},
-                **{name: value for (name, _), value in zip(SLSQP_EXTRA_CONTROLS, values)},
-                domain_backtracking=True)
+    options = dict(preserved or {})
+    if values:
+        options.update(
+            {name: value for (name, _), value in zip(SLSQP_EXTRA_CONTROLS, values)}
+        )
+    if selected == "slsqp":
+        options.pop("mu_strategy", None)
+        options["domain_backtracking"] = True
+        return options
+    common = {
+        "ftol",
+        "maxiter",
+        "finite_diff_step",
+        "feasibility_tol",
+        "optimality_tol",
+    }
+    if selected == "pounce_ipm":
+        common.add("mu_strategy")
+    options = {name: value for name, value in options.items() if name in common}
+    if selected == "pounce_ipm" and mu_strategy is not None:
+        options["mu_strategy"] = mu_strategy
+    return options
+
+
+def editor_solver_arguments(values, offset=0):
+    """Read the shared launch/export tail without shifting legacy editor fields.
+
+    The tail contains five expert values and preserved options, followed by
+    optional solver and barrier strategy selections. Older direct clients omit
+    the last two entries and keep the historical SLSQP interpretation.
+    """
+    tail = values[offset:]
+    if not tail:
+        return {"solver_options": extra_solver_options([])}
+    if len(tail) == 1 and (tail[0] is None or isinstance(tail[0], dict)):
+        return {"solver_options": extra_solver_options([], tail[0])}
+    count = len(SLSQP_EXTRA_CONTROLS)
+    if len(tail) not in (count + 1, count + 3):
+        raise ValueError("Incomplete optimizer controls. Reload the app and try again.")
+    selection = {}
+    if len(tail) == count + 3:
+        selection = {
+            "solver": normalize_optimizer(tail[count + 1]),
+            "mu_strategy": tail[count + 2],
+        }
+    return {
+        "solver_options": extra_solver_options(tail[:count], tail[count], **selection),
+        **selection,
+    }
 
 
 PERFORMANCE = {
@@ -65,18 +129,18 @@ PERFORMANCE = {
     "power_actual": ("Shaft power [W]", 1e5),
     "shaft_torque": ("Shaft torque [N m]", 100),
     "maximum_mach_number": ("Maximum Mach number [-]", 1),
-    "exit_rotor_diameter": ("Exit rotor diameter [m]", .1),
+    "exit_rotor_diameter": ("Exit rotor diameter [m]", 0.1),
     "specific_speed": ("Specific speed [-]", 1),
     "rotational_speed": ("Rotational speed [rpm]", 10000),
 }
 GEOMETRY = {
     "flow_turning": ("Blade-row flow turning [deg]", 90),
     "flaring_angle": ("Flaring angle [deg]", 10),
-    "height": ("Blade height [m]", .01),
-    "chord": ("True chord [m]", .01),
-    "chord_meridional": ("Meridional chord [m]", .01),
-    "radius_in": ("Inlet radius [m]", .1),
-    "radius_out": ("Exit radius [m]", .1),
+    "height": ("Blade height [m]", 0.01),
+    "chord": ("True chord [m]", 0.01),
+    "chord_meridional": ("Meridional chord [m]", 0.01),
+    "radius_in": ("Inlet radius [m]", 0.1),
+    "radius_out": ("Exit radius [m]", 0.1),
     "aspect_ratio": ("Aspect ratio [-]", 1),
     "solidity_chord": ("Solidity [-]", 1),
     "blade_count_continuous": ("Continuous blade count [-]", 50),
@@ -89,7 +153,7 @@ INTERSPACE_GEOMETRY = {
     "flaring_angle": ("Interspace flaring angle [deg]", 10),
     "hub_wall_angle": ("Hub wall angle [deg]", 10),
     "shroud_wall_angle": ("Shroud wall angle [deg]", 10),
-    "meridional_length": ("Interspace meridional length [m]", .01),
+    "meridional_length": ("Interspace meridional length [m]", 0.01),
 }
 
 
@@ -441,7 +505,22 @@ def finite(value, label):
     return float(value)
 
 
-def build_settings(config, variables, constraints, objective, direction, tolerance, iterations, feasibility, results=None, *, require_variables=True, solver_options=None):
+def build_settings(
+    config,
+    variables,
+    constraints,
+    objective,
+    direction,
+    tolerance,
+    iterations,
+    feasibility,
+    results=None,
+    *,
+    require_variables=True,
+    solver_options=None,
+    solver=None,
+    mu_strategy=None,
+):
     """Validate UI values before launching; let the API clip initial guesses."""
     choices = variable_catalog(config)
     outputs = output_catalog(config, results)
@@ -456,7 +535,9 @@ def build_settings(config, variables, constraints, objective, direction, toleran
             raise ValueError("Select an available design variable in every row.")
         if path in selected:
             raise ValueError(f"Duplicate variable: {choices[path]['label']}.")
-        lo, hi = finite(row.get("lower"), "Lower bound"), finite(row.get("upper"), "Upper bound")
+        lo, hi = finite(row.get("lower"), "Lower bound"), finite(
+            row.get("upper"), "Upper bound"
+        )
         if lo >= hi or not math.isfinite(hi - lo):
             raise ValueError("Each variable needs finite bounds with lower < upper.")
         initial = row.get("initial")
@@ -469,23 +550,54 @@ def build_settings(config, variables, constraints, objective, direction, toleran
     for row in constraints:
         path = row.get("path")
         if path not in outputs:
-            raise ValueError("Select an available calculated quantity in every constraint.")
+            raise ValueError(
+                "Select an available calculated quantity in every constraint."
+            )
         operator = row.get("comparison")
         if operator not in ("<=", "=", ">="):
             raise ValueError("Choose a constraint comparison.")
         scale = finite(row.get("scale"), "Constraint scale")
         if scale <= 0:
-            raise ValueError("Constraint scale must be positive, including for a zero target.")
-        limits.append(dict(variable=path, type=operator, value=finite(row.get("target"), "Target"), normalize=scale))
-    tol, feas = finite(tolerance, "Solver tolerance"), finite(feasibility, "Feasibility tolerance")
+            raise ValueError(
+                "Constraint scale must be positive, including for a zero target."
+            )
+        limits.append(
+            dict(
+                variable=path,
+                type=operator,
+                value=finite(row.get("target"), "Target"),
+                normalize=scale,
+            )
+        )
+    tol, feas = finite(tolerance, "Solver tolerance"), finite(
+        feasibility, "Feasibility tolerance"
+    )
     count = finite(iterations, "Iteration limit")
     if min(tol, feas) <= 0 or count < 1 or count > 2000 or not count.is_integer():
-        raise ValueError("Tolerances must be positive; iteration limit must be an integer from 1 to 2000.")
-    options = solver_editor_options(dict(
+        raise ValueError(
+            "Tolerances must be positive; iteration limit must be an integer from 1 to 2000."
+        )
+    selected_solver = (
+        solver if solver is not None else config.get("optimization", {}).get("solver")
+    )
+    option_settings = dict(
         solver_options=dict(solver_options or {}, ftol=tol, maxiter=int(count)),
         feasibility_tolerance=feas,
-    ))
-    return dict(design_variables=selected, constraints=limits,
-                objective_function=dict(variable=objective, type=direction, normalize=outputs[objective]["scale"]),
-                feasibility_tolerance=feas,
-                solver_options=options)
+    )
+    if selected_solver is not None:
+        option_settings["solver"] = normalize_optimizer(selected_solver)
+        if option_settings["solver"] == "pounce_ipm" and mu_strategy is not None:
+            option_settings["solver_options"]["mu_strategy"] = mu_strategy
+    options = solver_editor_options(option_settings)
+    settings = dict(
+        design_variables=selected,
+        constraints=limits,
+        objective_function=dict(
+            variable=objective, type=direction, normalize=outputs[objective]["scale"]
+        ),
+        feasibility_tolerance=feas,
+        solver_options=options,
+    )
+    if "solver" in option_settings:
+        settings["solver"] = option_settings["solver"]
+    return settings

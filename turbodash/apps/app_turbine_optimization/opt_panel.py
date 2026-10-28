@@ -20,12 +20,26 @@ import dash_bootstrap_components as dbc
 
 from . import opt_jobs as jobs
 from .opt_model import (
-    build_settings, flat_config, nested_config, output_catalog, variable_catalog,
-    variable_groups, constraint_groups, SLSQP_EXTRA_CONTROLS, solver_editor_options,
+    build_settings,
+    flat_config,
+    nested_config,
+    output_catalog,
+    variable_catalog,
+    variable_groups,
+    constraint_groups,
+    SLSQP_EXTRA_CONTROLS,
+    solver_editor_options,
     extra_solver_options,
+    editor_optimizer,
+    editor_solver_arguments,
 )
-from .opt_selection import apply_selection_operations, picker_signature, picker_tree, selector_menu
-
+from turbodash.optimization import OPTIMIZER_LABELS
+from .opt_selection import (
+    apply_selection_operations,
+    picker_signature,
+    picker_tree,
+    selector_menu,
+)
 
 DEFAULT_OBJECTIVE = "$overall_performance.efficiency_ts_with_recovery"
 DEFAULT_CONSTRAINT = "$stages_performance.*.geometry_meanline.*.flaring_angle"
@@ -40,80 +54,346 @@ def field(label, component, help_text=None):
 
 
 def panel():
-    return html.Details([
-        html.Summary(["Optimization", html.Span("SLSQP", className="td-opt-badge")]),
-        html.Div([
-            dbc.Tabs(id="opt-tabs", active_tab="settings", children=[
-                dbc.Tab(label="Configuration", tab_id="settings", label_class_name="td-opt-help-configuration", children=html.Div([
-                    field("Objective", dcc.Dropdown(id="opt-objective", value=DEFAULT_OBJECTIVE, clearable=False)),
-                    field("Goal", dbc.RadioItems(id="opt-direction", value="maximize", inline=True,
-                                                options=[{"label": "Maximize", "value": "maximize"},
-                                                         {"label": "Minimize", "value": "minimize"}])),
-                    field("Iteration limit", dbc.Input(id="opt-iterations", type="number", value=solver_editor_options()["maxiter"], min=1, max=2000, step=1)),
-                    html.Div([
-                        field("Solver tolerance", dbc.Input(id="opt-tolerance", type="number", value=1e-9, min=1e-14, step="any", className="td-scientific"),
-                              "Native SLSQP stopping tolerance (ftol). Separate feasibility and KKT optimality checks still apply; show expert settings to inspect or change them."),
-                        html.Div([
-                            field("Feasibility tolerance", dbc.Input(id="opt-feasibility", type="number", value=1e-6, min=1e-14, step="any", className="td-scientific"),
-                                  "Maximum allowed normalized constraint and bound violation before a result can be applied."),
-                            field("Optimality tolerance", dbc.Input(id="opt-optimality-tolerance", type="number", value=1e-4, min=1e-14, step="any", className="td-scientific"),
-                                  "Maximum KKT stationarity, dual-feasibility, and complementarity residuals in normalized solver coordinates, including variable bounds. This is independent of native ftol."),
-                        ], id="opt-expert-tolerances", hidden=True, className="td-opt-settings-grid"),
-                    ], className="td-opt-settings-grid td-opt-tolerances"),
-                    html.Div([
-                        field("First step fraction", dbc.Input(id="opt-first-step", type="number", value=solver_editor_options()["first_step_fraction"], min=1e-8, max=1, step="any"),
-                              "Fraction of the first proposed SLSQP step to try. Default 0.25 starts conservatively, then the growth factor restores larger steps."),
-                        field("Step growth factor", dbc.Input(id="opt-step-growth-factor", type="number", value=solver_editor_options()["step_growth_factor"], min=1, step="any", placeholder="Blank disables"),
-                              "Default 1.5 increases the starting step fraction by 50% each iteration. After recovery, growth restarts from the accepted fraction. A factor of 1 holds it; blank disables gradual restoration."),
-                        field("Step reduction factor", dbc.Input(id="opt-backtrack-factor", type="number", value=.5, min=1e-8, max=.99999999, step="any"),
-                              "Multiply an invalid trial step by this factor before retrying. Default 0.5 halves the step. Recovery is always enabled in the app."),
-                        field("Trial retry limit", dbc.Input(id="opt-max-backtracks", type="number", value=20, min=0, step=1),
-                              "Maximum reductions of an invalid trial. Exhausting the limit stops the run with the physical failure details."),
-                    ], id="opt-expert-steps", hidden=True, className="td-opt-settings-grid td-opt-expert-steps"),
-                    html.Div(
-                        dbc.Checkbox(id="opt-expert-settings", label="Show expert settings", value=False,
-                                     persistence=True, persistence_type="local"),
-                        className="td-opt-expert-footer",
+    defaults = solver_editor_options()
+    slsqp_defaults = solver_editor_options({"solver": "slsqp"})
+    return html.Details(
+        [
+            html.Summary(
+                [
+                    "Optimization",
+                    html.Span(
+                        OPTIMIZER_LABELS["slsqp"],
+                        id="opt-solver-badge",
+                        className="td-opt-badge",
                     ),
-                ], className="td-opt-tab")),
-                dbc.Tab(label="Design variables", tab_id="variables", label_class_name="td-opt-help-variables", children=html.Div([
-                    html.Div([selector_menu("variable"), selector_menu("variable", groups=True)],
-                             className="td-opt-picker-actions"),
-                    html.Div(id="opt-variable-rows"),
-                ], className="td-opt-tab")),
-                dbc.Tab(label="Constraints", tab_id="constraints", label_class_name="td-opt-help-constraints", children=html.Div([
-                    html.Div([selector_menu("constraint"), selector_menu("constraint", groups=True)],
-                             className="td-opt-picker-actions"),
-                    html.Div(id="opt-constraint-rows"),
-                ], className="td-opt-tab")),
-            ]),
-            *[html.Span(message, id=f"opt-tab-help-{name}", className="visually-hidden",
-                        **{"data-opt-help-tab": f"td-opt-help-{name}"})
-              for name, message in (
-                  ("configuration", "Choose what to optimize and whether to maximize or minimize it. Set the iteration limit and solver tolerance; expert settings reveal the separate acceptance tolerances and step controls. Hiding expert settings keeps their values."),
-                  ("variables", "Select the inputs the optimizer may change, individually or in groups. Set each lower and upper bound. Leave Initial blank to use the current design; out-of-bounds initial values are clipped and logged."),
-                  ("constraints", "Select the limits the design must satisfy, individually or in groups. Choose a comparison and target. Scale divides the physical residual into a normalized violation; it must be positive, even for a zero target."),
-              )],
-        ], className="td-opt-body"),
-        dcc.Store(id="opt-launching", data=False), dcc.Store(id="opt-catalog"), dcc.Store(id="opt-editor-state", data={"variables": [], "constraints": []}),
-        dcc.Store(id="opt-editor-load"),
-        dcc.Store(id="opt-solver-options", data=solver_editor_options()),
-        dcc.Store(id="opt-selection-request", data={"revision": 0, "operations": []}),
-        dcc.Store(id="opt-picker-signature"),
-        dcc.Store(id="opt-job", storage_type="session"), dcc.Store(id="opt-applied-result"),
-        dcc.Store(id="opt-progress-snapshot"),
-        dcc.Store(id="opt-outcome-state", data="ready"),
-        dcc.Interval(id="opt-poll", interval=750),
-    ], className="td-opt-panel", id="opt-panel")
+                ]
+            ),
+            html.Div(
+                [
+                    dbc.Tabs(
+                        id="opt-tabs",
+                        active_tab="settings",
+                        children=[
+                            dbc.Tab(
+                                label="Configuration",
+                                tab_id="settings",
+                                label_class_name="td-opt-help-configuration",
+                                children=html.Div(
+                                    [
+                                        field(
+                                            "Objective",
+                                            dcc.Dropdown(
+                                                id="opt-objective",
+                                                value=DEFAULT_OBJECTIVE,
+                                                clearable=False,
+                                            ),
+                                        ),
+                                        field(
+                                            "Goal",
+                                            dcc.RadioItems(
+                                                id="opt-direction",
+                                                value="maximize",
+                                                className="td-segmented",
+                                                options=[
+                                                    {
+                                                        "label": "Maximize",
+                                                        "value": "maximize",
+                                                    },
+                                                    {
+                                                        "label": "Minimize",
+                                                        "value": "minimize",
+                                                    },
+                                                ],
+                                            ),
+                                        ),
+                                        field(
+                                            "Optimizer",
+                                            dcc.Dropdown(
+                                                id="opt-solver",
+                                                value="slsqp",
+                                                clearable=False,
+                                                searchable=False,
+                                                options=[
+                                                    dict(label=label, value=name)
+                                                    for name, label in OPTIMIZER_LABELS.items()
+                                                ],
+                                            ),
+                                            "IPM (Pounce): interior-point method for constrained turbine design. "
+                                            "SQP (Pounce): sequential quadratic programming with an active-set approach; an alternative when IPM struggles. "
+                                            "SLSQP (SciPy, through PySolverView): the default sequential least-squares method, with adjustable first-step and invalid-trial recovery controls. "
+                                            "All three use the same feasibility and first-order optimality checks.",
+                                        ),
+                                        field(
+                                            "Iteration limit",
+                                            dbc.Input(
+                                                id="opt-iterations",
+                                                type="number",
+                                                value=defaults["maxiter"],
+                                                min=1,
+                                                max=2000,
+                                                step=1,
+                                            ),
+                                        ),
+                                        html.Div(
+                                            [
+                                                field(
+                                                    "Solver tolerance",
+                                                    dbc.Input(
+                                                        id="opt-tolerance",
+                                                        type="number",
+                                                        value=defaults["ftol"],
+                                                        min=1e-14,
+                                                        step="any",
+                                                        className="td-scientific",
+                                                    ),
+                                                    "Native stopping tolerance. Separate feasibility and KKT optimality limits still apply; expert settings let you inspect or change them.",
+                                                ),
+                                                html.Div(
+                                                    [
+                                                        field(
+                                                            "Feasibility tolerance",
+                                                            dbc.Input(
+                                                                id="opt-feasibility",
+                                                                type="number",
+                                                                value=1e-6,
+                                                                min=1e-14,
+                                                                step="any",
+                                                                className="td-scientific",
+                                                            ),
+                                                            "Maximum allowed normalized constraint and bound violation before a result can be applied.",
+                                                        ),
+                                                        field(
+                                                            "Optimality tolerance",
+                                                            dbc.Input(
+                                                                id="opt-optimality-tolerance",
+                                                                type="number",
+                                                                value=defaults[
+                                                                    "optimality_tol"
+                                                                ],
+                                                                min=1e-14,
+                                                                step="any",
+                                                                className="td-scientific",
+                                                            ),
+                                                            "Maximum first-order KKT residual in normalized coordinates, including bounds. Passing the complete check can stop Pounce; an earlier native exit also ends the run.",
+                                                        ),
+                                                    ],
+                                                    id="opt-expert-tolerances",
+                                                    hidden=True,
+                                                    className="td-opt-settings-grid",
+                                                ),
+                                            ],
+                                            className="td-opt-settings-grid td-opt-tolerances",
+                                        ),
+                                        html.Div(
+                                            [
+                                                field(
+                                                    "First step fraction",
+                                                    dbc.Input(
+                                                        id="opt-first-step",
+                                                        type="number",
+                                                        value=slsqp_defaults[
+                                                            "first_step_fraction"
+                                                        ],
+                                                        min=1e-8,
+                                                        max=1,
+                                                        step="any",
+                                                    ),
+                                                    "Fraction of the first proposed SLSQP step to try. Default 0.25 starts conservatively, then the growth factor restores larger steps.",
+                                                ),
+                                                field(
+                                                    "Step growth factor",
+                                                    dbc.Input(
+                                                        id="opt-step-growth-factor",
+                                                        type="number",
+                                                        value=slsqp_defaults[
+                                                            "step_growth_factor"
+                                                        ],
+                                                        min=1,
+                                                        step="any",
+                                                        placeholder="Blank disables",
+                                                    ),
+                                                    "Default 1.5 increases the starting step fraction by 50% each iteration. After recovery, growth restarts from the accepted fraction. A factor of 1 holds it; blank disables gradual restoration.",
+                                                ),
+                                                field(
+                                                    "Step reduction factor",
+                                                    dbc.Input(
+                                                        id="opt-backtrack-factor",
+                                                        type="number",
+                                                        value=0.5,
+                                                        min=1e-8,
+                                                        max=0.99999999,
+                                                        step="any",
+                                                    ),
+                                                    "Multiply an invalid trial step by this factor before retrying. Default 0.5 halves the step. Recovery is always enabled in the app.",
+                                                ),
+                                                field(
+                                                    "Trial retry limit",
+                                                    dbc.Input(
+                                                        id="opt-max-backtracks",
+                                                        type="number",
+                                                        value=20,
+                                                        min=0,
+                                                        step=1,
+                                                    ),
+                                                    "Maximum reductions of an invalid trial. Exhausting the limit stops the run with the physical failure details.",
+                                                ),
+                                            ],
+                                            id="opt-expert-steps",
+                                            hidden=True,
+                                            className="td-opt-settings-grid td-opt-expert-steps",
+                                        ),
+                                        html.Div(
+                                            [
+                                                field(
+                                                    "Barrier strategy",
+                                                    dcc.Dropdown(
+                                                        id="opt-mu-strategy",
+                                                        value="adaptive",
+                                                        clearable=False,
+                                                        searchable=False,
+                                                        options=[
+                                                            dict(
+                                                                label="Adaptive",
+                                                                value="adaptive",
+                                                            ),
+                                                            dict(
+                                                                label="Monotone",
+                                                                value="monotone",
+                                                            ),
+                                                        ],
+                                                    ),
+                                                    "Adaptive was fastest at the requested accuracy in the turbine comparison. Monotone is an alternative trajectory.",
+                                                ),
+                                            ],
+                                            id="opt-expert-ipm",
+                                            hidden=True,
+                                            className="td-opt-settings-grid",
+                                        ),
+                                        html.Div(
+                                            dbc.Checkbox(
+                                                id="opt-expert-settings",
+                                                label="Show expert settings",
+                                                value=False,
+                                                persistence=True,
+                                                persistence_type="local",
+                                            ),
+                                            className="td-opt-expert-footer",
+                                        ),
+                                    ],
+                                    className="td-opt-tab",
+                                ),
+                            ),
+                            dbc.Tab(
+                                label="Design variables",
+                                tab_id="variables",
+                                label_class_name="td-opt-help-variables",
+                                children=html.Div(
+                                    [
+                                        html.Div(
+                                            [
+                                                selector_menu("variable"),
+                                                selector_menu("variable", groups=True),
+                                            ],
+                                            className="td-opt-picker-actions",
+                                        ),
+                                        html.Div(id="opt-variable-rows"),
+                                    ],
+                                    className="td-opt-tab",
+                                ),
+                            ),
+                            dbc.Tab(
+                                label="Constraints",
+                                tab_id="constraints",
+                                label_class_name="td-opt-help-constraints",
+                                children=html.Div(
+                                    [
+                                        html.Div(
+                                            [
+                                                selector_menu("constraint"),
+                                                selector_menu(
+                                                    "constraint", groups=True
+                                                ),
+                                            ],
+                                            className="td-opt-picker-actions",
+                                        ),
+                                        html.Div(id="opt-constraint-rows"),
+                                    ],
+                                    className="td-opt-tab",
+                                ),
+                            ),
+                        ],
+                    ),
+                    *[
+                        html.Span(
+                            message,
+                            id=f"opt-tab-help-{name}",
+                            className="visually-hidden",
+                            **{"data-opt-help-tab": f"td-opt-help-{name}"},
+                        )
+                        for name, message in (
+                            (
+                                "configuration",
+                                "Choose what to optimize and whether to maximize or minimize it. Set the iteration limit and solver tolerance; expert settings reveal the separate acceptance tolerances and step controls. Hiding expert settings keeps their values.",
+                            ),
+                            (
+                                "variables",
+                                "Select the inputs the optimizer may change, individually or in groups. Set each lower and upper bound. Leave Initial blank to use the current design; out-of-bounds initial values are clipped and logged.",
+                            ),
+                            (
+                                "constraints",
+                                "Select the limits the design must satisfy, individually or in groups. Choose a comparison and target. Scale divides the physical residual into a normalized violation; it must be positive, even for a zero target.",
+                            ),
+                        )
+                    ],
+                ],
+                className="td-opt-body",
+            ),
+            dcc.Store(id="opt-launching", data=False),
+            dcc.Store(id="opt-catalog"),
+            dcc.Store(id="opt-editor-state", data={"variables": [], "constraints": []}),
+            dcc.Store(id="opt-editor-load"),
+            dcc.Store(id="opt-solver-options", data=solver_editor_options()),
+            dcc.Store(id="opt-last-solver"),
+            dcc.Store(
+                id="opt-selection-request", data={"revision": 0, "operations": []}
+            ),
+            dcc.Store(id="opt-picker-signature"),
+            dcc.Store(id="opt-job", storage_type="session"),
+            dcc.Store(id="opt-applied-result"),
+            dcc.Store(id="opt-progress-snapshot"),
+            dcc.Store(id="opt-outcome-state", data="ready"),
+            dcc.Interval(id="opt-poll", interval=750),
+        ],
+        className="td-opt-panel",
+        id="opt-panel",
+    )
 
 
 def terminal():
     """Keep the expandable run log and final report in the workbench's dock."""
-    return html.Details([
-        html.Summary(["Optimization terminal", html.Span("SLSQP", className="td-opt-badge")]),
-        html.Pre("Convergence output and the final optimization report will appear here when you start a run.",
-                 id="opt-log", tabIndex=0, **{"aria-label": "Optimization output and final report"}),
-    ], id="opt-terminal", className="td-opt-terminal", open=False)
+    return html.Details(
+        [
+            html.Summary(
+                [
+                    "Optimization terminal",
+                    html.Span(
+                        OPTIMIZER_LABELS["slsqp"],
+                        id="opt-terminal-solver",
+                        className="td-opt-badge",
+                    ),
+                ]
+            ),
+            html.Pre(
+                "Convergence output and the final optimization report will appear here when you start a run.",
+                id="opt-log",
+                tabIndex=0,
+                **{"aria-label": "Optimization output and final report"},
+            ),
+        ],
+        id="opt-terminal",
+        className="td-opt-terminal",
+        open=False,
+    )
 
 
 def actions():
@@ -140,7 +420,6 @@ def recovery_summary(result):
     """Give successful recoveries a compact status outside the solver report."""
     count = result.get("domain_rejections", 0)
     return f" Recovered {count} invalid trial{'s' if count != 1 else ''}." if count else ""
-
 
 
 def outcome_presentation(state, launching=False):
@@ -286,17 +565,30 @@ def reconcile_editor(rows, previous, catalog, kind, trigger, loaded=None, *,
 def register_callbacks(app, live_config, render_results):
     """Bind the editors to this app's existing control and rendering functions."""
     overall_values = State({"scope": "overall", "key": ALL}, "value")
-    stage_values = State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "value")
+    stage_values = State(
+        {"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "value"
+    )
     overall_ids = State({"scope": "overall", "key": ALL}, "id")
-    stage_ids = State({"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "id")
+    stage_ids = State(
+        {"scope": "stage", "stage": ALL, "key": ALL, "elem": "input"}, "id"
+    )
     var_path = {"type": "opt-variable-path", "row": ALL}
     con_path = {"type": "opt-constraint-path", "row": ALL}
     var_num = {"type": "opt-variable-number", "row": ALL, "field": ALL}
     con_num = {"type": "opt-constraint-number", "row": ALL, "field": ALL}
     comparison = {"type": "opt-comparison", "row": ALL}
-    editor_states = [State(var_path, "value"), State(var_path, "id"), State(var_num, "value"), State(var_num, "id"),
-                     State(con_path, "value"), State(con_path, "id"), State(con_num, "value"), State(con_num, "id"),
-                     State(comparison, "value"), State(comparison, "id")]
+    editor_states = [
+        State(var_path, "value"),
+        State(var_path, "id"),
+        State(var_num, "value"),
+        State(var_num, "id"),
+        State(con_path, "value"),
+        State(con_path, "id"),
+        State(con_num, "value"),
+        State(con_num, "id"),
+        State(comparison, "value"),
+        State(comparison, "id"),
+    ]
 
     @app.callback(Output("opt-catalog", "data"), Output("opt-objective", "options"),
                   Input("result_store", "data"))
@@ -319,7 +611,8 @@ def register_callbacks(app, live_config, render_results):
             return config ? {config: config, revision: (previous?.revision || 0) + 1,
                 selection_revision: selection?.revision || 0} : null;
         }""",
-        Output("opt-editor-load", "data"), Input("loaded_cfg_store", "data"),
+        Output("opt-editor-load", "data"),
+        Input("loaded_cfg_store", "data"),
         State("opt-selection-request", "data"),
         State("opt-editor-load", "data"),
     )
@@ -447,39 +740,91 @@ def register_callbacks(app, live_config, render_results):
                 [constraint_row(row, catalog["constraints"]) for row in constraints] or html.P("No constraints · bounds still apply to every free input.", className="td-opt-empty"), state)
 
     app.clientside_callback(
-        "function(expert) { return [!expert, !expert]; }",
-        Output("opt-expert-tolerances", "hidden"), Output("opt-expert-steps", "hidden"),
+        """function(expert, solver) {
+            return [!expert, !expert || solver !== 'slsqp', !expert || solver !== 'pounce_ipm'];
+        }""",
+        Output("opt-expert-tolerances", "hidden"),
+        Output("opt-expert-steps", "hidden"),
+        Output("opt-expert-ipm", "hidden"),
         Input("opt-expert-settings", "value"),
+        Input("opt-solver", "value"),
     )
 
-    @app.callback(Output("opt-objective", "value"), Output("opt-direction", "value"),
-                  Output("opt-tolerance", "value"), Output("opt-iterations", "value"), Output("opt-feasibility", "value"),
-                  *[Output(component_id, "value") for _, component_id in SLSQP_EXTRA_CONTROLS],
-                  Output("opt-solver-options", "data"),
-                  Input("loaded_cfg_store", "data"))
+    @app.callback(
+        Output("opt-solver-badge", "children"),
+        Output("opt-terminal-solver", "children"),
+        Output("opt-last-solver", "data"),
+        Input("opt-solver", "value"),
+        Input("opt-job", "data"),
+        Input("opt-applied-result", "data"),
+        State("opt-last-solver", "data"),
+    )
+    def display_solver(solver, job, applied, previous):
+        selected = OPTIMIZER_LABELS.get(solver, OPTIMIZER_LABELS["slsqp"])
+        # Keep the terminal tied to the actual run when the next selection changes.
+        executed = (
+            (job or {}).get("solver") or previous or (applied or {}).get("solver")
+        )
+        return selected, OPTIMIZER_LABELS.get(executed, selected), executed
+
+    @app.callback(
+        Output("opt-objective", "value"),
+        Output("opt-direction", "value"),
+        Output("opt-tolerance", "value"),
+        Output("opt-iterations", "value"),
+        Output("opt-feasibility", "value"),
+        *[Output(component_id, "value") for _, component_id in SLSQP_EXTRA_CONTROLS],
+        Output("opt-solver", "value"),
+        Output("opt-mu-strategy", "value"),
+        Output("opt-solver-options", "data"),
+        Input("loaded_cfg_store", "data"),
+    )
     def load_settings(config):
-        settings = (config or {}).get("optimization", {})
-        objective = settings.get("objective_function", {})
+        settings = (config or {}).get("optimization")
+        objective = (settings or {}).get("objective_function", {})
         options = solver_editor_options(settings)
-        return (objective.get("variable", DEFAULT_OBJECTIVE), objective.get("type", "maximize"),
-                options["ftol"], options["maxiter"], settings.get("feasibility_tolerance", 1e-6),
-                *[options[name] for name, _ in SLSQP_EXTRA_CONTROLS], options)
+        controls = dict(solver_editor_options({"solver": "slsqp"}), **options)
+        return (
+            objective.get("variable", DEFAULT_OBJECTIVE),
+            objective.get("type", "maximize"),
+            options["ftol"],
+            options["maxiter"],
+            (settings or {}).get("feasibility_tolerance", 1e-6),
+            *[controls[name] for name, _ in SLSQP_EXTRA_CONTROLS],
+            editor_optimizer(settings),
+            options.get("mu_strategy", "adaptive"),
+            options,
+        )
 
     job_outputs = [
-        Output("opt-job", "data"), Output("opt-status", "children"), Output("opt-log", "children"),
-        Output("opt-progress-snapshot", "data"), Output("opt-progress", "children"),
-        Output("loaded_cfg_store", "data", allow_duplicate=True), Output("opt-applied-result", "data"),
+        Output("opt-job", "data"),
+        Output("opt-status", "children"),
+        Output("opt-log", "children"),
+        Output("opt-progress-snapshot", "data"),
+        Output("opt-progress", "children"),
+        Output("loaded_cfg_store", "data", allow_duplicate=True),
+        Output("opt-applied-result", "data"),
         Output("opt-terminal", "open"),
         Output("opt-outcome-state", "data"),
     ]
     job_states = [
-        State("opt-job", "data"), overall_values, stage_values, overall_ids, stage_ids,
-        State("stage_data_store", "data"), *editor_states,
-        State("opt-objective", "value"), State("opt-direction", "value"),
-        State("opt-tolerance", "value"), State("opt-iterations", "value"), State("opt-feasibility", "value"),
+        State("opt-job", "data"),
+        overall_values,
+        stage_values,
+        overall_ids,
+        stage_ids,
+        State("stage_data_store", "data"),
+        *editor_states,
+        State("opt-objective", "value"),
+        State("opt-direction", "value"),
+        State("opt-tolerance", "value"),
+        State("opt-iterations", "value"),
+        State("opt-feasibility", "value"),
         State("result_store", "data"),
         *[State(component_id, "value") for _, component_id in SLSQP_EXTRA_CONTROLS],
         State("opt-solver-options", "data"),
+        State("opt-solver", "value"),
+        State("opt-mu-strategy", "value"),
     ]
 
     @app.callback(*job_outputs, Input("opt-poll", "n_intervals"), *job_states, prevent_initial_call=True)
@@ -510,40 +855,107 @@ def register_callbacks(app, live_config, render_results):
             if not _click:
                 raise PreventUpdate
             try:
-                if handle and (handle.get("applying") or jobs.job_status(handle, owner)["state"] == "running"):
+                if handle and (
+                    handle.get("applying")
+                    or jobs.job_status(handle, owner)["state"] == "running"
+                ):
                     raise PreventUpdate
                 config = live_config(ov, sv, oi, si, stages)
                 variables = collect_rows(*values[:4])
                 constraints = collect_rows(*values[4:10])
-                settings = build_settings(config, variables, constraints, *values[10:15], results=values[15],
-                                          solver_options=extra_solver_options(values[16:-1], values[-1]))
+                settings = build_settings(
+                    config,
+                    variables,
+                    constraints,
+                    *values[10:15],
+                    results=values[15],
+                    **editor_solver_arguments(values, offset=16),
+                )
                 handle = jobs.start_job(config, settings, owner)
-                return handle, "Optimizing turbine…", "Starting a fresh optimization run…", None, "Preparing initial design…", no_update, no_update, no_update, "running"
+                handle = dict(handle, solver=settings.get("solver", "slsqp"))
+                return (
+                    handle,
+                    "Optimizing turbine…",
+                    "Starting a fresh optimization run…",
+                    None,
+                    "Preparing initial design…",
+                    no_update,
+                    no_update,
+                    no_update,
+                    "running",
+                )
             except PreventUpdate:
                 raise
             except Exception as error:
-                return None, f"Could not start: {error}", f"ERROR: {error}", None, "", no_update, no_update, no_update, "failed"
+                return (
+                    None,
+                    f"Could not start: {error}",
+                    f"ERROR: {error}",
+                    None,
+                    "",
+                    no_update,
+                    no_update,
+                    no_update,
+                    "failed",
+                )
         if not handle:
             raise PreventUpdate
         try:
             if handle.get("applying"):
                 current = live_config(ov, sv, oi, si, stages)
                 displayed = values[15]
-                if (displayed and jobs.fingerprint(displayed) == handle["target"]
-                        and jobs.fingerprint(current) == handle["target"]):
-                    return None, handle["message"], no_update, no_update, no_update, no_update, no_update, no_update, "success"
+                if (
+                    displayed
+                    and jobs.fingerprint(displayed) == handle["target"]
+                    and jobs.fingerprint(current) == handle["target"]
+                ):
+                    return (
+                        None,
+                        handle["message"],
+                        no_update,
+                        no_update,
+                        no_update,
+                        no_update,
+                        no_update,
+                        no_update,
+                        "success",
+                    )
                 if time.time() - handle["applied_at"] > 45:
                     # The inspector remains editable while jobs run. A user may
                     # have changed the design after the optimized values arrived;
                     # never overwrite those edits with the pre-run configuration.
-                    return None, "Optimization application was not confirmed. Current inputs retained.", no_update, no_update, "", no_update, no_update, no_update, "unconfirmed"
+                    return (
+                        None,
+                        "Optimization application was not confirmed. Current inputs retained.",
+                        no_update,
+                        no_update,
+                        "",
+                        no_update,
+                        no_update,
+                        no_update,
+                        "unconfirmed",
+                    )
                 raise PreventUpdate
             status, log, progress, result = jobs.read_job(handle, owner)
-            summary = (f"Update {progress['iteration']} · objective {progress['objective']:.7g} · violation {progress['max_constraint_violation']:.3g}" if progress else "Preparing initial design…")
+            summary = (
+                f"Update {progress['iteration']} · objective {progress['objective']:.7g} · violation {progress['max_constraint_violation']:.3g}"
+                if progress
+                else "Preparing initial design…"
+            )
             if status["state"] == "cancelled" and not progress:
                 summary = ""
             if status["state"] == "running":
-                return no_update, "Optimizing turbine…", log, progress, summary, no_update, no_update, no_update, "running"
+                return (
+                    no_update,
+                    "Optimizing turbine…",
+                    log,
+                    progress,
+                    summary,
+                    no_update,
+                    no_update,
+                    no_update,
+                    "running",
+                )
             config, applied = no_update, no_update
             message = status["message"]
             outcome = "cancelled" if status["state"] == "cancelled" else "failed"
@@ -560,16 +972,51 @@ def register_callbacks(app, live_config, render_results):
                     recovery = recovery_summary(result)
                     if recovery:
                         message = message.rstrip(".") + "." + recovery
-                    pending = dict(handle, applying=True, target=jobs.fingerprint(result["config"]),
-                                   applied_at=time.time(), message=message)
-                    return pending, "Applying optimized design…", log, progress, summary, config, applied, no_update, "applying"
+                    pending = dict(
+                        handle,
+                        applying=True,
+                        target=jobs.fingerprint(result["config"]),
+                        applied_at=time.time(),
+                        message=message,
+                    )
+                    return (
+                        pending,
+                        "Applying optimized design…",
+                        log,
+                        progress,
+                        summary,
+                        config,
+                        applied,
+                        no_update,
+                        "applying",
+                    )
             elif result:
                 message = f"Result not applied · {result['message']}"
-            return None, message, log, progress, summary, config, applied, no_update, outcome
+            return (
+                None,
+                message,
+                log,
+                progress,
+                summary,
+                config,
+                applied,
+                no_update,
+                outcome,
+            )
         except PreventUpdate:
             raise
         except Exception as error:
-            return None, f"Optimization stopped: {error}", f"ERROR: {error}", no_update, "", no_update, no_update, no_update, "failed"
+            return (
+                None,
+                f"Optimization stopped: {error}",
+                f"ERROR: {error}",
+                no_update,
+                "",
+                no_update,
+                no_update,
+                no_update,
+                "failed",
+            )
 
     @app.callback(
         Output("opt-actions", "className"), Output("opt-actions", "aria-busy"),
@@ -584,8 +1031,14 @@ def register_callbacks(app, live_config, render_results):
         """function(job, launching, style) {
             return [!!job || !!launching, !job || !!job.applying || !!launching,
                     job ? 'td-opt-panel td-section td-opt-busy' : 'td-opt-panel td-section',
-                    Object.assign({}, style, {pointerEvents: 'auto'})];
+                    Object.assign({}, style, {pointerEvents: 'auto'}), !!job || !!launching];
         }""",
-        Output("opt-start", "disabled"), Output("opt-stop", "disabled"),
-        Output("opt-panel", "className"), Output("design-controls", "style"),
-        Input("opt-job", "data"), Input("opt-launching", "data"), State("design-controls", "style"))
+        Output("opt-start", "disabled"),
+        Output("opt-stop", "disabled"),
+        Output("opt-panel", "className"),
+        Output("design-controls", "style"),
+        Output("opt-solver", "disabled"),
+        Input("opt-job", "data"),
+        Input("opt-launching", "data"),
+        State("design-controls", "style"),
+    )

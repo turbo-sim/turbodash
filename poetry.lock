@@ -1331,14 +1331,14 @@ scipy = ">=1.12"
 
 [[package]]
 name = "jaxprop"
-version = "0.5.7"
+version = "0.5.8"
 description = "JAX-compatible thermodynamic property calculations."
 optional = false
 python-versions = "<3.14,>=3.11"
 groups = ["main"]
 files = [
-    {file = "jaxprop-0.5.7-py3-none-any.whl", hash = "sha256:3c1998a45944b569c4d935f8fc37e05c205360c4166b193aae6aedd29ca05a00"},
-    {file = "jaxprop-0.5.7.tar.gz", hash = "sha256:1ad82775b86b5b0b5b767afe70f41a1bda97b877daf4994accd2bbdf7b91485e"},
+    {file = "jaxprop-0.5.8-py3-none-any.whl", hash = "sha256:3b6db9bfa5bd9ee37a4c3441f92f86b772e0c88ce8609bf76d32c322fbc795a3"},
+    {file = "jaxprop-0.5.8.tar.gz", hash = "sha256:9bbc31ab353715827140a00f23ef01d1cf952e9a5d21516bb7e0fbefb607c815"},
 ]
 
 [package.dependencies]
@@ -1350,7 +1350,7 @@ jaxlib = ">=0.6.0,<0.7.0"
 matplotlib = ">=3.10.6,<4.0.0"
 numpy = ">=2.3.0,<3.0.0"
 optimistix = ">=0.0.10,<0.0.11"
-pysolver_view = ">=0.7.1,<0.8.0"
+pysolver_view = ">=0.7.1,<1.0.0"
 scipy = ">=1.16.1,<2.0.0"
 tqdm = ">=4.67.1,<5.0.0"
 
@@ -2669,6 +2669,35 @@ test = ["pytest-httpserver", "pytest-localftpserver"]
 xxhash = ["xxhash (>=1.4.3)"]
 
 [[package]]
+name = "pounce-solver"
+version = "0.13.0"
+description = "Python interface to POUNCE — a pure-Rust interior-point optimization solver for nonlinear, conic (LP/QP/SOCP/SDP/exp/power), and global problems (NLP core ported from Ipopt). cyipopt-style Problem class, scipy-style minimize() facade, solve_qp/solve_socp/sos_minimize, and JAX-friendly autodiff / implicit differentiation."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "pounce_solver-0.13.0-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:caa1bacf83ee881e14bd579286bb39b270d84e4cb56d0b6657d3297b638456c9"},
+    {file = "pounce_solver-0.13.0-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:9248ca8444e8d3e53e15c8a0b244730d65714f6d164ca279b282b69c6fcce6b0"},
+    {file = "pounce_solver-0.13.0-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:aec11d3999f500cea25a81ed6f7a2c462a76889988cac6b8d5240370038a741f"},
+    {file = "pounce_solver-0.13.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1141d1b23b6dd03f92e68d32db310c59883c490c191850143eff512be45ab0dd"},
+    {file = "pounce_solver-0.13.0-cp39-abi3-win_amd64.whl", hash = "sha256:636fd3935d46a666b7a33c6b113f6c421e151e9a3e066dfda0d0a7895c05b5a4"},
+    {file = "pounce_solver-0.13.0.tar.gz", hash = "sha256:2ec19f51864bb6815ee3527c98001c01722bd3b29a5c1471d07ea29eb577c190"},
+]
+
+[package.dependencies]
+numpy = ">=1.23"
+scipy = ">=1.11"
+
+[package.extras]
+dev = ["jax (>=0.4.30)", "jaxlib (>=0.4.30)", "jsonschema (>=4)", "plotly (>=5)", "pytest (>=7)", "pyyaml (>=6)", "scipy (>=1.11)", "torch (>=2.2)"]
+diffrax = ["diffrax (>=0.5)"]
+gams = ["gamsapi[core] (>=45)", "pyyaml (>=6)"]
+jax = ["jax (>=0.4.30)", "jaxlib (>=0.4.30)"]
+scipy = ["scipy (>=1.11)"]
+torch = ["torch (>=2.2)"]
+viz = ["plotly (>=5)"]
+
+[[package]]
 name = "prompt-toolkit"
 version = "3.0.52"
 description = "Library for building powerful interactive command lines in Python"
@@ -3069,14 +3098,14 @@ diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "pysolver-view"
-version = "0.7.4"
+version = "0.8.1"
 description = "Visualization of solver convergence evolution"
 optional = false
 python-versions = "<3.14,>=3.10"
 groups = ["main"]
 files = [
-    {file = "pysolver_view-0.7.4-py3-none-any.whl", hash = "sha256:96211b7b08736d10923198454e72d9b821e4aa046fcdf0abb788d5093d0cc288"},
-    {file = "pysolver_view-0.7.4.tar.gz", hash = "sha256:4ff1f945238d211a0cba7a9720506f7527a7a20e09ca5ee34cf87f39ad52c82c"},
+    {file = "pysolver_view-0.8.1-py3-none-any.whl", hash = "sha256:c8224fe67a4ac0505fc795f02ca46414bb5f469f9d92778ed0a068729f861aef"},
+    {file = "pysolver_view-0.8.1.tar.gz", hash = "sha256:2535e9ec9a3abe53e38ccb30cdf95ba154634e19513e95be85e64bd2d5aac2b6"},
 ]
 
 [package.dependencies]
@@ -3085,12 +3114,14 @@ matplotlib = ">=3.10.1,<4.0.0"
 numpy = ">=2.2.4,<3.0.0"
 openpyxl = ">=3.1.5,<4.0.0"
 pandas = ">=2.2.3,<3.0.0"
+pounce-solver = {version = "0.13.0", optional = true, markers = "extra == \"pounce\""}
 PyYAML = ">=6.0.2,<7.0.0"
 scipy = {version = "1.17.1", markers = "python_version >= \"3.11\" and python_version < \"3.14\""}
 toml = ">=0.10.2,<0.11.0"
 
 [package.extras]
 jax = ["jax (>=0.5.3,<0.6.0)"]
+pounce = ["pounce-solver (==0.13.0)"]
 thermodynamics = ["CoolProp (>=6.6,<8)"]
 
 [[package]]
@@ -4996,4 +5027,4 @@ mesh = ["turbo_moc"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.14"
-content-hash = "9c45df983beebcf66cd63e4998c4210eafd45bbca9d3c4469d351819677477d7"
+content-hash = "32ccfe8a7efb4f6de0095c45473f8fda69c07f9f2c80605dbcee172f1b0cf131"

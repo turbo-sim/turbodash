@@ -35,12 +35,12 @@ numpy = "^2.3.0"
 # PySolverView's controlled SLSQP bridge requires this SciPy interface.
 scipy = "1.17.1"
 matplotlib = "^3.10.6"
-jaxprop = "^0.5.7"
+jaxprop = "^0.5.8"
 python-docx = "^1.2.0"
 xlwings = "0.34.0"
 dash-bootstrap-components = "^2.0.4"
-# The optimization app uses width-configurable final reports from 0.7.4.
-pysolver-view = "^0.7.4"
+# NLP backends used by the workbench optimizer selector and development studies.
+pysolver-view = { version = "^0.8.1", extras = ["pounce"] }
 # Use a published version so the optional mesh extra is accepted by PyPI.
 turbo_moc = { version = "1.2.0", optional = true }
 

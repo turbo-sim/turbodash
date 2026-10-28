@@ -8,6 +8,7 @@ used to develop and validate them.
 | --- | --- |
 | [app_design](app_design/README.md) | Current workbench blueprint: visual style, UI/UX, components, icons and reference screenshots |
 | [optimization](optimization/README.md) | Independent KKT maintenance checks and the SLSQP recovery/step-control design record; user examples live in [demos/optimization](../demos/optimization/README.md) |
+| [pounce_solvers](pounce_solvers/README.md) | Four-solver axial-turbine NLP comparison with convergence histories, model/derivative/solver/KKT timing, and solver recommendations |
 | [blade_parametrization](blade_parametrization/README.md) | Blade parametrization prototypes, reference papers, and geometry review |
 | [loss_model_analysis](loss_model_analysis/README.md) | Loss correlations, digitization sources, numerical audits, and reports |
 

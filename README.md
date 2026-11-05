@@ -1,6 +1,6 @@
-﻿# Turbodash
+# Turbodash
 
-Turbodash is an interactive application for the meanline design and optimization of axial and radial turbines.
+Interactive Python application for meanline design, analysis and optimization of axial and radial turbines.
 
 - [Hosted meanline app](https://turbodash.onrender.com/)
 - [PyPI package](https://pypi.org/project/turbodash-core/)
@@ -92,3 +92,11 @@ The original single-stage app remains available with `poetry run app_stage` or `
 ## License
 
 This project is released under the MIT License.
+
+<!-- research-software-metadata:start -->
+## Development and citation
+
+Roberto Agromayor originally developed Turbodash, with contributions from Srinivas Prakash Diwanji.
+
+Citation metadata is provided in [CITATION.cff](CITATION.cff). For version-specific reproducibility, also record the release or commit used.
+<!-- research-software-metadata:end -->

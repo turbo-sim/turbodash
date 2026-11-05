@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+type: software
+message: If you use this software, please cite it using this metadata and record the version or commit used.
+title: 'Turbodash: Interactive Python application for meanline design, analysis and optimization of axial and radial
+  turbines'
+abstract: Interactive Python application for meanline design, analysis and optimization of axial and radial turbines.
+authors:
+- family-names: Agromayor
+  given-names: Roberto
+  orcid: https://orcid.org/0009-0009-9289-1130
+- family-names: Diwanji
+  given-names: Srinivas Prakash
+version: 0.9.0
+repository-code: https://github.com/turbo-sim/turbodash
+url: https://github.com/turbo-sim/turbodash

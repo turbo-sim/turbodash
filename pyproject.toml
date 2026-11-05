@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "turbodash-core"
 version = "0.9.0"
-description = "Interactive Dash app for turbomachinery stage preliminary design"
-authors = ["Roberto Agromayor"]
+description = "Interactive Python application for meanline design, analysis and optimization of axial and radial turbines."
+authors = ["Roberto Agromayor", "Srinivas Prakash Diwanji"]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/turbo-sim/turbodash"

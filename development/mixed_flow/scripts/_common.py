@@ -1,6 +1,5 @@
 """Shared plotting/configuration helpers for the standalone examples."""
 
-from dataclasses import MISSING, asdict, fields
 from pathlib import Path
 import sys
 
@@ -12,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from development.mixed_flow.explorer import model
 from development.mixed_flow.meridional import (
     BladeEdges,
     BladeMeridional,
@@ -42,25 +42,12 @@ def style():
 
 
 def example_config():
-    return {
-        "dimensions": asdict(MeanlineDimensions.from_ratios()),
-        "hub": asdict(WallShape()),
-        "shroud": asdict(WallShape()),
-        "blade": asdict(BladeEdges()),
-        "splitter_start": 0.25,
-    }
+    return model.default_config()
 
 
 def build(config=None):
     data = example_config() if config is None else config
-    channel = MeridionalChannel(
-        MeanlineDimensions(**data["dimensions"]),
-        hub=WallShape(**data.get("hub", {})),
-        shroud=WallShape(**data.get("shroud", {})),
-    )
-    blade = BladeMeridional(channel, BladeEdges(**data.get("blade", {})))
-    splitter = blade.splitter(data.get("splitter_start", 0.25))
-    return channel, blade, splitter
+    return model.build_geometry(data)[1:]
 
 
 def load_config(path):
@@ -80,38 +67,7 @@ def load_config(path):
         raise ValueError(
             "The YAML configuration must contain a mapping of parameter groups."
         )
-    unknown = set(data) - {"dimensions", "hub", "shroud", "blade", "splitter_start"}
-    if unknown:
-        raise ValueError(
-            f"Unknown configuration keys: {', '.join(sorted(map(str, unknown)))}."
-        )
-    if "dimensions" not in data:
-        raise ValueError("The YAML configuration requires a dimensions mapping.")
-    for name, model in (
-        ("dimensions", MeanlineDimensions),
-        ("hub", WallShape),
-        ("shroud", WallShape),
-        ("blade", BladeEdges),
-    ):
-        group = data.get(name, {})
-        if not isinstance(group, dict):
-            raise ValueError(f"{name} must be a mapping; use {{}} for its defaults.")
-        specifications = fields(model)
-        unknown = set(group) - {field.name for field in specifications}
-        if unknown:
-            raise ValueError(
-                f"Unknown {name} parameters: {', '.join(sorted(map(str, unknown)))}."
-            )
-        missing = {
-            field.name
-            for field in specifications
-            if field.default is MISSING and field.default_factory is MISSING
-        } - set(group)
-        if missing:
-            raise ValueError(
-                f"Missing {name} parameters: {', '.join(sorted(missing))}."
-            )
-    return data
+    return model.normalize_config(data)
 
 
 def line(ax, points, **kwargs):

@@ -1,0 +1,20 @@
+# Engineering dimensions use metres; control-point vectors are dimensionless.
+dimensions:
+  inlet_hub_radius: 0.025
+  inlet_shroud_radius: 0.065
+  outlet_radius: 0.1
+  outlet_width: 0.008
+  axial_length: 0.06
+  inlet_flow_angle_deg: 0.0
+  outlet_flow_angle_deg: 90.0
+hub: {}
+shroud: {}
+blade: {}
+splitter_start: 0.25
+# Total [delta z, delta r] from each engineering wall's exact degree-six spline,
+# divided by that original wall's straight endpoint chord. Only 2, 3, 4 can move.
+control_point_displacements:
+  hub:
+    3: [0.008, -0.004]
+  shroud:
+    3: [-0.006, 0.004]

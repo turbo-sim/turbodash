@@ -82,9 +82,15 @@ class WallCurve:
         self._bow_vector = shape.bow * np.array([-chord[1], chord[0]])
         self.shape = shape
         self.start, self.end = start.copy(), end.copy()
+        self._build_arclength_map()
+
+    def _build_arclength_map(self):
+        """Build the shared physical-coordinate map for either wall evaluator."""
         table_u = np.linspace(0.0, 1.0, 4097)
         speed = np.linalg.norm(self.derivative(table_u), axis=-1)
-        if np.any(speed <= self._chord_length * 1e-10):
+        if not np.all(np.isfinite(speed)) or np.any(
+            speed <= self._chord_length * 1e-10
+        ):
             raise ValueError(
                 "Wall curve has a vanishing tangent; reduce bow or tangent reaches."
             )
@@ -165,3 +171,41 @@ class WallCurve:
         return (
             first[..., 0] * second[..., 1] - first[..., 1] * second[..., 0]
         ) / np.linalg.norm(first, axis=-1) ** 3
+
+
+class SplineWallCurve(WallCurve):
+    """Exact edited wall using the existing arclength and diagnostic machinery.
+
+    The engineering baseline remains available so total displacements can be
+    replaced without accumulating previous edits. Endpoint position and tangent
+    constraints are enforced by the displacement adapter before construction.
+    """
+
+    def __init__(self, baseline, spline):
+        self.baseline = baseline
+        self._spline = BSpline(
+            spline.t.copy(), spline.c.copy(), spline.k, extrapolate=False
+        )
+        self._spline_derivatives = {
+            order: self._spline.derivative(order) for order in (1, 2)
+        }
+        self.shape = baseline.shape
+        self.start, self.end = baseline.start.copy(), baseline.end.copy()
+        self._chord_length = baseline._chord_length
+        self._build_arclength_map()
+
+    def point(self, u):
+        return self._spline(unit_interval(u, "u"))
+
+    def derivative(self, u, order=1):
+        if order not in (1, 2):
+            raise ValueError("Derivative order must be 1 or 2.")
+        return self._spline_derivatives[order](unit_interval(u, "u"))
+
+    def as_bspline(self):
+        return BSpline(
+            self._spline.t.copy(),
+            self._spline.c.copy(),
+            self._spline.k,
+            extrapolate=False,
+        )

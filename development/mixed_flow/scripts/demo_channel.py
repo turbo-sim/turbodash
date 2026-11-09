@@ -4,7 +4,6 @@ Run from any directory; all example length inputs are in metres.
 """
 
 import argparse
-from dataclasses import asdict
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -52,15 +51,8 @@ def main():
         ax.grid(True)
     fig.suptitle("Centrifugal / mixed-flow geometry · engineering inputs", fontsize=16)
     save(fig, args.output_dir, "channel_overview")
-    resolved = {
-        "dimensions": asdict(channel.dimensions),
-        "hub": asdict(channel.hub_shape),
-        "shroud": asdict(channel.shroud_shape),
-        "blade": asdict(blade.edges),
-        "splitter_start": config.get("splitter_start", 0.25),
-    }
     (args.output_dir / "parameters.yaml").write_text(
-        yaml.safe_dump(resolved, sort_keys=False, allow_unicode=True), encoding="utf-8"
+        yaml.safe_dump(config, sort_keys=False, allow_unicode=True), encoding="utf-8"
     )
     np.savetxt(
         args.output_dir / "channel.csv",

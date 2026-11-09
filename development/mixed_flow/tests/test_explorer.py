@@ -127,7 +127,7 @@ def test_app_serves_layout_without_starting_server():
     client = app.server.test_client()
     for route in ("/", "/_dash-layout", "/_dash-dependencies", "/assets/style.css"):
         assert client.get(route).status_code == 200
-    assert len(app.callback_map) == 4
+    assert "wall-editor-scene.data" in app.callback_map
     with pytest.raises(ValueError, match="dimensions"):
         create_app({})
 

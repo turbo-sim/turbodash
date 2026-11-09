@@ -265,7 +265,7 @@ def normalize_config(data):
     if not isinstance(data, dict):
         raise ValueError("Configuration must be a YAML mapping.")
     result = default_config()
-    unknown = set(data) - set(result)
+    unknown = set(data) - set(result) - {"control_point_displacements"}
     if unknown:
         raise ValueError(
             f"Unknown configuration group: {', '.join(map(str, unknown))}."
@@ -281,6 +281,15 @@ def normalize_config(data):
     if missing := required - set(data["dimensions"]):
         raise ValueError(f"Missing dimensions: {', '.join(sorted(missing))}.")
     for group, value in data.items():
+        if group == "control_point_displacements":
+            # Keep this optional extension out of legacy configurations. The
+            # kernel owns point indices, units, and displacement validation.
+            from ..meridional.editing import normalize_displacements
+
+            displacements = normalize_displacements(value)
+            if displacements:
+                result[group] = displacements
+            continue
         if group == "splitter_start":
             result[group] = value
             continue
@@ -380,6 +389,7 @@ def build_geometry(config):
         MeanlineDimensions(**config["dimensions"]),
         hub=WallShape(**config["hub"]),
         shroud=WallShape(**config["shroud"]),
+        control_point_displacements=config.get("control_point_displacements"),
     )
     blade = BladeMeridional(channel, BladeEdges(**config["blade"]))
     return config, channel, blade, blade.splitter(config["splitter_start"])

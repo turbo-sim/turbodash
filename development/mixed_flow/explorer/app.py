@@ -178,11 +178,15 @@ def create_app(initial_config=None):
         assets_folder=str(HERE / "assets"),
         title="Meridional channel explorer",
     )
+    from .control_point_editor import register as register_wall_editor
+
+    wall_editor = register_wall_editor(app, config)
     app.layout = html.Div(
         [
             dcc.Store(id="draft-config", data=config),
             dcc.Store(id="reference-config", data=reference),
             dcc.Store(id="generation-state", data={"valid": True}),
+            dcc.Store(id="wall-commit"),
             dcc.Download(id="yaml-download"),
             html.Header(
                 [
@@ -330,6 +334,54 @@ def create_app(initial_config=None):
                             ),
                             html.Div(
                                 [
+                                    html.Div(
+                                        [
+                                            html.Div(
+                                                [
+                                                    html.Div(
+                                                        [
+                                                            html.H3(
+                                                                "Drag the wall control points"
+                                                            ),
+                                                            html.P(
+                                                                "Choose hub or shroud in Object. Move points 2, 3 or 4 in the z-r plane; coordinates display in mm."
+                                                            ),
+                                                        ]
+                                                    ),
+                                                    html.Span(
+                                                        "nurbspy", className="mc-units"
+                                                    ),
+                                                ],
+                                                className="mc-card-heading",
+                                            ),
+                                            html.Div(
+                                                [
+                                                    html.Button(
+                                                        "Apply wall edits",
+                                                        id="wall-apply",
+                                                        className="mc-button mc-button-primary",
+                                                    ),
+                                                    html.Button(
+                                                        "Clear wall offsets",
+                                                        id="wall-clear",
+                                                        className="mc-button",
+                                                    ),
+                                                    html.Span(
+                                                        "Apply updates the passage plots and saved YAML.",
+                                                        id="wall-notice",
+                                                        role="status",
+                                                    ),
+                                                ],
+                                                className="mc-wall-actions",
+                                            ),
+                                            wall_editor,
+                                            html.P(
+                                                "Points 0, 1, 5 and 6 preserve station positions and tangents. Unsupported or folded shapes are rejected during preview. Apply stores total offsets from the engineering-generated walls; Clear restores those walls. Interior edits can change endpoint curvature.",
+                                                className="mc-card-footnote",
+                                            ),
+                                        ],
+                                        className="mc-card mc-wall-editor-card",
+                                    ),
                                     html.Div(
                                         [
                                             html.Div(

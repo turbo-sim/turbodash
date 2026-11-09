@@ -25,7 +25,7 @@ def post_upload(app, contents, draft):
     key, callback = next(
         (key, callback)
         for key, callback in app.callback_map.items()
-        if "draft-config.data" in key
+        if "file-notice.children" in key
     )
     outputs = []
     for output in callback["output"]:

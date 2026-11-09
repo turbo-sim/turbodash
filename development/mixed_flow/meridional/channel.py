@@ -3,6 +3,7 @@
 import numpy as np
 
 from .curves import WallCurve
+from .editing import apply_displacements, normalize_displacements
 from .parameters import MeanlineDimensions, WallShape, unit_interval
 
 
@@ -19,11 +20,21 @@ class MeridionalChannel:
     a numerical geometry check, not a proof of global injectivity or flow quality.
     """
 
-    def __init__(self, dimensions, hub=WallShape(), shroud=WallShape()):
+    def __init__(
+        self,
+        dimensions,
+        hub=WallShape(),
+        shroud=WallShape(),
+        *,
+        control_point_displacements=None,
+    ):
         if not isinstance(dimensions, MeanlineDimensions):
             raise TypeError("dimensions must be MeanlineDimensions.")
         self.dimensions = dimensions
         self.hub_shape, self.shroud_shape = hub, shroud
+        self.control_point_displacements = normalize_displacements(
+            control_point_displacements
+        )
         inlet, outlet = dimensions.inlet_points, dimensions.outlet_points
         self.hub = WallCurve(
             inlet[0],
@@ -38,6 +49,12 @@ class MeridionalChannel:
             shroud,
             inlet_angle_deg=dimensions.inlet_flow_angle_deg,
             outlet_angle_deg=dimensions.outlet_flow_angle_deg,
+        )
+        self.hub = apply_displacements(
+            self.hub, self.control_point_displacements.get("hub")
+        )
+        self.shroud = apply_displacements(
+            self.shroud, self.control_point_displacements.get("shroud")
         )
         self.validate()
 

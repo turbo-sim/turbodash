@@ -1780,6 +1780,70 @@ html5 = ["html5lib"]
 htmlsoup = ["BeautifulSoup4"]
 
 [[package]]
+name = "manifold3d"
+version = "3.5.4"
+description = "Library for geometric robustness"
+optional = true
+python-versions = ">=3.9"
+groups = ["main"]
+markers = "extra == \"print\""
+files = [
+    {file = "manifold3d-3.5.4-cp310-cp310-macosx_10_14_universal2.whl", hash = "sha256:7e43cdeeab20fd58bf3cb513de18ea04db194f4f64f6f1b4d8080590c4206389"},
+    {file = "manifold3d-3.5.4-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:afe19a01f74b0223525ca3511b24cc119d8cbfa51a141fe2727464860fc54c5b"},
+    {file = "manifold3d-3.5.4-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:0d8e25a2ea72ecba7c543c624e665c5c5078a38247e979f3c968b6480feebf97"},
+    {file = "manifold3d-3.5.4-cp310-cp310-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:4d4a0e3a982bdce4b97877164f6a1d5e2b1efc2a9144ffd7b6c3d0eb714ce850"},
+    {file = "manifold3d-3.5.4-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:b1eb3c3c2de01c048244fd9e8b21e45dc37043e5bc47106df35e564377ef85a9"},
+    {file = "manifold3d-3.5.4-cp310-cp310-win_amd64.whl", hash = "sha256:06ee0b2ebec889e4ab447b1b4e9e845dd2e1ee05d02454e838fb63723848c579"},
+    {file = "manifold3d-3.5.4-cp311-cp311-macosx_10_14_universal2.whl", hash = "sha256:1b948c0dab18195d1ea22e57cf89b13757c2b062e8f64d68ef55cd952a4f5a32"},
+    {file = "manifold3d-3.5.4-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:b4b2a9ed95c51b6dbb6f22dbc01ec7d696c10041fd1d29a7cc31ae75a33943d3"},
+    {file = "manifold3d-3.5.4-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:6b9eedfdd50868b553e5bd5c83b6d99f8d2d70007cba3bf849ae90722a57ecfc"},
+    {file = "manifold3d-3.5.4-cp311-cp311-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:e2498cc4c2e9b623e5b557d57ef91af9e5881dc1b592e720f74e004bc145a73c"},
+    {file = "manifold3d-3.5.4-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:d021c4096aa0e40748c0720b8386002de349b788b3ad7d92a3dba214110d0f0e"},
+    {file = "manifold3d-3.5.4-cp311-cp311-win_amd64.whl", hash = "sha256:34ef0b1b70b6d153eb12a72706e128e9b629c562cd4ab103083afd17ca071fbd"},
+    {file = "manifold3d-3.5.4-cp311-cp311-win_arm64.whl", hash = "sha256:df86fafec8268e6b164a7338b1dd9eb77139870ed5fa0e0d343a7d9870f3a833"},
+    {file = "manifold3d-3.5.4-cp312-cp312-macosx_10_14_universal2.whl", hash = "sha256:d4b47d7b0aba1ba1b575e7d549be8c9ba2d552b03e4043e3022454fdaad13447"},
+    {file = "manifold3d-3.5.4-cp312-cp312-macosx_10_14_x86_64.whl", hash = "sha256:b1ae587cf7cfa489fb50bba84a0e048d9daadd105b6a047a312e45a7602163fa"},
+    {file = "manifold3d-3.5.4-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:d440e37d1e9888f90f42c70b4b3da98655be54105616e7739d84692bf7bda671"},
+    {file = "manifold3d-3.5.4-cp312-cp312-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:4f4e8ca1c59d68047b262dbdb6e917ac4abff2942a65e7e469f4a398ce1f0b9b"},
+    {file = "manifold3d-3.5.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:4a985892699268bbf07192b78b5e5569034c41ce74bf8183495123e8095af4fe"},
+    {file = "manifold3d-3.5.4-cp312-cp312-win_amd64.whl", hash = "sha256:5be1025860df8a83ed3c4fd585d87376b075e23ea45e833578fe77eacc49bee1"},
+    {file = "manifold3d-3.5.4-cp312-cp312-win_arm64.whl", hash = "sha256:559b6cd07976a6ab3edf9806e5f1757432c397589069e01a0045e78d326ff510"},
+    {file = "manifold3d-3.5.4-cp313-cp313-macosx_10_14_universal2.whl", hash = "sha256:f26933565a268f91e222a494570bebe494bde204277134b3e32e0d6ac686a9ad"},
+    {file = "manifold3d-3.5.4-cp313-cp313-macosx_10_14_x86_64.whl", hash = "sha256:95b512975ae13d5ecc57a9d388cf84be4cc717add5173d7d5fa408e6d6a07677"},
+    {file = "manifold3d-3.5.4-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:ed0736f472c3362b8084867f10a724a9a483927bdb7cbfceb564acc52a7f4273"},
+    {file = "manifold3d-3.5.4-cp313-cp313-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:8b46d2f19017fc2f3095d71cc111b8574e92afd5515d70529720324da5b1c0ed"},
+    {file = "manifold3d-3.5.4-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:7a5469641713f1bc291fea873cb134c435704df36828d134190fc2475b304259"},
+    {file = "manifold3d-3.5.4-cp313-cp313-win_amd64.whl", hash = "sha256:76975aa4ebd18dcb0481e43dac3ed70d78066e9ad047e73a5f7dbc0df1553cf4"},
+    {file = "manifold3d-3.5.4-cp313-cp313-win_arm64.whl", hash = "sha256:552ffb1f79ef77f1c7e05d638ee43e7fe88c652b1f9b042a88aab1fef85fc28c"},
+    {file = "manifold3d-3.5.4-cp314-cp314-macosx_10_15_universal2.whl", hash = "sha256:7c96a28ef7ed7a34e37cad775db95831051f03ca9e188f572b0a08b3561f4763"},
+    {file = "manifold3d-3.5.4-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:487b351a9b064353c9a8cb86b9f004ec0064511d121355a0fe738e96a5ca5306"},
+    {file = "manifold3d-3.5.4-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:3d6a81f79f4812dd9e88c8093588c31c6e863c410f61a274656f9cdff76b80c0"},
+    {file = "manifold3d-3.5.4-cp314-cp314-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:a7869f140b830faf93a76da3705d814b8e1652f3f68aab39351bfc6f05d93e01"},
+    {file = "manifold3d-3.5.4-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:c3fc18f0712b5ff10fdc5307f9abc8a40affe3a5f8559a19b9c03e3a82e4513b"},
+    {file = "manifold3d-3.5.4-cp314-cp314-win_amd64.whl", hash = "sha256:a04a30eb686e913e1872dce6f537947d64a01c5b4a882af0be47beef2309b074"},
+    {file = "manifold3d-3.5.4-cp314-cp314-win_arm64.whl", hash = "sha256:8c309c698837fdbca297ad7387f5348526e6635e49ce28476e2c9dcad30a947e"},
+    {file = "manifold3d-3.5.4-cp314-cp314t-macosx_10_15_universal2.whl", hash = "sha256:ee967a8f1b526194ea8a598e04d2fd6920a9a78e9d465a7b78e2a6827585b8f3"},
+    {file = "manifold3d-3.5.4-cp314-cp314t-macosx_10_15_x86_64.whl", hash = "sha256:a55945fccc1ad20c958bedf61397a12ea5329f897a29f2237c70e12bdf7bd51d"},
+    {file = "manifold3d-3.5.4-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:5284a8a14fc86798d1698b37729e519516ba6c0574624ae16542032764adf189"},
+    {file = "manifold3d-3.5.4-cp314-cp314t-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:fd68576b104f563a8d2a9629f7de565c5ac704f276394f9ffdb9f0c5a05c20d8"},
+    {file = "manifold3d-3.5.4-cp314-cp314t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:ae80814e5c6f85f4c53f632b71009fdfa185645a1d68c673d0d7a6171c29f78b"},
+    {file = "manifold3d-3.5.4-cp314-cp314t-win_amd64.whl", hash = "sha256:d034b1d74df1aad9377f30b2228c33b3887bf5057c7efd98a86892604edd86aa"},
+    {file = "manifold3d-3.5.4-cp39-cp39-macosx_10_14_universal2.whl", hash = "sha256:50aa85d2f1acb60954b5caeef5a449ebdc7943582a6206a89100e46df0b99024"},
+    {file = "manifold3d-3.5.4-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:5e89a4e256638137f9cc5ed516bab91d8bebf14e9a21ff50de53d8222ec68ed0"},
+    {file = "manifold3d-3.5.4-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:423ac7d8346861d1f48d9073f511d43ac707179db17ffd93a930fc0df641ce0b"},
+    {file = "manifold3d-3.5.4-cp39-cp39-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:827f57a5768aa236811265bb8ff5ca1da414ba117621339aeeed9c7739527840"},
+    {file = "manifold3d-3.5.4-cp39-cp39-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:e985b56662467a041a7b8855aabf8047bb12860f7b18590f43affe28d0866602"},
+    {file = "manifold3d-3.5.4-cp39-cp39-win_amd64.whl", hash = "sha256:d4060fa919ef9111f40d35f108a9fb88cf41274ab0ef7f3b8ffb235f23724292"},
+    {file = "manifold3d-3.5.4.tar.gz", hash = "sha256:5bd88c482c6fd7fc01aa7b715b3e31c2585ee98343d5559d286ba30db0d0b6f0"},
+]
+
+[package.dependencies]
+numpy = [
+    {version = "*", markers = "python_version < \"3.12\""},
+    {version = ">=1.26.0b1", markers = "python_version >= \"3.12\""},
+]
+
+[[package]]
 name = "markdown-it-py"
 version = "3.0.0"
 description = "Python port of markdown-it. Markdown parsing, done right!"
@@ -5023,8 +5087,9 @@ type = ["pytest-mypy"]
 
 [extras]
 mesh = ["turbo_moc"]
+print = ["manifold3d"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.14"
-content-hash = "32ccfe8a7efb4f6de0095c45473f8fda69c07f9f2c80605dbcee172f1b0cf131"
+content-hash = "8c6e2293e7003114fa66fdf4363d5977d9d5a36f16ff5173f6e82d6413c774db"

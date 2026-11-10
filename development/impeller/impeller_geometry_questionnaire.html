@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Impeller geometry · Design questionnaire</title>
+<style>
+body{overflow-wrap:anywhere}
+:root{--ink:#172d3b;--muted:#516370;--paper:#f5f4ef;--white:#fff;--line:#d4dddc;--teal:#12685c;--teal-light:#eaf4ef;--orange:#a95121;--orange-light:#fff2e8;--nav:#102c3a;--shadow:0 8px 30px #17344708}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:25px}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button,a,input,textarea,select{touch-action:manipulation}button{cursor:pointer}a{color:var(--teal)}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #d08b26;outline-offset:4px}button:disabled{opacity:.55;cursor:default}h1,h2,h3,p{margin:0}h1{font-size:clamp(32px,4vw,52px);line-height:1.12;letter-spacing:-1.7px;font-weight:650;max-width:850px}h2{font-size:28px;line-height:1.2;letter-spacing:-.6px}h3{font-size:18px;line-height:1.35}p+p{margin-top:12px}code{font:13px/1.55 ui-monospace,Consolas,monospace;overflow-wrap:anywhere}small,.small{font-size:13px}.muted{color:var(--muted)}.eyebrow{font-size:12px;letter-spacing:1.6px;text-transform:uppercase;font-weight:700}.topline{padding:17px max(24px,calc((100vw - 1280px)/2));display:flex;justify-content:space-between;gap:20px;align-items:center;background:var(--nav);color:#fff}.topline .eyebrow{color:#c7dbdc}.topline a{color:#fff;font-size:13px;text-decoration:none}.topline a:hover{text-decoration:underline}.hero{max-width:1328px;margin:auto;padding:42px 24px 30px;display:grid;grid-template-columns:1fr auto;gap:28px;align-items:end}.hero .eyebrow{color:var(--teal);margin-bottom:13px}.hero p{max-width:790px;margin-top:17px;color:var(--muted)}.scope-label{display:inline-flex;align-items:center;gap:8px;font-size:13px;margin-top:22px;margin-right:16px}.scope-label:before{content:"";width:6px;height:6px;background:var(--teal);border-radius:50%}.hero-side{font-size:13px;text-align:right;color:var(--muted);max-width:200px}.hero-side strong{display:block;font-size:32px;color:var(--ink);font-weight:500}.layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:36px;max-width:1328px;margin:auto;padding:0 24px 70px}.sidebar{position:sticky;top:24px;align-self:start;padding-top:12px}.progress-label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:9px}progress{width:100%;height:5px;border:none;background:#dce4df;border-radius:8px;overflow:hidden;display:block}progress::-webkit-progress-bar{background:#dce4df}progress::-webkit-progress-value{background:var(--teal)}progress::-moz-progress-bar{background:var(--teal)}.sidebar nav{margin:27px 0 24px}.sidebar nav a{color:var(--muted);display:flex;gap:12px;align-items:center;padding:10px 0;text-decoration:none;font-size:14px}.sidebar nav a:hover{color:var(--ink)}.nav-number{font-size:11px;color:var(--teal);width:24px}.sidebar .btn{width:100%;margin-top:8px}.save-status{font-size:12px;line-height:1.5;color:var(--muted);margin-top:16px;overflow-wrap:anywhere}.sidebar-note{border-top:1px solid var(--line);margin-top:22px;padding-top:18px;font-size:12px;color:var(--muted)}.sidebar-note a{display:inline-block;margin-top:8px}.intro{padding:22px 26px;background:#e7efeb;border-left:3px solid var(--teal);margin-bottom:36px}.intro p{font-size:14px}.intro strong{font-weight:650}.chapter{margin-top:42px}.chapter:first-of-type{margin-top:0}.chapter-heading{display:flex;gap:15px;align-items:baseline;margin-bottom:13px}.chapter-index{font:13px ui-monospace,Consolas,monospace;color:var(--teal)}.chapter-description{color:var(--muted);font-size:15px;max-width:780px;margin-bottom:22px}.question{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:25px;margin:16px 0;box-shadow:var(--shadow);scroll-margin-top:20px;min-width:0}.question-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:10px}.question-title{display:flex;align-items:baseline;gap:10px}.question-number{font:12px ui-monospace,Consolas,monospace;color:var(--muted);flex-shrink:0}.question-title h3{font-size:19px}.badge{font-size:11px;font-weight:650;white-space:nowrap;border-radius:4px;background:#edf0f1;color:#53626b;padding:3px 7px}.badge.reviewed{background:var(--teal-light);color:var(--teal)}.badge.discuss{background:var(--orange-light);color:var(--orange)}.why{font-size:14px;color:var(--muted);margin-bottom:18px}.choices{border:0;padding:0;margin:0;display:grid;gap:9px;min-width:0}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.option{display:flex;gap:12px;align-items:flex-start;padding:13px 14px;border:1px solid #dbe1e0;border-radius:7px;cursor:pointer;transition:border-color .1s,background .1s;min-width:0}.option:has(input:checked){border-color:var(--teal);background:#f1f7f3}.option input{margin:5px 0 0;accent-color:var(--teal);flex-shrink:0;width:16px;height:16px}.option-text{min-width:0}.option-title{font-size:14px;font-weight:650}.option-desc{display:block;font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5}.recommend{font-size:10px;letter-spacing:.4px;color:var(--teal);display:inline-block;margin-left:7px;text-transform:uppercase}.option.discuss-option{border:0;padding:8px 14px 3px}.option.discuss-option:has(input:checked){background:var(--orange-light)}.option.discuss-option .option-title{font-weight:450;color:var(--muted);font-size:13px}.question-footer{margin-top:17px;padding-top:14px;border-top:1px solid #e4e9e7;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.review-check{font-size:13px;display:flex;gap:8px;align-items:center;cursor:pointer}.review-check input{accent-color:var(--teal);width:15px;height:15px}.hint{margin-top:13px;font-size:12px;color:var(--muted);line-height:1.55}.notes{width:100%;font-size:13px}.notes summary{cursor:pointer;color:var(--teal);padding:4px 0}.notes label{display:block;margin:8px 0 5px}.notes textarea{width:100%;min-height:78px;resize:vertical;border:1px solid var(--line);border-radius:5px;padding:10px;background:#fcfdfc;color:var(--ink);font-size:14px}.detail-fields{margin-top:18px;display:grid;gap:13px}.detail-fields label{font-size:13px;font-weight:600;display:block}.detail-fields input[type=text],.detail-fields select{display:block;margin-top:6px;width:100%;border:1px solid var(--line);border-radius:5px;padding:9px 10px;background:#fcfdfc;color:var(--ink);font-size:13px}.detail-fields .field-help{font-size:12px;color:var(--muted);margin-top:5px}.detail-fields .checkline{display:flex;gap:9px;align-items:flex-start;font-weight:400;cursor:pointer}.checkline input{accent-color:var(--teal);margin-top:5px}.architecture{margin:16px 0 3px;padding:16px;background:#f7f8f5;border-radius:6px;font-size:13px}.architecture summary{color:var(--teal);font-weight:600;cursor:pointer}.file-row{margin-top:13px;display:grid;grid-template-columns:120px minmax(0,1fr);gap:8px}.file-row strong{font-size:12px}.file-row code{font-size:12px}.file-row:first-of-type code{display:block}.figure{background:#edf2ee;border-radius:9px;padding:21px 23px;margin:20px 0;display:grid;grid-template-columns:1fr 1fr;gap:25px;align-items:center}.figure h3{font-size:16px;margin-bottom:8px}.figure p{font-size:13px;color:var(--muted)}.figure svg{width:100%;height:auto;display:block;max-height:235px;overflow:visible}.figure svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:var(--ink);font-size:12px}.figure .figure-tag{font-size:10px;letter-spacing:.7px;text-transform:uppercase;display:block;margin-top:9px;color:var(--muted)}.review-panel{margin-top:44px;border-top:2px solid var(--ink);padding-top:28px}.review-panel>p{margin-top:12px;color:var(--muted);font-size:14px}.review-stats{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}.stat{padding:12px 18px;background:#e7eee9;border-radius:6px;min-width:130px;font-size:12px;color:var(--muted)}.stat strong{font-size:24px;font-weight:550;display:block;color:var(--ink)}.review-table{width:100%;border-collapse:collapse;font-size:13px;margin:18px 0}.review-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:600}.review-table th,.review-table td{padding:12px 9px 12px 0;border-bottom:1px solid var(--line);vertical-align:top}.review-table td:first-child{width:30%}.review-table td:last-child{width:95px}.review-table a{text-decoration:none}.review-table .answer-note{font-size:12px;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere;margin-top:5px}.issues{background:var(--orange-light);color:#793d18;font-size:13px;padding:15px 18px;border-radius:6px;margin:18px 0}.issues h3{font-size:14px}.issues ul{padding-left:18px;margin:8px 0 0}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px;align-items:center}.btn{border:1px solid #bfcfca;border-radius:6px;padding:10px 15px;background:#fff;color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;line-height:1.45}.btn:hover{background:#edf3ef}.btn.primary{background:var(--teal);border-color:var(--teal);color:white}.btn.primary:hover{background:#0c554b}.btn.quiet{background:transparent;border-color:transparent;color:var(--muted);padding-left:0;text-decoration:underline}.export-help{font-size:13px;color:var(--muted);margin-top:15px}.export-help strong{color:var(--ink)}#message{min-height:25px;margin-top:12px;font-size:13px;color:var(--teal)}.summary-box{width:100%;min-height:230px;font:12px/1.6 ui-monospace,Consolas,monospace;padding:14px;border:1px solid var(--line);border-radius:6px;margin-top:13px;resize:vertical}.print-summary{display:none}.bottom{font-size:12px;color:var(--muted);margin-top:30px;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}dialog{border:1px solid var(--line);border-radius:10px;padding:28px;max-width:480px;color:var(--ink);box-shadow:0 30px 80px #0003}dialog::backdrop{background:#172d3b66}dialog p{margin-top:12px;font-size:14px}noscript{display:block;padding:24px;background:var(--orange-light)}[hidden]{display:none!important}
+@media(max-width:1000px){.layout{grid-template-columns:190px minmax(0,1fr);gap:24px}.hero-side{display:none}.figure{grid-template-columns:1fr}.figure svg{max-height:215px}.figure .caption{order:2}}
+@media(max-width:720px){.topline{padding:14px 18px}.topline .eyebrow{font-size:10px}.topline a{font-size:12px}.hero{padding:29px 18px 22px;display:block}h1{font-size:36px;letter-spacing:-1px}.hero p{font-size:15px}.layout{display:block;padding:0 16px 40px}.sidebar{position:static;padding:12px 2px 22px}.sidebar nav{display:flex;flex-wrap:wrap;gap:0 17px;margin:13px 0}.sidebar nav a{font-size:12px;padding:5px 0;gap:4px}.nav-number{width:auto}.sidebar .btn{width:auto;margin-right:6px}.sidebar-note{display:none}.save-status{margin-top:8px}.intro{padding:17px 18px;margin-bottom:25px}.question{padding:18px 16px}.question-title h3{font-size:17px}.question-head{gap:9px}.badge{font-size:10px}.question-number{display:none}.recommend{margin-left:0;display:block;font-size:9px}.option{padding:12px 10px;gap:9px}.chapter{margin-top:30px}.chapter-heading h2{font-size:25px}.figure{padding:17px;gap:10px}.file-row{display:block}.file-row strong{display:block;margin-bottom:3px}.review-table td:first-child{width:29%}.review-table td:last-child{width:76px}.review-table{font-size:12px}.review-table .badge{white-space:normal}.review-stats{gap:7px}.stat{min-width:95px;padding:10px 12px}.actions .btn{flex:1;min-width:140px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+@media print{body{background:white;font-size:11pt}.topline{background:white;color:var(--ink);border-bottom:1px solid var(--line);padding:0 0 14px}.topline .eyebrow{color:var(--ink)}.topline a,.sidebar,.intro,.chapter,.review-stats,.actions,.export-help,#message,.summary-details,.bottom,dialog{display:none!important}.hero{padding:20px 0;display:block}.hero h1{font-size:27pt}.hero-side,.scope-label{display:none}.layout{display:block;padding:0}.review-panel{margin:0;border-top:1px solid var(--line)}.review-table{font-size:10pt}.review-table tr{break-inside:avoid}.review-table a{color:var(--ink);text-decoration:none}.issues{background:white;border:1px solid var(--line)}.print-summary{display:block;font-size:10pt;white-space:pre-wrap;margin:12px 0}.badge{background:none!important;color:var(--ink)!important}}
+</style>
+</head>
+<body>
+<header class="topline"><div class="eyebrow">Turbodash / Reversible machine</div><a href="impeller_implementation_plan.md">Read the assessment ↗</a></header>
+<div class="hero">
+  <div><div class="eyebrow">Geometry decisions · 10 November 2026</div><h1>Define the impeller geometry.</h1><p>The implementation location is agreed. Review the remaining choices that determine the first complete shape. Each question has a recommendation, a short explanation and space for your own requirements.</p><span class="scope-label">Geometry first</span><span class="scope-label">One rotor for both modes</span><span class="scope-label">Meshing deferred</span></div>
+  <div class="hero-side"><strong>14</strong>items; 1 agreed<br>About 10–15 minutes</div>
+</div>
+<noscript>This questionnaire needs JavaScript to show the questions and save answers. Open this HTML file in a browser with JavaScript enabled. The accompanying assessment is available through the link above.</noscript>
+<div class="layout">
+  <aside class="sidebar" aria-label="Questionnaire navigation">
+    <div class="progress-label"><span>Choices reviewed</span><span id="progress-label">0 / 14</span></div><progress id="progress" max="14" value="0" aria-label="Choices reviewed"></progress>
+    <nav><a href="#code"><span class="nav-number">01</span>Code & starting case</a><a href="#scope"><span class="nav-number">02</span>Geometry scope</a><a href="#channel"><span class="nav-number">03</span>Channel & sections</a><a href="#shape"><span class="nav-number">04</span>Blade shape</a><a href="#delivery"><span class="nav-number">05</span>First delivery</a><a href="#review"><span class="nav-number">06</span>Review & export</a></nav>
+    <a class="btn primary" href="#review">Review answers</a><button class="btn" id="import-button" type="button">Load saved answers</button><input hidden type="file" id="import-file" accept="application/json,.json">
+    <p class="save-status" id="save-status" role="status">Draft stays in this browser.</p><div class="sidebar-note">Selections are saved locally when browser storage is available. Export a file to keep or share your answers.<br><a href="impeller_implementation_plan.md">Technical assessment</a></div>
+  </aside>
+  <main id="main">
+    <div class="intro"><p><strong>Recommendations are proposals.</strong> A preselected choice becomes reviewed when you select an option or tick “I have reviewed this choice.” You can leave decisions open. Exported answers identify both unreviewed defaults and topics to discuss.</p><p>We will reuse the maintained geometry code. The package is turbodash.geometry.impeller, with a theory note using (u, v). Nurbspy is optional. App integration may follow geometry and export validation without waiting for a mesh.</p></div>
+    <div id="chapters"></div>
+    <section id="review" class="review-panel" aria-labelledby="review-title">
+      <div class="chapter-heading"><span class="chapter-index">06</span><h2 id="review-title">Review & export</h2></div>
+      <p>Check the choices below. Exporting creates a design brief for our next discussion; it does not start implementation or create a valid impeller parameter file.</p>
+      <div class="review-stats"><div class="stat"><strong id="count-reviewed">0</strong>reviewed</div><div class="stat"><strong id="count-defaults">14</strong>unreviewed</div><div class="stat"><strong id="count-open">0</strong>to discuss</div></div>
+      <div id="issues" class="issues" hidden><h3>Details to settle before target-case geometry</h3><ul id="issue-list"></ul></div>
+      <div id="print-details" class="print-summary"></div>
+      <table class="review-table"><caption class="sr-only">Selected answers and review status</caption><thead><tr><th scope="col">Decision</th><th scope="col">Selected answer</th><th scope="col">Status</th></tr></thead><tbody id="review-rows"></tbody></table>
+      <div class="actions"><button type="button" class="btn primary" id="export-json">Export answers · JSON</button><button type="button" class="btn" id="export-md">Download Markdown</button><button type="button" class="btn" id="copy-md">Copy summary</button><button type="button" class="btn" id="print">Print / PDF</button></div>
+      <p class="export-help"><strong>To hand this back:</strong> save the JSON file beside this questionnaire and tell me its location, or paste the copied summary into our conversation. Answers are not sent automatically.</p>
+      <p id="message" role="status" aria-live="polite"></p>
+      <details class="summary-details"><summary>View the complete Markdown summary</summary><textarea class="summary-box" id="markdown-preview" readonly aria-label="Markdown answer summary"></textarea></details>
+      <div class="actions"><button type="button" class="btn quiet" id="accept-defaults">Accept all unreviewed recommendations</button><button type="button" class="btn quiet" id="reset-open">Reset this draft</button></div>
+      <footer class="bottom"><span>Geometry brief · Version 1 · Updated decisions</span><span>Self-contained · Works offline · No automatic submission</span></footer>
+    </section>
+  </main>
+</div>
+<dialog id="reset-dialog" aria-labelledby="reset-title"><h2 id="reset-title">Reset this draft?</h2><p>This clears draft choices and notes and restores the proposed defaults. The implementation location agreed in our conversation is retained. Previously exported files are unchanged.</p><div class="actions"><button class="btn" type="button" id="reset-cancel">Keep draft</button><button class="btn primary" type="button" id="reset-confirm">Reset draft</button></div></dialog>
+<script id="question-data" type="application/json">[
+  {
+    "id": "location",
+    "group": "code",
+    "title": "Implementation location — agreed",
+    "why": "The reusable feature will live in turbodash.geometry.impeller and be imported from MastersThesis. This choice was recorded in our conversation.",
+    "recommended": "turbodash",
+    "options": [
+      {
+        "id": "turbodash",
+        "label": "Turbodash library + thesis drivers",
+        "detail": "Keep the channel, blade construction and public API under geometry/impeller/. Import existing section laws; use nurbspy only if a concrete operation needs it."
+      },
+      {
+        "id": "turbomoc",
+        "label": "TurboMoC owns the geometry",
+        "detail": "Place the reusable impeller API in TurboMoC; adapt Turbodash and thesis drivers to consume it."
+      },
+      {
+        "id": "thesis",
+        "label": "Thesis prototype, then promote",
+        "detail": "Develop orchestration in MastersThesis while importing existing kernels; promote reusable additions before wider use."
+      }
+    ],
+    "noteLabel": "Preferred repository or folder changes",
+    "fixed": true,
+    "hint": "This updates the location in earlier saved drafts while retaining your other answers and notes. You can record proposed changes below."
+  },
+  {
+    "id": "baseline",
+    "group": "code",
+    "title": "Which machine should seed the geometry?",
+    "why": "A reproducible starting case supplies dimensions and endpoint angles. It need not be the final thesis design.",
+    "recommended": "example",
+    "options": [
+      {
+        "id": "example",
+        "label": "Committed reversible example",
+        "detail": "Use MastersThesis/meanline/examples/example_reversible.yaml as a labeled starting example."
+      },
+      {
+        "id": "selected_case",
+        "label": "A saved design candidate",
+        "detail": "Identify its file or run in the notes; retain its source and design status."
+      },
+      {
+        "id": "supplied_dimensions",
+        "label": "Explicit dimensions",
+        "detail": "Supply a separate dimensional specification for the first geometry."
+      }
+    ],
+    "hint": "No S-90 candidate is assumed to be the adopted design.",
+    "noteLabel": "Case path, run identifier or dimensional specification"
+  },
+  {
+    "id": "scope",
+    "group": "scope",
+    "title": "What should complete geometry include?",
+    "why": "An aerodynamic impeller definition does not specify every feature of a manufactured wheel.",
+    "recommended": "aerodynamic",
+    "options": [
+      {
+        "id": "aerodynamic",
+        "label": "Complete aerodynamic geometry",
+        "detail": "Curved walls, closed blades, repeated row and periodic-passage surfaces."
+      },
+      {
+        "id": "schematic_wheel",
+        "label": "Also a schematic hub/backdisk",
+        "detail": "Add a simple wheel body for assembly visualization, without manufacturing detail."
+      },
+      {
+        "id": "manufacturing",
+        "label": "Manufacturing features too",
+        "detail": "Include bore, backdisk and fillets using additional supplied dimensions and constraints."
+      }
+    ]
+  },
+  {
+    "id": "tip",
+    "group": "scope",
+    "title": "How should the blade tip meet the outer wall?",
+    "why": "An open blade ends below the casing; a shrouded blade meets its cover. These are different surfaces.",
+    "recommended": "case",
+    "options": [
+      {
+        "id": "case",
+        "label": "Match the case, including clearance",
+        "detail": "Use the source case's construction and document its clearance definition."
+      },
+      {
+        "id": "open",
+        "label": "Explicitly open impeller",
+        "detail": "Construct a blade tip below the casing with a specified gap law."
+      },
+      {
+        "id": "shrouded",
+        "label": "Shrouded impeller",
+        "detail": "Join blade tips to a cover surface; define cover thickness separately if a solid is required."
+      }
+    ],
+    "hint": "The meanline field eps_a must not silently become a casing-normal offset; confirm the distance direction.",
+    "noteLabel": "Clearance value/source, distance direction, or need to support both constructions"
+  },
+  {
+    "id": "splitters",
+    "group": "scope",
+    "title": "Are splitters needed in the first version?",
+    "why": "Splitters need their own extent, circumferential position and thickness, not only a shortened main blade.",
+    "recommended": "main_only",
+    "options": [
+      {
+        "id": "main_only",
+        "label": "Main blades first",
+        "detail": "Match the present reversible builder and keep the blade-set model extensible."
+      },
+      {
+        "id": "one_splitter",
+        "label": "One splitter per passage",
+        "detail": "Include independent splitter placement and thickness controls now."
+      },
+      {
+        "id": "custom_set",
+        "label": "Another blade-set arrangement",
+        "detail": "Specify the main/splitter counts and arrangement in the notes."
+      }
+    ]
+  },
+  {
+    "id": "walls",
+    "group": "channel",
+    "title": "How should hub and shroud curves be controlled?",
+    "why": "The mixed-flow prototype already supplies separate wall engineering controls and optional spline refinement.",
+    "recommended": "existing",
+    "options": [
+      {
+        "id": "existing",
+        "label": "Reuse all existing wall controls",
+        "detail": "Station dimensions, separate slopes/reaches/bow, and optional control-point offsets."
+      },
+      {
+        "id": "engineering",
+        "label": "Engineering controls only",
+        "detail": "Retain the compact parameter set without direct spline editing initially."
+      },
+      {
+        "id": "reference",
+        "label": "Match supplied curves",
+        "detail": "Fit or import reference walls while retaining their dimensions and provenance."
+      }
+    ]
+  },
+  {
+    "id": "edges",
+    "group": "channel",
+    "title": "How freely should blade edges move in the channel?",
+    "why": "Meridional sweep changes blade extent independently of the hub/shroud walls.",
+    "recommended": "independent",
+    "options": [
+      {
+        "id": "independent",
+        "label": "Independent endpoints and edge bow",
+        "detail": "Preserve the existing hub/shroud LE/TE positions and bowed edge controls."
+      },
+      {
+        "id": "straight",
+        "label": "Straight spanwise edge placement",
+        "detail": "Use simpler edge curves for the initial implementation."
+      },
+      {
+        "id": "physical_angles",
+        "label": "Prescribed physical sweep angles",
+        "detail": "Solve edge positions from supplied geometric angle constraints."
+      }
+    ]
+  },
+  {
+    "id": "sections",
+    "group": "channel",
+    "title": "How many sections need independent controls?",
+    "why": "Separate angle and thickness laws describe spanwise variation. Intermediate sections need a consistent interpolation.",
+    "recommended": "two_optional",
+    "options": [
+      {
+        "id": "two_optional",
+        "label": "Hub and shroud; optional middle",
+        "detail": "Start with two control sections and permit an intermediate section when needed."
+      },
+      {
+        "id": "three",
+        "label": "Hub, middle and shroud",
+        "detail": "Expose three independently controlled sections immediately."
+      },
+      {
+        "id": "arbitrary",
+        "label": "User-defined span stations",
+        "detail": "Allow an arbitrary ordered set of section controls."
+      }
+    ],
+    "hint": "Preserve the meanline inlet angle at RMS radius, which is generally not geometric midspan."
+  },
+  {
+    "id": "angles",
+    "group": "shape",
+    "title": "Which angle distributions are needed initially?",
+    "why": "The maintained turning law is monotone between its endpoints. Some impellers require an interior angle maximum.",
+    "recommended": "existing",
+    "options": [
+      {
+        "id": "existing",
+        "label": "Existing turning controls",
+        "detail": "Reuse independent endpoint angles, turning location and concentration per section."
+      },
+      {
+        "id": "flexible",
+        "label": "Add a flexible spline angle law",
+        "detail": "Allow nonmonotone distributions through additional angle controls."
+      },
+      {
+        "id": "reference",
+        "label": "Match a reference distribution",
+        "detail": "Supply the reference and its physical or conformal coordinate definition."
+      }
+    ]
+  },
+  {
+    "id": "stacking",
+    "group": "shape",
+    "title": "How should sections align circumferentially?",
+    "why": "Section angle laws determine turning; stacking fixes their relative circumferential positions.",
+    "recommended": "leading",
+    "options": [
+      {
+        "id": "leading",
+        "label": "Align leading edges initially",
+        "detail": "Allow optional stacking offsets; let trailing-edge position follow the angle laws."
+      },
+      {
+        "id": "trailing",
+        "label": "Align trailing edges",
+        "detail": "Choose the section offsets to satisfy trailing-edge alignment."
+      },
+      {
+        "id": "lean_rake",
+        "label": "Prescribe LE lean and TE rake",
+        "detail": "Solve a remaining angle-law parameter to meet both constraints."
+      }
+    ]
+  },
+  {
+    "id": "interpolation",
+    "group": "shape",
+    "title": "How should the surface connect the sections?",
+    "why": "Straight 3D interpolation and interpolation on curved stream surfaces generally give different interior geometry.",
+    "recommended": "stream_surfaces",
+    "options": [
+      {
+        "id": "stream_surfaces",
+        "label": "Follow curved stream surfaces",
+        "detail": "Interpolate section laws and stacking through the prescribed meridional channel."
+      },
+      {
+        "id": "ruled",
+        "label": "Enforce a ruled surface",
+        "detail": "Connect corresponding hub/shroud points with straight generators."
+      },
+      {
+        "id": "both",
+        "label": "Compare both constructions",
+        "detail": "Implement both and quantify their geometric differences."
+      }
+    ]
+  },
+  {
+    "id": "thickness",
+    "group": "shape",
+    "title": "What should dimensional thickness mean?",
+    "why": "On a curved surface, chart thickness, paired-point separation and surface-normal thickness differ.",
+    "recommended": "paired",
+    "options": [
+      {
+        "id": "paired",
+        "label": "Physical paired-side distance",
+        "detail": "Target full separation of corresponding side points and report the residual."
+      },
+      {
+        "id": "chart",
+        "label": "Conformal-chart thickness ratio",
+        "detail": "Retain the chart definition and report resulting physical thickness."
+      },
+      {
+        "id": "normal",
+        "label": "Surface-normal thickness",
+        "detail": "Require a different offset construction and validation."
+      }
+    ],
+    "hint": "Reuse the Denton/fullness family with independent hub/shroud parameters."
+  },
+  {
+    "id": "edge_shape",
+    "group": "shape",
+    "title": "Which eye-side and rim-side edge shapes are required?",
+    "why": "The inflow edge changes during reversed operation. Actual edge thickness must remain distinct from a shoulder thickness control.",
+    "recommended": "cutoff",
+    "options": [
+      {
+        "id": "cutoff",
+        "label": "Rounded eye; finite rim cutoff",
+        "detail": "Preserve a declared actual rim-edge thickness consistent with the meanline."
+      },
+      {
+        "id": "both_round",
+        "label": "Rounded at both ends",
+        "detail": "Explore rounded edges for both flow directions; specify edge radii and shoulder values."
+      },
+      {
+        "id": "custom",
+        "label": "Specified custom edge shapes",
+        "detail": "Provide edge curves, radii, thicknesses or required transition conditions."
+      }
+    ],
+    "hint": "This is a geometric starting choice, not a claim of optimal reversible performance."
+  },
+  {
+    "id": "delivery",
+    "group": "delivery",
+    "title": "When should an interactive interface be added?",
+    "why": "The common deliverables are a Python API, saved parameters, a theory note using (u, v), section curves, 3D row visualization and closed-blade STL export. Geometry acceptance does not require a mesh.",
+    "recommended": "scripts_first",
+    "options": [
+      {
+        "id": "scripts_first",
+        "label": "Scripts and exports first",
+        "detail": "Complete and validate the reusable geometry before interface work."
+      },
+      {
+        "id": "explorer_after",
+        "label": "Then a small geometry explorer",
+        "detail": "Add a focused explorer after script and export acceptance."
+      },
+      {
+        "id": "app_with",
+        "label": "App integration in this phase",
+        "detail": "Deliver geometry and its Turbodash controls together."
+      }
+    ]
+  }
+]</script>
+<script>
+'use strict';
+(() => {
+const QUESTIONS=JSON.parse(document.getElementById('question-data').textContent);
+const FORMAT='impeller-geometry-questionnaire-v1';
+const STORAGE='turbodash.impeller.geometry.questionnaire.v1';
+const EXAMPLE='MastersThesis/meanline/examples/example_reversible.yaml';
+const GROUPS=[{id:'code',title:'Code & starting case',description:'Review the agreed package location and identify the machine used to develop it.'},{id:'scope',title:'What does “complete” include?',description:'Set the first geometry boundary: aerodynamic surfaces, tip treatment and blade arrangement.'},{id:'channel',title:'Channel & spanwise sections',description:'Keep the curved meridional channel separate from blade extent and section design.'},{id:'shape',title:'The blade shape',description:'Specify angle laws, stacking and thickness so that the generated surface has the intended physical meaning.'},{id:'delivery',title:'The first delivery',description:'Choose the workflow and exports needed to inspect and reproduce the geometry.'}];
+const $=id=>document.getElementById(id);
+const escapeHtml=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const defaults=()=>({format:FORMAT,updated_at:null,answers:Object.fromEntries(QUESTIONS.map(q=>[q.id,{selected:q.recommended,reviewed:Boolean(q.fixed),notes:''}])),details:{case_reference:EXAMPLE,thesis_location:'MastersThesis/cfd/reversible/ (case data) + cfd/pipeline/parametrize.py (thin driver)',clearance_definition:'unresolved',clearance_source:'Use the selected case; confirm the distance direction before interpreting eps_a.',step:false,extra_outputs:''}});
+const isRecord=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
+function validate(raw){
+ if(!isRecord(raw)||raw.format!==FORMAT||!isRecord(raw.answers))throw new Error('This is not a version 1 impeller questionnaire answer file.');
+ const next=defaults();
+ for(const q of QUESTIONS){const a=raw.answers[q.id];if(!isRecord(a)||typeof a.selected!=='string'||![...q.options.map(o=>o.id),'discuss'].includes(a.selected)||typeof a.reviewed!=='boolean'||typeof a.notes!=='string'||a.notes.length>12000)throw new Error('Invalid or missing answer: '+q.title);next.answers[q.id]={selected:a.selected,reviewed:a.reviewed,notes:a.notes};}
+ if(!isRecord(raw.details))throw new Error('The answer file has no valid case details.');
+ for(const key of ['case_reference','thesis_location','clearance_source','extra_outputs']){if(typeof raw.details[key]!=='string'||raw.details[key].length>12000)throw new Error('Invalid detail: '+key);next.details[key]=raw.details[key];}
+ if(!['unresolved','source','casing_normal','axial','radial'].includes(raw.details.clearance_definition)||typeof raw.details.step!=='boolean')throw new Error('Invalid clearance or export choice.');
+ next.details.clearance_definition=raw.details.clearance_definition;next.details.step=raw.details.step;
+ next.updated_at=typeof raw.updated_at==='string'?raw.updated_at:null;next.answers.location.selected='turbodash';next.answers.location.reviewed=true;return next;
+}
+let state=defaults(),storageAvailable=true,restored=false;
+try{const raw=localStorage.getItem(STORAGE);if(raw){state=validate(JSON.parse(raw));restored=true;}}catch(error){storageAvailable=false;}
+function selectedOption(q){return q.options.find(o=>o.id===state.answers[q.id].selected)||{label:'Discuss before implementation',detail:''};}
+function answerStatus(q){const a=state.answers[q.id];return q.fixed?'Agreed in conversation':!a.reviewed?(a.selected===q.recommended?'Unreviewed recommendation':'Unreviewed selection'):a.selected==='discuss'?'To discuss':'Reviewed';}
+function issues(){const result=[];for(const q of QUESTIONS){if(state.answers[q.id].selected==='discuss')result.push(q.title+' — discussion requested.');}
+ if(!state.details.case_reference.trim())result.push('Identify the starting case or the source of supplied dimensions.');
+ if(state.answers.baseline.selected!=='example'&&state.answers.baseline.selected!=='discuss'&&state.details.case_reference===EXAMPLE)result.push('Replace the example reference with the selected case or supplied dimensions.');
+ if(state.answers.tip.selected!=='shrouded'&&state.details.clearance_definition==='unresolved')result.push('Confirm the clearance distance direction when the selected case is open. The meanline symbol eps_a alone does not settle it.');
+ if(!state.details.thesis_location.trim())result.push('Record the preferred location for thesis-specific cases and drivers.');
+ return result;
+}
+function counts(){return {reviewed:QUESTIONS.filter(q=>state.answers[q.id].reviewed).length,open:QUESTIONS.filter(q=>state.answers[q.id].selected==='discuss').length};}
+function brief(){return {scope:'Complete impeller geometry first; meshing deferred.',implementation:'turbodash.geometry.impeller, imported from MastersThesis.',theory:'Deliver and maintain the theory note using (u, v); repeated local integration symbols are permitted.',reuse:'Reuse maintained code; nurbspy is optional and used only for an operation that actually needs it.',reversibility:'One physical impeller shared by compressor and turbine operation.',app_gate:'Geometry and export validation; no mesh prerequisite.'};}
+function snapshot(){return {...state,brief_revision:2,exported_at:new Date().toISOString(),brief:brief(),review_summary:{...counts(),unreviewed:QUESTIONS.length-counts().reviewed,open_details:issues()},question_catalog:QUESTIONS.map(q=>({id:q.id,question:q.title,recommended:q.recommended,selected_label:selectedOption(q).label,status:answerStatus(q)}))};}
+const clearanceLabels={unresolved:'Confirm before target-case geometry',source:'Use an explicitly documented source convention',casing_normal:'Shortest distance normal to the casing',axial:'Axial distance',radial:'Radial distance'};
+function markdown(){const c=counts();const lines=['# Impeller geometry — questionnaire answers','','Questionnaire version: 1','Exported: '+new Date().toISOString(),'','## Agreed task scope','','- Complete geometry first; mesh generation deferred.','- Implementation: turbodash.geometry.impeller, imported from MastersThesis.', '- Required theory note: use (u, v) for parameter-space coordinates; repeated local integration symbols are permitted.', '- Reuse maintained code; nurbspy is optional and requires a concrete need.','- One physical impeller for compressor and turbine operation.','- App work may follow geometry/export acceptance; no mesh gate.','','## Review status','',c.reviewed+' / '+QUESTIONS.length+' choices reviewed; '+(QUESTIONS.length-c.reviewed)+' unreviewed; '+c.open+' marked for discussion.','', 'Unreviewed selections are proposals, not approved design decisions.','','## Case and implementation details','','- Starting case or dimension source: '+state.details.case_reference,'- Thesis-specific location: '+state.details.thesis_location,'- Clearance definition: '+clearanceLabels[state.details.clearance_definition],'- Clearance value/source: '+state.details.clearance_source,'- STEP solid export in the first phase: '+(state.details.step?'Requested':'Not requested'),'- Additional outputs: '+(state.details.extra_outputs||'None specified')];
+ for(const [i,q] of QUESTIONS.entries()){const a=state.answers[q.id];lines.push('','## '+(i+1)+'. '+q.title,'','Status: **'+answerStatus(q)+'**','','Selected: '+selectedOption(q).label,'','Recommended: '+q.options.find(o=>o.id===q.recommended).label);if(a.notes.trim())lines.push('','Notes:',...a.notes.split('\n').map(l=>'> '+l));}
+ const pending=issues();if(pending.length)lines.push('','## Details still open','',...pending.map(x=>'- '+x));lines.push('','This is a design brief, not a validated geometry configuration. Exporting does not start implementation.','');return lines.join('\n');}
+function persist(){state.updated_at=new Date().toISOString();try{localStorage.setItem(STORAGE,JSON.stringify(state));storageAvailable=true;}catch(error){storageAvailable=false;}update();}
+function message(text){$('message').textContent=text;}
+function renderQuestion(q,index){const a=state.answers[q.id];const options=q.fixed?q.options.filter(o=>o.id===q.recommended):[...q.options,{id:'discuss',label:'Discuss before implementation',detail:''}];return `<article class="question" id="q-${q.id}" aria-labelledby="title-${q.id}"><div class="question-head"><div class="question-title"><span class="question-number">${String(index+1).padStart(2,'0')}</span><h3 id="title-${q.id}">${escapeHtml(q.title)}</h3></div><span class="badge" id="badge-${q.id}">Proposed</span></div><p class="why">${escapeHtml(q.why)}</p><fieldset class="choices"><legend class="sr-only">${escapeHtml(q.title)}</legend>${options.map(o=>`<label class="option ${o.id==='discuss'?'discuss-option':''}"><input type="radio" name="answer-${q.id}" value="${o.id}" ${q.fixed?'disabled':''} ${a.selected===o.id?'checked':''}><span class="option-text"><span class="option-title">${escapeHtml(o.label)}</span>${o.id===q.recommended?'<span class="recommend">'+(q.fixed?'Agreed in conversation':'Recommended')+'</span>':''}${o.detail?`<span class="option-desc">${escapeHtml(o.detail)}</span>`:''}</span></label>`).join('')}</fieldset>${extras(q.id)}${q.hint?`<p class="hint">${escapeHtml(q.hint)}</p>`:''}<div class="question-footer"><label class="review-check"><input type="checkbox" data-reviewed="${q.id}" ${q.fixed?'disabled':''} ${a.reviewed?'checked':''}>${q.fixed?'Recorded in our conversation':'I have reviewed this choice'}</label><details class="notes" ${a.notes?'open':''}><summary>Add requirements or a different proposal</summary><label for="notes-${q.id}">${escapeHtml(q.noteLabel||'Notes for this decision')}</label><textarea id="notes-${q.id}" data-notes="${q.id}" maxlength="12000" placeholder="Your requirements, dimensions, concerns or alternative…">${escapeHtml(a.notes)}</textarea></details></div></article>`;}
+function extras(id){if(id==='location')return `<details class="architecture" open><summary>Implementation package and related code</summary><div class="file-row"><strong>Turbodash</strong><div><code>turbodash/turbodash/geometry/impeller/</code><code>turbodash/turbodash/geometry/blade_parametrization/</code></div></div><div class="file-row"><strong>MastersThesis</strong><div>Case data, meanline adapter and study scripts.<br><code>Proposed: cfd/reversible/ + cfd/pipeline/parametrize.py</code></div></div><div class="file-row"><strong>Shared dependencies</strong><div>Reuse suitable mapping/CAD code from <code>method_of_characteristics/src/turbo_moc/</code>. Use <code>nurbspy</code> only if a specific operation needs it; it is not required by the core.</div></div><p class="hint">Paths are relative to git_projects. The impeller package location is agreed; internal modules and thesis driver paths can be refined. Meshing is deferred.</p></details><div class="detail-fields"><label>Preferred thesis case / driver location<input type="text" data-detail="thesis_location" value="${escapeHtml(state.details.thesis_location)}" maxlength="12000"></label></div>`;
+ if(id==='baseline')return `<div class="detail-fields"><label>Case path, candidate identifier or dimension source<input type="text" data-detail="case_reference" value="${escapeHtml(state.details.case_reference)}" maxlength="12000"></label><p class="field-help">The proposed example is a development starting point. It does not designate an adopted thesis optimum.</p></div>`;
+ if(id==='tip')return `<div class="detail-fields"><label>For an open tip: what does clearance measure?<select data-detail="clearance_definition">${Object.entries(clearanceLabels).map(([k,v])=>`<option value="${k}" ${state.details.clearance_definition===k?'selected':''}>${v}</option>`).join('')}</select></label><label>Clearance value, source or instruction<input type="text" data-detail="clearance_source" maxlength="12000" value="${escapeHtml(state.details.clearance_source)}"></label><p class="field-help">These details apply only to an open-tip construction. No clearance value is invented from this questionnaire.</p></div>`;
+ if(id==='delivery')return `<div class="detail-fields"><label class="checkline"><input type="checkbox" data-detail="step" ${state.details.step?'checked':''}><span>Also require <strong>STEP blade solids</strong> in the first phase.<br><span class="field-help">Adds CAD fitting, closure and reimport checks to the surface/curve exports.</span></span></label><label>Other required formats or acceptance criteria<input type="text" data-detail="extra_outputs" maxlength="12000" value="${escapeHtml(state.details.extra_outputs)}" placeholder="For example: full-row STEP assembly, separate side patches, parameter sweeps…"></label></div>`;return '';}
+const diagrams={
+scope:`<figure class="figure"><svg viewBox="0 0 440 200" role="img" aria-labelledby="tip-svg-title"><title id="tip-svg-title">Open blade tips leave a clearance to the casing; shrouded blades meet a cover.</title><path d="M20 51H197 M243 51H420" fill="none" stroke="#a95121" stroke-width="5"/><path d="M20 159H197 M243 159H420" fill="none" stroke="#172d3b" stroke-width="6"/><path d="M66 158L83 76H106L90 158 M123 158L140 76H163L147 158" fill="#12685c" opacity=".9"/><path d="M285 158L305 52H328L309 158 M344 158L364 52H387L367 158" fill="#12685c" opacity=".9"/><path d="M177 53V74 M171 56L177 52L183 56 M171 71L177 76L183 71" fill="none" stroke="#172d3b" stroke-width="1.4"/><text x="25" y="29">Open impeller</text><text x="248" y="29">Shrouded impeller</text><text x="29" y="185">Hub</text><text x="168" y="97">Gap</text><text x="250" y="185">Hub</text><text x="365" y="42">Cover</text></svg><figcaption class="caption"><h3>The casing and the blade tip are distinct.</h3><p>For an open impeller, the blade stops short of the casing. A shrouded blade meets its cover. The first geometry must express the construction and clearance direction you intend.</p><span class="figure-tag">Schematic · dimensions unspecified</span></figcaption></figure>`,
+channel:`<figure class="figure"><svg viewBox="0 0 370 230" role="img" aria-labelledby="channel-svg-title"><title id="channel-svg-title">Meridional view with independently curved hub and shroud, an axial eye, radial rim and swept leading edge.</title><path d="M45 183C155 183 231 178 231 44L171 44C171 106 132 108 45 108Z" fill="#d2e6dc"/><path d="M45 183C155 183 231 178 231 44" fill="none" stroke="#172d3b" stroke-width="3"/><path d="M45 108C132 108 171 106 171 44" fill="none" stroke="#a95121" stroke-width="3"/><path d="M60 108Q90 141 104 183" fill="none" stroke="#12685c" stroke-width="3" stroke-dasharray="5 4"/><path d="M171 54H231" fill="none" stroke="#12685c" stroke-width="3"/><path d="M18 208H82 M18 208V151" fill="none" stroke="#6a7d82" stroke-width="1.3"/><text x="84" y="212">z</text><text x="9" y="145">r</text><text x="44" y="92">Shroud</text><text x="239" y="146">Hub</text><text x="160" y="26">Radial rim</text><text x="12" y="131">Eye</text><text x="108" y="212">Swept eye-side edge</text><path d="M124 196L103 179" fill="none" stroke="#6a7d82"/><text x="247" y="58">Rim-side edge</text><path d="M242 55H232" fill="none" stroke="#6a7d82"/></svg><figcaption class="caption"><h3>Wall shape and blade extent are separate controls.</h3><p>Hub and shroud turn the flow path from axial to radial. Edge placement trims the blade within that channel. Meridional sweep changes the edge position in this view; circumferential stacking is a separate choice.</p><span class="figure-tag">Meridional section · z axial, r radial</span></figcaption></figure>`,
+shape:`<figure class="figure"><svg viewBox="0 0 410 220" role="img" aria-labelledby="shape-svg-title"><title id="shape-svg-title">Developed view of hub, middle and shroud section camberlines with aligned eye-side reference points and independently shaped paths.</title><path d="M78 30V181" fill="none" stroke="#8ba19d" stroke-dasharray="4 4"/><path d="M78 55C155 55 168 25 260 39 M78 111C139 111 185 81 282 96 M78 171C140 171 193 127 309 151" fill="none" stroke="#12685c" stroke-width="3"/><circle cx="78" cy="55" r="4" fill="#172d3b"/><circle cx="78" cy="111" r="4" fill="#172d3b"/><circle cx="78" cy="171" r="4" fill="#172d3b"/><text x="6" y="59">Shroud</text><text x="6" y="115">Middle</text><text x="6" y="175">Hub</text><text x="67" y="205">Eye-side alignment</text><text x="273" y="34">Rim follows</text><text x="273" y="49">the angle law</text></svg><figcaption class="caption"><h3>Stacking sets the relative azimuth of sections.</h3><p>The angle law determines each section's wrap. Aligning one reference edge fixes its circumferential position. Prescribing both edge positions also requires adjusting the angle law to satisfy the total wrap.</p><span class="figure-tag">Developed section sketch · curves offset for readability</span></figcaption></figure>`};
+function render(){
+ $('chapters').innerHTML=GROUPS.map(g=>`<section class="chapter" id="${g.id}" aria-labelledby="chapter-${g.id}"><div class="chapter-heading"><span class="chapter-index">${String(GROUPS.indexOf(g)+1).padStart(2,'0')}</span><h2 id="chapter-${g.id}">${g.title}</h2></div><p class="chapter-description">${g.description}</p>${diagrams[g.id]||''}${QUESTIONS.filter(q=>q.group===g.id).map(q=>renderQuestion(q,QUESTIONS.indexOf(q))).join('')}</section>`).join('');update();
+}
+function update(){const c=counts();$('progress').value=c.reviewed;$('progress').max=QUESTIONS.length;$('progress-label').textContent=c.reviewed+' / '+QUESTIONS.length;$('count-reviewed').textContent=c.reviewed;$('count-defaults').textContent=QUESTIONS.length-c.reviewed;$('count-open').textContent=c.open;
+ for(const q of QUESTIONS){const a=state.answers[q.id],badge=$('badge-'+q.id);if(!badge)continue;badge.textContent=q.fixed?'Agreed':!a.reviewed?'Proposed':a.selected==='discuss'?'To discuss':'Reviewed';badge.className='badge'+(a.reviewed?(a.selected==='discuss'?' discuss':' reviewed'):'');document.querySelector('[data-reviewed="'+q.id+'"]').checked=a.reviewed;}
+ const rows=$('review-rows');rows.replaceChildren();for(const q of QUESTIONS){const a=state.answers[q.id],tr=document.createElement('tr'),label=document.createElement('td'),value=document.createElement('td'),status=document.createElement('td'),link=document.createElement('a');link.href='#q-'+q.id;link.textContent=q.title;label.append(link);value.textContent=selectedOption(q).label;if(a.notes.trim()){const note=document.createElement('div');note.className='answer-note';note.textContent=a.notes;value.append(note);}const tag=document.createElement('span');tag.className='badge'+(a.reviewed?(a.selected==='discuss'?' discuss':' reviewed'):'');tag.textContent=q.fixed?'Agreed':!a.reviewed?'Unreviewed':a.selected==='discuss'?'Discuss':'Reviewed';status.append(tag);tr.append(label,value,status);rows.append(tr);}
+ const pending=issues();$('issues').hidden=pending.length===0;$('issue-list').replaceChildren(...pending.map(x=>{const li=document.createElement('li');li.textContent=x;return li;}));$('markdown-preview').value=markdown();$('print-details').textContent='Starting case: '+state.details.case_reference+'\nThesis location: '+state.details.thesis_location+'\nClearance: '+clearanceLabels[state.details.clearance_definition]+' — '+state.details.clearance_source+'\nSTEP solids requested: '+(state.details.step?'Yes':'No')+'\nOther outputs: '+(state.details.extra_outputs||'None specified');
+ $('save-status').textContent=!storageAvailable?'Browser storage is unavailable. Export your answers before closing.':state.updated_at?'Saved in this browser · '+new Date(state.updated_at).toLocaleTimeString('en-GB',{timeZone:'Europe/Paris',hour:'2-digit',minute:'2-digit'})+' Paris time':restored?'Draft restored in this browser.':'Draft stays in this browser. Export to keep a portable copy.';
+}
+$('chapters').addEventListener('change',event=>{const el=event.target;if(el.matches('input[type=radio]')){const id=el.name.slice(7);state.answers[id].selected=el.value;state.answers[id].reviewed=true;persist();}else if(el.dataset.reviewed){state.answers[el.dataset.reviewed].reviewed=el.checked;persist();}else if(el.dataset.detail){state.details[el.dataset.detail]=el.type==='checkbox'?el.checked:el.value;persist();}});
+$('chapters').addEventListener('input',event=>{const el=event.target;if(el.dataset.notes){state.answers[el.dataset.notes].notes=el.value;persist();}else if(el.dataset.detail&&el.type!=='checkbox'&&el.tagName!=='SELECT'){state.details[el.dataset.detail]=el.value;persist();}});
+function download(text,name,type){const blob=new Blob([text],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);message('Download prepared. Your browser controls where the file is saved.');}
+$('export-json').addEventListener('click',()=>download(JSON.stringify(snapshot(),null,2)+'\n','impeller-geometry-answers.json','application/json'));
+$('export-md').addEventListener('click',()=>download(markdown(),'impeller-geometry-answers.md','text/markdown;charset=utf-8'));
+$('copy-md').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(markdown());message('Summary copied. Paste it into our conversation.');}catch(error){$('markdown-preview').closest('details').open=true;$('markdown-preview').focus();$('markdown-preview').select();message('Select and copy the summary below with Ctrl+C (or Command+C).');}});
+$('print').addEventListener('click',()=>window.print());
+$('accept-defaults').addEventListener('click',()=>{for(const q of QUESTIONS)if(!state.answers[q.id].reviewed){state.answers[q.id].selected=q.recommended;state.answers[q.id].reviewed=true;}persist();render();message('Unreviewed recommendations accepted. Existing reviewed choices and all notes were retained.');});
+$('reset-open').addEventListener('click',()=>$('reset-dialog').showModal());$('reset-cancel').addEventListener('click',()=>$('reset-dialog').close());$('reset-confirm').addEventListener('click',()=>{state=defaults();persist();render();$('reset-dialog').close();message('Draft reset; the agreed implementation location was retained.');});
+$('import-button').addEventListener('click',()=>$('import-file').click());$('import-file').addEventListener('change',async event=>{const file=event.target.files[0];if(!file)return;try{if(file.size>400000)throw new Error('This file is larger than a questionnaire answer file should be (400 KB limit).');const candidate=validate(JSON.parse(await file.text()));state=candidate;persist();render();message('Saved answers loaded. Review status and notes were restored.');$('review').scrollIntoView();}catch(error){message('Could not load answers: '+error.message+' Your current draft is unchanged.');$('review').scrollIntoView();}finally{event.target.value='';}});
+render();
+})();
+</script>
+</body>
+</html>

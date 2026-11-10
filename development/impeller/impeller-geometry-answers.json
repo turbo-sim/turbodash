@@ -1,0 +1,197 @@
+{
+  "format": "impeller-geometry-questionnaire-v1",
+  "updated_at": "2026-11-10T11:54:24.309Z",
+  "answers": {
+    "location": {
+      "selected": "turbodash",
+      "reviewed": true,
+      "notes": ""
+    },
+    "baseline": {
+      "selected": "example",
+      "reviewed": true,
+      "notes": ""
+    },
+    "scope": {
+      "selected": "aerodynamic",
+      "reviewed": true,
+      "notes": "Assume shrouded machine, no need to model tip gap"
+    },
+    "tip": {
+      "selected": "shrouded",
+      "reviewed": true,
+      "notes": ""
+    },
+    "splitters": {
+      "selected": "main_only",
+      "reviewed": true,
+      "notes": ""
+    },
+    "walls": {
+      "selected": "existing",
+      "reviewed": true,
+      "notes": ""
+    },
+    "edges": {
+      "selected": "independent",
+      "reviewed": true,
+      "notes": ""
+    },
+    "sections": {
+      "selected": "two_optional",
+      "reviewed": true,
+      "notes": ""
+    },
+    "angles": {
+      "selected": "existing",
+      "reviewed": true,
+      "notes": ""
+    },
+    "stacking": {
+      "selected": "leading",
+      "reviewed": true,
+      "notes": "This is an important aspect. You can proceed with it in the first implementation, but you should discuss in a note the pros/cons of the different options an dthe implementation complexity."
+    },
+    "interpolation": {
+      "selected": "stream_surfaces",
+      "reviewed": true,
+      "notes": ""
+    },
+    "thickness": {
+      "selected": "paired",
+      "reviewed": true,
+      "notes": "You can implement what oyu think is more suitable, but please do not use complex iterative calculations in the blade parametrization. I want a clean explicit once-through parametrization if possilbe"
+    },
+    "edge_shape": {
+      "selected": "both_round",
+      "reviewed": true,
+      "notes": "We do not need cutoff shapes for the parametrization trailing edge. Is is fine to have both rounded"
+    },
+    "delivery": {
+      "selected": "scripts_first",
+      "reviewed": true,
+      "notes": ""
+    }
+  },
+  "details": {
+    "case_reference": "MastersThesis/meanline/examples/example_reversible.yaml",
+    "thesis_location": "Actually, I prefer that you work in a directory in turbodash/development/impeller. In this directory you can make a compy of a yaml configuration file with the geometry inputs for the parametrization obtained from the output file of the master thesis meanline code. I think this can work well",
+    "clearance_definition": "unresolved",
+    "clearance_source": "Use the selected case; confirm the distance direction before interpreting eps_a.",
+    "step": false,
+    "extra_outputs": "Please, also prepare a markdown  document with the next steps of things that should be impleented, or things that should be imporved based on the outcomes of what you implemented."
+  },
+  "exported_at": "2026-11-10T11:54:40.352Z",
+  "brief": {
+    "scope": "Complete impeller geometry first; meshing deferred.",
+    "reuse": "Reuse maintained Turbodash, TurboMoC and nurbspy implementations.",
+    "reversibility": "One physical impeller shared by compressor and turbine operation.",
+    "app_gate": "Geometry and export validation; no mesh prerequisite."
+  },
+  "review_summary": {
+    "reviewed": 14,
+    "open": 0,
+    "unreviewed": 0,
+    "open_details": []
+  },
+  "question_catalog": [
+    {
+      "id": "location",
+      "question": "Where should the reusable implementation live?",
+      "recommended": "turbodash",
+      "selected_label": "Turbodash library + thesis drivers",
+      "status": "Reviewed"
+    },
+    {
+      "id": "baseline",
+      "question": "Which machine should seed the geometry?",
+      "recommended": "example",
+      "selected_label": "Committed reversible example",
+      "status": "Reviewed"
+    },
+    {
+      "id": "scope",
+      "question": "What should complete geometry include?",
+      "recommended": "aerodynamic",
+      "selected_label": "Complete aerodynamic geometry",
+      "status": "Reviewed"
+    },
+    {
+      "id": "tip",
+      "question": "How should the blade tip meet the outer wall?",
+      "recommended": "case",
+      "selected_label": "Shrouded impeller",
+      "status": "Reviewed"
+    },
+    {
+      "id": "splitters",
+      "question": "Are splitters needed in the first version?",
+      "recommended": "main_only",
+      "selected_label": "Main blades first",
+      "status": "Reviewed"
+    },
+    {
+      "id": "walls",
+      "question": "How should hub and shroud curves be controlled?",
+      "recommended": "existing",
+      "selected_label": "Reuse all existing wall controls",
+      "status": "Reviewed"
+    },
+    {
+      "id": "edges",
+      "question": "How freely should blade edges move in the channel?",
+      "recommended": "independent",
+      "selected_label": "Independent endpoints and edge bow",
+      "status": "Reviewed"
+    },
+    {
+      "id": "sections",
+      "question": "How many sections need independent controls?",
+      "recommended": "two_optional",
+      "selected_label": "Hub and shroud; optional middle",
+      "status": "Reviewed"
+    },
+    {
+      "id": "angles",
+      "question": "Which angle distributions are needed initially?",
+      "recommended": "existing",
+      "selected_label": "Existing turning controls",
+      "status": "Reviewed"
+    },
+    {
+      "id": "stacking",
+      "question": "How should sections align circumferentially?",
+      "recommended": "leading",
+      "selected_label": "Align leading edges initially",
+      "status": "Reviewed"
+    },
+    {
+      "id": "interpolation",
+      "question": "How should the surface connect the sections?",
+      "recommended": "stream_surfaces",
+      "selected_label": "Follow curved stream surfaces",
+      "status": "Reviewed"
+    },
+    {
+      "id": "thickness",
+      "question": "What should dimensional thickness mean?",
+      "recommended": "paired",
+      "selected_label": "Physical paired-side distance",
+      "status": "Reviewed"
+    },
+    {
+      "id": "edge_shape",
+      "question": "Which eye-side and rim-side edge shapes are required?",
+      "recommended": "cutoff",
+      "selected_label": "Rounded at both ends",
+      "status": "Reviewed"
+    },
+    {
+      "id": "delivery",
+      "question": "When should an interactive interface be added?",
+      "recommended": "scripts_first",
+      "selected_label": "Scripts and exports first",
+      "status": "Reviewed"
+    }
+  ]
+}

@@ -10,6 +10,7 @@ apps/
     app_turbine_optimization/    # Optimization app, panel, model, jobs, assets
     app_stage/                   # Constant-loss stage calculator
     app_stage_efficiency/        # Dimensionless efficiency explorer
+    app_impeller/                # Curved-channel impeller geometry workbench
     shared/                      # Startup, launchers, mesh jobs, panels, assets
 ```
 
@@ -27,12 +28,15 @@ target `turbodash.apps.app_<name>.app:server`.
 | Experimental workspace with optimization | `turbodash.apps.app_turbine_optimization` | `app_turbine_optimization` or `turbodash-optimization` | Uses the current design or an uploaded YAML case |
 | Original constant-loss stage calculator | `turbodash.apps.app_stage` | `app_stage` or `turbodash-stage` | [Runner](../../demos/apps/stage/run.py), [case](../../demos/apps/stage/case.yaml) |
 | Dimensionless stage efficiency explorer | `turbodash.apps.app_stage_efficiency` | `app_stage_efficiency` | [Runner](../../demos/apps/stage_efficiency/run.py), [case](../../demos/apps/stage_efficiency/case.yaml) |
+| Centrifugal impeller geometry | `turbodash.apps.app_impeller` | `turbodash-impeller` | [Workflow](../../development/impeller/README.md), [case](../../development/impeller/examples/reversible_impeller_zero_rake.yaml) |
+
+The impeller app uses a factory: `from turbodash.apps.app_impeller.app import create_app`; then `app = create_app(config)` and `server = app.server` for an embedding or WSGI deployment. Its default local port is 8052; `--config`, `--host`, `--port` and `--open-browser` are supported. The default case is read from the development checkout; installed deployments can supply an explicit configuration. The native draggable wall editor uses the companion nurbspy checkout, while all impeller geometry evaluation remains in Turbodash.
 
 The existing `turbodash.launch_app_turbine()`, `launch_app_experimental()` and
 `launch_app_stage()` helpers still open the selected app with their original
 browser/reloader behavior. The console commands run with `debug=False`.
 
-All five apps support an optional `--open-browser` flag. After registering the
+All apps support an optional `--open-browser` flag. After registering the
 commands with `poetry install --only-root`, run any of these from the repository
 root:
 

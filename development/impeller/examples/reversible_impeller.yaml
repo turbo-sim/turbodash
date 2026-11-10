@@ -1,0 +1,167 @@
+# Editable geometry seed from the selected reversible meanline example.
+# Source output, geometry overrides and assumed shaping controls are recorded below.
+schema_version: 1
+name: reversible_example_shrouded_impeller
+source:
+  source_repository: MastersThesis
+  source_case: meanline/examples/example_reversible.yaml
+  source_commit: 255e66949184cafc4767c1eec3e92d93ac85e0b6
+  source_worktree_clean: true
+  source_worktree_status: ''
+  source_sha256:
+    meanline/examples/example_reversible.yaml: f663ac6006f646a6bfde5f1ebf2470fe5d3c0535917022d47c965570fa5ba0d9
+    meanline/reversible_machine/configuration.py: 69d12dc9d0b1c86bc8e0853aacef9398da39368ddea8052a2d11798f577b6a7a
+    meanline/reversible_machine/design.py: 7cb56dc5247ddc0edb9531cd316a89ba2d9b7de5569072fa5d5e8d1e694f07b5
+    meanline/centrifugal_compressor/configuration.py: a59d4939c90b860b1a944b8b8e5ee844a07587cf3f10c02eafd41db5e46cc708
+    meanline/centrifugal_compressor/design.py: 30f14562e13bb3fc7039db6405b72074a8e317066331de753191f987fa7e0648
+    meanline/centrifugal_compressor/geometry.py: ef91f07d3f65cc07953ae32b4c490a56a91a332e2973346454c8483849553838
+    meanline/centrifugal_compressor/fluids.py: b400dcaa0122617e66f8067855cb8a9bdafea98956db8cbb11cc2a736317f866
+    meanline/requirements-meanline.txt: d6351860c62963b9d33129836c3690d126b530fb634eaa973b2a404d2fa25ed7
+  evaluation_utc: '2026-11-10T12:04:41.006520+00:00'
+  evaluation: reversible_machine.design.evaluate_design at each design_variables.*.value
+  optimized: false
+  adopted_thesis_design: false
+  runtime:
+    python: 3.13.2
+    numpy: 2.4.4
+    scipy: 1.17.1
+    CoolProp: 7.2.0
+    jaxprop: 0.5.8
+    PyYAML: 6.0.3
+  reproduce_from_turbodash: python development/impeller/export_meanline_example.py
+    --thesis-root ../MastersThesis --output-dir development/impeller/examples --overwrite
+  evaluation_status:
+    flag: 0
+    compressor_flag: 0
+    turbine_flag: 0
+    finite_performance: true
+    constraint_targets_satisfied: false
+    constraint_screen_absolute_tolerance: 1.0e-06
+    violated_constraints:
+    - variable: compressor_beta_tt
+      relation: '='
+      target: 2.6
+      actual: 2.5880645173772865
+    - variable: turbine_beta_tt
+      relation: '='
+      target: 3.29
+      actual: 2.6841233750040097
+    note: This is a starting design; the simple absolute constraint screen is in each
+      reported quantity's units, not an optimizer acceptance check.
+  result_file: source_meanline_result.json
+  result_sha256: 9f93eb4f74c1f120e7fcf51c1f60ad4ee20d8f2cbe21e8256c2f2abe41d0c91c
+  meanline_geometry:
+    D_1_h: 0.1911299999446609
+    D_1_s: 0.41500693987984033
+    D_2: 0.6370999998155363
+    b_2: 0.028178932991841172
+    L_z: 0.12513599646376858
+    beta_1b_h: -32.64557397044923
+    beta_1b_s: -54.28854563123154
+    beta_2b: -27.43
+    t_b_1: 0.0031854999990776818
+    t_b_2: 0.0031854999990776818
+    Z_r_full: 20.0
+    beta_1b: -47.28
+    eps_a: 0.0005635786598368234
+    eps_r: 0.0005635786598368234
+    eps_b: 0.0005635786598368234
+    Z_r_split: 0.0
+    is_shrouded: false
+  geometry_overrides:
+    shrouded: true
+    modeled_tip_gap_m: 0.0
+    performance_recomputed: false
+    reason: 'Approved geometry brief: shrouded impeller with no modeled tip gap.'
+  shape_assumptions:
+    walls: Independent polynomial walls; axial inlet, radial outlet; tangent fractions
+      0.45, zero bow.
+    blade_footprint: Both edges at the channel endpoints; zero edge bow.
+    maximum_thickness: 2 * max(t_b_1, t_b_2); a geometric starting choice, not a meanline
+      output.
+    edge_thickness: t_b_1 and t_b_2 seed unrounded body scales; the rounded tips have
+      zero paired thickness.
+    spanwise_thickness: Initially equal hub/shroud inputs; independently editable.
+    angle_distribution: Production monotone turning law; location 0.5, concentration
+      1.2.
+    inlet_interpolation: Linear interpolation of tangent of inlet angle against actual
+      leading-edge radius.
+    stacking: Aligned leading edges, zero circumferential offsets.
+dimensions:
+  inlet_hub_radius: 0.09556499997233045
+  inlet_shroud_radius: 0.20750346993992017
+  outlet_radius: 0.31854999990776817
+  outlet_width: 0.028178932991841172
+  axial_length: 0.11104652996784799
+  inlet_flow_angle_deg: 0.0
+  outlet_flow_angle_deg: 90.0
+hub:
+  inlet_angle_deg: 0.0
+  outlet_angle_deg: 90.0
+  inlet_tangent_fraction: 0.45
+  outlet_tangent_fraction: 0.45
+  bow: 0.0
+shroud:
+  inlet_angle_deg: 0.0
+  outlet_angle_deg: 90.0
+  inlet_tangent_fraction: 0.45
+  outlet_tangent_fraction: 0.45
+  bow: 0.0
+control_point_displacements: {}
+blade_edges:
+  leading_hub: 0.0
+  leading_shroud: 0.0
+  trailing_hub: 1.0
+  trailing_shroud: 1.0
+  leading_bow: 0.0
+  trailing_bow: 0.0
+blade_count: 20
+sections:
+- v: 0.0
+  camberline:
+    inlet_metal_angle_deg: -32.64557397044923
+    outlet_metal_angle_deg: -27.43
+    interpolation: angle
+    turning_location: 0.5
+    turning_concentration: 1.2
+  thickness:
+    maximum_thickness_m: 0.0063709999981553635
+    leading_edge_thickness_m: 0.0031854999990776818
+    trailing_edge_thickness_m: 0.0031854999990776818
+    maximum_thickness_location: 0.3
+    leading_edge_fraction: 0.08
+    trailing_edge_fraction: 0.08
+    leading_edge_rounding_exponent: 3.0
+    trailing_edge_rounding_exponent: 3.0
+    shape_exponent: 2.0
+    leading_edge_fullness: 0.0
+    trailing_edge_fullness: 0.0
+  stacking_offset_deg: 0.0
+- v: 1.0
+  camberline:
+    inlet_metal_angle_deg: -54.28854563123154
+    outlet_metal_angle_deg: -27.43
+    interpolation: angle
+    turning_location: 0.5
+    turning_concentration: 1.2
+  thickness:
+    maximum_thickness_m: 0.0063709999981553635
+    leading_edge_thickness_m: 0.0031854999990776818
+    trailing_edge_thickness_m: 0.0031854999990776818
+    maximum_thickness_location: 0.3
+    leading_edge_fraction: 0.08
+    trailing_edge_fraction: 0.08
+    leading_edge_rounding_exponent: 3.0
+    trailing_edge_rounding_exponent: 3.0
+    shape_exponent: 2.0
+    leading_edge_fullness: 0.0
+    trailing_edge_fullness: 0.0
+  stacking_offset_deg: 0.0
+inlet_interpolation: tangent_radius
+construction:
+  shrouded: true
+  splitters: false
+numerics:
+  streamwise_points: 161
+  spanwise_points: 17
+  integration_points: 2001

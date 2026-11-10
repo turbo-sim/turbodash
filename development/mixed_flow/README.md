@@ -155,6 +155,9 @@ The GIF needs only the project's existing Matplotlib/Pillow environment.
 
 ## Read and run
 
+- [Geometry design questionnaire](../impeller/impeller_geometry_questionnaire.html): records the geometry choices and exports answers as JSON or Markdown. The implementation location in `turbodash.geometry.impeller` is recorded; meshing is deferred.
+- [Complete impeller assessment and implementation plan](../impeller/impeller_implementation_plan.md)
+- [Impeller geometry theory note](../impeller/impeller_geometry_theory.md): derivation using $(u,v)$, maintained alongside the implementation.
 - [Parameterization, equations, defaults, and limitations](parametrization.md)
 - [Romei findings and recommended design checks](romei_design_guidelines.md)
 - [Six geometry sensitivity examples](assets/parameter_sweep.svg)
@@ -216,13 +219,20 @@ hub_bspline = channel.hub.as_bspline()  # exact SciPy B-spline, parameter u in [
 
 ## Files and scope
 
+The canonical meridional implementation now lives in
+[`turbodash.geometry.impeller.meridional`](../../turbodash/geometry/impeller/meridional/).
+The modules in this folder's [`meridional/`](meridional/) directory re-export
+that implementation for compatibility with the existing explorer, scripts and
+imports. New reusable code should import the package directly; the geometry
+kernel is maintained in one place.
+
 | Location | Purpose |
 | --- | --- |
-| [meridional/parameters.py](meridional/parameters.py) | Meanline station dimensions, inclination, area adapters, wall engineering inputs |
-| [meridional/curves.py](meridional/curves.py) | Smooth walls, arclength mapping, derivatives, curvature, exact B-spline export |
-| [meridional/channel.py](meridional/channel.py) | Hub/shroud interpolation, geometry screening, areas |
-| [meridional/editing.py](meridional/editing.py) | Sparse total wall offsets, protected points, and baseline scaling |
-| [meridional/blades.py](meridional/blades.py) | Separate main-blade and splitter meridional extents |
+| [meridional/parameters.py](../../turbodash/geometry/impeller/meridional/parameters.py) | Meanline station dimensions, inclination, area adapters, wall engineering inputs |
+| [meridional/curves.py](../../turbodash/geometry/impeller/meridional/curves.py) | Smooth walls, arclength mapping, derivatives, curvature, exact B-spline export |
+| [meridional/channel.py](../../turbodash/geometry/impeller/meridional/channel.py) | Hub/shroud interpolation, geometry screening, areas |
+| [meridional/editing.py](../../turbodash/geometry/impeller/meridional/editing.py) | Sparse total wall offsets, protected points, and baseline scaling |
+| [meridional/blades.py](../../turbodash/geometry/impeller/meridional/blades.py) | Separate main-blade and splitter meridional extents |
 | [explorer/app.py](explorer/app.py) | Local Dash interface and callback handling |
 | [explorer/model.py](explorer/model.py) | YAML persistence, engineering controls, and display-unit conversions |
 | [explorer/plots.py](explorer/plots.py) | Interactive geometry and diagnostic figures |
@@ -232,11 +242,13 @@ hub_bspline = channel.hub.as_bspline()  # exact SciPy B-spline, parameter u in [
 | [tests/test_meridional.py](tests/test_meridional.py) | Geometry invariants and invalid-input checks |
 | [tests/test_explorer.py](tests/test_explorer.py) | YAML, units, presets, inheritance, and app contracts |
 
-This is a development geometry package. It is not connected to the production
-Turbodash app or its turbine solver. It defines a **2-D meridional blade extent**;
-circumferential camber, metal angle, thickness, blade count, lean/rake, and tip
-clearance remain separate future layers. Area diagnostics exclude blockage and
-do not determine the blade throat, choking, surge, or efficiency.
+This explorer remains a development interface, separate from the production
+Turbodash app and its turbine solver. It defines a **2-D meridional blade extent**.
+The [impeller workflow](../impeller/README.md) adds span-dependent metal angle,
+camber, thickness, stacking and repeated shrouded main blades to the shared
+channel kernel. Tip clearance, splitters in 3-D, and volume meshing remain
+outside that first geometry implementation. Area diagnostics here exclude
+blockage and do not determine the blade throat, choking, surge, or efficiency.
 
 Regenerate the tracked documentation figures with:
 
